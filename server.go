@@ -14,17 +14,23 @@ type Server struct {
 }
 
 type ServerProperties struct {
-	ObjectUuid      string          `json:"object_uuid"`
-	Name            string          `json:"name"`
-	Memory          int             `json:"memory"`
-	Cores           int             `json:"cores"`
-	HardwareProfile string          `json:"hardware_profile"`
-	Status          string          `json:"status"`
-	LocationUuid    string          `json:"location_uuid"`
-	Power           bool            `json:"power"`
-	CurrentPrice    float64         `json:"current_price"`
-	Labels          []string        `json:"labels"`
-	Relations       ServerRelations `json:"relations"`
+	ObjectUuid           string          `json:"object_uuid"`
+	Name                 string          `json:"name"`
+	Memory               int             `json:"memory"`
+	Cores                int             `json:"cores"`
+	HardwareProfile      string          `json:"hardware_profile"`
+	Status               string          `json:"status"`
+	LocationUuid         string          `json:"location_uuid"`
+	Power                bool            `json:"power"`
+	CurrentPrice         float64         `json:"current_price"`
+	AvailablityZone      string          `json:"availability_zone"`
+	AutoRecovery         bool            `json:"auto_recovery"`
+	Legacy               bool            `json:"legacy"`
+	ConsoleToken         string          `json:"console_token"`
+	UsageInMinutesMemory int             `json:"usage_in_minutes_memory"`
+	UsageInMinutesCores  int             `json:"usage_in_minutes_cores"`
+	Labels               []string        `json:"labels"`
+	Relations            ServerRelations `json:"relations"`
 }
 
 type ServerRelations struct {
@@ -58,13 +64,17 @@ type ServerCreateRequest struct {
 	Cores           int             `json:"cores"`
 	LocationUuid    string          `json:"location_uuid"`
 	HardwareProfile string          `json:"hardware_profile,omitempty"`
+	AvailablityZone string          `json:"availability_zone,omitempty"`
 	Labels          []interface{}   `json:"labels,omitempty"`
 	Relations       ServerRelations `json:"relations,omitempty"`
 }
 
 type ServerUpdateRequest struct {
-	Name   string        `json:"name,omitempty"`
-	Labels []interface{} `json:"labels"`
+	Name            string        `json:"name,omitempty"`
+	AvailablityZone string        `json:"availability_zone,omitempty"`
+	Memory          int           `json:"memory,omitempty"`
+	Cores           int           `json:"cores,omitempty"`
+	Labels          []interface{} `json:"labels"`
 }
 
 func (c *Client) GetServer(id string) (*Server, error) {
