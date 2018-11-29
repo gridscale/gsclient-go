@@ -2,7 +2,6 @@ package gsclient
 
 import (
 	"fmt"
-	"log"
 )
 
 type Networks struct {
@@ -71,12 +70,8 @@ func (c *Client) GetNetwork(id string) (*Network, error) {
 		uri:    apiNetworkBase + "/" + id,
 		method: "GET",
 	}
-	log.Printf("%v", r)
-
 	response := new(Network)
 	err := r.execute(*c, &response)
-
-	log.Printf("Received network: %v", response)
 
 	return response, err
 }
@@ -123,7 +118,6 @@ func (c *Client) GetNetworkList() ([]Network, error) {
 		uri:    apiNetworkBase,
 		method: "GET",
 	}
-	log.Printf("%v", r)
 
 	response := new(Networks)
 	err := r.execute(*c, &response)

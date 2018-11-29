@@ -2,7 +2,6 @@ package gsclient
 
 import (
 	"fmt"
-	"log"
 )
 
 type Templates struct {
@@ -30,8 +29,6 @@ func (c *Client) GetTemplate(id string) (*Template, error) {
 
 	response := new(Template)
 	err := r.execute(*c, &response)
-
-	log.Printf("Received sshkey: %v", response)
 
 	return response, err
 }

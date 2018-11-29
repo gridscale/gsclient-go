@@ -1,9 +1,5 @@
 package gsclient
 
-import (
-	"log"
-)
-
 type Ips struct {
 	List map[string]IpProperties `json:"ips"`
 }
@@ -85,8 +81,6 @@ func (c *Client) GetIp(id string) (*Ip, error) {
 	response := new(Ip)
 	err := r.execute(*c, &response)
 
-	log.Printf("Received ip: %v", response)
-
 	return response, err
 }
 
@@ -98,8 +92,6 @@ func (c *Client) GetIpList() (*Ips, error) {
 
 	response := new(Ips)
 	err := r.execute(*c, &response)
-
-	log.Printf("Received ips: %v", response)
 
 	return response, err
 }

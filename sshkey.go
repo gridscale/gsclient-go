@@ -1,9 +1,5 @@
 package gsclient
 
-import (
-	"log"
-)
-
 type Sshkeys struct {
 	List map[string]SshkeyProperties `json:"sshkeys"`
 }
@@ -43,8 +39,6 @@ func (c *Client) GetSshkey(id string) (*Sshkey, error) {
 	response := new(Sshkey)
 	err := r.execute(*c, &response)
 
-	log.Printf("Received sshkey: %v", response)
-
 	return response, err
 }
 
@@ -56,8 +50,6 @@ func (c *Client) GetSshkeyList() (*Sshkeys, error) {
 
 	response := new(Sshkeys)
 	err := r.execute(*c, &response)
-
-	log.Printf("Received sshkeys: %v", response)
 
 	return response, err
 }

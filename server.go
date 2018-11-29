@@ -2,7 +2,6 @@ package gsclient
 
 import (
 	"fmt"
-	"log"
 )
 
 type Servers struct {
@@ -86,7 +85,6 @@ func (c *Client) GetServer(id string) (*Server, error) {
 		uri:    apiServerBase + "/" + id,
 		method: "GET",
 	}
-	log.Printf("%v", r)
 
 	response := new(Server)
 	err := r.execute(*c, &response)
@@ -99,7 +97,6 @@ func (c *Client) GetServerList() ([]Server, error) {
 		uri:    apiServerBase,
 		method: "GET",
 	}
-	log.Printf("%v", r)
 
 	response := new(Servers)
 	err := r.execute(*c, &response)
