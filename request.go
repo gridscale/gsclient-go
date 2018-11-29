@@ -43,7 +43,7 @@ func (r RequestError) Error() string {
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *Request) execute(c Client, output interface{}) error {
 	url := c.cfg.APIUrl + r.uri
-	log.Printf("Url: %v", url)
+	log.Printf("[DEBUG] %v request sent to URL: %v", r.method, url)
 
 	//Convert the body of the request to json
 	jsonBody := new(bytes.Buffer)
@@ -76,7 +76,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 		return err
 	}
 
-	log.Printf("Status code returned: %v", result.StatusCode)
+	log.Printf("[DEBUG] Status code returned: %v", result.StatusCode)
 
 	if result.StatusCode >= 300 {
 		errorMessage := new(RequestError) //error messages have a different structure, so they are read with a different struct
