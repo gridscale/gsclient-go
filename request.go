@@ -117,7 +117,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 }
 
 func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
-	timer := time.After(30 * time.Second)
+	timer := time.After(2 * time.Minute)
 
 	for {
 		select {
