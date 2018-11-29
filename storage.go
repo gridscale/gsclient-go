@@ -67,19 +67,19 @@ type StorageSnapshotSchedules struct {
 }
 type StorageTemplate struct {
 	Sshkeys      []string `json:"sshkeys,omitempty"`
-	TemplateUuid string   `json:"template_uuid"`
+	TemplateUuid string   `json:"template_uuid,omitempty"`
 	Password     string   `json:"password,omitempty"`
 	PasswordType string   `json:"password_type,omitempty"`
 	Hostname     string   `json:"hostname,omitempty"`
 }
 
 type StorageCreateRequest struct {
-	Capacity     int             `json:"capacity"`
-	LocationUuid string          `json:"location_uuid"`
-	Name         string          `json:"name"`
-	StorageType  string          `json:"storage_type,omitempty"`
-	Template     StorageTemplate `json:"template,omitempty"`
-	Labels       []interface{}   `json:"labels,omitempty"`
+	Capacity     int              `json:"capacity"`
+	LocationUuid string           `json:"location_uuid"`
+	Name         string           `json:"name"`
+	StorageType  string           `json:"storage_type,omitempty"`
+	Template     *StorageTemplate `json:"template,omitempty"`
+	Labels       []interface{}    `json:"labels,omitempty"`
 }
 
 type StorageUpdateRequest struct {
