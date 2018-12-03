@@ -85,7 +85,7 @@ type StorageCreateRequest struct {
 type StorageUpdateRequest struct {
 	Name     string        `json:"name,omitempty"`
 	Labels   []interface{} `json:"labels"`
-	Capacity int           `json:"capacity"`
+	Capacity int           `json:"capacity,omitempty"`
 }
 
 func (c *Client) GetStorage(id string) (*Storage, error) {
