@@ -40,8 +40,12 @@ type ServerRelations struct {
 }
 
 type ServerStorage struct {
-	StorageUuid string `json:"storage_uuid,omitempty"`
-	BootDevice  bool   `json:"bootdevice,omitempty"`
+	ObjectUuid string `json:"object_uuid"`
+	Target     int    `json:"target"`
+	Lun        int    `json:"lun"`
+	Controller int    `json:"controller"`
+	CreateTime string `json:"create_time"`
+	BootDevice bool   `json:"bootdevice"`
 }
 
 type ServerIsoImage struct {
@@ -49,23 +53,65 @@ type ServerIsoImage struct {
 }
 
 type ServerNetwork struct {
+	Vlan                 *int          `json:"vlan,omitempty"`
+	L2security           bool          `json:"l2security"`
+	Vxlan                *int          `json:"vxlan,omitempty"`
+	ServerUuid           string        `json:"server_uuid"`
+	CreateTime           string        `json:"create_time"`
+	PublicNet            bool          `json:"public_net"`
+	FirewallTemplateUuid *string       `json:"firewall_template_uuid,omitempty"`
+	ObjectName           string        `json:"object_name"`
+	Mac                  string        `json:"mac"`
+	BootDevice           bool          `json:"bootdevice"`
+	L3security           []interface{} `json:"l3security"`
+	PartnerUuid          string        `json:"partner_uuid"`
+	Ordering             int           `json:"ordering"`
+	Firewall             *string       `json:"firewall,omitempty"`
+	NetworkType          string        `json:"network_type"`
+	NetworkUuid          string        `json:"network_uuid"`
+	ObjectUuid           string        `json:"object_uuid"`
+	Mcast                *string       `json:"mcast, omitempty"`
+}
+
+type ServerIp struct {
+	ServerUuid string `json:"server_uuid"`
+	CreateTime string `json:"create_time"`
+	Prefix     string `json:"prefix"`
+	Family     int    `json:"family"`
+	ObjectUuid string `json:"object_uuid"`
+	Ip         string `json:"ip"`
+}
+
+type ServerCreateRequest struct {
+	Name            string                       `json:"name"`
+	Memory          int                          `json:"memory"`
+	Cores           int                          `json:"cores"`
+	LocationUuid    string                       `json:"location_uuid"`
+	HardwareProfile string                       `json:"hardware_profile,omitempty"`
+	AvailablityZone string                       `json:"availability_zone,omitempty"`
+	Labels          []interface{}                `json:"labels,omitempty"`
+	Relations       ServerCreateRequestRelations `json:"relations,omitempty"`
+}
+
+type ServerCreateRequestRelations struct {
+	IsoImages []ServerIsoImage             `json:"isoimages"`
+	Networks  []ServerCreateRequestNetwork `json:"networks"`
+	PublicIps []ServerCreateRequestIp      `json:"public_ips"`
+	Storages  []ServerCreateRequestStorage `json:"storages"`
+}
+
+type ServerCreateRequestStorage struct {
+	StorageUuid string `json:"storage_uuid,omitempty"`
+	BootDevice  bool   `json:"bootdevice,omitempty"`
+}
+
+type ServerCreateRequestNetwork struct {
 	NetworkUuid string `json:"network_uuid,omitempty"`
 	BootDevice  bool   `json:"bootdevice,omitempty"`
 }
 
-type ServerIp struct {
+type ServerCreateRequestIp struct {
 	IpaddrUuid string `json:"ipaddr_uuid,omitempty"`
-}
-
-type ServerCreateRequest struct {
-	Name            string          `json:"name"`
-	Memory          int             `json:"memory"`
-	Cores           int             `json:"cores"`
-	LocationUuid    string          `json:"location_uuid"`
-	HardwareProfile string          `json:"hardware_profile,omitempty"`
-	AvailablityZone string          `json:"availability_zone,omitempty"`
-	Labels          []interface{}   `json:"labels,omitempty"`
-	Relations       ServerRelations `json:"relations,omitempty"`
 }
 
 type ServerUpdateRequest struct {
@@ -188,6 +234,7 @@ func (c *Client) ShutdownServer(id string) error {
 	r := Request{
 		uri:    apiServerBase + "/" + id + "/shutdown",
 		method: "PATCH",
+		body: new(map[string]string),
 	}
 
 	err = r.execute(*c, nil)
@@ -198,7 +245,7 @@ func (c *Client) ShutdownServer(id string) error {
 	//If we get an error, which includes a timeout, power off the server instead
 	err = c.WaitForServerPowerStatus(id, false)
 	if err != nil {
-		c.StopServer(id)
+		return c.StopServer(id)
 	}
 
 	return nil
