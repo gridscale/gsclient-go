@@ -60,9 +60,9 @@ type ServerIsoImage struct {
 }
 
 type ServerNetwork struct {
-	Vlan                 int          `json:"vlan,omitempty"`
+	//Vlan                 int          `json:"vlan,omitempty"`
 	L2security           bool          `json:"l2security"`
-	Vxlan                int          `json:"vxlan,omitempty"`
+	//Vxlan                int          `json:"vxlan,omitempty"`
 	ServerUuid           string        `json:"server_uuid"`
 	CreateTime           string        `json:"create_time"`
 	PublicNet            bool          `json:"public_net"`
@@ -77,7 +77,7 @@ type ServerNetwork struct {
 	NetworkType          string        `json:"network_type"`
 	NetworkUuid          string        `json:"network_uuid"`
 	ObjectUuid           string        `json:"object_uuid"`
-	Mcast                string       `json:"mcast, omitempty"`
+	//Mcast                string       `json:"mcast, omitempty"`
 }
 
 type ServerIp struct {
