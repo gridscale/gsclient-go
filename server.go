@@ -56,27 +56,30 @@ type ServerStorage struct {
 }
 
 type ServerIsoImage struct {
-	IsoImageUuid string `json:"isoimage_uuid,omitempty"`
+	ObjectUuid string `json:"object_uuid"`
+	ObjectName string `json:"object_name"`
+	Private    bool   `json:"private"`
+	CreateTime string `json:"create_time"`
 }
 
 type ServerNetwork struct {
-	//Vlan                 int          `json:"vlan,omitempty"`
-	L2security           bool          `json:"l2security"`
-	//Vxlan                int          `json:"vxlan,omitempty"`
-	ServerUuid           string        `json:"server_uuid"`
-	CreateTime           string        `json:"create_time"`
-	PublicNet            bool          `json:"public_net"`
-	FirewallTemplateUuid string       `json:"firewall_template_uuid,omitempty"`
-	ObjectName           string        `json:"object_name"`
-	Mac                  string        `json:"mac"`
-	BootDevice           bool          `json:"bootdevice"`
+	L2security           bool   `json:"l2security"`
+	ServerUuid           string `json:"server_uuid"`
+	CreateTime           string `json:"create_time"`
+	PublicNet            bool   `json:"public_net"`
+	FirewallTemplateUuid string `json:"firewall_template_uuid,omitempty"`
+	ObjectName           string `json:"object_name"`
+	Mac                  string `json:"mac"`
+	BootDevice           bool   `json:"bootdevice"`
+	PartnerUuid          string `json:"partner_uuid"`
+	Ordering             int    `json:"ordering"`
+	Firewall             string `json:"firewall,omitempty"`
+	NetworkType          string `json:"network_type"`
+	NetworkUuid          string `json:"network_uuid"`
+	ObjectUuid           string `json:"object_uuid"`
 	//L3security           []interface{} `json:"l3security"`
-	PartnerUuid          string        `json:"partner_uuid"`
-	Ordering             int           `json:"ordering"`
-	Firewall             string       `json:"firewall,omitempty"`
-	NetworkType          string        `json:"network_type"`
-	NetworkUuid          string        `json:"network_uuid"`
-	ObjectUuid           string        `json:"object_uuid"`
+	//Vlan                 int          `json:"vlan,omitempty"`
+	//Vxlan                int          `json:"vxlan,omitempty"`
 	//Mcast                string       `json:"mcast, omitempty"`
 }
 
@@ -101,10 +104,10 @@ type ServerCreateRequest struct {
 }
 
 type ServerCreateRequestRelations struct {
-	IsoImages []ServerIsoImage             `json:"isoimages"`
-	Networks  []ServerCreateRequestNetwork `json:"networks"`
-	PublicIps []ServerCreateRequestIp      `json:"public_ips"`
-	Storages  []ServerCreateRequestStorage `json:"storages"`
+	IsoImages []ServerCreateRequestIsoimage `json:"isoimages"`
+	Networks  []ServerCreateRequestNetwork  `json:"networks"`
+	PublicIps []ServerCreateRequestIp       `json:"public_ips"`
+	Storages  []ServerCreateRequestStorage  `json:"storages"`
 }
 
 type ServerCreateRequestStorage struct {
@@ -119,6 +122,10 @@ type ServerCreateRequestNetwork struct {
 
 type ServerCreateRequestIp struct {
 	IpaddrUuid string `json:"ipaddr_uuid,omitempty"`
+}
+
+type ServerCreateRequestIsoimage struct {
+	IsoimageUuid string `json:"isoimage_uuid,omitempty"`
 }
 
 type ServerUpdateRequest struct {
