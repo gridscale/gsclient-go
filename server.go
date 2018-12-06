@@ -40,12 +40,19 @@ type ServerRelations struct {
 }
 
 type ServerStorage struct {
-	ObjectUuid string `json:"object_uuid"`
-	Target     int    `json:"target"`
-	Lun        int    `json:"lun"`
-	Controller int    `json:"controller"`
-	CreateTime string `json:"create_time"`
-	BootDevice bool   `json:"bootdevice"`
+	ObjectUuid       string `json:"object_uuid"`
+	ObjectName       string `json:"object_name"`
+	Capacity         int    `json:"capacity"`
+	StorageType      string `json:"storage_type"`
+	Target           int    `json:"target"`
+	Lun              int    `json:"lun"`
+	Controller       int    `json:"controller"`
+	CreateTime       string `json:"create_time"`
+	BootDevice       bool   `json:"bootdevice"`
+	Bus              int    `json:"bus"`
+	LastUsedTemplate string `json:"last_used_template"`
+	LicenseProductNo int    `json:"license_product_no"`
+	ServerUuid       string `json:"server_uuid"`
 }
 
 type ServerIsoImage struct {
@@ -53,24 +60,24 @@ type ServerIsoImage struct {
 }
 
 type ServerNetwork struct {
-	Vlan                 *int          `json:"vlan,omitempty"`
+	Vlan                 int          `json:"vlan,omitempty"`
 	L2security           bool          `json:"l2security"`
-	Vxlan                *int          `json:"vxlan,omitempty"`
+	Vxlan                int          `json:"vxlan,omitempty"`
 	ServerUuid           string        `json:"server_uuid"`
 	CreateTime           string        `json:"create_time"`
 	PublicNet            bool          `json:"public_net"`
-	FirewallTemplateUuid *string       `json:"firewall_template_uuid,omitempty"`
+	FirewallTemplateUuid string       `json:"firewall_template_uuid,omitempty"`
 	ObjectName           string        `json:"object_name"`
 	Mac                  string        `json:"mac"`
 	BootDevice           bool          `json:"bootdevice"`
-	L3security           []interface{} `json:"l3security"`
+	//L3security           []interface{} `json:"l3security"`
 	PartnerUuid          string        `json:"partner_uuid"`
 	Ordering             int           `json:"ordering"`
-	Firewall             *string       `json:"firewall,omitempty"`
+	Firewall             string       `json:"firewall,omitempty"`
 	NetworkType          string        `json:"network_type"`
 	NetworkUuid          string        `json:"network_uuid"`
 	ObjectUuid           string        `json:"object_uuid"`
-	Mcast                *string       `json:"mcast, omitempty"`
+	Mcast                string       `json:"mcast, omitempty"`
 }
 
 type ServerIp struct {
@@ -234,7 +241,7 @@ func (c *Client) ShutdownServer(id string) error {
 	r := Request{
 		uri:    apiServerBase + "/" + id + "/shutdown",
 		method: "PATCH",
-		body: new(map[string]string),
+		body:   new(map[string]string),
 	}
 
 	err = r.execute(*c, nil)
