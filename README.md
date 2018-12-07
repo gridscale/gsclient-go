@@ -73,6 +73,10 @@ Not all endpoints have been implemented in this client, but new ones will be add
 	* Unlink Storage (UnlinkStorage)
 	* Link Network (LinkNetwork)
 	* Unlink Network (UnlinkNetwork)
+	* Link IP (LinkIp)
+    * Unlink IP (UnlinkIp)
+    * Link ISO-Image (LinkIsoimage)
+    * Unlink ISO-Image (UnlinkIsoimage)
 * Storages
 	* Storages Get (GetStorageList)
 	* Storage Get (GetStorage)
