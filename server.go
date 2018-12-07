@@ -291,7 +291,7 @@ func (c *Client) StartServer(id string) error {
 	return c.WaitForServerPowerStatus(id, true)
 }
 
-func (c *Client) LinkStorage(serverid string, storageid string, bootdevice string) error {
+func (c *Client) LinkStorage(serverid string, storageid string, bootdevice bool) error {
 	body := map[string]interface{}{
 		"object_uuid": storageid,
 		"bootdevice":  bootdevice,
@@ -314,7 +314,7 @@ func (c *Client) UnlinkStorage(serverid string, storageid string) error {
 	return r.execute(*c, nil)
 }
 
-func (c *Client) LinkNetwork(serverid string, networkid string, bootdevice string) error {
+func (c *Client) LinkNetwork(serverid string, networkid string, bootdevice bool) error {
 	body := map[string]interface{}{
 		"object_uuid": networkid,
 		"bootdevice":  bootdevice,
@@ -331,6 +331,50 @@ func (c *Client) LinkNetwork(serverid string, networkid string, bootdevice strin
 func (c *Client) UnlinkNetwork(serverid string, networkid string) error {
 	r := Request{
 		uri:    apiServerBase + "/" + serverid + "/networks/" + networkid,
+		method: "DELETE",
+	}
+
+	return r.execute(*c, nil)
+}
+
+func (c *Client) LinkIsoimage(serverid string, isoimageid string) error {
+	body := map[string]interface{}{
+		"object_uuid": isoimageid,
+	}
+	r := Request{
+		uri:    apiServerBase + "/" + serverid + "/isoimages",
+		method: "POST",
+		body:   body,
+	}
+
+	return r.execute(*c, nil)
+}
+
+func (c *Client) UnlinkIsoimage(serverid string, isoimageid string) error {
+	r := Request{
+		uri:    apiServerBase + "/" + serverid + "/isoimages/" + isoimageid,
+		method: "DELETE",
+	}
+
+	return r.execute(*c, nil)
+}
+
+func (c *Client) LinkIp(serverid string, ipid string) error {
+	body := map[string]interface{}{
+		"object_uuid": ipid,
+	}
+	r := Request{
+		uri:    apiServerBase + "/" + serverid + "/ips",
+		method: "POST",
+		body:   body,
+	}
+
+	return r.execute(*c, nil)
+}
+
+func (c *Client) UnlinkIp(serverid string, ipid string) error {
+	r := Request{
+		uri:    apiServerBase + "/" + serverid + "/ips/" + ipid,
 		method: "DELETE",
 	}
 
