@@ -33,6 +33,8 @@ config := gsclient.NewConfiguration("User-UUID", "API-token")
 client := gsclient.NewClient(config)
 ```
 
+Make sure to replace the user-UUID and API-token strings with valid credentials or variables containing valid credentials. It is recommended to use enviroment variables for them.
+
 ## Using API endpoints
 
 After having created a Client type, as shown above, it will be possible to interact with the API. An example would be the [Servers Get endpoint](https://gridscale.io/en/api-documentation/index.html#servers-get):
