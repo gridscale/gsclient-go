@@ -33,7 +33,7 @@ config := gsclient.NewConfiguration("User-UUID", "API-token")
 client := gsclient.NewClient(config)
 ```
 
-Make sure to replace the user-UUID and API-token strings with valid credentials or variables containing valid credentials. It is recommended to use enviroment variables for them.
+Make sure to replace the user-UUID and API-token strings with valid credentials or variables containing valid credentials. It is recommended to use environment variables for them.
 
 ## Using API endpoints
 
