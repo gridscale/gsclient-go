@@ -97,7 +97,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 		method: "GET",
 	}
 
-	timer := time.After(30 * time.Second)
+	timer := time.After(time.Minute)
 
 	for {
 		select {
