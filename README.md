@@ -56,7 +56,7 @@ client.CreateIp(requestBody)
 
 What options are available for each create and update request can be found in the source code. After installing it should be located in: 
 ```
-˜/go/src/bitbucket.org/gridscale/gsclient-go
+~/go/src/bitbucket.org/gridscale/gsclient-go
 ```
 
 ## Implemented API Endpoints
