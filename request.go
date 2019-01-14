@@ -37,7 +37,11 @@ type RequestError struct {
 }
 
 func (r RequestError) Error() string {
-	return "[Error] statuscode " + r.StatusMessage + " returned: " + r.ErrorMessage
+	message := r.ErrorMessage
+	if message == "" {
+		message = "no error message received from server"
+	}
+	return fmt.Sprintf("[Error] statuscode %v returned: %s", r.StatusCode, message)
 }
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
