@@ -92,6 +92,13 @@ Not all endpoints have been implemented in this client, but new ones will be add
 	* Network Patch (UpdateNetwork)
 	* Network Delete (DeleteNetwork)
 	* (GetNetworkPublic) No official endpoint, but gives the Public Network
+* Loadbalancers
+	* LoadBalancers Get (GetLoadBalancerList)
+	* LoadBalancer Get (GetLoadBalancer)
+	* LoadBalancer Create (CreateLoadBalancer)
+	* LoadBalancer Patch (UpdateLoadBalancer)
+	* LoadBalancer Delete (DeleteLoadBalancer)
+	* LoadBalancerEvents Get (GetLoadBalancerEventList)
 * IPs
 	* IPs Get (GetIpList)
 	* IP Get (GetIp)

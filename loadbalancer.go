@@ -4,7 +4,7 @@ import (
 	"path"
 )
 
-//LoadBalancer is the JSON struct of a list of loadbalancers
+//LoadBalancers is the JSON struct of a list of loadbalancers
 type LoadBalancers struct {
 	List map[string]LoadBalancerProperties `json:"loadbalancers"`
 }
@@ -25,7 +25,7 @@ type LoadBalancerProperties struct {
 	BackendServers      []BackendServer           `json:"backend_servers"`
 	Labels              []string                  `json:"labels"`
 	LocationUuid        string                    `json:"location_uuid"`
-	RedirectHttpToHttps bool                      `json:"redirect_http_to_https"`
+	RedirectHTTPToHTTPS bool                      `json:"redirect_http_to_https"`
 	CreateTime          string                    `json:"create_time"`
 	ListenPort          map[string]map[string]int `json:"listen_ports"`
 	ChangeTime          string                    `json:"change_time"`
@@ -56,7 +56,7 @@ type LoadBalancerCreateRequest struct {
 	BackendServers      []BackendServer  `json:"backend_servers"`
 	Labels              []string         `json:"labels"`
 	LocationUuid        string           `json:"location_uuid"`
-	RedirectHttpToHttps bool             `json:"redirect_http_to_https"`
+	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
 }
 
 //LoadBalancerUpdateRequest is the JSON struct for updating a loadbalancer request
@@ -69,13 +69,31 @@ type LoadBalancerUpdateRequest struct {
 	BackendServers      []BackendServer  `json:"backend_servers"`
 	Labels              []string         `json:"labels"`
 	LocationUuid        string           `json:"location_uuid"`
-	RedirectHttpToHttps bool             `json:"redirect_http_to_https"`
+	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
 }
 
 //LoadBalancerCreateResponse is the JSON struct for a loadbalancer response
 type LoadBalancerCreateResponse struct {
 	RequestUuid string `json:"request_uuid"`
 	ObjectUuid  string `json:"object_uuid"`
+}
+
+//LoadBalancerEvents is the JSON struct for a loadbalancer's events
+type LoadBalancerEvents struct {
+	Events []LoadBalancerEventProperties `json:"events"`
+}
+
+//LoadBalancerEventProperties is the properties of a loadbalancer's event
+type LoadBalancerEventProperties struct {
+	ObjectUuid    string `json:"object_uuid"`
+	ObjectType    string `json:"object_type"`
+	RequestUuid   string `json:"request_uuid"`
+	RequestType   string `json:"request_type"`
+	Activity      string `json:"activity"`
+	RequestStatus string `json:"request_status"`
+	Change        string `json:"change"`
+	Timestamp     string `json:"timestamp"`
+	UserUuid      string `json:"user_uuid"`
 }
 
 //GetLoadBalancerList returns a list of load balancers
@@ -90,16 +108,13 @@ func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
 
 	list := []LoadBalancer{}
 	for _, properties := range response.List {
-		LoadBalancer := LoadBalancer{
-			Properties: properties,
-		}
-		list = append(list, LoadBalancer)
+		list = append(list, LoadBalancer{Properties: properties})
 	}
 
 	return list, err
 }
 
-//GetLoadBalancer returns a load balancer for a given uuid
+//GetLoadBalancer returns a load balancer of a given uuid
 func (c *Client) GetLoadBalancer(id string) (*LoadBalancer, error) {
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
@@ -142,14 +157,15 @@ func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) e
 	return r.execute(*c, nil)
 }
 
-//EventLoadBalancer update configuraton of a load balancer
-func (c *Client) EventLoadBalancer(id string) error {
+//GetLoadBalancerEventList retrives events of a given uuid
+func (c *Client) GetLoadBalancerEventList(id string) (*LoadBalancerEvents, error) {
 	r := Request{
-		uri:    path.Join(apiLoadBalancerBase, id),
+		uri:    path.Join(apiLoadBalancerBase, id, "events"),
 		method: "GET",
 	}
-
-	return r.execute(*c, nil)
+	response := new(LoadBalancerEvents)
+	err := r.execute(*c, &response)
+	return response, err
 }
 
 //DeleteLoadBalancer deletes a load balancer
