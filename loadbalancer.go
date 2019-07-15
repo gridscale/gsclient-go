@@ -54,9 +54,10 @@ type LoadBalancerCreateRequest struct {
 	Algorithm           string           `json:"algorithm"`
 	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
 	BackendServers      []BackendServer  `json:"backend_servers"`
-	Labels              []string         `json:"labels"`
+	Labels              []interface{}    `json:"labels"`
 	LocationUuid        string           `json:"location_uuid"`
 	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
+	Status              string           `json:"status,omitempty"`
 }
 
 //LoadBalancerUpdateRequest is the JSON struct for updating a loadbalancer request
@@ -70,6 +71,7 @@ type LoadBalancerUpdateRequest struct {
 	Labels              []string         `json:"labels"`
 	LocationUuid        string           `json:"location_uuid"`
 	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
+	Status              string           `json:"status,omitempty"`
 }
 
 //LoadBalancerCreateResponse is the JSON struct for a loadbalancer response
