@@ -41,7 +41,7 @@ func main() {
 
 	// populate settings into LoadBalancerCreateRequest
 	labels := make([]interface{}, 0)
-	labels = append(labels, "dddd")
+	labels = append(labels, "lb-http")
 	lbRequest := gsclient.LoadBalancerCreateRequest{
 		Name:                "go-client-lb",
 		Algorithm:           "leastconn",
