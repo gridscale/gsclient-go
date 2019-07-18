@@ -6,9 +6,8 @@ import (
 	"os"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"bitbucket.org/gridscale/gsclient-go"
+	log "github.com/sirupsen/logrus"
 )
 
 const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
@@ -41,6 +40,8 @@ func main() {
 	log.Info("[INFO] IPv6 has been created")
 
 	// populate settings into LoadBalancerCreateRequest
+	labels := make([]interface{}, 0)
+	labels = append(labels, "lb-http")
 	lbRequest := gsclient.LoadBalancerCreateRequest{
 		Name:                "go-client-lb",
 		Algorithm:           "leastconn",
@@ -62,7 +63,7 @@ func main() {
 				Host:   "185.201.147.176",
 			},
 		},
-		Labels: []string{"lb-http"},
+		Labels: labels,
 	}
 
 	clb, err := client.CreateLoadBalancer(lbRequest)
@@ -82,7 +83,7 @@ func main() {
 	}
 
 	lbUpdateRequest := gsclient.LoadBalancerUpdateRequest{
-		Name:                glb.Properties.Name,
+		Name:                "go-client-lb233",
 		Algorithm:           glb.Properties.Algorithm,
 		LocationUuid:        glb.Properties.LocationUuid,
 		ListenIPv6Uuid:      glb.Properties.ListenIPv6Uuid,
@@ -97,9 +98,10 @@ func main() {
 			},
 		},
 		BackendServers: glb.Properties.BackendServers,
-		Labels:         []string{"lb-https"},
+		Labels:         labels,
 	}
 	err = client.UpdateLoadBalancer(glb.Properties.ObjectUuid, lbUpdateRequest)
+
 	if err != nil {
 		log.Fatal("Update loadbalancer has failed with error", err)
 	}
