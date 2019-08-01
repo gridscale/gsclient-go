@@ -1,5 +1,7 @@
 package gsclient
 
+import "path"
+
 //PaaSServices is the JSON struct of a list of PaaS services
 type PaaSServices struct {
 	List map[string]PaaSServiceProperties `json:"paas_services"`
@@ -51,13 +53,13 @@ type ResourceLimit struct {
 }
 
 type PaaSServiceCreateResponse struct {
-	RequestUuid     string                 `json:"request_uuid"`
-	ListenPorts     map[string]string      `json:"listen_ports"`
-	PaaSServiceUuid string                 `json:"paas_service_uuid"`
-	Credentials     []Credential           `json:"credentials"`
-	ObjectUuid      string                 `json:"object_uuid"`
-	ResourceLimits  []ResourceLimit        `json:"resource_limits"`
-	Parameters      map[string]interface{} `json:"parameters"`
+	RequestUuid     string                       `json:"request_uuid"`
+	ListenPorts     map[string]map[string]string `json:"listen_ports"`
+	PaaSServiceUuid string                       `json:"paas_service_uuid"`
+	Credentials     []Credential                 `json:"credentials"`
+	ObjectUuid      string                       `json:"object_uuid"`
+	ResourceLimits  []ResourceLimit              `json:"resource_limits"`
+	Parameters      map[string]interface{}       `json:"parameters"`
 }
 
 type PaaSTemplates struct {
@@ -174,7 +176,7 @@ type PaaSSecurityZoneUpdateRequest struct {
 //GetPaaSServiceList returns a list of PaaS Services
 func (c *Client) GetPaaSServiceList() ([]PaaSService, error) {
 	r := Request{
-		uri:    apiPaaSBase + "/services",
+		uri:    path.Join(apiPaaSBase, "services"),
 		method: "GET",
 	}
 
@@ -194,7 +196,7 @@ func (c *Client) GetPaaSServiceList() ([]PaaSService, error) {
 //CreatePaaSService creates a new PaaS service
 func (c *Client) CreatePaaSService(body PaaSServiceCreateRequest) (*PaaSServiceCreateResponse, error) {
 	r := Request{
-		uri:    apiPaaSBase + "/services",
+		uri:    path.Join(apiPaaSBase, "services"),
 		method: "POST",
 		body:   body,
 	}
@@ -213,11 +215,11 @@ func (c *Client) CreatePaaSService(body PaaSServiceCreateRequest) (*PaaSServiceC
 //GetPaaSService returns a specific PaaS Service based on given id
 func (c *Client) GetPaaSService(id string) (PaaSService, error) {
 	r := Request{
-		uri:    apiPaaSBase + "/services/" + id,
+		uri:    path.Join(apiPaaSBase, "services", id),
 		method: "GET",
 	}
 
-	response := PaaSService{}
+	var response PaaSService
 	err := r.execute(*c, &response)
 	return response, err
 }
@@ -225,7 +227,7 @@ func (c *Client) GetPaaSService(id string) (PaaSService, error) {
 //UpdatePaaSService updates a specific PaaS Service based on a given id
 func (c *Client) UpdatePaaSService(id string, body PaaSServiceUpdateRequest) error {
 	r := Request{
-		uri:    apiPaaSBase + "/services/" + id,
+		uri:    path.Join(apiPaaSBase, "services", id),
 		method: "PATCH",
 		body:   body,
 	}
@@ -235,7 +237,7 @@ func (c *Client) UpdatePaaSService(id string, body PaaSServiceUpdateRequest) err
 //DeletePaaSService deletes a PaaS service
 func (c *Client) DeletePaaSService(id string) error {
 	r := Request{
-		uri:    apiPaaSBase + "/services/" + id,
+		uri:    path.Join(apiPaaSBase, "services", id),
 		method: "DELETE",
 	}
 
@@ -245,7 +247,7 @@ func (c *Client) DeletePaaSService(id string) error {
 //GetPaaSServiceMetrics get a specific PaaS Service's metrics based on a given id
 func (c *Client) GetPaaSServiceMetrics(id string) ([]PaaSServiceMetric, error) {
 	r := Request{
-		uri:    apiPaaSBase + "/services/" + id + "/metrics",
+		uri:    path.Join(apiPaaSBase, "services", id, "metrics"),
 		method: "GET",
 	}
 	response := new(PaaSServiceMetrics)
@@ -262,7 +264,7 @@ func (c *Client) GetPaaSServiceMetrics(id string) ([]PaaSServiceMetric, error) {
 //GetPaaSTemplateList returns a list of PaaS service templates
 func (c *Client) GetPaaSTemplateList() ([]PaasTemplate, error) {
 	r := Request{
-		uri:    apiPaaSBase + "/service_templates",
+		uri:    path.Join(apiPaaSBase, "service_templates"),
 		method: "GET",
 	}
 
@@ -283,7 +285,7 @@ func (c *Client) GetPaaSTemplateList() ([]PaasTemplate, error) {
 //GetSecurityZones get available security zones
 func (c *Client) GetSecurityZoneList() ([]PaaSSecurityZone, error) {
 	r := Request{
-		uri:    apiPaaSBase + "/security_zones",
+		uri:    path.Join(apiPaaSBase, "security_zones"),
 		method: "GET",
 	}
 	response := new(PaaSSecurityZones)
@@ -300,7 +302,7 @@ func (c *Client) GetSecurityZoneList() ([]PaaSSecurityZone, error) {
 //CreateSecurityZone creates a new PaaS security zone
 func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (*PaaSSecurityZoneCreateResponse, error) {
 	r := Request{
-		uri:    apiPaaSBase + "/security_zone",
+		uri:    path.Join(apiPaaSBase, "security_zone"),
 		method: "POST",
 		body:   body,
 	}
@@ -317,7 +319,7 @@ func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (*Pa
 //GetSecurityZone get a specific PaaS Security Zone based on given id
 func (c *Client) GetPaaSSecurityZone(id string) (PaaSSecurityZone, error) {
 	r := Request{
-		uri:    apiPaaSBase + "/security_zones/" + id,
+		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: "GET",
 	}
 	response := PaaSSecurityZone{}
@@ -328,7 +330,7 @@ func (c *Client) GetPaaSSecurityZone(id string) (PaaSSecurityZone, error) {
 //UpdatePaaSSecurityZone update a specific PaaS security zone based on given id
 func (c *Client) UpdatePaaSSecurityZone(id string, body PaaSSecurityZoneUpdateRequest) error {
 	r := Request{
-		uri:    apiPaaSBase + "/security_zones/" + id,
+		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: "PATCH",
 		body:   body,
 	}
@@ -338,7 +340,7 @@ func (c *Client) UpdatePaaSSecurityZone(id string, body PaaSSecurityZoneUpdateRe
 //DeletePaaSSecurityZone delete a specific PaaS Security Zone based on given id
 func (c *Client) DeletePaaSSecurityZone(id string) error {
 	r := Request{
-		uri:    apiPaaSBase + "/security_zones/" + id,
+		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: "DELETE",
 	}
 	return r.execute(*c, nil)
