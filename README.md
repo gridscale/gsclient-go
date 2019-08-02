@@ -115,7 +115,20 @@ Not all endpoints have been implemented in this client, but new ones will be add
 	* Templates Get (GetTemplateList)
 	* Template Get (GetTemplate)
 	* (GetTemplateByName) No official endpoint, but gives a template which matches the exact name given.
-
+* PaaS
+    * PaaS services Get (GetPaaSServiceList)
+    * PaaS service Get (GetPaaSService)
+    * PaaS service Create (CreatePaaSService)
+    * PaaS service Update (UpdatePaaSService)
+    * PaaS service Delete (DeletePaaSService)
+    * PaaS service metrics Get (GetPaaSServiceMetrics)
+    * PaaS service templates Get (GetPaaSTemplateList)
+    * PaaS service security zones Get (GetPaaSSecurityZoneList)
+    * Paas service security zone Get (GetPaaSSecurityZone)
+    * PaaS service security zone Create (CreatePaaSSecurityZone)
+    * PaaS service security zone Update (UpdatePaaSSecurityZone)
+    * PaaS service security zone Delete (DeletePaaSSecurityZone)
+    
 Note: The functions in this list can be called with a Client type.
 
 ## Known Issues
