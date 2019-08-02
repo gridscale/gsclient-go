@@ -27,7 +27,7 @@ func setupTestClient() (*Client, *http.ServeMux) {
 	return NewClient(&config), mux
 }
 
-func TestCreateLoadBalancer(t *testing.T) {
+func TestClient_CreateLoadBalancer(t *testing.T) {
 	client, mux := setupTestClient()
 	uri := path.Join(apiLoadBalancerBase)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +57,7 @@ func TestCreateLoadBalancer(t *testing.T) {
 	}
 	assert.Equal(t, fmt.Sprintf("&%s", prepareLoadBalancerObjectCreateResponse()), fmt.Sprintf("%s", response))
 }
-func TestGetLoadBalancer(t *testing.T) {
+func TestClient_GetLoadBalancer(t *testing.T) {
 	client, mux := setupTestClient()
 	uri := path.Join(apiLoadBalancerBase, loadBalancerID)
 	expectedObject := getMockLoadbalancer()
@@ -71,7 +71,7 @@ func TestGetLoadBalancer(t *testing.T) {
 	}
 	assert.Equal(t, fmt.Sprintf("%v", expectedObject.Properties), fmt.Sprintf("%v", loadbalancer.Properties))
 }
-func TestGetLoadBalancerList(t *testing.T) {
+func TestClient_GetLoadBalancerList(t *testing.T) {
 	client, mux := setupTestClient()
 	uri := path.Join(apiLoadBalancerBase)
 	expectedObjects := getMockLoadbalancer()

@@ -110,7 +110,7 @@ type PaaSServiceMetrics struct {
 }
 
 type PaaSServiceMetric struct {
-	Properties PaaSMetricProperties `json:"paas_service_metrics"`
+	Properties PaaSMetricProperties `json:"paas_service_metric"`
 }
 
 type PaaSMetricProperties struct {
@@ -283,7 +283,7 @@ func (c *Client) GetPaaSTemplateList() ([]PaasTemplate, error) {
 }
 
 //GetSecurityZones get available security zones
-func (c *Client) GetSecurityZoneList() ([]PaaSSecurityZone, error) {
+func (c *Client) GetPaaSSecurityZoneList() ([]PaaSSecurityZone, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones"),
 		method: "GET",
