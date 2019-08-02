@@ -9,13 +9,9 @@ import (
 	"testing"
 )
 
-const (
-	paasServiceUuid  = "690de890-13c0-4e76-8a01-e10ba8786e53"
-	securityZoneUuid = "abc-123"
-)
-
 func TestClient_GetPaaSServiceList(t *testing.T) {
-	client, mux := setupTestClient()
+	server, client, mux := setupTestClient()
+	defer server.Close()
 	uri := path.Join(apiPaaSBase, "services")
 	expectedObj := getMockPaaSService()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
@@ -31,14 +27,15 @@ func TestClient_GetPaaSServiceList(t *testing.T) {
 }
 
 func TestClient_GetPaaSService(t *testing.T) {
-	client, mux := setupTestClient()
-	uri := path.Join(apiPaaSBase, "services", paasServiceUuid)
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "services", dummyUuid)
 	expectedObj := getMockPaaSService()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
 		fmt.Fprint(w, preparePaaSHTTPGetResponse())
 	})
-	paas, err := client.GetPaaSService(paasServiceUuid)
+	paas, err := client.GetPaaSService(dummyUuid)
 	if err != nil {
 		t.Errorf("GetPaaSService returned an error %v", err)
 	}
@@ -46,7 +43,8 @@ func TestClient_GetPaaSService(t *testing.T) {
 }
 
 func TestClient_CreatePaaSService(t *testing.T) {
-	client, mux := setupTestClient()
+	server, client, mux := setupTestClient()
+	defer server.Close()
 	uri := path.Join(apiPaaSBase, "services")
 	expectedRespObj := getMockPaaSServiceCreateResponse()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +52,7 @@ func TestClient_CreatePaaSService(t *testing.T) {
 		fmt.Fprintf(w, preparePaaSHTTPCreateResponse())
 	})
 
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, requestUUID)
+	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
@@ -78,15 +76,16 @@ func TestClient_CreatePaaSService(t *testing.T) {
 }
 
 func TestClient_UpdatePaaSService(t *testing.T) {
-	client, mux := setupTestClient()
-	uri := path.Join(apiPaaSBase, "services", paasServiceUuid)
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "services", dummyUuid)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodPatch)
 		fmt.Fprintf(w, "")
 	})
 	parameters := make(map[string]interface{})
 	parameters["TEST_PARAM"] = "param value"
-	err := client.UpdatePaaSService(paasServiceUuid, PaaSServiceUpdateRequest{
+	err := client.UpdatePaaSService(dummyUuid, PaaSServiceUpdateRequest{
 		Name:       "test",
 		Labels:     []string{"label"},
 		Parameters: parameters,
@@ -103,26 +102,28 @@ func TestClient_UpdatePaaSService(t *testing.T) {
 }
 
 func TestClient_DeletePaaSService(t *testing.T) {
-	client, mux := setupTestClient()
-	uri := path.Join(apiPaaSBase, "services", paasServiceUuid)
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "services", dummyUuid)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodDelete)
 		fmt.Fprintf(w, "")
 	})
-	err := client.DeletePaaSService(paasServiceUuid)
+	err := client.DeletePaaSService(dummyUuid)
 	if err != nil {
 		t.Errorf("DeletePaaSService returned an error %v", err)
 	}
 }
 
 func TestClient_GetPaaSServiceMetrics(t *testing.T) {
-	client, mux := setupTestClient()
-	uri := path.Join(apiPaaSBase, "services", paasServiceUuid, "metrics")
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "services", dummyUuid, "metrics")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
 		fmt.Fprintf(writer, preparePaaSHTTPGetMetricsResponse())
 	})
-	res, err := client.GetPaaSServiceMetrics(paasServiceUuid)
+	res, err := client.GetPaaSServiceMetrics(dummyUuid)
 	if err != nil {
 		t.Errorf("GetPaaSServiceMetrics returned an error %v", err)
 	}
@@ -131,7 +132,8 @@ func TestClient_GetPaaSServiceMetrics(t *testing.T) {
 }
 
 func TestClient_GetPaaSTemplateList(t *testing.T) {
-	client, mux := setupTestClient()
+	server, client, mux := setupTestClient()
+	defer server.Close()
 	uri := path.Join(apiPaaSBase, "service_templates")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
@@ -146,7 +148,8 @@ func TestClient_GetPaaSTemplateList(t *testing.T) {
 }
 
 func TestClient_GetSecurityZoneList(t *testing.T) {
-	client, mux := setupTestClient()
+	server, client, mux := setupTestClient()
+	defer server.Close()
 	uri := path.Join(apiPaaSBase, "security_zones")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
@@ -162,13 +165,14 @@ func TestClient_GetSecurityZoneList(t *testing.T) {
 }
 
 func TestClient_CreatePaaSSecurityZone(t *testing.T) {
-	client, mux := setupTestClient()
+	server, client, mux := setupTestClient()
+	defer server.Close()
 	uri := path.Join(apiPaaSBase, "security_zone")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodPost)
 		fmt.Fprintf(writer, preparePaaSHTTPCreateSecurityZone())
 	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, requestUUID)
+	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
@@ -183,13 +187,14 @@ func TestClient_CreatePaaSSecurityZone(t *testing.T) {
 }
 
 func TestClient_GetPaaSSecurityZone(t *testing.T) {
-	client, mux := setupTestClient()
-	uri := path.Join(apiPaaSBase, "security_zones", securityZoneUuid)
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUuid)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
 		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZone())
 	})
-	res, err := client.GetPaaSSecurityZone(securityZoneUuid)
+	res, err := client.GetPaaSSecurityZone(dummyUuid)
 	if err != nil {
 		t.Errorf("GetPaaSSecurityZone returned an error %v", err)
 	}
@@ -197,16 +202,17 @@ func TestClient_GetPaaSSecurityZone(t *testing.T) {
 }
 
 func TestClient_UpdatePaaSSecurityZone(t *testing.T) {
-	client, mux := setupTestClient()
-	uri := path.Join(apiPaaSBase, "security_zones", securityZoneUuid)
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUuid)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodPatch)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UpdatePaaSSecurityZone(securityZoneUuid, PaaSSecurityZoneUpdateRequest{
+	err := client.UpdatePaaSSecurityZone(dummyUuid, PaaSSecurityZoneUpdateRequest{
 		Name:                 "test",
 		LocationUuid:         "a-b-c",
-		PaaSSecurityZoneUuid: securityZoneUuid,
+		PaaSSecurityZoneUuid: dummyUuid,
 	})
 	if err != nil {
 		t.Errorf("UpdatePaaSSecurityZone returned an error %v", err)
@@ -214,13 +220,14 @@ func TestClient_UpdatePaaSSecurityZone(t *testing.T) {
 }
 
 func TestClient_DeletePaaSSecurityZone(t *testing.T) {
-	client, mux := setupTestClient()
-	uri := path.Join(apiPaaSBase, "security_zones", securityZoneUuid)
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUuid)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodDelete)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeletePaaSSecurityZone(securityZoneUuid)
+	err := client.DeletePaaSSecurityZone(dummyUuid)
 	if err != nil {
 		t.Errorf("DeletePaaSSecurityZone returned an error %v", err)
 	}
@@ -235,7 +242,7 @@ func getMockPaaSService() PaaSService {
 	parameters["TEST_PARAM"] = "param value"
 	mock := PaaSService{
 		Properties: PaaSServiceProperties{
-			ObjectUuid: paasServiceUuid,
+			ObjectUuid: dummyUuid,
 			Labels:     []string{"label"},
 			Credentials: []Credential{
 				{
@@ -269,7 +276,7 @@ func getMockPaaSServiceMetric() PaaSServiceMetric {
 	mock := PaaSServiceMetric{Properties: PaaSMetricProperties{
 		BeginTime:       "2018-04-28T09:47:41Z",
 		EndTime:         "2018-04-28T09:47:41Z",
-		PaaSServiceUuid: paasServiceUuid,
+		PaaSServiceUuid: dummyUuid,
 		CoreUsage: PaaSMetricValue{
 			Value: 50,
 			Unit:  "percentage",
@@ -291,7 +298,7 @@ func preparePaaSHTTPGetMetricsResponse() string {
 func preparePaaSHTTPGetListResponse() string {
 	paas := getMockPaaSService()
 	res, _ := json.Marshal(paas.Properties)
-	return fmt.Sprintf(`{"paas_services": {"%s" : %s}}`, paasServiceUuid, string(res))
+	return fmt.Sprintf(`{"paas_services": {"%s" : %s}}`, dummyUuid, string(res))
 }
 
 func preparePaaSHTTPGetResponse() string {
@@ -315,9 +322,9 @@ func getMockPaaSServiceCreateResponse() PaaSServiceCreateResponse {
 	parameters := make(map[string]interface{})
 	parameters["TEST_PARAM"] = "param value"
 	return PaaSServiceCreateResponse{
-		RequestUuid:     requestUUID,
+		RequestUuid:     dummyRequestUUID,
 		ListenPorts:     listenPort,
-		PaaSServiceUuid: paasServiceUuid,
+		PaaSServiceUuid: dummyUuid,
 		Credentials: []Credential{
 			{
 				Username: "username",
@@ -325,7 +332,7 @@ func getMockPaaSServiceCreateResponse() PaaSServiceCreateResponse {
 				Type:     "type",
 			},
 		},
-		ObjectUuid: paasServiceUuid,
+		ObjectUuid: dummyUuid,
 		ResourceLimits: []ResourceLimit{
 			{
 				Resource: "cpu",
@@ -391,9 +398,9 @@ func preparePaaSHTTPGetSecurityZone() string {
 
 func getMockPaaSSecurityZoneCreateResponse() PaaSSecurityZoneCreateResponse {
 	return PaaSSecurityZoneCreateResponse{
-		RequestUuid:          requestUUID,
-		PaaSSecurityZoneUuid: securityZoneUuid,
-		ObjectUuid:           securityZoneUuid,
+		RequestUuid:          dummyRequestUUID,
+		PaaSSecurityZoneUuid: dummyUuid,
+		ObjectUuid:           dummyUuid,
 	}
 }
 

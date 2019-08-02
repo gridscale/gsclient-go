@@ -4,38 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
-	"os"
 	"path"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-const loadBalancerID = "690de890-13c0-4e76-8a01-e10ba8786e53"
-const requestUUID = "x123xx1x-123x-1x12-123x-123xxx123x1x"
-
-func setupTestClient() (*Client, *http.ServeMux) {
-	mux := http.NewServeMux()
-	server := httptest.NewServer(mux)
-	config := Config{
-		APIUrl:     server.URL,
-		UserUUID:   os.Getenv("USER_UUID"),
-		APIToken:   os.Getenv("API_TOKEN"),
-		HTTPClient: http.DefaultClient,
-	}
-	return NewClient(&config), mux
-}
-
 func TestClient_CreateLoadBalancer(t *testing.T) {
-	client, mux := setupTestClient()
+	server, client, mux := setupTestClient()
+	defer server.Close()
 	uri := path.Join(apiLoadBalancerBase)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodPost)
 		fmt.Fprint(w, prepareLoadBalancerHTTPCreateResponse())
 	})
 
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, requestUUID)
+	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
@@ -58,21 +42,23 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("&%s", prepareLoadBalancerObjectCreateResponse()), fmt.Sprintf("%s", response))
 }
 func TestClient_GetLoadBalancer(t *testing.T) {
-	client, mux := setupTestClient()
-	uri := path.Join(apiLoadBalancerBase, loadBalancerID)
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiLoadBalancerBase, dummyUuid)
 	expectedObject := getMockLoadbalancer()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
 		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse())
 	})
-	loadbalancer, err := client.GetLoadBalancer(loadBalancerID)
+	loadbalancer, err := client.GetLoadBalancer(dummyUuid)
 	if err != nil {
 		t.Errorf("GetLoadBalancer returned error: %v", err)
 	}
 	assert.Equal(t, fmt.Sprintf("%v", expectedObject.Properties), fmt.Sprintf("%v", loadbalancer.Properties))
 }
 func TestClient_GetLoadBalancerList(t *testing.T) {
-	client, mux := setupTestClient()
+	server, client, mux := setupTestClient()
+	defer server.Close()
 	uri := path.Join(apiLoadBalancerBase)
 	expectedObjects := getMockLoadbalancer()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +78,7 @@ func getMockLoadbalancer() LoadBalancer {
 	labels = append(labels, "nice")
 	lb := LoadBalancer{
 		Properties: LoadBalancerProperties{
-			ObjectUuid:          loadBalancerID,
+			ObjectUuid:          dummyUuid,
 			Name:                "go-client-lb",
 			Algorithm:           "leastconn",
 			LocationUuid:        "45ed677b-3702-4b36-be2a-a2eab9827950",
@@ -128,16 +114,16 @@ func prepareLoadBalancerHTTPGetResponse() string {
 func prepareLoadBalancerHTTPListResponse() string {
 	lb := getMockLoadbalancer()
 	res, _ := json.Marshal(lb.Properties)
-	return fmt.Sprintf(`{"loadbalancers": {"%s": %s}}`, loadBalancerID, string(res))
+	return fmt.Sprintf(`{"loadbalancers": {"%s": %s}}`, dummyUuid, string(res))
 }
 
 func prepareLoadBalancerHTTPCreateResponse() string {
-	return fmt.Sprintf(`{"request_uuid": "%s","object_uuid": "%s"}`, requestUUID, loadBalancerID)
+	return fmt.Sprintf(`{"request_uuid": "%s","object_uuid": "%s"}`, dummyRequestUUID, dummyUuid)
 }
 
 func prepareLoadBalancerObjectCreateResponse() LoadBalancerCreateResponse {
 	return LoadBalancerCreateResponse{
-		RequestUuid: requestUUID,
-		ObjectUuid:  loadBalancerID,
+		RequestUuid: dummyRequestUUID,
+		ObjectUuid:  dummyUuid,
 	}
 }
