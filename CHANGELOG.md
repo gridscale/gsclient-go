@@ -5,6 +5,7 @@
 FEATURES:
 
 * Add support for LBaaS (GH-2)
+* Add support for PaaS (GH-6)
 
 IMPROVEMENTS:
 
