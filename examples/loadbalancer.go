@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"bitbucket.org/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go"
 	log "github.com/sirupsen/logrus"
 )
 
