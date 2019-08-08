@@ -141,6 +141,12 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Object Storage's Access Key Create (CreateObjectStorageAccessKey)
     * Object Storage's Access Key Delete (DeleteObjectStorageAccessKey)
     * Object Storage's Buckets Get (GetObjectStorageBucketList)
+* Storage Snapshot Scheduler
+    * Storage Snapshot Schedules Get (GetStorageSnapshotScheduleList)
+    * Storage Snapshot Schedule Get (GetStorageSnapshotSchedule)
+    * Storage Snapshot Schedule Create (CreateStorageSnapshotSchedule)
+    * Storage Snapshot Schedule Update (UpdateStorageSnapshotSchedule)
+    * Storage Snapshot Schedule Delete (DeleteStorageSnapshotSchedule)
     
 Note: The functions in this list can be called with a Client type.
 
