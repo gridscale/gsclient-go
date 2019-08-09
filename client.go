@@ -8,6 +8,7 @@ const (
 	apiSshkeyBase       = "/objects/sshkeys"
 	apiTemplateBase     = "/objects/templates"
 	apiLoadBalancerBase = "/objects/loadbalancers"
+	apiPaaSBase         = "/objects/paas"
 )
 
 type Client struct {
