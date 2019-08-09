@@ -134,6 +134,14 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Object Storage's Access Key Create (CreateObjectStorageAccessKey)
     * Object Storage's Access Key Delete (DeleteObjectStorageAccessKey)
     * Object Storage's Buckets Get (GetObjectStorageBucketList)
+* Storage Snapshot
+    * Storage Snapshots Get (GetStorageSnapshotList)
+    * Storage Snapshot Get (GetStorageSnapshot)
+    * Storage Snapshot Create (CreateStorageSnapshot)
+    * Storage Snapshot Update (UpdateStorageSnapshot)
+    * Storage Snapshot Delete (DeleteStorageSnapshot)
+    * Storage Rollback (RollbackStorage)
+    * Storage Snapshot Export to S3 (ExportStorageSnapshotToS3)
     
 Note: The functions in this list can be called with a Client type.
 
