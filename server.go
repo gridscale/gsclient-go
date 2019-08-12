@@ -40,27 +40,6 @@ type ServerRelations struct {
 	Storages  []ServerStorage  `json:"storages"`
 }
 
-type ServerNetwork struct {
-	L2security           bool   `json:"l2security"`
-	ServerUuid           string `json:"server_uuid"`
-	CreateTime           string `json:"create_time"`
-	PublicNet            bool   `json:"public_net"`
-	FirewallTemplateUuid string `json:"firewall_template_uuid,omitempty"`
-	ObjectName           string `json:"object_name"`
-	Mac                  string `json:"mac"`
-	BootDevice           bool   `json:"bootdevice"`
-	PartnerUuid          string `json:"partner_uuid"`
-	Ordering             int    `json:"ordering"`
-	Firewall             string `json:"firewall,omitempty"`
-	NetworkType          string `json:"network_type"`
-	NetworkUuid          string `json:"network_uuid"`
-	ObjectUuid           string `json:"object_uuid"`
-	//L3security           []interface{} `json:"l3security"`
-	//Vlan                 int          `json:"vlan,omitempty"`
-	//Vxlan                int          `json:"vxlan,omitempty"`
-	//Mcast                string       `json:"mcast, omitempty"`
-}
-
 type ServerCreateRequest struct {
 	Name            string                       `json:"name"`
 	Memory          int                          `json:"memory"`
