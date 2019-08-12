@@ -128,6 +128,13 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * PaaS service security zone Create (CreatePaaSSecurityZone)
     * PaaS service security zone Update (UpdatePaaSSecurityZone)
     * PaaS service security zone Delete (DeletePaaSSecurityZone)
+* ISO Image
+    * ISO Images Get (GetISOImageList)
+    * ISO Image Get (GetISOImage)
+    * ISO Image Create (CreateISOImage)
+    * ISO Image Update (UpdateISOImage)
+    * ISO Image Delete (DeleteISOImage)
+    * ISO Image Events Get (GetISOImageEventList)
 * Object Storage
     * Object Storage's Access Keys Get (GetObjectStorageAccessKeyList)
     * Object Storage's Access Key Get (GetObjectStorageAccessKey)
