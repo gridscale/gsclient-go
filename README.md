@@ -128,6 +128,12 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * PaaS service security zone Create (CreatePaaSSecurityZone)
     * PaaS service security zone Update (UpdatePaaSSecurityZone)
     * PaaS service security zone Delete (DeletePaaSSecurityZone)
+* Object Storage
+    * Object Storage's Access Keys Get (GetObjectStorageAccessKeyList)
+    * Object Storage's Access Key Get (GetObjectStorageAccessKey)
+    * Object Storage's Access Key Create (CreateObjectStorageAccessKey)
+    * Object Storage's Access Key Delete (DeleteObjectStorageAccessKey)
+    * Object Storage's Buckets Get (GetObjectStorageBucketList)
     
 Note: The functions in this list can be called with a Client type.
 
