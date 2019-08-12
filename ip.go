@@ -62,19 +62,19 @@ type IpCreateResponse struct {
 }
 
 type IpCreateRequest struct {
-	Name         string        `json:"name,omitempty"`
-	Family       int           `json:"family"`
-	LocationUuid string        `json:"location_uuid"`
-	Failover     bool          `json:"failover,omitempty"`
-	ReverseDns   string        `json:"reverse_dns,omitempty"`
-	Labels       []interface{} `json:"labels,omitempty"`
+	Name         string   `json:"name,omitempty"`
+	Family       int      `json:"family"`
+	LocationUuid string   `json:"location_uuid"`
+	Failover     bool     `json:"failover,omitempty"`
+	ReverseDns   string   `json:"reverse_dns,omitempty"`
+	Labels       []string `json:"labels,omitempty"`
 }
 
 type IpUpdateRequest struct {
-	Name       string        `json:"name,omitempty"`
-	Failover   bool          `json:"failover"`
-	ReverseDns string        `json:"reverse_dns,omitempty"`
-	Labels     []interface{} `json:"labels"`
+	Name       string   `json:"name,omitempty"`
+	Failover   bool     `json:"failover"`
+	ReverseDns string   `json:"reverse_dns,omitempty"`
+	Labels     []string `json:"labels"`
 }
 
 //GetIp get a specific IP based on given id
