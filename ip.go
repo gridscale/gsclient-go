@@ -1,5 +1,10 @@
 package gsclient
 
+import (
+	"net/http"
+	"path"
+)
+
 type Ips struct {
 	List map[string]IpProperties `json:"ips"`
 }
@@ -72,41 +77,48 @@ type IpUpdateRequest struct {
 	Labels     []interface{} `json:"labels"`
 }
 
-func (c *Client) GetIp(id string) (*Ip, error) {
+//GetIp get a specific IP based on given id
+func (c *Client) GetIp(id string) (Ip, error) {
 	r := Request{
-		uri:    apiIpBase + "/" + id,
-		method: "GET",
+		uri:    path.Join(apiIpBase, id),
+		method: http.MethodGet,
 	}
 
-	response := new(Ip)
+	var response Ip
 	err := r.execute(*c, &response)
 
 	return response, err
 }
 
-func (c *Client) GetIpList() (*Ips, error) {
+//GetIpList gets a list of available IPs
+func (c *Client) GetIpList() ([]Ip, error) {
 	r := Request{
 		uri:    apiIpBase,
-		method: "GET",
+		method: http.MethodGet,
 	}
 
-	response := new(Ips)
+	var response Ips
+	var list []Ip
 	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		list = append(list, Ip{Properties: properties})
+	}
 
-	return response, err
+	return list, err
 }
 
-func (c *Client) CreateIp(body IpCreateRequest) (*IpCreateResponse, error) {
+//CreateIp creates an IP
+func (c *Client) CreateIp(body IpCreateRequest) (IpCreateResponse, error) {
 	r := Request{
 		uri:    apiIpBase,
-		method: "POST",
+		method: http.MethodPost,
 		body:   body,
 	}
 
-	response := new(IpCreateResponse)
+	var response IpCreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
-		return nil, err
+		return IpCreateResponse{}, err
 	}
 
 	err = c.WaitForRequestCompletion(response.RequestUuid)
@@ -114,26 +126,28 @@ func (c *Client) CreateIp(body IpCreateRequest) (*IpCreateResponse, error) {
 	return response, err
 }
 
+//DeleteIp deletes a specific IP based on given id
 func (c *Client) DeleteIp(id string) error {
 	r := Request{
-		uri:    apiIpBase + "/" + id,
-		method: "DELETE",
+		uri:    path.Join(apiIpBase, id),
+		method: http.MethodDelete,
 	}
 
 	return r.execute(*c, nil)
 }
 
+//UpdateIp updates a specific IP based on given id
 func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
 	r := Request{
-		uri:    apiIpBase + "/" + id,
-		method: "PATCH",
+		uri:    path.Join(apiIpBase, id),
+		method: http.MethodPatch,
 		body:   body,
 	}
 
 	return r.execute(*c, nil)
 }
 
-//Returns 0 if an error was encountered
+//GetIpVersion gets IP's version, returns 0 if an error was encountered
 func (c *Client) GetIpVersion(id string) int {
 	ip, err := c.GetIp(id)
 	if err != nil {
