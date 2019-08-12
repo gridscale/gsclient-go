@@ -141,6 +141,13 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Object Storage's Access Key Create (CreateObjectStorageAccessKey)
     * Object Storage's Access Key Delete (DeleteObjectStorageAccessKey)
     * Object Storage's Buckets Get (GetObjectStorageBucketList)
+* Firewall
+    * Firewalls Get (GetFirewallList)
+    * Firewall Get (GetFirewall)
+    * Firewall Create (CreateFirewall)
+    * Firewall Update (UpdateFirewall)
+    * Firewall Delete (DeleteFirewall)
+    * Firewall Events Get (GetFirewallEventList) 
     
 Note: The functions in this list can be called with a Client type.
 
