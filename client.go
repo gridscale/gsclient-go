@@ -10,6 +10,7 @@ const (
 	apiLoadBalancerBase = "/objects/loadbalancers"
 	apiPaaSBase         = "/objects/paas"
 	apiISOBase          = "/objects/isoimages"
+	apiObjectStorageBase = "/objects/objectstorages"
 )
 
 type Client struct {

@@ -135,6 +135,12 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * ISO Image Update (UpdateISOImage)
     * ISO Image Delete (DeleteISOImage)
     * ISO Image Events Get (GetISOImageEventList)
+* Object Storage
+    * Object Storage's Access Keys Get (GetObjectStorageAccessKeyList)
+    * Object Storage's Access Key Get (GetObjectStorageAccessKey)
+    * Object Storage's Access Key Create (CreateObjectStorageAccessKey)
+    * Object Storage's Access Key Delete (DeleteObjectStorageAccessKey)
+    * Object Storage's Buckets Get (GetObjectStorageBucketList)
     
 Note: The functions in this list can be called with a Client type.
 
