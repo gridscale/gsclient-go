@@ -100,6 +100,22 @@ func TestClient_DeleteIp(t *testing.T) {
 	}
 }
 
+func TestClient_GetIpEventList(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiNetworkBase, dummyUuid, "events")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareIpEventListHTTPGet())
+	})
+	res, err := client.GetIpEventList(dummyUuid)
+	if err != nil {
+		t.Errorf("GetIpEventList returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockIpEvent()), fmt.Sprintf("%v", res))
+}
+
 func TestClient_GetIpVersion(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
@@ -174,4 +190,25 @@ func getMockIpCreateResponse() IpCreateResponse {
 func prepareIpCreateResponse() string {
 	res, _ := json.Marshal(getMockIpCreateResponse())
 	return string(res)
+}
+
+func getMockIpEvent() IpEvent {
+	mock := IpEvent{Properties:IpEventProperties{
+		ObjectType:    "type",
+		RequestUuid:   dummyRequestUUID,
+		ObjectUuid:    dummyUuid,
+		Activity:      "activity",
+		RequestType:   "tcp",
+		RequestStatus: "done",
+		Change:        "change note",
+		Timestamp:     dummyTime,
+		UserUuid:      dummyUuid,
+	}}
+	return mock
+}
+
+func prepareIpEventListHTTPGet() string {
+	event := getMockIpEvent()
+	res, _ := json.Marshal(event.Properties)
+	return fmt.Sprintf(`{"events": [%s]}`, string(res))
 }

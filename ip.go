@@ -77,6 +77,26 @@ type IpUpdateRequest struct {
 	Labels     []string `json:"labels"`
 }
 
+type IpEventList struct {
+	List []IpEventProperties `json:"events"`
+}
+
+type IpEvent struct {
+	Properties IpEventProperties `json:"event"`
+}
+
+type IpEventProperties struct {
+	ObjectType    string `json:"object_type"`
+	RequestUuid   string `json:"request_uuid"`
+	ObjectUuid    string `json:"object_uuid"`
+	Activity      string `json:"activity"`
+	RequestType   string `json:"request_type"`
+	RequestStatus string `json:"request_status"`
+	Change        string `json:"change"`
+	Timestamp     string `json:"timestamp"`
+	UserUuid      string `json:"user_uuid"`
+}
+
 //GetIp get a specific IP based on given id
 func (c *Client) GetIp(id string) (Ip, error) {
 	r := Request{
@@ -146,6 +166,22 @@ func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
 
 	return r.execute(*c, nil)
 }
+
+//GetIpEventList gets a list of an IP's events
+func (c *Client) GetIpEventList(id string) ([]IpEvent, error) {
+	r := Request{
+		uri:    path.Join(apiNetworkBase, id, "events"),
+		method: http.MethodGet,
+	}
+	var response IpEventList
+	var list []IpEvent
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		list = append(list, IpEvent{Properties: properties})
+	}
+	return list, err
+}
+
 
 //GetIpVersion gets IP's version, returns 0 if an error was encountered
 func (c *Client) GetIpVersion(id string) int {
