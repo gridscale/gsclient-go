@@ -13,6 +13,22 @@ type ServerStorageSingle struct {
 	Properties ServerStorage `json:"storage_relation"`
 }
 
+type ServerStorage struct {
+	ObjectUuid       string `json:"object_uuid"`
+	ObjectName       string `json:"object_name"`
+	Capacity         int    `json:"capacity"`
+	StorageType      string `json:"storage_type"`
+	Target           int    `json:"target"`
+	Lun              int    `json:"lun"`
+	Controller       int    `json:"controller"`
+	CreateTime       string `json:"create_time"`
+	BootDevice       bool   `json:"bootdevice"`
+	Bus              int    `json:"bus"`
+	LastUsedTemplate string `json:"last_used_template"`
+	LicenseProductNo int    `json:"license_product_no"`
+	ServerUuid       string `json:"server_uuid"`
+}
+
 type ServerStorageCreateRequest struct {
 	ObjectUuid string `json:"object_uuid"`
 	BootDevice bool   `json:"bootdevice"`

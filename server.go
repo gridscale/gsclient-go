@@ -40,29 +40,6 @@ type ServerRelations struct {
 	Storages  []ServerStorage  `json:"storages"`
 }
 
-type ServerStorage struct {
-	ObjectUuid       string `json:"object_uuid"`
-	ObjectName       string `json:"object_name"`
-	Capacity         int    `json:"capacity"`
-	StorageType      string `json:"storage_type"`
-	Target           int    `json:"target"`
-	Lun              int    `json:"lun"`
-	Controller       int    `json:"controller"`
-	CreateTime       string `json:"create_time"`
-	BootDevice       bool   `json:"bootdevice"`
-	Bus              int    `json:"bus"`
-	LastUsedTemplate string `json:"last_used_template"`
-	LicenseProductNo int    `json:"license_product_no"`
-	ServerUuid       string `json:"server_uuid"`
-}
-
-type ServerIsoImage struct {
-	ObjectUuid string `json:"object_uuid"`
-	ObjectName string `json:"object_name"`
-	Private    bool   `json:"private"`
-	CreateTime string `json:"create_time"`
-}
-
 type ServerNetwork struct {
 	L2security           bool   `json:"l2security"`
 	ServerUuid           string `json:"server_uuid"`
@@ -82,15 +59,6 @@ type ServerNetwork struct {
 	//Vlan                 int          `json:"vlan,omitempty"`
 	//Vxlan                int          `json:"vxlan,omitempty"`
 	//Mcast                string       `json:"mcast, omitempty"`
-}
-
-type ServerIp struct {
-	ServerUuid string `json:"server_uuid"`
-	CreateTime string `json:"create_time"`
-	Prefix     string `json:"prefix"`
-	Family     int    `json:"family"`
-	ObjectUuid string `json:"object_uuid"`
-	Ip         string `json:"ip"`
 }
 
 type ServerCreateRequest struct {

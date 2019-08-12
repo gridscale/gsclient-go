@@ -13,6 +13,15 @@ type ServerIpSingle struct {
 	Properties ServerIp `json:"ip_relation"`
 }
 
+type ServerIp struct {
+	ServerUuid string `json:"server_uuid"`
+	CreateTime string `json:"create_time"`
+	Prefix     string `json:"prefix"`
+	Family     int    `json:"family"`
+	ObjectUuid string `json:"object_uuid"`
+	Ip         string `json:"ip"`
+}
+
 type ServerIpCreateRequest struct {
 	ObjectUuid string `json:"object_uuid"`
 }
