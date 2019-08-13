@@ -39,7 +39,7 @@ type ServerNetworkCreateRequest struct {
 	Ordering             int           `json:"ordering"`
 	BootDevice           bool          `json:"bootdevice"`
 	L3security           []string      `json:"l3security"`
-	//Firewall             FirewallRules `json:"firewall"`
+	Firewall             FirewallRules `json:"firewall"`
 	FirewallTemplateUuid string        `json:"firewall_template_uuid"`
 }
 
@@ -47,10 +47,9 @@ type ServerNetworkUpdateRequest struct {
 	Ordering             int           `json:"ordering"`
 	BootDevice           bool          `json:"bootdevice"`
 	L3security           []string      `json:"l3security"`
-	//Firewall             FirewallRules `json:"firewall"`
+	Firewall             FirewallRules `json:"firewall"`
 	FirewallTemplateUuid string        `json:"firewall_template_uuid"`
 }
-
 
 //GetServerNetworkList gets a list of a specific server's networks
 func (c *Client) GetServerNetworkList(id string) ([]ServerNetwork, error) {
