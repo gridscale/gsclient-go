@@ -86,6 +86,7 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Storage Create (CreateStorage)
     * Storage Patch (UpdateStorage)
     * Storage Delete (DeleteStorage)
+    * Storage's events Get (GetStorageEventList)
 * Networks
     * Networks Get (GetNetworkList)
     * Network Get (GetNetwork)
