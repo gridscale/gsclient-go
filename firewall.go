@@ -103,12 +103,12 @@ func (c *Client) GetFirewallList() ([]Firewall, error) {
 		method: http.MethodGet,
 	}
 	var response FirewallList
-	var list []Firewall
+	var firewalls []Firewall
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, Firewall{Properties: properties})
+		firewalls = append(firewalls, Firewall{Properties: properties})
 	}
-	return list, err
+	return firewalls, err
 }
 
 //GetFirewall gets a specific firewall based on given id
@@ -164,10 +164,10 @@ func (c *Client) GetFirewallEventList(id string) ([]FirewallEvent, error) {
 		method: http.MethodGet,
 	}
 	var response FirewallEventList
-	var list []FirewallEvent
+	var firewallEvents []FirewallEvent
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, FirewallEvent{Properties: properties})
+		firewallEvents = append(firewallEvents, FirewallEvent{Properties: properties})
 	}
-	return list, err
+	return firewallEvents, err
 }
