@@ -251,9 +251,9 @@ func (c *Client) IsServerOn(id string) (bool, error) {
 	return server.Properties.Power, nil
 }
 
-//TurnOnOffServer turn on/off a specific server.
+//turnOnOffServer turn on/off a specific server.
 //turnOn=true to turn on, turnOn=false to turn off
-func (c *Client) TurnOnOffServer(id string, turnOn bool) error {
+func (c *Client) turnOnOffServer(id string, turnOn bool) error {
 	isOn, err := c.IsServerOn(id)
 	if err != nil {
 		return err
@@ -276,6 +276,16 @@ func (c *Client) TurnOnOffServer(id string, turnOn bool) error {
 	}
 
 	return c.WaitForServerPowerStatus(id, turnOn)
+}
+
+//StartServer starts a server
+func (c *Client) StartServer(id string) error {
+	return c.turnOnOffServer(id, true)
+}
+
+//StopServer stops a server
+func (c *Client) StopServer(id string) error {
+	return c.turnOnOffServer(id, false)
 }
 
 //ShutdownServer shutdowns a specific server
@@ -303,7 +313,7 @@ func (c *Client) ShutdownServer(id string) error {
 	//If we get an error, which includes a timeout, power off the server instead
 	err = c.WaitForServerPowerStatus(id, false)
 	if err != nil {
-		return c.TurnOnOffServer(id, false)
+		return c.turnOnOffServer(id, false)
 	}
 
 	return nil
