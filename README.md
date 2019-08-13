@@ -158,6 +158,13 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Storage Snapshot Delete (DeleteStorageSnapshot)
     * Storage Rollback (RollbackStorage)
     * Storage Snapshot Export to S3 (ExportStorageSnapshotToS3)
+* Firewall
+    * Firewalls Get (GetFirewallList)
+    * Firewall Get (GetFirewall)
+    * Firewall Create (CreateFirewall)
+    * Firewall Update (UpdateFirewall)
+    * Firewall Delete (DeleteFirewall)
+    * Firewall Events Get (GetFirewallEventList) 
     
 Note: The functions in this list can be called with a Client type.
 
