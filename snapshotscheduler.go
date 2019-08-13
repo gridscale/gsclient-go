@@ -28,10 +28,10 @@ type StorageSnapshotSchedulerProperties struct {
 }
 
 type StorageSnapshotRelations struct {
-	Snapshots []StorageSnapshotRelation `json:"snapshots"`
+	Snapshots []StorageSnapshotSchedulerRelation `json:"snapshots"`
 }
 
-type StorageSnapshotRelation struct {
+type StorageSnapshotSchedulerRelation struct {
 	CreateTime string `json:"create_time"`
 	Name       string `json:"name"`
 	ObjectUuid string `json:"object_uuid"`
