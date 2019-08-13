@@ -1,5 +1,10 @@
 package gsclient
 
+import (
+	"net/http"
+	"path"
+)
+
 type Ips struct {
 	List map[string]IpProperties `json:"ips"`
 }
@@ -57,56 +62,83 @@ type IpCreateResponse struct {
 }
 
 type IpCreateRequest struct {
-	Name         string        `json:"name,omitempty"`
-	Family       int           `json:"family"`
-	LocationUuid string        `json:"location_uuid"`
-	Failover     bool          `json:"failover,omitempty"`
-	ReverseDns   string        `json:"reverse_dns,omitempty"`
-	Labels       []interface{} `json:"labels,omitempty"`
+	Name         string   `json:"name,omitempty"`
+	Family       int      `json:"family"`
+	LocationUuid string   `json:"location_uuid"`
+	Failover     bool     `json:"failover,omitempty"`
+	ReverseDns   string   `json:"reverse_dns,omitempty"`
+	Labels       []string `json:"labels,omitempty"`
 }
 
 type IpUpdateRequest struct {
-	Name       string        `json:"name,omitempty"`
-	Failover   bool          `json:"failover"`
-	ReverseDns string        `json:"reverse_dns,omitempty"`
-	Labels     []interface{} `json:"labels"`
+	Name       string   `json:"name,omitempty"`
+	Failover   bool     `json:"failover"`
+	ReverseDns string   `json:"reverse_dns,omitempty"`
+	Labels     []string `json:"labels"`
 }
 
-func (c *Client) GetIp(id string) (*Ip, error) {
+type IpEventList struct {
+	List []IpEventProperties `json:"events"`
+}
+
+type IpEvent struct {
+	Properties IpEventProperties `json:"event"`
+}
+
+type IpEventProperties struct {
+	ObjectType    string `json:"object_type"`
+	RequestUuid   string `json:"request_uuid"`
+	ObjectUuid    string `json:"object_uuid"`
+	Activity      string `json:"activity"`
+	RequestType   string `json:"request_type"`
+	RequestStatus string `json:"request_status"`
+	Change        string `json:"change"`
+	Timestamp     string `json:"timestamp"`
+	UserUuid      string `json:"user_uuid"`
+}
+
+//GetIp get a specific IP based on given id
+func (c *Client) GetIp(id string) (Ip, error) {
 	r := Request{
-		uri:    apiIpBase + "/" + id,
-		method: "GET",
+		uri:    path.Join(apiIpBase, id),
+		method: http.MethodGet,
 	}
 
-	response := new(Ip)
+	var response Ip
 	err := r.execute(*c, &response)
 
 	return response, err
 }
 
-func (c *Client) GetIpList() (*Ips, error) {
+//GetIpList gets a list of available IPs
+func (c *Client) GetIpList() ([]Ip, error) {
 	r := Request{
 		uri:    apiIpBase,
-		method: "GET",
+		method: http.MethodGet,
 	}
 
-	response := new(Ips)
+	var response Ips
+	var IPs []Ip
 	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPs = append(IPs, Ip{Properties: properties})
+	}
 
-	return response, err
+	return IPs, err
 }
 
-func (c *Client) CreateIp(body IpCreateRequest) (*IpCreateResponse, error) {
+//CreateIp creates an IP
+func (c *Client) CreateIp(body IpCreateRequest) (IpCreateResponse, error) {
 	r := Request{
 		uri:    apiIpBase,
-		method: "POST",
+		method: http.MethodPost,
 		body:   body,
 	}
 
-	response := new(IpCreateResponse)
+	var response IpCreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
-		return nil, err
+		return IpCreateResponse{}, err
 	}
 
 	err = c.WaitForRequestCompletion(response.RequestUuid)
@@ -114,26 +146,44 @@ func (c *Client) CreateIp(body IpCreateRequest) (*IpCreateResponse, error) {
 	return response, err
 }
 
+//DeleteIp deletes a specific IP based on given id
 func (c *Client) DeleteIp(id string) error {
 	r := Request{
-		uri:    apiIpBase + "/" + id,
-		method: "DELETE",
+		uri:    path.Join(apiIpBase, id),
+		method: http.MethodDelete,
 	}
 
 	return r.execute(*c, nil)
 }
 
+//UpdateIp updates a specific IP based on given id
 func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
 	r := Request{
-		uri:    apiIpBase + "/" + id,
-		method: "PATCH",
+		uri:    path.Join(apiIpBase, id),
+		method: http.MethodPatch,
 		body:   body,
 	}
 
 	return r.execute(*c, nil)
 }
 
-//Returns 0 if an error was encountered
+//GetIpEventList gets a list of an IP's events
+func (c *Client) GetIpEventList(id string) ([]IpEvent, error) {
+	r := Request{
+		uri:    path.Join(apiNetworkBase, id, "events"),
+		method: http.MethodGet,
+	}
+	var response IpEventList
+	var IPevents []IpEvent
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPevents = append(IPevents, IpEvent{Properties: properties})
+	}
+	return IPevents, err
+}
+
+
+//GetIpVersion gets IP's version, returns 0 if an error was encountered
 func (c *Client) GetIpVersion(id string) int {
 	ip, err := c.GetIp(id)
 	if err != nil {

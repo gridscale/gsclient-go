@@ -1,4 +1,5 @@
 # The gridscale Go Client
+[![Build Status](https://travis-ci.com/gridscale/gsclient-go.svg?branch=master)](https://travis-ci.com/gridscale/gsclient-go)
 
 This is a client for the gridscale API. It can be used to make an application interact with the gridscale cloud platform to create and manage resources.
 
@@ -105,6 +106,8 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * IP Create (CreateIp)
     * IP Patch (UpdateIp)
     * IP Delete (DeleteIp)
+    * IP Events Get (GetIpEventList)
+    * IP Version Get (GetIpVersion)
 * SSH-Keys
     * SSH-Keys Get (GetSshkeyList)
     * SSH-Key Get (GetSshkey)
