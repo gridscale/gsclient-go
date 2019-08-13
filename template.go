@@ -2,9 +2,11 @@ package gsclient
 
 import (
 	"fmt"
+	"net/http"
+	"path"
 )
 
-type Templates struct {
+type TemplateList struct {
 	List map[string]TemplateProperties `json:"templates"`
 }
 
@@ -34,42 +36,40 @@ type TemplateProperties struct {
 	Labels           []string `json:"labels"`
 }
 
-func (c *Client) GetTemplate(id string) (*Template, error) {
+//GetTemplate gets a template
+func (c *Client) GetTemplate(id string) (Template, error) {
 	r := Request{
-		uri:    apiTemplateBase + "/" + id,
-		method: "GET",
+		uri:    path.Join(apiTemplateBase, id),
+		method: http.MethodGet,
 	}
-
-	response := new(Template)
+	var response Template
 	err := r.execute(*c, &response)
 
 	return response, err
 }
 
+//GetTemplateList gets a list of templates
 func (c *Client) GetTemplateList() ([]Template, error) {
 	r := Request{
 		uri:    apiTemplateBase,
-		method: "GET",
+		method: http.MethodGet,
 	}
-
-	response := new(Templates)
+	var response TemplateList
+	var templates []Template
 	err := r.execute(*c, &response)
-
-	list := []Template{}
 	for _, properties := range response.List {
-		template := Template{
+		templates = append(templates, Template{
 			Properties: properties,
-		}
-		list = append(list, template)
+		})
 	}
-
-	return list, err
+	return templates, err
 }
 
-func (c *Client) GetTemplateByName(name string) (*Template, error) {
+//GetTemplateByName gets a template by its name
+func (c *Client) GetTemplateByName(name string) (Template, error) {
 	templates, err := c.GetTemplateList()
 	if err != nil {
-		return nil, err
+		return Template{}, err
 	}
 	for _, template := range templates {
 		if template.Properties.Name == name {
@@ -77,5 +77,5 @@ func (c *Client) GetTemplateByName(name string) (*Template, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("Template %v not found", name)
+	return Template{}, fmt.Errorf("Template %v not found", name)
 }
