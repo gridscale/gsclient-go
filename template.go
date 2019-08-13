@@ -104,7 +104,7 @@ func (c *Client) GetTemplateByName(name string) (Template, error) {
 	}
 	for _, template := range templates {
 		if template.Properties.Name == name {
-			return c.GetTemplate(template.Properties.ObjectUuid)
+			return Template{Properties:template.Properties}, nil
 		}
 	}
 
