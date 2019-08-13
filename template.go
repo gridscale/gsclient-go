@@ -118,9 +118,9 @@ func (c *Client) CreateTemplate(body TemplateCreateRequest) (CreateResponse, err
 		method: http.MethodPost,
 		body:   body,
 	}
-	var resonse CreateResponse
-	err := r.execute(*c, &resonse)
-	return resonse, err
+	var response CreateResponse
+	err := r.execute(*c, &response)
+	return response, err
 }
 
 //UpdateTemplate updates a template
