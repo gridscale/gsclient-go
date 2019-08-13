@@ -1,5 +1,5 @@
 # The gridscale Go Client
-
+[![Build Status](https://travis-ci.com/gridscale/gsclient-go.svg?branch=master)](https://travis-ci.com/gridscale/gsclient-go)
 This is a client for the gridscale API. It can be used to make an application interact with the gridscale cloud platform to create and manage resources.
 
 ## Preparation for Use
