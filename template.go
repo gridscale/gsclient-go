@@ -36,6 +36,37 @@ type TemplateProperties struct {
 	Labels           []string `json:"labels"`
 }
 
+type TemplateEventList struct {
+	List []TemplateEventProperties `json:"events"`
+}
+
+type TemplateEvent struct {
+	Properties TemplateEventProperties `json:"event"`
+}
+
+type TemplateEventProperties struct {
+	ObjectType    string `json:"object_type"`
+	RequestUuid   string `json:"request_uuid"`
+	ObjectUuid    string `json:"object_uuid"`
+	Activity      string `json:"activity"`
+	RequestType   string `json:"request_type"`
+	RequestStatus string `json:"request_status"`
+	Change        string `json:"change"`
+	Timestamp     string `json:"timestamp"`
+	UserUuid      string `json:"user_uuid"`
+}
+
+type TemplateCreateRequest struct {
+	Name         string   `json:"name"`
+	SnapshotUuid string   `json:"snapshot_uuid"`
+	Labels       []string `json:"labels"`
+}
+
+type TemplateUpdateRequest struct {
+	Name   string   `json:"name"`
+	Labels []string `json:"labels"`
+}
+
 //GetTemplate gets a template
 func (c *Client) GetTemplate(id string) (Template, error) {
 	r := Request{
@@ -78,4 +109,50 @@ func (c *Client) GetTemplateByName(name string) (Template, error) {
 	}
 
 	return Template{}, fmt.Errorf("Template %v not found", name)
+}
+
+//CreateTemplate creates a template
+func (c *Client) CreateTemplate(body TemplateCreateRequest) (CreateResponse, error) {
+	r := Request{
+		uri:    apiTemplateBase,
+		method: http.MethodPost,
+		body:   body,
+	}
+	var resonse CreateResponse
+	err := r.execute(*c, &resonse)
+	return resonse, err
+}
+
+//UpdateTemplate updates a template
+func (c *Client) UpdateTemplate(id string, body TemplateUpdateRequest) error {
+	r := Request{
+		uri:    path.Join(apiTemplateBase, id),
+		method: http.MethodPatch,
+		body:   body,
+	}
+	return r.execute(*c, nil)
+}
+
+//DeleteTemplate deletes a template
+func (c *Client) DeleteTemplate(id string) error {
+	r := Request{
+		uri:    path.Join(apiTemplateBase, id),
+		method: http.MethodDelete,
+	}
+	return r.execute(*c, nil)
+}
+
+//GetTemplateEventList gets a list of a template's events
+func (c *Client) GetTemplateEventList(id string) ([]TemplateEvent, error) {
+	r := Request{
+		uri:    path.Join(apiTemplateBase, id, "events"),
+		method: http.MethodGet,
+	}
+	var response TemplateEventList
+	var templateEvents []TemplateEvent
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		templateEvents = append(templateEvents, TemplateEvent{Properties:properties})
+	}
+	return templateEvents, err
 }

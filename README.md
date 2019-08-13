@@ -118,6 +118,10 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Templates Get (GetTemplateList)
     * Template Get (GetTemplate)
     * (GetTemplateByName) No official endpoint, but gives a template which matches the exact name given.
+    * Template Create (CreateTemplate)
+    * Template Update (UpdateTemplate)
+    * Template Delete (DeleteTemplate)
+    * Template's events Get (GetTemplateEventList)
 * PaaS
     * PaaS services Get (GetPaaSServiceList)
     * PaaS service Get (GetPaaSService)
