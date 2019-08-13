@@ -160,16 +160,15 @@ func (c *Client) GetServerList() ([]Server, error) {
 	}
 
 	var response Servers
+	var servers []Server
 	err := r.execute(*c, &response)
-
-	list := []Server{}
 	for _, properties := range response.List {
-		list = append(list, Server{
+		servers = append(servers, Server{
 			Properties: properties,
 		})
 	}
 
-	return list, err
+	return servers, err
 }
 
 //CreateServer create a server
@@ -219,12 +218,12 @@ func (c *Client) GetServerEventList(id string) ([]ServerEvent, error) {
 		method: http.MethodGet,
 	}
 	var response ServerEventList
-	var list []ServerEvent
+	var serverEvents []ServerEvent
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, ServerEvent{Properties: properties})
+		serverEvents = append(serverEvents, ServerEvent{Properties: properties})
 	}
-	return list, err
+	return serverEvents, err
 }
 
 //GetServerMetricList gets a list of a specific server's metrics
