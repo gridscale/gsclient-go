@@ -105,6 +105,8 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * IP Create (CreateIp)
     * IP Patch (UpdateIp)
     * IP Delete (DeleteIp)
+    * IP Events Get (GetIpEventList)
+    * IP Version Get (GetIpVersion)
 * SSH-Keys
     * SSH-Keys Get (GetSshkeyList)
     * SSH-Key Get (GetSshkey)
