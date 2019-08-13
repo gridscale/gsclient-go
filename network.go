@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"fmt"
 	"net/http"
 	"path"
 )
@@ -176,4 +177,19 @@ func (c *Client) GetNetworkEventList(id string) ([]NetworkEvent, error) {
 		list = append(list, NetworkEvent{Properties: properties})
 	}
 	return list, err
+}
+
+//GetNetworkPublic gets public network
+func (c *Client) GetNetworkPublic() (Network, error) {
+	networks, err := c.GetNetworkList()
+	if err != nil {
+		return Network{}, err
+	}
+	for _, network := range networks {
+		if network.Properties.PublicNet {
+			return c.GetNetwork(network.Properties.ObjectUuid)
+		}
+	}
+
+	return Network{}, fmt.Errorf("Public Network not found")
 }
