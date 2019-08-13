@@ -118,13 +118,13 @@ func (c *Client) GetIpList() ([]Ip, error) {
 	}
 
 	var response Ips
-	var list []Ip
+	var IPs []Ip
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, Ip{Properties: properties})
+		IPs = append(IPs, Ip{Properties: properties})
 	}
 
-	return list, err
+	return IPs, err
 }
 
 //CreateIp creates an IP
@@ -174,12 +174,12 @@ func (c *Client) GetIpEventList(id string) ([]IpEvent, error) {
 		method: http.MethodGet,
 	}
 	var response IpEventList
-	var list []IpEvent
+	var IPevents []IpEvent
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, IpEvent{Properties: properties})
+		IPevents = append(IPevents, IpEvent{Properties: properties})
 	}
-	return list, err
+	return IPevents, err
 }
 
 
