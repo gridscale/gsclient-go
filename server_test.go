@@ -152,7 +152,7 @@ func TestClient_IsServerOn(t *testing.T) {
 	assert.Equal(t, true, isOn)
 }
 
-func TestClient_TurnOnOffServer(t *testing.T) {
+func TestClient_turnOnOffServer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUuid)
@@ -166,9 +166,49 @@ func TestClient_TurnOnOffServer(t *testing.T) {
 		power = false
 		fmt.Fprint(writer, "")
 	})
-	err := client.TurnOnOffServer(dummyUuid, false)
+	err := client.turnOnOffServer(dummyUuid, false)
 	if err != nil {
-		t.Errorf("TurnOnOffServer returned an error %v", err)
+		t.Errorf("turnOnOffServer returned an error %v", err)
+	}
+}
+
+func TestClient_StartServer(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiServerBase, dummyUuid)
+	power := false
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareServerHTTPGet(power))
+	})
+	mux.HandleFunc(uri + "/power", func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodPatch, request.Method)
+		power = true
+		fmt.Fprint(writer, "")
+	})
+	err := client.StartServer(dummyUuid)
+	if err != nil {
+		t.Errorf("StartServer returned an error %v", err)
+	}
+}
+
+func TestClient_StopServer(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiServerBase, dummyUuid)
+	power := true
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareServerHTTPGet(power))
+	})
+	mux.HandleFunc(uri + "/power", func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodPatch, request.Method)
+		power = false
+		fmt.Fprint(writer, "")
+	})
+	err := client.StopServer(dummyUuid)
+	if err != nil {
+		t.Errorf("StopServer returned an error %v", err)
 	}
 }
 
