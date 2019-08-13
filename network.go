@@ -152,16 +152,15 @@ func (c *Client) GetNetworkList() ([]Network, error) {
 	}
 
 	var response Networks
+	var networks []Network
 	err := r.execute(*c, &response)
-
-	list := []Network{}
 	for _, properties := range response.List {
-		list = append(list, Network{
+		networks = append(networks, Network{
 			Properties: properties,
 		})
 	}
 
-	return list, err
+	return networks, err
 }
 
 //GetNetworkEventList gets a list of a network's events
@@ -171,12 +170,12 @@ func (c *Client) GetNetworkEventList(id string) ([]NetworkEvent, error) {
 		method: http.MethodGet,
 	}
 	var response NetworkEventList
-	var list []NetworkEvent
+	var networkEvents []NetworkEvent
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, NetworkEvent{Properties: properties})
+		networkEvents = append(networkEvents, NetworkEvent{Properties: properties})
 	}
-	return list, err
+	return networkEvents, err
 }
 
 //GetNetworkPublic gets public network
