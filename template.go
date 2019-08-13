@@ -13,12 +13,25 @@ type Template struct {
 }
 
 type TemplateProperties struct {
-	Name       string `json:"name"`
-	ObjectUuid string `json:"object_uuid"`
-	Status     string `json:"status"`
-	CreateTime string `json:"create_time"`
-	ChangeTime string `json:"change_time"`
-	Template   string `json:"sshkey"`
+	Status           string   `json:"status"`
+	Ostype           string   `json:"ostype"`
+	LocationUuid     string   `json:"location_uuid"`
+	Version          string   `json:"version"`
+	LocationIata     string   `json:"location_iata"`
+	ChangeTime       string   `json:"change_time"`
+	Private          bool     `json:"private"`
+	ObjectUuid       string   `json:"object_uuid"`
+	LicenseProductNo int      `json:"license_product_no"`
+	CreateTime       string   `json:"create_time"`
+	UsageInMinutes   int      `json:"usage_in_minutes"`
+	Capacity         int      `json:"capacity"`
+	LocationName     string   `json:"location_name"`
+	Distro           string   `json:"distro"`
+	Description      string   `json:"description"`
+	CurrentPrice     float64  `json:"current_price"`
+	LocationCountry  string   `json:"location_country"`
+	Name             string   `json:"name"`
+	Labels           []string `json:"labels"`
 }
 
 func (c *Client) GetTemplate(id string) (*Template, error) {
