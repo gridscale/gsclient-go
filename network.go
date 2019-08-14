@@ -2,6 +2,8 @@ package gsclient
 
 import (
 	"fmt"
+	"net/http"
+	"path"
 )
 
 type Networks struct {
@@ -53,40 +55,67 @@ type NetworkServer struct {
 }
 
 type NetworkCreateRequest struct {
-	Name         string        `json:"name"`
-	Labels       []interface{} `json:"labels,omitempty"`
-	LocationUuid string        `json:"location_uuid"`
-	L2Security   bool          `json:"l2security,omitempty"`
+	Name         string   `json:"name"`
+	Labels       []string `json:"labels,omitempty"`
+	LocationUuid string   `json:"location_uuid"`
+	L2Security   bool     `json:"l2security,omitempty"`
+}
+
+type NetworkCreateResponse struct {
+	ObjectUuid  string `json:"object_uuid"`
+	RequestUuid string `json:"request_uuid"`
 }
 
 type NetworkUpdateRequest struct {
-	Name       string        `json:"name,omitempty"`
-	Labels     []interface{} `json:"labels"`
-	L2Security bool          `json:"l2security"`
+	Name       string   `json:"name,omitempty"`
+	Labels     []string `json:"labels"`
+	L2Security bool     `json:"l2security"`
 }
 
-func (c *Client) GetNetwork(id string) (*Network, error) {
+type NetworkEventList struct {
+	List []NetworkEventProperties `json:"events"`
+}
+
+type NetworkEvent struct {
+	Properties NetworkEventProperties `json:"event"`
+}
+
+type NetworkEventProperties struct {
+	ObjectType    string `json:"object_type"`
+	RequestUuid   string `json:"request_uuid"`
+	ObjectUuid    string `json:"object_uuid"`
+	Activity      string `json:"activity"`
+	RequestType   string `json:"request_type"`
+	RequestStatus string `json:"request_status"`
+	Change        string `json:"change"`
+	Timestamp     string `json:"timestamp"`
+	UserUuid      string `json:"user_uuid"`
+}
+
+//GetNetwork get a specific network based on given id
+func (c *Client) GetNetwork(id string) (Network, error) {
 	r := Request{
-		uri:    apiNetworkBase + "/" + id,
-		method: "GET",
+		uri:    path.Join(apiNetworkBase, id),
+		method: http.MethodGet,
 	}
-	response := new(Network)
+	var response Network
 	err := r.execute(*c, &response)
 
 	return response, err
 }
 
-func (c *Client) CreateNetwork(body NetworkCreateRequest) (*CreateResponse, error) {
+//CreateNetwork creates a network
+func (c *Client) CreateNetwork(body NetworkCreateRequest) (NetworkCreateResponse, error) {
 	r := Request{
 		uri:    apiNetworkBase,
-		method: "POST",
+		method: http.MethodPost,
 		body:   body,
 	}
 
-	response := new(CreateResponse)
+	var response NetworkCreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
-		return nil, err
+		return NetworkCreateResponse{}, err
 	}
 
 	err = c.WaitForRequestCompletion(response.RequestUuid)
@@ -94,49 +123,66 @@ func (c *Client) CreateNetwork(body NetworkCreateRequest) (*CreateResponse, erro
 	return response, err
 }
 
+//DeleteNetwork deletes a specific network based on given id
 func (c *Client) DeleteNetwork(id string) error {
 	r := Request{
-		uri:    apiNetworkBase + "/" + id,
-		method: "DELETE",
+		uri:    path.Join(apiNetworkBase, id),
+		method: http.MethodDelete,
 	}
 
 	return r.execute(*c, nil)
 }
 
+//UpdateNetwork updates a specific network based on given id
 func (c *Client) UpdateNetwork(id string, body NetworkUpdateRequest) error {
 	r := Request{
-		uri:    apiNetworkBase + "/" + id,
-		method: "PATCH",
+		uri:    path.Join(apiNetworkBase, id),
+		method: http.MethodPatch,
 		body:   body,
 	}
 
 	return r.execute(*c, nil)
 }
 
+//GetNetworkList gets a list of available networks
 func (c *Client) GetNetworkList() ([]Network, error) {
 	r := Request{
 		uri:    apiNetworkBase,
-		method: "GET",
+		method: http.MethodGet,
 	}
 
-	response := new(Networks)
+	var response Networks
+	var networks []Network
 	err := r.execute(*c, &response)
-
-	list := []Network{}
 	for _, properties := range response.List {
-		network := Network{
+		networks = append(networks, Network{
 			Properties: properties,
-		}
-		list = append(list, network)
+		})
 	}
 
-	return list, err
+	return networks, err
 }
 
-func (c *Client) GetNetworkPublic() (*Network, error) {
+//GetNetworkEventList gets a list of a network's events
+func (c *Client) GetNetworkEventList(id string) ([]NetworkEvent, error) {
+	r := Request{
+		uri:    path.Join(apiNetworkBase, id, "events"),
+		method: http.MethodGet,
+	}
+	var response NetworkEventList
+	var networkEvents []NetworkEvent
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		networkEvents = append(networkEvents, NetworkEvent{Properties: properties})
+	}
+	return networkEvents, err
+}
+
+//GetNetworkPublic gets public network
+func (c *Client) GetNetworkPublic() (Network, error) {
 	networks, err := c.GetNetworkList()
 	if err != nil {
-		return nil, err
+		return Network{}, err
 	}
 	for _, network := range networks {
 		if network.Properties.PublicNet {
@@ -144,5 +190,5 @@ func (c *Client) GetNetworkPublic() (*Network, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("Public Network not found")
+	return Network{}, fmt.Errorf("Public Network not found")
 }

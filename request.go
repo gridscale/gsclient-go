@@ -19,7 +19,6 @@ type Request struct {
 type CreateResponse struct {
 	ObjectUuid  string `json:"object_uuid"`
 	RequestUuid string `json:"request_uuid"`
-	ServerUuid  string `json:"server_uuid"`
 }
 
 type RequestStatus map[string]RequestStatusProperties
