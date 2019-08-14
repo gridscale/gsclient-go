@@ -57,7 +57,7 @@ func TestClient_CreateServerIp(t *testing.T) {
 	}
 }
 
-func TestClient_DeleteServerId(t *testing.T) {
+func TestClient_DeleteServerIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUuid, "ips", dummyUuid)
@@ -65,9 +65,9 @@ func TestClient_DeleteServerId(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteServerId(dummyUuid, dummyUuid)
+	err := client.DeleteServerIp(dummyUuid, dummyUuid)
 	if err != nil {
-		t.Errorf("DeleteServerId returned an error %v", err)
+		t.Errorf("DeleteServerIp returned an error %v", err)
 	}
 }
 

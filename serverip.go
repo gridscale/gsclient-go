@@ -26,7 +26,6 @@ type ServerIpCreateRequest struct {
 	ObjectUuid string `json:"object_uuid"`
 }
 
-
 //GetServerIpList gets a list of a specific server's IPs
 func (c *Client) GetServerIpList(id string) ([]ServerIp, error) {
 	r := Request{
@@ -59,24 +58,24 @@ func (c *Client) CreateServerIp(id string, body ServerIpCreateRequest) error {
 	return r.execute(*c, nil)
 }
 
-//DeleteServerId delete a link between a storage and an IP
-func (c *Client) DeleteServerId(serverId, ipId string) error {
+//DeleteServerIp delete a link between a storage and an IP
+func (c *Client) DeleteServerIp(serverId, ipID string) error {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "ips", ipId),
+		uri:    path.Join(apiServerBase, serverId, "ips", ipID),
 		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)
 }
 
 //LinkIp attaches an IP to a server
-func (c *Client) LinkIp(serverid string, ipid string) error {
+func (c *Client) LinkIp(serverId string, ipID string) error {
 	body := ServerIpCreateRequest{
-		ObjectUuid:ipid,
+		ObjectUuid: ipID,
 	}
-	return c.CreateServerIp(serverid, body)
+	return c.CreateServerIp(serverId, body)
 }
 
 //UnlinkIp removes a link between an IP and a server
-func (c *Client) UnlinkIp(serverid string, ipid string) error {
-	return c.DeleteServerId(serverid, ipid)
+func (c *Client) UnlinkIp(serverId string, ipID string) error {
+	return c.DeleteServerIp(serverId, ipID)
 }

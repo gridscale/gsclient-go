@@ -100,7 +100,7 @@ func TestClient_LinkNetwork(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.LinkNetwork(dummyUuid, dummyUuid, dummyUuid, true, 0, nil)
+	err := client.LinkNetwork(dummyUuid, dummyUuid, dummyUuid, true, 0, nil, FirewallRules{})
 	if err != nil {
 		t.Errorf("LinkNetwork returned an error %v", err)
 	}

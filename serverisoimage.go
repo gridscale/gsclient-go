@@ -81,15 +81,15 @@ func (c *Client) DeleteServerIsoImage(serverId, isoImageId string) error {
 	return r.execute(*c, nil)
 }
 
-//LinkIsoimage attaches an ISO image to a server
-func (c *Client) LinkIsoimage(serverid string, isoimageid string) error {
+//LinkIsoImage attaches an ISO image to a server
+func (c *Client) LinkIsoImage(serverId string, isoimageId string) error {
 	body := ServerIsoImageCreateRequest{
-		ObjectUuid:isoimageid,
+		ObjectUuid: isoimageId,
 	}
-	return c.CreateServerIsoImage(serverid, body)
+	return c.CreateServerIsoImage(serverId, body)
 }
 
-//UnlinkIsoimage removes the link between an ISO image and a server
-func (c *Client) UnlinkIsoimage(serverid string, isoimageid string) error {
-	return c.DeleteServerIsoImage(serverid, isoimageid)
+//UnlinkIsoImage removes the link between an ISO image and a server
+func (c *Client) UnlinkIsoImage(serverId string, isoimageId string) error {
+	return c.DeleteServerIsoImage(serverId, isoimageId)
 }

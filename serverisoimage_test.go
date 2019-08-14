@@ -87,7 +87,7 @@ func TestClient_DeleteServerIsoImage(t *testing.T) {
 	}
 }
 
-func TestClient_LinkIsoimage(t *testing.T) {
+func TestClient_LinkIsoImage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUuid, "isoimages")
@@ -95,13 +95,13 @@ func TestClient_LinkIsoimage(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.LinkIsoimage(dummyUuid, dummyUuid)
+	err := client.LinkIsoImage(dummyUuid, dummyUuid)
 	if err != nil {
-		t.Errorf("LinkIsoimage returned an error %v", err)
+		t.Errorf("LinkIsoImage returned an error %v", err)
 	}
 }
 
-func TestClient_UnlinkIsoimage(t *testing.T) {
+func TestClient_UnlinkIsoImage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUuid, "isoimages", dummyUuid)
@@ -109,9 +109,9 @@ func TestClient_UnlinkIsoimage(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UnlinkIsoimage(dummyUuid, dummyUuid)
+	err := client.UnlinkIsoImage(dummyUuid, dummyUuid)
 	if err != nil {
-		t.Errorf("UnlinkIsoimage returned an error %v", err)
+		t.Errorf("UnlinkIsoImage returned an error %v", err)
 	}
 }
 

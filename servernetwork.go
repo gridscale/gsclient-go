@@ -103,20 +103,20 @@ func (c *Client) DeleteServerNetwork(serverId, networkId string) error {
 }
 
 //LinkNetwork attaches a network to a server
-func (c *Client) LinkNetwork(serverid, networkid, firewallTemplate string, bootdevice bool, order int,
-	l3security []string) error {
+func (c *Client) LinkNetwork(serverId, networkId, firewallTemplate string, bootdevice bool, order int,
+	l3security []string, firewall FirewallRules) error {
 	body := ServerNetworkCreateRequest{
-		ObjectUuid:           networkid,
+		ObjectUuid:           networkId,
 		Ordering:             order,
 		BootDevice:           bootdevice,
 		L3security:           l3security,
 		FirewallTemplateUuid: firewallTemplate,
-		//Firewall:
+		Firewall:             firewall,
 	}
-	return c.CreateServerNetwork(serverid, body)
+	return c.CreateServerNetwork(serverId, body)
 }
 
 //UnlinkNetwork removes the link between a network and a server
-func (c *Client) UnlinkNetwork(serverid string, networkid string) error {
-	return c.DeleteServerNetwork(serverid, networkid)
+func (c *Client) UnlinkNetwork(serverId string, networkId string) error {
+	return c.DeleteServerNetwork(serverId, networkId)
 }

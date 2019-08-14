@@ -152,7 +152,7 @@ func TestClient_IsServerOn(t *testing.T) {
 	assert.Equal(t, true, isOn)
 }
 
-func TestClient_turnOnOffServer(t *testing.T) {
+func TestClient_setServerPowerState(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUuid)
@@ -166,7 +166,7 @@ func TestClient_turnOnOffServer(t *testing.T) {
 		power = false
 		fmt.Fprint(writer, "")
 	})
-	err := client.turnOnOffServer(dummyUuid, false)
+	err := client.setServerPowerState(dummyUuid, false)
 	if err != nil {
 		t.Errorf("turnOnOffServer returned an error %v", err)
 	}

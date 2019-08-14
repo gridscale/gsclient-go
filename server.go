@@ -233,12 +233,12 @@ func (c *Client) GetServerMetricList(id string) ([]ServerMetric, error) {
 		method: http.MethodGet,
 	}
 	var response ServerMetricList
-	var list []ServerMetric
+	var serverMetrics []ServerMetric
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, ServerMetric{Properties: properties})
+		serverMetrics = append(serverMetrics, ServerMetric{Properties: properties})
 	}
-	return list, err
+	return serverMetrics, err
 }
 
 //IsServerOn returns true if the server's power is on, otherwise returns false
@@ -250,14 +250,14 @@ func (c *Client) IsServerOn(id string) (bool, error) {
 	return server.Properties.Power, nil
 }
 
-//turnOnOffServer turn on/off a specific server.
+//setServerPowerState turn on/off a specific server.
 //turnOn=true to turn on, turnOn=false to turn off
-func (c *Client) turnOnOffServer(id string, turnOn bool) error {
+func (c *Client) setServerPowerState(id string, powerState bool) error {
 	isOn, err := c.IsServerOn(id)
 	if err != nil {
 		return err
 	}
-	if isOn == turnOn {
+	if isOn == powerState {
 		return nil
 	}
 
@@ -265,7 +265,7 @@ func (c *Client) turnOnOffServer(id string, turnOn bool) error {
 		uri:    path.Join(apiServerBase, id, "power"),
 		method: http.MethodPatch,
 		body: ServerPowerUpdateRequest{
-			Power: turnOn,
+			Power: powerState,
 		},
 	}
 
@@ -274,17 +274,17 @@ func (c *Client) turnOnOffServer(id string, turnOn bool) error {
 		return err
 	}
 
-	return c.WaitForServerPowerStatus(id, turnOn)
+	return c.WaitForServerPowerStatus(id, powerState)
 }
 
 //StartServer starts a server
 func (c *Client) StartServer(id string) error {
-	return c.turnOnOffServer(id, true)
+	return c.setServerPowerState(id, true)
 }
 
 //StopServer stops a server
 func (c *Client) StopServer(id string) error {
-	return c.turnOnOffServer(id, false)
+	return c.setServerPowerState(id, false)
 }
 
 //ShutdownServer shutdowns a specific server
@@ -312,7 +312,7 @@ func (c *Client) ShutdownServer(id string) error {
 	//If we get an error, which includes a timeout, power off the server instead
 	err = c.WaitForServerPowerStatus(id, false)
 	if err != nil {
-		return c.turnOnOffServer(id, false)
+		return c.setServerPowerState(id, false)
 	}
 
 	return nil

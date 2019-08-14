@@ -92,15 +92,15 @@ func (c *Client) DeleteServerStorage(serverId, storageId string) error {
 }
 
 //LinkStorage attaches a storage to a server
-func (c *Client) LinkStorage(serverid string, storageid string, bootdevice bool) error {
+func (c *Client) LinkStorage(serverId string, storageId string, bootdevice bool) error {
 	body := ServerStorageCreateRequest{
-		ObjectUuid: storageid,
+		ObjectUuid: storageId,
 		BootDevice: bootdevice,
 	}
-	return c.CreateServerStorage(serverid, body)
+	return c.CreateServerStorage(serverId, body)
 }
 
 //UnlinkStorage remove a storage from a server
-func (c *Client) UnlinkStorage(serverid string, storageid string) error {
-	return c.DeleteServerStorage(serverid, storageid)
+func (c *Client) UnlinkStorage(serverId string, storageId string) error {
+	return c.DeleteServerStorage(serverId, storageId)
 }
