@@ -73,12 +73,12 @@ func (c *Client) GetStorageSnapshotList(id string) ([]StorageSnapshot, error) {
 		method: http.MethodGet,
 	}
 	var response StorageSnapshotList
-	var list []StorageSnapshot
+	var snapshots []StorageSnapshot
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, StorageSnapshot{Properties: properties})
+		snapshots = append(snapshots, StorageSnapshot{Properties: properties})
 	}
-	return list, err
+	return snapshots, err
 }
 
 //GetStorageSnapshot gets a specific storage's snapshot based on given storage id and snapshot id.
