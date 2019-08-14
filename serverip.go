@@ -58,7 +58,7 @@ func (c *Client) CreateServerIp(id string, body ServerIpCreateRequest) error {
 	return r.execute(*c, nil)
 }
 
-//DeleteServerIp delete a link between a storage and an IP
+//DeleteServerIp delete a link between a server and an IP
 func (c *Client) DeleteServerIp(serverId, ipID string) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, serverId, "ips", ipID),
