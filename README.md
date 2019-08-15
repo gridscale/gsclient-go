@@ -137,6 +137,7 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * SSH-Key Create (CreateSshkey)
     * SSH-Key Patch (UpdateSshkey)
     * SSH-Key Delete (DeleteSshkey)
+    * SSH-Key's events Get (GetSshkeyEventList)
 * Template
     * Templates Get (GetTemplateList)
     * Template Get (GetTemplate)
