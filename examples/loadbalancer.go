@@ -40,7 +40,7 @@ func main() {
 	log.Info("[INFO] IPv6 has been created")
 
 	// populate settings into LoadBalancerCreateRequest
-	labels := make([]interface{}, 0)
+	labels := make([]string, 0)
 	labels = append(labels, "lb-http")
 	lbRequest := gsclient.LoadBalancerCreateRequest{
 		Name:                "go-client-lb",
@@ -73,15 +73,14 @@ func main() {
 	log.WithFields(log.Fields{
 		"Loadbalancer_uuid": clb.ObjectUuid}).Info("Loadbalancer successfully created")
 
-	log.Info("Update loadbalacer: Press 'Enter' to continue...")
-	bufio.NewReader(os.Stdin).ReadBytes('\n')
-
 	// Get the loadbalacer to update some settings
 	glb, err := client.GetLoadBalancer(clb.ObjectUuid)
 	if err != nil {
 		log.Fatal("Get loadbalancer has failed with error", err)
 	}
 
+	log.Info("Update loadbalacer: Press 'Enter' to continue...")
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	lbUpdateRequest := gsclient.LoadBalancerUpdateRequest{
 		Name:                "go-client-lb233",
 		Algorithm:           glb.Properties.Algorithm,
@@ -118,8 +117,8 @@ func main() {
 	}
 	log.WithFields(log.Fields{
 		"Loadbalancer_uuid": glb.Properties.ObjectUuid,
-		"events":            response.Events,
-	}).Info("Loadbalancer successfully events retrived")
+		"events":            response,
+	}).Info("Loadbalancer successfully events retrieved")
 
 	log.Info("Delete IPs and loadbalancer: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')

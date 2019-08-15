@@ -5,14 +5,17 @@ import (
 	"path"
 )
 
+//StorageList JSON struct of a list of storages
 type StorageList struct {
 	List map[string]StorageProperties `json:"storages"`
 }
 
+//Storage JSON struct of a single storage
 type Storage struct {
 	Properties StorageProperties `json:"storage"`
 }
 
+//StorageProperties JSON struct of properties of a storage
 type StorageProperties struct {
 	ChangeTime       string                    `json:"change_time"`
 	LocationIata     string                    `json:"location_iata"`
@@ -35,12 +38,14 @@ type StorageProperties struct {
 	CreateTime       string                    `json:"create_time"`
 }
 
+//StorageRelations JSON struct of a list of a storage's relations
 type StorageRelations struct {
-	Servers           []StorageServer            `json:"servers"`
-	SnapshotSchedules []StorageSnapshotSchedules `json:"snapshot_schedules"`
+	Servers           []StorageServerRelation              `json:"servers"`
+	SnapshotSchedules []StorageAndSnapshotScheduleRelation `json:"snapshot_schedules"`
 }
 
-type StorageServer struct {
+//StorageServerRelation JSON struct of a relation between a storage and a server
+type StorageServerRelation struct {
 	Bootdevice bool   `json:"bootdevice"`
 	Target     int    `json:"target"`
 	Controller int    `json:"controller"`
@@ -51,6 +56,7 @@ type StorageServer struct {
 	ObjectName string `json:"object_name"`
 }
 
+//StorageSnapshotRelation JSON struct of a relation between a storage and a snapshot
 type StorageSnapshotRelation struct {
 	LastUsedTemplate      string `json:"last_used_template"`
 	ObjectUuid            string `json:"object_uuid"`
@@ -62,7 +68,8 @@ type StorageSnapshotRelation struct {
 	ObjectName            string `json:"object_name"`
 }
 
-type StorageSnapshotSchedules struct {
+//StorageAndSnapshotScheduleRelation JSON struct of a relation between a storage and a snapshot schedule
+type StorageAndSnapshotScheduleRelation struct {
 	RunInterval   int    `json:"run_interval"`
 	KeepSnapshots int    `json:"keep_snapshots"`
 	ObjectName    string `json:"object_name"`
@@ -71,14 +78,17 @@ type StorageSnapshotSchedules struct {
 	Name          string `json:"name"`
 	CreateTime    string `json:"create_time"`
 }
+
+//StorageTemplate JSON struct of a storage template
 type StorageTemplate struct {
 	Sshkeys      []string `json:"sshkeys,omitempty"`
-	TemplateUuid string   `json:"template_uuid,omitempty"`
+	TemplateUuid string   `json:"template_uuid"`
 	Password     string   `json:"password,omitempty"`
 	PasswordType string   `json:"password_type,omitempty"`
 	Hostname     string   `json:"hostname,omitempty"`
 }
 
+//StorageCreateRequest JSON struct of a request for creating a storage
 type StorageCreateRequest struct {
 	Capacity     int             `json:"capacity"`
 	LocationUuid string          `json:"location_uuid"`
@@ -88,20 +98,24 @@ type StorageCreateRequest struct {
 	Labels       []string        `json:"labels,omitempty"`
 }
 
+//StorageUpdateRequest JSON struct of a request for updating a storage
 type StorageUpdateRequest struct {
 	Name     string   `json:"name,omitempty"`
-	Labels   []string `json:"labels"`
+	Labels   []string `json:"labels,omitempty"`
 	Capacity int      `json:"capacity,omitempty"`
 }
 
+//StorageEventList JSON struct of a list of a storage's events
 type StorageEventList struct {
 	List []StorageEventProperties `json:"events"`
 }
 
+//StorageEvent JSON struct of an event of a storage
 type StorageEvent struct {
 	Properties StorageEventProperties `json:"event"`
 }
 
+//StorageEventProperties JSON struct of properties of an event of a storage
 type StorageEventProperties struct {
 	ObjectType    string `json:"object_type"`
 	RequestUuid   string `json:"request_uuid"`

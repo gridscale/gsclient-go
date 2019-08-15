@@ -6,14 +6,17 @@ import (
 	"path"
 )
 
-type Networks struct {
+//NetworkList is JSON struct of a list of networks
+type NetworkList struct {
 	List map[string]NetworkProperties `json:"networks"`
 }
 
+//Network is JSON struct of a single network
 type Network struct {
 	Properties NetworkProperties `json:"network"`
 }
 
+//NetworkProperties is JSON struct of a network's properties
 type NetworkProperties struct {
 	LocationCountry string           `json:"location_country"`
 	LocationUuid    string           `json:"location_uuid"`
@@ -32,17 +35,20 @@ type NetworkProperties struct {
 	Relations       NetworkRelations `json:"relations"`
 }
 
+//NetworkRelations is JSON struct of a list of a network's relations
 type NetworkRelations struct {
 	Vlans   []NetworkVlan   `json:"vlans"`
 	Servers []NetworkServer `json:"servers"`
 }
 
+//NetworkVlan is JSON struct of a relation between a network and a VLAN
 type NetworkVlan struct {
 	Vlan       int    `json:"vlan"`
 	TenantName string `json:"tenant_name"`
 	TenantUuid string `json:"tenant_uuid"`
 }
 
+//NetworkServer is JSON struct of a relation between a network and a server
 type NetworkServer struct {
 	ObjectUuid  string   `json:"object_uuid"`
 	Mac         string   `json:"mac"`
@@ -54,6 +60,7 @@ type NetworkServer struct {
 	Ordering    int      `json:"ordering"`
 }
 
+//NetworkCreateRequest is JSON of a request for creating a network
 type NetworkCreateRequest struct {
 	Name         string   `json:"name"`
 	Labels       []string `json:"labels,omitempty"`
@@ -61,25 +68,30 @@ type NetworkCreateRequest struct {
 	L2Security   bool     `json:"l2security,omitempty"`
 }
 
+//NetworkCreateResponse is JSON of a response for creating a network
 type NetworkCreateResponse struct {
 	ObjectUuid  string `json:"object_uuid"`
 	RequestUuid string `json:"request_uuid"`
 }
 
+//NetworkUpdateRequest is JSON of a request for updating a network
 type NetworkUpdateRequest struct {
 	Name       string   `json:"name,omitempty"`
 	Labels     []string `json:"labels"`
 	L2Security bool     `json:"l2security"`
 }
 
+//NetworkEventList is JSON struct of a list of a network's events
 type NetworkEventList struct {
 	List []NetworkEventProperties `json:"events"`
 }
 
+//NetworkEvent is JSON struct of a single event of a network
 type NetworkEvent struct {
 	Properties NetworkEventProperties `json:"event"`
 }
 
+//NetworkEventProperties is JSON struct of properties of an event
 type NetworkEventProperties struct {
 	ObjectType    string `json:"object_type"`
 	RequestUuid   string `json:"request_uuid"`
@@ -100,7 +112,6 @@ func (c *Client) GetNetwork(id string) (Network, error) {
 	}
 	var response Network
 	err := r.execute(*c, &response)
-
 	return response, err
 }
 
@@ -111,15 +122,12 @@ func (c *Client) CreateNetwork(body NetworkCreateRequest) (NetworkCreateResponse
 		method: http.MethodPost,
 		body:   body,
 	}
-
 	var response NetworkCreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
 		return NetworkCreateResponse{}, err
 	}
-
 	err = c.WaitForRequestCompletion(response.RequestUuid)
-
 	return response, err
 }
 
@@ -129,7 +137,6 @@ func (c *Client) DeleteNetwork(id string) error {
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
 	}
-
 	return r.execute(*c, nil)
 }
 
@@ -150,8 +157,7 @@ func (c *Client) GetNetworkList() ([]Network, error) {
 		uri:    apiNetworkBase,
 		method: http.MethodGet,
 	}
-
-	var response Networks
+	var response NetworkList
 	var networks []Network
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
@@ -159,7 +165,6 @@ func (c *Client) GetNetworkList() ([]Network, error) {
 			Properties: properties,
 		})
 	}
-
 	return networks, err
 }
 
@@ -186,9 +191,8 @@ func (c *Client) GetNetworkPublic() (Network, error) {
 	}
 	for _, network := range networks {
 		if network.Properties.PublicNet {
-			return c.GetNetwork(network.Properties.ObjectUuid)
+			return Network{Properties: network.Properties}, nil
 		}
 	}
-
 	return Network{}, fmt.Errorf("Public Network not found")
 }

@@ -5,15 +5,18 @@ import (
 	"path"
 )
 
-type ServerNetworkList struct {
-	List []ServerNetwork `json:"network_relations"`
+//ServerNetworkRelationList JSON struct of a list of relations between a server and networks
+type ServerNetworkRelationList struct {
+	List []ServerNetworkRelationProperties `json:"network_relations"`
 }
 
-type ServerNetworkSingle struct {
-	Properties ServerNetwork `json:"network_relation"`
+//ServerNetworkRelation JSON struct of a single relation between a server and a network
+type ServerNetworkRelation struct {
+	Properties ServerNetworkRelationProperties `json:"network_relation"`
 }
 
-type ServerNetwork struct {
+//ServerNetworkRelationProperties JSON struct of properties of a relation between a server and a network
+type ServerNetworkRelationProperties struct {
 	L2security           bool     `json:"l2security"`
 	ServerUuid           string   `json:"server_uuid"`
 	CreateTime           string   `json:"create_time"`
@@ -34,16 +37,18 @@ type ServerNetwork struct {
 	//Mcast                string       `json:"mcast, omitempty"`
 }
 
-type ServerNetworkCreateRequest struct {
+//ServerNetworkRelationCreateRequest JSON struct of a request for creating a relation between a server and a network
+type ServerNetworkRelationCreateRequest struct {
 	ObjectUuid           string        `json:"object_uuid"`
-	Ordering             int           `json:"ordering"`
-	BootDevice           bool          `json:"bootdevice"`
-	L3security           []string      `json:"l3security"`
-	Firewall             FirewallRules `json:"firewall"`
-	FirewallTemplateUuid string        `json:"firewall_template_uuid"`
+	Ordering             int           `json:"ordering,omitempty"`
+	BootDevice           bool          `json:"bootdevice,omitempty"`
+	L3security           []string      `json:"l3security,omitempty"`
+	Firewall             FirewallRules `json:"firewall,omitempty"`
+	FirewallTemplateUuid string        `json:"firewall_template_uuid,omitempty"`
 }
 
-type ServerNetworkUpdateRequest struct {
+//ServerNetworkRelationUpdateRequest JSON struct of a request for updating a relation between a server and a network
+type ServerNetworkRelationUpdateRequest struct {
 	Ordering             int           `json:"ordering"`
 	BootDevice           bool          `json:"bootdevice"`
 	L3security           []string      `json:"l3security"`
@@ -52,29 +57,29 @@ type ServerNetworkUpdateRequest struct {
 }
 
 //GetServerNetworkList gets a list of a specific server's networks
-func (c *Client) GetServerNetworkList(id string) ([]ServerNetwork, error) {
+func (c *Client) GetServerNetworkList(id string) ([]ServerNetworkRelationProperties, error) {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "networks"),
 		method: http.MethodGet,
 	}
-	var response ServerNetworkList
+	var response ServerNetworkRelationList
 	err := r.execute(*c, &response)
 	return response.List, err
 }
 
 //GetServerNetwork gets a network of a specific server
-func (c *Client) GetServerNetwork(serverId, networkId string) (ServerNetwork, error) {
+func (c *Client) GetServerNetwork(serverId, networkId string) (ServerNetworkRelationProperties, error) {
 	r := Request{
 		uri:    path.Join(apiServerBase, serverId, "networks", networkId),
 		method: http.MethodGet,
 	}
-	var response ServerNetworkSingle
+	var response ServerNetworkRelation
 	err := r.execute(*c, &response)
 	return response.Properties, err
 }
 
 //UpdateServerNetwork updates a link between a network and a server
-func (c *Client) UpdateServerNetwork(serverId, networkId string, body ServerNetworkUpdateRequest) error {
+func (c *Client) UpdateServerNetwork(serverId, networkId string, body ServerNetworkRelationUpdateRequest) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, serverId, "networks", networkId),
 		method: http.MethodPatch,
@@ -84,7 +89,7 @@ func (c *Client) UpdateServerNetwork(serverId, networkId string, body ServerNetw
 }
 
 //CreateServerNetwork creates a link between a network and a storage
-func (c *Client) CreateServerNetwork(id string, body ServerNetworkCreateRequest) error {
+func (c *Client) CreateServerNetwork(id string, body ServerNetworkRelationCreateRequest) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "networks"),
 		method: http.MethodPost,
@@ -105,7 +110,7 @@ func (c *Client) DeleteServerNetwork(serverId, networkId string) error {
 //LinkNetwork attaches a network to a server
 func (c *Client) LinkNetwork(serverId, networkId, firewallTemplate string, bootdevice bool, order int,
 	l3security []string, firewall FirewallRules) error {
-	body := ServerNetworkCreateRequest{
+	body := ServerNetworkRelationCreateRequest{
 		ObjectUuid:           networkId,
 		Ordering:             order,
 		BootDevice:           bootdevice,

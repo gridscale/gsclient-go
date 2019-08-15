@@ -9,7 +9,6 @@ import (
 	"testing"
 )
 
-
 func TestClient_GetServerIpList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
@@ -49,8 +48,8 @@ func TestClient_CreateServerIp(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerIp(dummyUuid, ServerIpCreateRequest{
-		ObjectUuid:dummyUuid,
+	err := client.CreateServerIp(dummyUuid, ServerIpRelationCreateRequest{
+		ObjectUuid: dummyUuid,
 	})
 	if err != nil {
 		t.Errorf("CreateServerIp returned an error %v", err)
@@ -99,8 +98,8 @@ func TestClient_UnlinkIp(t *testing.T) {
 	}
 }
 
-func getMockServerIp() ServerIp {
-	mock := ServerIp{
+func getMockServerIp() ServerIpRelationProperties {
+	mock := ServerIpRelationProperties{
 		ServerUuid: dummyUuid,
 		CreateTime: dummyTime,
 		Prefix:     "pre",
@@ -117,7 +116,7 @@ func prepareServerIpListHTTPGet() string {
 	return fmt.Sprintf(`{"ip_relations": [%s]}`, string(res))
 }
 
-func prepareServerIpHTTPGet() string{
+func prepareServerIpHTTPGet() string {
 	ip := getMockServerIp()
 	res, _ := json.Marshal(ip)
 	return fmt.Sprintf(`{"ip_relation": %s}`, string(res))

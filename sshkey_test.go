@@ -115,7 +115,7 @@ func TestClient_GetSshkeyEventList(t *testing.T) {
 }
 
 func getMockSshkey() Sshkey {
-	mock := Sshkey{Properties:SshkeyProperties{
+	mock := Sshkey{Properties: SshkeyProperties{
 		Name:       "test",
 		ObjectUuid: dummyUuid,
 		Status:     "active",
@@ -137,7 +137,7 @@ func getMockSshkeyCreateResponse() CreateResponse {
 }
 
 func getMockSshkeyEvent() SshkeyEvent {
-	mock := SshkeyEvent{Properties:SshkeyEventProperties{
+	mock := SshkeyEvent{Properties: SshkeyEventProperties{
 		ObjectType:    "type",
 		RequestUuid:   dummyRequestUUID,
 		ObjectUuid:    dummyUuid,

@@ -59,13 +59,13 @@ func TestClient_CreateStorage(t *testing.T) {
 		LocationUuid: dummyUuid,
 		Name:         "test",
 		StorageType:  "storage",
-		Template:     StorageTemplate{
+		Template: StorageTemplate{
 			TemplateUuid: dummyUuid,
 			Password:     "pass",
 			PasswordType: "crypt",
 			Hostname:     "example.com",
 		},
-		Labels:       []string{"label"},
+		Labels: []string{"label"},
 	})
 	if err != nil {
 		t.Errorf("CreateStorage returned an error %v", err)
@@ -122,7 +122,7 @@ func TestClient_GetStorageEventList(t *testing.T) {
 }
 
 func getMockStorage() Storage {
-	mock := Storage{Properties:StorageProperties{
+	mock := Storage{Properties: StorageProperties{
 		ChangeTime:       dummyTime,
 		LocationIata:     "iata",
 		Status:           "active",
@@ -138,7 +138,7 @@ func getMockStorage() Storage {
 		Name:             "test",
 		LocationName:     "Cologne",
 		ObjectUuid:       dummyUuid,
-		Snapshots:        []StorageSnapshotRelation{
+		Snapshots: []StorageSnapshotRelation{
 			{
 				LastUsedTemplate:      dummyUuid,
 				ObjectUuid:            dummyUuid,
@@ -150,9 +150,9 @@ func getMockStorage() Storage {
 				ObjectName:            "test",
 			},
 		},
-		Relations:        StorageRelations{},
-		Labels:           []string{"label"},
-		CreateTime:       dummyTime,
+		Relations:  StorageRelations{},
+		Labels:     []string{"label"},
+		CreateTime: dummyTime,
 	}}
 	return mock
 }
@@ -166,7 +166,7 @@ func getMockStorageCreateResponse() CreateResponse {
 }
 
 func getMockStorageEvent() StorageEvent {
-	mock := StorageEvent{Properties:StorageEventProperties{
+	mock := StorageEvent{Properties: StorageEventProperties{
 		ObjectType:    "type",
 		RequestUuid:   dummyRequestUUID,
 		ObjectUuid:    dummyUuid,

@@ -128,7 +128,7 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 }
 
 func getMockTemplate() Template {
-	mock := Template{Properties:TemplateProperties{
+	mock := Template{Properties: TemplateProperties{
 		Status:           "active",
 		Ostype:           "type",
 		LocationUuid:     dummyUuid,
@@ -161,7 +161,7 @@ func getMockTemplateCreateResponse() CreateResponse {
 }
 
 func getMockTemplateEvent() TemplateEvent {
-	mock := TemplateEvent{Properties:TemplateEventProperties{
+	mock := TemplateEvent{Properties: TemplateEventProperties{
 		ObjectType:    "type",
 		RequestUuid:   dummyRequestUUID,
 		ObjectUuid:    dummyUuid,

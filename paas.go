@@ -1,6 +1,9 @@
 package gsclient
 
-import "path"
+import (
+	"net/http"
+	"path"
+)
 
 //PaaSServices is the JSON struct of a list of PaaS services
 type PaaSServices struct {
@@ -32,26 +35,30 @@ type PaaSServiceProperties struct {
 	Parameters     map[string]interface{} `json:"parameters"`
 }
 
+//Credential is JSON struct of credential
 type Credential struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Type     string `json:"type"`
 }
 
+//PaaSServiceCreateRequest is JSON struct of a request for creating a PaaS service
 type PaaSServiceCreateRequest struct {
 	Name                    string                 `json:"name"`
 	PaaSServiceTemplateUuid string                 `json:"paas_service_template_uuid"`
-	Labels                  []string               `json:"labels"`
-	PaaSSecurityZoneUuid    string                 `json:"paas_security_zone_uuid"`
-	ResourceLimits          []ResourceLimit        `json:"resource_limits"`
-	Parameters              map[string]interface{} `json:"parameters"`
+	Labels                  []string               `json:"labels,omitempty"`
+	PaaSSecurityZoneUuid    string                 `json:"paas_security_zone_uuid,omitempty"`
+	ResourceLimits          []ResourceLimit        `json:"resource_limits,omitempty"`
+	Parameters              map[string]interface{} `json:"parameters,omitempty"`
 }
 
+//ResourceLimit is JSON struct of resource limit
 type ResourceLimit struct {
 	Resource string `json:"resource"`
 	Limit    int    `json:"limit"`
 }
 
+//PaaSServiceCreateResponse is JSON struct of a response for creating a PaaS service
 type PaaSServiceCreateResponse struct {
 	RequestUuid     string                       `json:"request_uuid"`
 	ListenPorts     map[string]map[string]string `json:"listen_ports"`
@@ -62,14 +69,17 @@ type PaaSServiceCreateResponse struct {
 	Parameters      map[string]interface{}       `json:"parameters"`
 }
 
+//PaaSTemplates is JSON struct of a list of PaaS Templates
 type PaaSTemplates struct {
 	List map[string]PaaSTemplateProperties `json:"paas_service_templates"`
 }
 
-type PaasTemplate struct {
+//PaaSTemplate is JSON struct for a single PaaS Template
+type PaaSTemplate struct {
 	Properties PaaSTemplateProperties `json:"paas_service_template"`
 }
 
+//PaaSTemplateProperties is JSOn struct of properties of a PaaS template
 type PaaSTemplateProperties struct {
 	Name             string               `json:"name"`
 	ObjectUuid       string               `json:"object_uuid"`
@@ -81,6 +91,7 @@ type PaaSTemplateProperties struct {
 	ParametersSchema map[string]Parameter `json:"parameters_schema"`
 }
 
+//Parameter JSON of a parameter
 type Parameter struct {
 	Required    bool        `json:"required"`
 	Empty       bool        `json:"empty"`
@@ -93,26 +104,31 @@ type Parameter struct {
 	Regex       string      `json:"regex"`
 }
 
+//Resource JSON of a resource
 type Resource struct {
 	Memory      int `json:"memory"`
 	Connections int `json:"connections"`
 }
 
+//PaaSServiceUpdateRequest JSON of a request for updating a PaaS service
 type PaaSServiceUpdateRequest struct {
-	Name           string                 `json:"name"`
-	Labels         []string               `json:"labels"`
-	Parameters     map[string]interface{} `json:"parameters"`
-	ResourceLimits []ResourceLimit        `json:"resource_limits"`
+	Name           string                 `json:"name,omitempty"`
+	Labels         []string               `json:"labels,omitempty"`
+	Parameters     map[string]interface{} `json:"parameters,omitempty"`
+	ResourceLimits []ResourceLimit        `json:"resource_limits,omitempty"`
 }
 
+//PaaSServiceMetrics JSON of a list of PaaS metrics
 type PaaSServiceMetrics struct {
 	List []PaaSMetricProperties `json:"paas_service_metrics"`
 }
 
+//PaaSServiceMetric JSON of a single PaaS metric
 type PaaSServiceMetric struct {
 	Properties PaaSMetricProperties `json:"paas_service_metric"`
 }
 
+//PaaSMetricProperties JSON of properties of a PaaS metric
 type PaaSMetricProperties struct {
 	BeginTime       string          `json:"begin_time"`
 	EndTime         string          `json:"end_time"`
@@ -121,19 +137,23 @@ type PaaSMetricProperties struct {
 	StorageSize     PaaSMetricValue `json:"storage_size"`
 }
 
+//PaaSMetricValue JSON of a metric value
 type PaaSMetricValue struct {
 	Value int    `json:"value"`
 	Unit  string `json:"unit"`
 }
 
+//PaaSSecurityZones JSON struct of a list of PaaS security zones
 type PaaSSecurityZones struct {
 	List map[string]PaaSSecurityZoneProperties `json:"paas_security_zones"`
 }
 
+//PaaSSecurityZone JSON struct of a single PaaS security zone
 type PaaSSecurityZone struct {
 	Properties PaaSSecurityZoneProperties `json:"paas_security_zone"`
 }
 
+//PaaSSecurityZoneProperties JSOn struct of properties of a PaaS security zone
 type PaaSSecurityZoneProperties struct {
 	LocationCountry string              `json:"location_country"`
 	CreateTime      string              `json:"create_time"`
@@ -148,67 +168,66 @@ type PaaSSecurityZoneProperties struct {
 	Relation        PaaSRelationService `json:"relation"`
 }
 
+//PaaSRelationService JSON struct of a relation between a PaaS service and a service
 type PaaSRelationService struct {
 	Services []ServiceObject `json:"services"`
 }
 
+//ServiceObject JSON struct of a service object
 type ServiceObject struct {
 	ObjectUuid string `json:"object_uuid"`
 }
 
+//PaaSSecurityZoneCreateRequest JSON struct of a request for creating a PaaS security zone
 type PaaSSecurityZoneCreateRequest struct {
-	Name         string `json:"name"`
-	LocationUuid string `json:"location_uuid"`
+	Name         string `json:"name,omitempty"`
+	LocationUuid string `json:"location_uuid,omitempty"`
 }
 
+//PaaSSecurityZoneCreateResponse JSON struct of a response for creating a PaaS security zone
 type PaaSSecurityZoneCreateResponse struct {
 	RequestUuid          string `json:"request_uuid"`
 	PaaSSecurityZoneUuid string `json:"paas_security_zone_uuid"`
 	ObjectUuid           string `json:"object_uuid"`
 }
 
+//PaaSSecurityZoneUpdateRequest JSON struct of a request for updating a PaaS security zone
 type PaaSSecurityZoneUpdateRequest struct {
-	Name                 string `json:"name"`
-	LocationUuid         string `json:"location_uuid"`
-	PaaSSecurityZoneUuid string `json:"paas_security_zone_uuid"`
+	Name                 string `json:"name,omitempty"`
+	LocationUuid         string `json:"location_uuid,omitempty"`
+	PaaSSecurityZoneUuid string `json:"paas_security_zone_uuid,omitempty"`
 }
 
 //GetPaaSServiceList returns a list of PaaS Services
 func (c *Client) GetPaaSServiceList() ([]PaaSService, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services"),
-		method: "GET",
+		method: http.MethodGet,
 	}
-
-	response := new(PaaSServices)
+	var response PaaSServices
+	var paasServices []PaaSService
 	err := r.execute(*c, &response)
-
-	list := []PaaSService{}
 	for _, properties := range response.List {
-		list = append(list, PaaSService{
+		paasServices = append(paasServices, PaaSService{
 			Properties: properties,
 		})
 	}
-
-	return list, err
+	return paasServices, err
 }
 
 //CreatePaaSService creates a new PaaS service
-func (c *Client) CreatePaaSService(body PaaSServiceCreateRequest) (*PaaSServiceCreateResponse, error) {
+func (c *Client) CreatePaaSService(body PaaSServiceCreateRequest) (PaaSServiceCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services"),
-		method: "POST",
+		method: http.MethodPost,
 		body:   body,
 	}
-
-	response := new(PaaSServiceCreateResponse)
-	err := r.execute(*c, response)
+	var response PaaSServiceCreateResponse
+	err := r.execute(*c, &response)
 	if err != nil {
-		return nil, err
+		return PaaSServiceCreateResponse{}, err
 	}
-
 	err = c.WaitForRequestCompletion(response.RequestUuid)
-
 	return response, err
 }
 
@@ -216,9 +235,8 @@ func (c *Client) CreatePaaSService(body PaaSServiceCreateRequest) (*PaaSServiceC
 func (c *Client) GetPaaSService(id string) (PaaSService, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
-		method: "GET",
+		method: http.MethodGet,
 	}
-
 	var response PaaSService
 	err := r.execute(*c, &response)
 	return response, err
@@ -228,7 +246,7 @@ func (c *Client) GetPaaSService(id string) (PaaSService, error) {
 func (c *Client) UpdatePaaSService(id string, body PaaSServiceUpdateRequest) error {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
-		method: "PATCH",
+		method: http.MethodPatch,
 		body:   body,
 	}
 	return r.execute(*c, nil)
@@ -238,9 +256,8 @@ func (c *Client) UpdatePaaSService(id string, body PaaSServiceUpdateRequest) err
 func (c *Client) DeletePaaSService(id string) error {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
-		method: "DELETE",
+		method: http.MethodDelete,
 	}
-
 	return r.execute(*c, nil)
 }
 
@@ -248,70 +265,66 @@ func (c *Client) DeletePaaSService(id string) error {
 func (c *Client) GetPaaSServiceMetrics(id string) ([]PaaSServiceMetric, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id, "metrics"),
-		method: "GET",
+		method: http.MethodGet,
 	}
-	response := new(PaaSServiceMetrics)
-	err := r.execute(*c, response)
-	list := []PaaSServiceMetric{}
+	var response PaaSServiceMetrics
+	var metrics []PaaSServiceMetric
+	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, PaaSServiceMetric{
+		metrics = append(metrics, PaaSServiceMetric{
 			Properties: properties,
 		})
 	}
-	return list, err
+	return metrics, err
 }
 
 //GetPaaSTemplateList returns a list of PaaS service templates
-func (c *Client) GetPaaSTemplateList() ([]PaasTemplate, error) {
+func (c *Client) GetPaaSTemplateList() ([]PaaSTemplate, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "service_templates"),
-		method: "GET",
+		method: http.MethodGet,
 	}
-
-	response := new(PaaSTemplates)
-	err := r.execute(*c, response)
-
-	list := []PaasTemplate{}
+	var response PaaSTemplates
+	var paasTemplates []PaaSTemplate
+	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		paasTemplate := PaasTemplate{
+		paasTemplate := PaaSTemplate{
 			Properties: properties,
 		}
-		list = append(list, paasTemplate)
+		paasTemplates = append(paasTemplates, paasTemplate)
 	}
-
-	return list, err
+	return paasTemplates, err
 }
 
 //GetSecurityZones get available security zones
 func (c *Client) GetPaaSSecurityZoneList() ([]PaaSSecurityZone, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones"),
-		method: "GET",
+		method: http.MethodGet,
 	}
-	response := new(PaaSSecurityZones)
-	err := r.execute(*c, response)
-	list := []PaaSSecurityZone{}
+	var response PaaSSecurityZones
+	var securityZones []PaaSSecurityZone
+	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, PaaSSecurityZone{
+		securityZones = append(securityZones, PaaSSecurityZone{
 			Properties: properties,
 		})
 	}
-	return list, err
+	return securityZones, err
 }
 
 //CreateSecurityZone creates a new PaaS security zone
-func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (*PaaSSecurityZoneCreateResponse, error) {
+func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (PaaSSecurityZoneCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zone"),
-		method: "POST",
+		method: http.MethodPost,
 		body:   body,
 	}
-	response := new(PaaSSecurityZoneCreateResponse)
-	err := r.execute(*c, response)
+	var response PaaSSecurityZoneCreateResponse
+	err := r.execute(*c, &response)
 	if err != nil {
-		return nil, err
+		return PaaSSecurityZoneCreateResponse{}, err
 	}
-
 	err = c.WaitForRequestCompletion(response.RequestUuid)
 	return response, err
 }
@@ -320,9 +333,9 @@ func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (*Pa
 func (c *Client) GetPaaSSecurityZone(id string) (PaaSSecurityZone, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
-		method: "GET",
+		method: http.MethodGet,
 	}
-	response := PaaSSecurityZone{}
+	var response PaaSSecurityZone
 	err := r.execute(*c, &response)
 	return response, err
 }
@@ -331,7 +344,7 @@ func (c *Client) GetPaaSSecurityZone(id string) (PaaSSecurityZone, error) {
 func (c *Client) UpdatePaaSSecurityZone(id string, body PaaSSecurityZoneUpdateRequest) error {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
-		method: "PATCH",
+		method: http.MethodPatch,
 		body:   body,
 	}
 	return r.execute(*c, nil)
@@ -341,7 +354,7 @@ func (c *Client) UpdatePaaSSecurityZone(id string, body PaaSSecurityZoneUpdateRe
 func (c *Client) DeletePaaSSecurityZone(id string) error {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
-		method: "DELETE",
+		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)
 }

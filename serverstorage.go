@@ -5,15 +5,18 @@ import (
 	"path"
 )
 
-type ServerStorageList struct {
-	List []ServerStorage `json:"storage_relations"`
+//ServerStorageRelationList JSON struct of a list of relations between a server and storages
+type ServerStorageRelationList struct {
+	List []ServerStorageRelationProperties `json:"storage_relations"`
 }
 
-type ServerStorageSingle struct {
-	Properties ServerStorage `json:"storage_relation"`
+//ServerStorageRelationSingle JSON struct of a single relation between a server and a storage
+type ServerStorageRelationSingle struct {
+	Properties ServerStorageRelationProperties `json:"storage_relation"`
 }
 
-type ServerStorage struct {
+//ServerStorageRelationProperties JSON struct of properties of a relation between a server and a storage
+type ServerStorageRelationProperties struct {
 	ObjectUuid       string `json:"object_uuid"`
 	ObjectName       string `json:"object_name"`
 	Capacity         int    `json:"capacity"`
@@ -29,41 +32,43 @@ type ServerStorage struct {
 	ServerUuid       string `json:"server_uuid"`
 }
 
-type ServerStorageCreateRequest struct {
+//ServerStorageRelationCreateRequest JSON struct of a request for creating a relation between a server and a storage
+type ServerStorageRelationCreateRequest struct {
 	ObjectUuid string `json:"object_uuid"`
-	BootDevice bool   `json:"bootdevice"`
+	BootDevice bool   `json:"bootdevice,omitempty"`
 }
 
-type ServerStorageUpdateRequest struct {
-	Ordering   int      `json:"ordering"`
-	BootDevice bool     `json:"bootdevice"`
-	L3security []string `json:"l3security"`
+//ServerStorageRelationUpdateRequest JSON struct of a request for updating a relation between a server and a storage
+type ServerStorageRelationUpdateRequest struct {
+	Ordering   int      `json:"ordering,omitempty"`
+	BootDevice bool     `json:"bootdevice,omitempty"`
+	L3security []string `json:"l3security,omitempty"`
 }
 
 //GetServerStorageList gets a list of a specific server's storages
-func (c *Client) GetServerStorageList(id string) ([]ServerStorage, error) {
+func (c *Client) GetServerStorageList(id string) ([]ServerStorageRelationProperties, error) {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "storages"),
 		method: http.MethodGet,
 	}
-	var response ServerStorageList
+	var response ServerStorageRelationList
 	err := r.execute(*c, &response)
 	return response.List, err
 }
 
 //GetServerStorage gets a storage of a specific server
-func (c *Client) GetServerStorage(serverId, storageId string) (ServerStorage, error) {
+func (c *Client) GetServerStorage(serverId, storageId string) (ServerStorageRelationProperties, error) {
 	r := Request{
 		uri:    path.Join(apiServerBase, serverId, "storages", storageId),
 		method: http.MethodGet,
 	}
-	var response ServerStorageSingle
+	var response ServerStorageRelationSingle
 	err := r.execute(*c, &response)
 	return response.Properties, err
 }
 
 //UpdateServerStorage updates a link between a storage and a server
-func (c *Client) UpdateServerStorage(serverId, storageId string, body ServerStorageUpdateRequest) error {
+func (c *Client) UpdateServerStorage(serverId, storageId string, body ServerStorageRelationUpdateRequest) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, serverId, "storages", storageId),
 		method: http.MethodPatch,
@@ -73,7 +78,7 @@ func (c *Client) UpdateServerStorage(serverId, storageId string, body ServerStor
 }
 
 //CreateServerStorage create a link between a server and a storage
-func (c *Client) CreateServerStorage(id string, body ServerStorageCreateRequest) error {
+func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreateRequest) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "storages"),
 		method: http.MethodPost,
@@ -93,7 +98,7 @@ func (c *Client) DeleteServerStorage(serverId, storageId string) error {
 
 //LinkStorage attaches a storage to a server
 func (c *Client) LinkStorage(serverId string, storageId string, bootdevice bool) error {
-	body := ServerStorageCreateRequest{
+	body := ServerStorageRelationCreateRequest{
 		ObjectUuid: storageId,
 		BootDevice: bootdevice,
 	}

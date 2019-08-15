@@ -115,8 +115,23 @@ func TestClient_GetNetworkEventList(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetworkEvent()), fmt.Sprintf("%v", res))
 }
 
+func TestClient_GetNetworkPublic(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := apiNetworkBase
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareNetworkListHTTPGet())
+	})
+	res, err := client.GetNetworkPublic()
+	if err != nil {
+		t.Errorf("GetNetworkPublic returned an error %v", err)
+	}
+	assert.Equal(t, fmt.Sprintf("%v", getMockNetwork()), fmt.Sprintf("%v", res))
+}
+
 func getMockNetwork() Network {
-	mock := Network{Properties:NetworkProperties{
+	mock := Network{Properties: NetworkProperties{
 		LocationCountry: "Germany",
 		LocationUuid:    "",
 		PublicNet:       true,
@@ -130,7 +145,7 @@ func getMockNetwork() Network {
 		LocationName:    "Cologne",
 		DeleteBlock:     false,
 		Labels:          nil,
-		Relations:       NetworkRelations{
+		Relations: NetworkRelations{
 			Vlans: []NetworkVlan{
 				{
 					Vlan:       1,
@@ -170,7 +185,7 @@ func prepareNetworkCreateResponse() string {
 }
 
 func getMockNetworkEvent() NetworkEvent {
-	mock := NetworkEvent{Properties:NetworkEventProperties{
+	mock := NetworkEvent{Properties: NetworkEventProperties{
 		ObjectType:    "type",
 		RequestUuid:   dummyRequestUUID,
 		ObjectUuid:    dummyUuid,

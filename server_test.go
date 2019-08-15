@@ -161,7 +161,7 @@ func TestClient_setServerPowerState(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerHTTPGet(power))
 	})
-	mux.HandleFunc(uri + "/power", func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		power = false
 		fmt.Fprint(writer, "")
@@ -181,7 +181,7 @@ func TestClient_StartServer(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerHTTPGet(power))
 	})
-	mux.HandleFunc(uri + "/power", func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		power = true
 		fmt.Fprint(writer, "")
@@ -201,7 +201,7 @@ func TestClient_StopServer(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerHTTPGet(power))
 	})
-	mux.HandleFunc(uri + "/power", func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		power = false
 		fmt.Fprint(writer, "")
@@ -221,7 +221,7 @@ func TestClient_ShutdownServer(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerHTTPGet(power))
 	})
-	mux.HandleFunc(uri + "/shutdown", func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(uri+"/shutdown", func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		power = false
 		fmt.Fprint(writer, "")
@@ -233,7 +233,7 @@ func TestClient_ShutdownServer(t *testing.T) {
 }
 
 func getMockServer(power bool) Server {
-	mock := Server{Properties:ServerProperties{
+	mock := Server{Properties: ServerProperties{
 		ObjectUuid:           dummyUuid,
 		Name:                 "Test",
 		Memory:               2,
@@ -250,8 +250,8 @@ func getMockServer(power bool) Server {
 		UsageInMinutesMemory: 47331,
 		UsageInMinutesCores:  17476,
 		Labels:               []string{"label"},
-		Relations:            ServerRelations{
-			IsoImages: []ServerIsoImage{
+		Relations: ServerRelations{
+			IsoImages: []ServerIsoImageRelationProperties{
 				{
 					ObjectUuid: dummyUuid,
 					ObjectName: "test",
@@ -277,7 +277,7 @@ func getMockServerCreateResponse() ServerCreateResponse {
 }
 
 func getMockServerEvent() ServerEvent {
-	mock := ServerEvent{Properties:ServerEventProperties{
+	mock := ServerEvent{Properties: ServerEventProperties{
 		ObjectType:    "type",
 		RequestUuid:   dummyRequestUUID,
 		ObjectUuid:    dummyUuid,
@@ -292,7 +292,7 @@ func getMockServerEvent() ServerEvent {
 }
 
 func getMockServerMetric() ServerMetric {
-	mock := ServerMetric{Properties:ServerMetricProperties{
+	mock := ServerMetric{Properties: ServerMetricProperties{
 		BeginTime:       dummyTime,
 		EndTime:         dummyTime,
 		PaaSServiceUuid: dummyUuid,
@@ -301,14 +301,14 @@ func getMockServerMetric() ServerMetric {
 			Unit  string  `json:"unit"`
 		}{
 			Value: 50.5,
-			Unit: "percentage",
+			Unit:  "percentage",
 		},
 		StorageSize: struct {
 			Value float64 `json:"value"`
 			Unit  string  `json:"unit"`
 		}{
 			Value: 10.5,
-			Unit: "GB",
+			Unit:  "GB",
 		},
 	}}
 	return mock

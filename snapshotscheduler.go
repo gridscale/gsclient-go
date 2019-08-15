@@ -5,57 +5,65 @@ import (
 	"path"
 )
 
+//StorageSnapshotScheduleList JSON of a list of storage snapshot schedule
 type StorageSnapshotScheduleList struct {
-	List map[string]StorageSnapshotSchedulerProperties `json:"snapshot_schedules"`
+	List map[string]StorageSnapshotScheduleProperties `json:"snapshot_schedules"`
 }
 
+//StorageSnapshotSchedule JSON struct of a single storage snapshot schedule
 type StorageSnapshotSchedule struct {
-	Properties StorageSnapshotSchedulerProperties `json:"snapshot_schedule"`
+	Properties StorageSnapshotScheduleProperties `json:"snapshot_schedule"`
 }
 
-type StorageSnapshotSchedulerProperties struct {
-	ChangeTime    string                            `json:"change_time"`
-	CreateTime    string                            `json:"create_time"`
-	KeepSnapshots int                               `json:"keep_snapshots"`
-	Labels        []string                          `json:"labels"`
-	Name          string                            `json:"name"`
-	NextRuntime   string                            `json:"next_runtime"`
-	ObjectUuid    string                            `json:"object_uuid"`
-	Relations     StorageSnapshotSchedulerRelations `json:"relations"`
-	RunInterval   int                               `json:"run_interval"`
-	Status        string                            `json:"status"`
-	StorageUuid   string                            `json:"storage_uuid"`
+//StorageSnapshotScheduleProperties JSON struct of properties of a single storage snapshot schedule
+type StorageSnapshotScheduleProperties struct {
+	ChangeTime    string                           `json:"change_time"`
+	CreateTime    string                           `json:"create_time"`
+	KeepSnapshots int                              `json:"keep_snapshots"`
+	Labels        []string                         `json:"labels"`
+	Name          string                           `json:"name"`
+	NextRuntime   string                           `json:"next_runtime"`
+	ObjectUuid    string                           `json:"object_uuid"`
+	Relations     StorageSnapshotScheduleRelations `json:"relations"`
+	RunInterval   int                              `json:"run_interval"`
+	Status        string                           `json:"status"`
+	StorageUuid   string                           `json:"storage_uuid"`
 }
 
-type StorageSnapshotSchedulerRelations struct {
-	Snapshots []StorageSnapshotSchedulerRelation `json:"snapshots"`
+//StorageSnapshotScheduleRelations JSON struct of a list of relations of a storage snapshot schedule
+type StorageSnapshotScheduleRelations struct {
+	Snapshots []StorageSnapshotScheduleRelation `json:"snapshots"`
 }
 
-type StorageSnapshotSchedulerRelation struct {
+//StorageSnapshotScheduleRelation JSON struct of a relation of a storage snapshot schedule
+type StorageSnapshotScheduleRelation struct {
 	CreateTime string `json:"create_time"`
 	Name       string `json:"name"`
 	ObjectUuid string `json:"object_uuid"`
 }
 
+//StorageSnapshotScheduleCreateRequest JSON struct of a request for creating a storage snapshot schedule
 type StorageSnapshotScheduleCreateRequest struct {
 	Name          string   `json:"name"`
-	Labels        []string `json:"labels"`
+	Labels        []string `json:"labels,omitempty"`
 	RunInterval   int      `json:"run_interval"`
 	KeepSnapshots int      `json:"keep_snapshots"`
-	NextRuntime   string   `json:"next_runtime"`
+	NextRuntime   string   `json:"next_runtime,omitempty"`
 }
 
+//StorageSnapshotScheduleCreateResponse JSON struct of a response for creating a storage snapshot schedule
 type StorageSnapshotScheduleCreateResponse struct {
 	RequestUuid string `json:"request_uuid"`
 	ObjectUuid  string `json:"object_uuid"`
 }
 
+//StorageSnapshotScheduleUpdateRequest JSON struct of a request for updating a storage snapshot schedule
 type StorageSnapshotScheduleUpdateRequest struct {
-	Name          string   `json:"name"`
-	Labels        []string `json:"labels"`
-	RunInterval   int      `json:"run_interval"`
-	KeepSnapshots int      `json:"keep_snapshots"`
-	NextRuntime   string   `json:"next_runtime"`
+	Name          string   `json:"name,omitempty"`
+	Labels        []string `json:"labels,omitempty"`
+	RunInterval   int      `json:"run_interval,omitempty"`
+	KeepSnapshots int      `json:"keep_snapshots,omitempty"`
+	NextRuntime   string   `json:"next_runtime,omitempty"`
 }
 
 //GetStorageSnapshotScheduleList gets a list of available storage snapshot schedules based on a given storage's id
@@ -65,12 +73,12 @@ func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSch
 		method: http.MethodGet,
 	}
 	var response StorageSnapshotScheduleList
-	var list []StorageSnapshotSchedule
+	var schedules []StorageSnapshotSchedule
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, StorageSnapshotSchedule{Properties: properties})
+		schedules = append(schedules, StorageSnapshotSchedule{Properties: properties})
 	}
-	return list, err
+	return schedules, err
 }
 
 //GetStorageSnapshotSchedule gets a specific storage snapshot scheduler based on a given storage's id and scheduler's id

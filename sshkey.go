@@ -5,14 +5,17 @@ import (
 	"path"
 )
 
+//SshkeyList JSON struct of a list of SSH-keys
 type SshkeyList struct {
 	List map[string]SshkeyProperties `json:"sshkeys"`
 }
 
+//Sshkey JSON struct of a single SSH-key
 type Sshkey struct {
 	Properties SshkeyProperties `json:"sshkey"`
 }
 
+//SshkeyProperties JSON struct of properties of a single SSH-key
 type SshkeyProperties struct {
 	Name       string   `json:"name"`
 	ObjectUuid string   `json:"object_uuid"`
@@ -24,26 +27,31 @@ type SshkeyProperties struct {
 	UserUuid   string   `json:"user_uuid"`
 }
 
+//SshkeyCreateRequest JSON struct of a request for creating a SSH-key
 type SshkeyCreateRequest struct {
 	Name   string   `json:"name"`
-	Sshkey string   `json:"sshkey"`
+	Sshkey string   `json:"sshkey,omitempty"`
 	Labels []string `json:"labels,omitempty"`
 }
 
+//SshkeyUpdateRequest JSON struct of a request for updating a SSH-key
 type SshkeyUpdateRequest struct {
 	Name   string   `json:"name,omitempty"`
 	Sshkey string   `json:"sshkey,omitempty"`
-	Labels []string `json:"labels"`
+	Labels []string `json:"labels,omitempty"`
 }
 
+//SshkeyEventList JSON struct of a list of a SSH-key's events
 type SshkeyEventList struct {
 	List []SshkeyEventProperties `json:"events"`
 }
 
+//SshkeyEvent JSON struct of an event of a SSH-key
 type SshkeyEvent struct {
 	Properties SshkeyEventProperties `json:"event"`
 }
 
+//SshkeyEventProperties JSON struct of properties of an event of a SSH-key
 type SshkeyEventProperties struct {
 	ObjectType    string `json:"object_type"`
 	RequestUuid   string `json:"request_uuid"`
@@ -128,7 +136,7 @@ func (c *Client) GetSshkeyEventList(id string) ([]SshkeyEvent, error) {
 	var sshEvents []SshkeyEvent
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		sshEvents = append(sshEvents, SshkeyEvent{Properties:properties})
+		sshEvents = append(sshEvents, SshkeyEvent{Properties: properties})
 	}
 	return sshEvents, err
 }
