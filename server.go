@@ -5,14 +5,17 @@ import (
 	"path"
 )
 
-type Servers struct {
+//ServerList JSON struct of a list of servers
+type ServerList struct {
 	List map[string]ServerProperties `json:"servers"`
 }
 
+//Server JSON struct of a single server
 type Server struct {
 	Properties ServerProperties `json:"server"`
 }
 
+//ServerProperties JSON struct of properties of a server
 type ServerProperties struct {
 	ObjectUuid           string          `json:"object_uuid"`
 	Name                 string          `json:"name"`
@@ -33,13 +36,15 @@ type ServerProperties struct {
 	Relations            ServerRelations `json:"relations"`
 }
 
+//ServerRelations JSON struct of a list of server relations
 type ServerRelations struct {
-	IsoImages []ServerIsoImage `json:"isoimages"`
-	Networks  []ServerNetwork  `json:"networks"`
-	PublicIps []ServerIp       `json:"public_ips"`
-	Storages  []ServerStorage  `json:"storages"`
+	IsoImages []ServerIsoImageRelationProperties `json:"isoimages"`
+	Networks  []ServerNetworkRelationProperties  `json:"networks"`
+	PublicIps []ServerIpRelationProperties       `json:"public_ips"`
+	Storages  []ServerStorageRelationProperties  `json:"storages"`
 }
 
+//ServerCreateRequest JSON struct of a request for creating a server
 type ServerCreateRequest struct {
 	Name            string                       `json:"name"`
 	Memory          int                          `json:"memory"`
@@ -49,8 +54,11 @@ type ServerCreateRequest struct {
 	AvailablityZone string                       `json:"availability_zone,omitempty"`
 	Labels          []string                     `json:"labels,omitempty"`
 	Relations       ServerCreateRequestRelations `json:"relations,omitempty"`
+	Status          string                       `json:"status,omitempty"`
+	AutoRecovery    bool                         `json:"auto_recovery,omitempty"`
 }
 
+//ServerCreateResponse JSON struct of a response for creating a server
 type ServerCreateResponse struct {
 	ObjectUuid   string   `json:"object_uuid"`
 	RequestUuid  string   `json:"request_uuid"`
@@ -60,10 +68,12 @@ type ServerCreateResponse struct {
 	IpaddrUuids  []string `json:"ipaddr_uuids"`
 }
 
+//ServerPowerUpdateRequest JSON struct of a request for updating server's power state
 type ServerPowerUpdateRequest struct {
-	Power bool `json:"power"`
+	Power bool `json:"power,omitempty"`
 }
 
+//ServerCreateRequestRelations JSOn struct of a list of a server's relations
 type ServerCreateRequestRelations struct {
 	IsoImages []ServerCreateRequestIsoimage `json:"isoimages"`
 	Networks  []ServerCreateRequestNetwork  `json:"networks"`
@@ -71,40 +81,49 @@ type ServerCreateRequestRelations struct {
 	Storages  []ServerCreateRequestStorage  `json:"storages"`
 }
 
+//ServerCreateRequestStorage JSON struct of a relation between a server and a storage
 type ServerCreateRequestStorage struct {
 	StorageUuid string `json:"storage_uuid,omitempty"`
 	BootDevice  bool   `json:"bootdevice,omitempty"`
 }
 
+//ServerCreateRequestNetwork JSON struct of a relation between a server and a network
 type ServerCreateRequestNetwork struct {
 	NetworkUuid string `json:"network_uuid,omitempty"`
 	BootDevice  bool   `json:"bootdevice,omitempty"`
 }
 
+//ServerCreateRequestIp JSON struct of a relation between a server and an IP address
 type ServerCreateRequestIp struct {
 	IpaddrUuid string `json:"ipaddr_uuid,omitempty"`
 }
 
+//ServerCreateRequestIsoimage JSON struct of a relation between a server and an ISO-Image
 type ServerCreateRequestIsoimage struct {
 	IsoimageUuid string `json:"isoimage_uuid,omitempty"`
 }
 
+//ServerUpdateRequest JSON of a request for updating a server
 type ServerUpdateRequest struct {
 	Name            string   `json:"name,omitempty"`
 	AvailablityZone string   `json:"availability_zone,omitempty"`
 	Memory          int      `json:"memory,omitempty"`
 	Cores           int      `json:"cores,omitempty"`
-	Labels          []string `json:"labels"`
+	Labels          []string `json:"labels,omitempty"`
+	AutoRecovery    bool     `json:"auto_recovery,omitempty"`
 }
 
+//ServerEventList JSON struct of a list of a server's events
 type ServerEventList struct {
 	List []ServerEventProperties `json:"events"`
 }
 
+//ServerEvent JSON struct of a single event of a server
 type ServerEvent struct {
 	Properties ServerEventProperties `json:"event"`
 }
 
+//ServerEventProperties JSON struct of properties of a server
 type ServerEventProperties struct {
 	ObjectType    string `json:"object_type"`
 	RequestUuid   string `json:"request_uuid"`
@@ -117,14 +136,17 @@ type ServerEventProperties struct {
 	UserUuid      string `json:"user_uuid"`
 }
 
+//ServerMetricList JSON struct of a list of a server's metrics
 type ServerMetricList struct {
 	List []ServerMetricProperties `json:"server_metrics"`
 }
 
+//ServerMetric JSON struct of a single metric of a server
 type ServerMetric struct {
 	Properties ServerMetricProperties `json:"server_metric"`
 }
 
+//ServerMetricProperties JSON stru
 type ServerMetricProperties struct {
 	BeginTime       string `json:"begin_time"`
 	EndTime         string `json:"end_time"`
@@ -145,10 +167,8 @@ func (c *Client) GetServer(id string) (Server, error) {
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodGet,
 	}
-
 	var response Server
 	err := r.execute(*c, &response)
-
 	return response, err
 }
 
@@ -158,8 +178,7 @@ func (c *Client) GetServerList() ([]Server, error) {
 		uri:    apiServerBase,
 		method: http.MethodGet,
 	}
-
-	var response Servers
+	var response ServerList
 	var servers []Server
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
@@ -167,7 +186,6 @@ func (c *Client) GetServerList() ([]Server, error) {
 			Properties: properties,
 		})
 	}
-
 	return servers, err
 }
 
@@ -178,15 +196,12 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 		method: http.MethodPost,
 		body:   body,
 	}
-
 	var response ServerCreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
 		return ServerCreateResponse{}, err
 	}
-
 	err = c.WaitForRequestCompletion(response.RequestUuid)
-
 	return response, err
 }
 
@@ -196,7 +211,6 @@ func (c *Client) DeleteServer(id string) error {
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodDelete,
 	}
-
 	return r.execute(*c, nil)
 }
 
@@ -207,7 +221,6 @@ func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
 		method: http.MethodPatch,
 		body:   body,
 	}
-
 	return r.execute(*c, nil)
 }
 
@@ -260,7 +273,6 @@ func (c *Client) setServerPowerState(id string, powerState bool) error {
 	if isOn == powerState {
 		return nil
 	}
-
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "power"),
 		method: http.MethodPatch,
@@ -268,12 +280,10 @@ func (c *Client) setServerPowerState(id string, powerState bool) error {
 			Power: powerState,
 		},
 	}
-
 	err = r.execute(*c, nil)
 	if err != nil {
 		return err
 	}
-
 	return c.WaitForServerPowerStatus(id, powerState)
 }
 
@@ -297,23 +307,19 @@ func (c *Client) ShutdownServer(id string) error {
 	if !server.Properties.Power {
 		return nil
 	}
-
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "shutdown"),
 		method: http.MethodPatch,
 		body:   new(map[string]string),
 	}
-
 	err = r.execute(*c, nil)
 	if err != nil {
 		return err
 	}
-
 	//If we get an error, which includes a timeout, power off the server instead
 	err = c.WaitForServerPowerStatus(id, false)
 	if err != nil {
 		return c.setServerPowerState(id, false)
 	}
-
 	return nil
 }

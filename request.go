@@ -16,25 +16,30 @@ type Request struct {
 	body   interface{}
 }
 
+//CreateResponse common struct of a response for creation
 type CreateResponse struct {
 	ObjectUuid  string `json:"object_uuid"`
 	RequestUuid string `json:"request_uuid"`
 }
 
+//RequestStatus status of a request
 type RequestStatus map[string]RequestStatusProperties
 
+//RequestStatusProperties JSON struct of properties of a request's status
 type RequestStatusProperties struct {
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	CreateTime string `json:"create_time"`
 }
 
+//RequestError error of a request
 type RequestError struct {
 	StatusMessage string `json:"status"`
 	ErrorMessage  string `json:"message"`
 	StatusCode    int
 }
 
+//Error just returns error as string
 func (r RequestError) Error() string {
 	message := r.ErrorMessage
 	if message == "" {
@@ -93,7 +98,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	}
 }
 
-//This function allows use to wait for a request to complete. Timeouts are currently hardcoded
+//WaitForRequestCompletion allows to wait for a request to complete. Timeouts are currently hardcoded
 func (c *Client) WaitForRequestCompletion(id string) error {
 	r := Request{
 		uri:    "/requests/" + id,
@@ -119,6 +124,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 	}
 }
 
+//WaitForServerPowerStatus  allows to wait for a server changing its power status. Timeouts are currently hardcoded
 func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 	timer := time.After(2 * time.Minute)
 

@@ -15,6 +15,7 @@ type StorageSnapshot struct {
 	Properties StorageSnapshotProperties `json:"snapshot"`
 }
 
+//StorageSnapshotProperties JSON struct of properties of a storage snapshot
 type StorageSnapshotProperties struct {
 	Labels           []string `json:"labels"`
 	ObjectUuid       string   `json:"object_uuid"`
@@ -33,25 +34,30 @@ type StorageSnapshotProperties struct {
 	ParentUuid       string   `json:"parent_uuid"`
 }
 
+//StorageSnapshotCreateRequest JSON struct of a request for creating a storage snapshot
 type StorageSnapshotCreateRequest struct {
-	Name   string   `json:"name"`
-	Labels []string `json:"labels"`
+	Name   string   `json:"name,omitempty"`
+	Labels []string `json:"labels,omitempty"`
 }
 
+//StorageSnapshotCreateResponse JSON struct of a response for creating a storage snapshot
 type StorageSnapshotCreateResponse struct {
 	RequestUuid string `json:"request_uuid"`
 	ObjectUuid  string `json:"object_uuid"`
 }
 
+//StorageSnapshotUpdateRequest JSON struct of a request for updating a storage snapshot
 type StorageSnapshotUpdateRequest struct {
-	Name   string   `json:"name"`
-	Labels []string `json:"labels"`
+	Name   string   `json:"name,omitempty"`
+	Labels []string `json:"labels,omitempty"`
 }
 
+//StorageRollbackRequest JSON struct of a request for rolling back
 type StorageRollbackRequest struct {
-	Rollback bool `json:"rollback"`
+	Rollback bool `json:"rollback,omitempty"`
 }
 
+//StorageSnapshotExportToS3Request JSON struct of a request for exporting a storage snapshot to S3
 type StorageSnapshotExportToS3Request struct {
 	S3auth struct {
 		Host       string `json:"host"`

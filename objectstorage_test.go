@@ -95,7 +95,7 @@ func TestClient_GetObjectStorageBucketList(t *testing.T) {
 }
 
 func getMockObjectStorageAccessKey() ObjectStorageAccessKey {
-	mock := ObjectStorageAccessKey{Properties:ObjectStorageAccessKeyProperties{
+	mock := ObjectStorageAccessKey{Properties: ObjectStorageAccessKeyProperties{
 		SecretKey: "dummy-secret-key",
 		AccessKey: "dummy-access-key",
 		User:      "any",
@@ -115,8 +115,8 @@ func prepareObjectStorageAccessKeyHTTPGet() string {
 	return string(res)
 }
 
-func getMockObjectStorageAccessKeyCreateResponse() ObjectStorageAccessKeyResponse {
-	mock := ObjectStorageAccessKeyResponse{
+func getMockObjectStorageAccessKeyCreateResponse() ObjectStorageAccessKeyCreateResponse {
+	mock := ObjectStorageAccessKeyCreateResponse{
 		AccessKey: struct {
 			SecretKey string `json:"secret_key"`
 			AccessKey string `json:"access_key"`
@@ -136,13 +136,13 @@ func prepareObjectStorageAccessKeyHTTPCreateResponse() string {
 }
 
 func getMockObjectStorageBucket() ObjectStorageBucket {
-	mock := ObjectStorageBucket{Properties:ObjectStorageBucketProperties{
+	mock := ObjectStorageBucket{Properties: ObjectStorageBucketProperties{
 		Name: "test",
 		Usage: struct {
 			SizeKb     int `json:"size_kb"`
 			NumObjects int `json:"num_objects"`
 		}{
-			SizeKb: 1000000,
+			SizeKb:     1000000,
 			NumObjects: 10,
 		},
 	}}

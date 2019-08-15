@@ -15,6 +15,7 @@ type Firewall struct {
 	Properties FirewallProperties `json:"firewall"`
 }
 
+//FirewallProperties is JSON struct of a firewall's properties
 type FirewallProperties struct {
 	Status       string           `json:"status"`
 	Labels       []string         `json:"labels"`
@@ -29,28 +30,32 @@ type FirewallProperties struct {
 	Name         string           `json:"name"`
 }
 
+//FirewallRules is JSON struct of a list of firewall's rules
 type FirewallRules struct {
-	RulesV6In  []FirewallRuleProperties `json:"rules-v6-in"`
-	RulesV6Out []FirewallRuleProperties `json:"rules-v6-out"`
-	RulesV4In  []FirewallRuleProperties `json:"rules-v4-in"`
-	RulesV4Out []FirewallRuleProperties `json:"rules-v4-out"`
+	RulesV6In  []FirewallRuleProperties `json:"rules-v6-in,omitempty"`
+	RulesV6Out []FirewallRuleProperties `json:"rules-v6-out,omitempty"`
+	RulesV4In  []FirewallRuleProperties `json:"rules-v4-in,omitempty"`
+	RulesV4Out []FirewallRuleProperties `json:"rules-v4-out,omitempty"`
 }
 
+//FirewallRuleProperties is JSON struct of a firewall's rule properties
 type FirewallRuleProperties struct {
-	Protocol string `json:"protocol"`
-	DstPort  string `json:"dst_port"`
-	SrcPort  string `json:"src_port"`
-	SrcCidr  string `json:"src_cidr"`
+	Protocol string `json:"protocol,omitempty"`
+	DstPort  string `json:"dst_port,omitempty"`
+	SrcPort  string `json:"src_port,omitempty"`
+	SrcCidr  string `json:"src_cidr,omitempty"`
 	Action   string `json:"action"`
-	Comment  string `json:"comment"`
-	DstCidr  string `json:"dst_cidr"`
+	Comment  string `json:"comment,omitempty"`
+	DstCidr  string `json:"dst_cidr,omitempty"`
 	Order    int    `json:"order"`
 }
 
+//FirewallRelation is a JSON struct of a list of firewall's relations
 type FirewallRelation struct {
 	Networks []NetworkInFirewall `json:"networks"`
 }
 
+//NetworkInFirewall is a JSON struct of a firewall's relation
 type NetworkInFirewall struct {
 	CreateTime  string `json:"create_time"`
 	NetworkUuid string `json:"network_uuid"`
@@ -59,31 +64,37 @@ type NetworkInFirewall struct {
 	ObjectName  string `json:"object_name"`
 }
 
+//FirewallCreateRequest is JSON struct of a request for creating a firewall
 type FirewallCreateRequest struct {
 	Name   string        `json:"name"`
-	Labels []string      `json:"labels"`
+	Labels []string      `json:"labels,omitempty"`
 	Rules  FirewallRules `json:"rules"`
 }
 
+//FirewallCreateResponse is JSON struct of a response for creating a firewall
 type FirewallCreateResponse struct {
 	RequestUuid string `json:"request_uuid"`
 	ObjectUuid  string `json:"object_uuid"`
 }
 
+//FirewallUpdateRequest is JSON struct of a request for updating a firewall
 type FirewallUpdateRequest struct {
-	Name   string        `json:"name"`
-	Labels []string      `json:"labels"`
-	Rules  FirewallRules `json:"rules"`
+	Name   string        `json:"name,omitempty"`
+	Labels []string      `json:"labels,omitempty"`
+	Rules  FirewallRules `json:"rules,omitempty"`
 }
 
+//FirewallEventList is JSON struct of a list of firewall's events
 type FirewallEventList struct {
 	List []FirewallEventProperties `json:"events"`
 }
 
+//FirewallEvent is JSOn struct of a single firewall's event
 type FirewallEvent struct {
 	Properties FirewallEventProperties `json:"event"`
 }
 
+//FirewallEventProperties is JSON struct of a firewall's properties
 type FirewallEventProperties struct {
 	ObjectType    string `json:"object_type"`
 	RequestUuid   string `json:"request_uuid"`

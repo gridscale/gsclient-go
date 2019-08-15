@@ -48,7 +48,7 @@ func TestClient_CreateServerStorage(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerStorage(dummyUuid, ServerStorageCreateRequest{
+	err := client.CreateServerStorage(dummyUuid, ServerStorageRelationCreateRequest{
 		ObjectUuid: dummyUuid,
 		BootDevice: true,
 	})
@@ -65,7 +65,7 @@ func TestClient_UpdateServerStorage(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UpdateServerStorage(dummyUuid, dummyUuid, ServerStorageUpdateRequest{
+	err := client.UpdateServerStorage(dummyUuid, dummyUuid, ServerStorageRelationUpdateRequest{
 		Ordering:   1,
 		BootDevice: true,
 	})
@@ -116,8 +116,8 @@ func TestClient_UnlinkStorage(t *testing.T) {
 	}
 }
 
-func getMockServerStorage() ServerStorage {
-	mock := ServerStorage{
+func getMockServerStorage() ServerStorageRelationProperties {
+	mock := ServerStorageRelationProperties{
 		ObjectUuid:       dummyUuid,
 		ObjectName:       "test",
 		Capacity:         10,

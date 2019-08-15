@@ -5,15 +5,18 @@ import (
 	"path"
 )
 
-type ServerIpList struct {
-	List []ServerIp `json:"ip_relations"`
+//ServerIpRelationList JSON struct of a list of relations between a server and IP addresses
+type ServerIpRelationList struct {
+	List []ServerIpRelationProperties `json:"ip_relations"`
 }
 
-type ServerIpSingle struct {
-	Properties ServerIp `json:"ip_relation"`
+//ServerIpRelation JSON struct of a single relation between a server and a IP address
+type ServerIpRelation struct {
+	Properties ServerIpRelationProperties `json:"ip_relation"`
 }
 
-type ServerIp struct {
+//ServerIpRelationProperties JSON struct of properties of a relation between a server and a IP address
+type ServerIpRelationProperties struct {
 	ServerUuid string `json:"server_uuid"`
 	CreateTime string `json:"create_time"`
 	Prefix     string `json:"prefix"`
@@ -22,34 +25,35 @@ type ServerIp struct {
 	Ip         string `json:"ip"`
 }
 
-type ServerIpCreateRequest struct {
+//ServerIpRelationCreateRequest JSON struct of request for creating a relation between a server and a IP address
+type ServerIpRelationCreateRequest struct {
 	ObjectUuid string `json:"object_uuid"`
 }
 
 //GetServerIpList gets a list of a specific server's IPs
-func (c *Client) GetServerIpList(id string) ([]ServerIp, error) {
+func (c *Client) GetServerIpList(id string) ([]ServerIpRelationProperties, error) {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "ips"),
 		method: http.MethodGet,
 	}
-	var response ServerIpList
+	var response ServerIpRelationList
 	err := r.execute(*c, &response)
 	return response.List, err
 }
 
 //GetServerIp gets an IP of a specific server
-func (c *Client) GetServerIp(serverId, ipId string) (ServerIp, error) {
+func (c *Client) GetServerIp(serverId, ipId string) (ServerIpRelationProperties, error) {
 	r := Request{
 		uri:    path.Join(apiServerBase, serverId, "ips", ipId),
 		method: http.MethodGet,
 	}
-	var response ServerIpSingle
+	var response ServerIpRelation
 	err := r.execute(*c, &response)
 	return response.Properties, err
 }
 
 //CreateServerIp create a link between a server and an IP
-func (c *Client) CreateServerIp(id string, body ServerIpCreateRequest) error {
+func (c *Client) CreateServerIp(id string, body ServerIpRelationCreateRequest) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "ips"),
 		method: http.MethodPost,
@@ -69,7 +73,7 @@ func (c *Client) DeleteServerIp(serverId, ipID string) error {
 
 //LinkIp attaches an IP to a server
 func (c *Client) LinkIp(serverId string, ipID string) error {
-	body := ServerIpCreateRequest{
+	body := ServerIpRelationCreateRequest{
 		ObjectUuid: ipID,
 	}
 	return c.CreateServerIp(serverId, body)

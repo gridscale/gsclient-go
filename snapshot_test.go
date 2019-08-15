@@ -105,7 +105,7 @@ func TestClient_RollbackStorage(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		fmt.Fprint(w, "")
 	})
-	err := client.RollbackStorage(dummyUuid, dummyUuid, StorageRollbackRequest{Rollback:true})
+	err := client.RollbackStorage(dummyUuid, dummyUuid, StorageRollbackRequest{Rollback: true})
 	if err != nil {
 		t.Errorf("RollbackStorage returned an error %v", err)
 	}
@@ -125,9 +125,9 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 			AccessKeys string `json:"access_keys"`
 			SecretKey  string `json:"secret_key"`
 		}{
-			Host: "example.com",
+			Host:       "example.com",
 			AccessKeys: "access_keys",
-			SecretKey: "secret_key",
+			SecretKey:  "secret_key",
 		},
 		S3data: struct {
 			Host     string `json:"host"`
@@ -147,7 +147,7 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 }
 
 func getMockStorageSnapshot() StorageSnapshot {
-	mock := StorageSnapshot{Properties:StorageSnapshotProperties{
+	mock := StorageSnapshot{Properties: StorageSnapshotProperties{
 		Labels:           []string{"label"},
 		ObjectUuid:       dummyUuid,
 		Name:             "test",

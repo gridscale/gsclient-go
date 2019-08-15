@@ -5,14 +5,17 @@ import (
 	"path"
 )
 
-type Ips struct {
+//IpList is JSON struct of a list of IPs
+type IpList struct {
 	List map[string]IpProperties `json:"ips"`
 }
 
+//Ip is JSON struct if a single IP
 type Ip struct {
 	Properties IpProperties `json:"ip"`
 }
 
+//IpProperties is JSON struct of an IP's properties
 type IpProperties struct {
 	Name            string      `json:"name"`
 	LocationCountry string      `json:"location_country"`
@@ -35,25 +38,29 @@ type IpProperties struct {
 	Relations       IpRelations `json:"relations"`
 }
 
+//IpRelations is JSON struct of a list of an IP's relations
 type IpRelations struct {
-	Loadbalancers []IpLoadbalancer `json:"loadbalancers"`
-	Servers       []IpServer       `json:"servers"`
-	PublicIps     []ServerIp       `json:"public_ips"`
-	Storages      []ServerStorage  `json:"storages"`
+	Loadbalancers []IpLoadbalancer                  `json:"loadbalancers"`
+	Servers       []IpServer                        `json:"servers"`
+	PublicIps     []ServerIpRelationProperties      `json:"public_ips"`
+	Storages      []ServerStorageRelationProperties `json:"storages"`
 }
 
+//IpLoadbalancer is JSON struct of the relation between an IP and a Load Balancer
 type IpLoadbalancer struct {
 	CreateTime       string `json:"create_time"`
 	LoadbalancerName string `json:"loadbalancer_name"`
 	LoadbalancerUuid string `json:"loadbalancer_uuid"`
 }
 
+//IpServer is JSON struct of the relation between an IP and a Server
 type IpServer struct {
 	CreateTime string `json:"create_time"`
 	ServerName string `json:"server_name"`
 	ServerUuid string `json:"server_uuid"`
 }
 
+//IpCreateResponse is JSON struct of a response for creating an IP
 type IpCreateResponse struct {
 	RequestUuid string `json:"request_uuid"`
 	ObjectUuid  string `json:"object_uuid"`
@@ -61,6 +68,7 @@ type IpCreateResponse struct {
 	Ip          string `json:"ip"`
 }
 
+//IpCreateRequest is JSON struct of a request for creating an IP
 type IpCreateRequest struct {
 	Name         string   `json:"name,omitempty"`
 	Family       int      `json:"family"`
@@ -70,21 +78,25 @@ type IpCreateRequest struct {
 	Labels       []string `json:"labels,omitempty"`
 }
 
+//IpUpdateRequest is JSON struct of a request for updating an IP
 type IpUpdateRequest struct {
 	Name       string   `json:"name,omitempty"`
 	Failover   bool     `json:"failover"`
 	ReverseDns string   `json:"reverse_dns,omitempty"`
-	Labels     []string `json:"labels"`
+	Labels     []string `json:"labels,omitempty"`
 }
 
+//IpEventList is JSON struct of a list of an IP's events
 type IpEventList struct {
 	List []IpEventProperties `json:"events"`
 }
 
+//IpEvent is JSON struct of a single IP
 type IpEvent struct {
 	Properties IpEventProperties `json:"event"`
 }
 
+//IpEventProperties is JSON struct of an IP's properties
 type IpEventProperties struct {
 	ObjectType    string `json:"object_type"`
 	RequestUuid   string `json:"request_uuid"`
@@ -117,7 +129,7 @@ func (c *Client) GetIpList() ([]Ip, error) {
 		method: http.MethodGet,
 	}
 
-	var response Ips
+	var response IpList
 	var IPs []Ip
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
@@ -174,14 +186,13 @@ func (c *Client) GetIpEventList(id string) ([]IpEvent, error) {
 		method: http.MethodGet,
 	}
 	var response IpEventList
-	var IPevents []IpEvent
+	var IPEvents []IpEvent
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		IPevents = append(IPevents, IpEvent{Properties: properties})
+		IPEvents = append(IPEvents, IpEvent{Properties: properties})
 	}
-	return IPevents, err
+	return IPEvents, err
 }
-
 
 //GetIpVersion gets IP's version, returns 0 if an error was encountered
 func (c *Client) GetIpVersion(id string) int {

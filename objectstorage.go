@@ -15,13 +15,15 @@ type ObjectStorageAccessKey struct {
 	Properties ObjectStorageAccessKeyProperties `json:"access_key"`
 }
 
+//NetworkEventProperties is JSON struct of properties of an object storage access key
 type ObjectStorageAccessKeyProperties struct {
 	SecretKey string `json:"secret_key"`
 	AccessKey string `json:"access_key"`
 	User      string `json:"user"`
 }
 
-type ObjectStorageAccessKeyResponse struct {
+//ObjectStorageAccessKeyCreateResponse is JSON struct of a response for creating an object storage access key
+type ObjectStorageAccessKeyCreateResponse struct {
 	AccessKey struct {
 		SecretKey string `json:"secret_key"`
 		AccessKey string `json:"access_key"`
@@ -29,14 +31,17 @@ type ObjectStorageAccessKeyResponse struct {
 	RequestUuid string `json:"request_uuid"`
 }
 
+//ObjectStorageBucketList is JSON struct of a list of buckets
 type ObjectStorageBucketList struct {
 	List []ObjectStorageBucketProperties `json:"buckets"`
 }
 
+//ObjectStorageBucket is JSON struct of a single bucket
 type ObjectStorageBucket struct {
 	Properties ObjectStorageBucketProperties `json:"bucket"`
 }
 
+//ObjectStorageBucketProperties is JSON struct of properties of a bucket
 type ObjectStorageBucketProperties struct {
 	Name  string `json:"name"`
 	Usage struct {
@@ -52,12 +57,12 @@ func (c *Client) GetObjectStorageAccessKeyList() ([]ObjectStorageAccessKey, erro
 		method: http.MethodGet,
 	}
 	var response ObjectStorageAccessKeyList
-	var list []ObjectStorageAccessKey
+	var accessKeys []ObjectStorageAccessKey
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, ObjectStorageAccessKey{Properties: properties})
+		accessKeys = append(accessKeys, ObjectStorageAccessKey{Properties: properties})
 	}
-	return list, err
+	return accessKeys, err
 }
 
 //GetObjectStorageAccessKey gets a specific object storage access key based on given id
@@ -72,15 +77,15 @@ func (c *Client) GetObjectStorageAccessKey(id string) (ObjectStorageAccessKey, e
 }
 
 //CreateObjectStorageAccessKey creates an object storage access key
-func (c *Client) CreateObjectStorageAccessKey() (ObjectStorageAccessKeyResponse, error) {
+func (c *Client) CreateObjectStorageAccessKey() (ObjectStorageAccessKeyCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys"),
 		method: http.MethodPost,
 	}
-	var response ObjectStorageAccessKeyResponse
+	var response ObjectStorageAccessKeyCreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
-		return ObjectStorageAccessKeyResponse{}, err
+		return ObjectStorageAccessKeyCreateResponse{}, err
 	}
 	err = c.WaitForRequestCompletion(response.RequestUuid)
 	return response, err
@@ -102,10 +107,10 @@ func (c *Client) GetObjectStorageBucketList() ([]ObjectStorageBucket, error) {
 		method: http.MethodGet,
 	}
 	var response ObjectStorageBucketList
-	var list []ObjectStorageBucket
+	var buckets []ObjectStorageBucket
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, ObjectStorageBucket{Properties:properties})
+		buckets = append(buckets, ObjectStorageBucket{Properties: properties})
 	}
-	return list, err
+	return buckets, err
 }

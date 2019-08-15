@@ -72,7 +72,7 @@ func TestClient_CreatePaaSService(t *testing.T) {
 	if err != nil {
 		t.Errorf("CreatePaaSService returned error %v", err)
 	}
-	assert.Equal(t, fmt.Sprintf("%v", expectedRespObj), fmt.Sprintf("%v", *response))
+	assert.Equal(t, fmt.Sprintf("%v", expectedRespObj), fmt.Sprintf("%v", response))
 }
 
 func TestClient_UpdatePaaSService(t *testing.T) {
@@ -183,7 +183,7 @@ func TestClient_CreatePaaSSecurityZone(t *testing.T) {
 	if err != nil {
 		t.Errorf("CreatePaaSSecurityZone returned an error %v", err)
 	}
-	assert.Equal(t, fmt.Sprintf("%v", getMockPaaSSecurityZoneCreateResponse()), fmt.Sprintf("%v", *res))
+	assert.Equal(t, fmt.Sprintf("%v", getMockPaaSSecurityZoneCreateResponse()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_GetPaaSSecurityZone(t *testing.T) {
@@ -343,8 +343,8 @@ func getMockPaaSServiceCreateResponse() PaaSServiceCreateResponse {
 	}
 }
 
-func getMockPaasTemplate() PaasTemplate {
-	mock := PaasTemplate{Properties: PaaSTemplateProperties{
+func getMockPaasTemplate() PaaSTemplate {
+	mock := PaaSTemplate{Properties: PaaSTemplateProperties{
 		Name:       "test",
 		ObjectUuid: "d711fc50-ad96-4070-b769-6fe2bf93792c",
 		Category:   "database",

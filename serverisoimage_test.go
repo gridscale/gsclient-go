@@ -48,8 +48,8 @@ func TestClient_CreateServerIsoImage(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerIsoImage(dummyUuid, ServerIsoImageCreateRequest{
-		ObjectUuid:dummyUuid,
+	err := client.CreateServerIsoImage(dummyUuid, ServerIsoImageRelationCreateRequest{
+		ObjectUuid: dummyUuid,
 	})
 	if err != nil {
 		t.Errorf("CreateServerIsoImage returned an error %v", err)
@@ -64,7 +64,7 @@ func TestClient_UpdateServerIsoImage(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UpdateServerIsoImage(dummyUuid, dummyUuid, ServerIsoImageUpdateRequest{
+	err := client.UpdateServerIsoImage(dummyUuid, dummyUuid, ServerIsoImageRelationUpdateRequest{
 		BootDevice: true,
 		Name:       "test",
 	})
@@ -115,8 +115,8 @@ func TestClient_UnlinkIsoImage(t *testing.T) {
 	}
 }
 
-func getMockServerIsoImage() ServerIsoImage {
-	mock := ServerIsoImage{
+func getMockServerIsoImage() ServerIsoImageRelationProperties {
+	mock := ServerIsoImageRelationProperties{
 		ObjectUuid: dummyUuid,
 		ObjectName: "test",
 		Private:    false,

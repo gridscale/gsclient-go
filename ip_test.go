@@ -133,7 +133,7 @@ func TestClient_GetIpVersion(t *testing.T) {
 }
 
 func getMockIP() Ip {
-	mock := Ip{Properties:IpProperties{
+	mock := Ip{Properties: IpProperties{
 		Name:            "test",
 		LocationCountry: "Germany",
 		LocationUuid:    dummyUuid,
@@ -152,7 +152,7 @@ func getMockIP() Ip {
 		UsagesInMinutes: 10,
 		CurrentPrice:    0.9,
 		Labels:          []string{"label"},
-		Relations:       IpRelations{
+		Relations: IpRelations{
 			Loadbalancers: []IpLoadbalancer{
 				{
 					CreateTime:       dummyTime,
@@ -193,7 +193,7 @@ func prepareIpCreateResponse() string {
 }
 
 func getMockIpEvent() IpEvent {
-	mock := IpEvent{Properties:IpEventProperties{
+	mock := IpEvent{Properties: IpEventProperties{
 		ObjectType:    "type",
 		RequestUuid:   dummyRequestUUID,
 		ObjectUuid:    dummyUuid,

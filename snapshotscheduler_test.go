@@ -105,7 +105,7 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 }
 
 func getMockStorageSnapshotSchedule() StorageSnapshotSchedule {
-	mock := StorageSnapshotSchedule{Properties:StorageSnapshotSchedulerProperties{
+	mock := StorageSnapshotSchedule{Properties: StorageSnapshotScheduleProperties{
 		ChangeTime:    dummyTime,
 		CreateTime:    dummyTime,
 		KeepSnapshots: 1,
@@ -113,16 +113,16 @@ func getMockStorageSnapshotSchedule() StorageSnapshotSchedule {
 		Name:          "test",
 		NextRuntime:   dummyTime,
 		ObjectUuid:    dummyUuid,
-		Relations:     StorageSnapshotSchedulerRelations{Snapshots: []StorageSnapshotSchedulerRelation{
+		Relations: StorageSnapshotScheduleRelations{Snapshots: []StorageSnapshotScheduleRelation{
 			{
 				CreateTime: dummyTime,
 				Name:       "test",
 				ObjectUuid: dummyUuid,
 			},
 		}},
-		RunInterval:   60,
-		Status:        "active",
-		StorageUuid:   dummyUuid,
+		RunInterval: 60,
+		Status:      "active",
+		StorageUuid: dummyUuid,
 	}}
 	return mock
 }

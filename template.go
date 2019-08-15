@@ -6,14 +6,17 @@ import (
 	"path"
 )
 
+//TemplateList JSON struct of a list of templates
 type TemplateList struct {
 	List map[string]TemplateProperties `json:"templates"`
 }
 
+//Template JSON struct of a single template
 type Template struct {
 	Properties TemplateProperties `json:"template"`
 }
 
+//TemplateProperties JSOn struct of properties of a template
 type TemplateProperties struct {
 	Status           string   `json:"status"`
 	Ostype           string   `json:"ostype"`
@@ -36,14 +39,17 @@ type TemplateProperties struct {
 	Labels           []string `json:"labels"`
 }
 
+//TemplateEventList JSON struct of a list of a template's events
 type TemplateEventList struct {
 	List []TemplateEventProperties `json:"events"`
 }
 
+//TemplateEvent JSON struct of an event of a template
 type TemplateEvent struct {
 	Properties TemplateEventProperties `json:"event"`
 }
 
+//TemplateEventProperties JSON struct of properties of an event of a template
 type TemplateEventProperties struct {
 	ObjectType    string `json:"object_type"`
 	RequestUuid   string `json:"request_uuid"`
@@ -56,15 +62,17 @@ type TemplateEventProperties struct {
 	UserUuid      string `json:"user_uuid"`
 }
 
+//TemplateCreateRequest JSON struct of a request for creating a template
 type TemplateCreateRequest struct {
 	Name         string   `json:"name"`
 	SnapshotUuid string   `json:"snapshot_uuid"`
-	Labels       []string `json:"labels"`
+	Labels       []string `json:"labels,omitempty"`
 }
 
+//TemplateUpdateRequest JSON struct of a request for updating a template
 type TemplateUpdateRequest struct {
-	Name   string   `json:"name"`
-	Labels []string `json:"labels"`
+	Name   string   `json:"name,omitempty"`
+	Labels []string `json:"labels,omitempty"`
 }
 
 //GetTemplate gets a template
@@ -75,7 +83,6 @@ func (c *Client) GetTemplate(id string) (Template, error) {
 	}
 	var response Template
 	err := r.execute(*c, &response)
-
 	return response, err
 }
 
@@ -104,10 +111,9 @@ func (c *Client) GetTemplateByName(name string) (Template, error) {
 	}
 	for _, template := range templates {
 		if template.Properties.Name == name {
-			return Template{Properties:template.Properties}, nil
+			return Template{Properties: template.Properties}, nil
 		}
 	}
-
 	return Template{}, fmt.Errorf("Template %v not found", name)
 }
 
@@ -152,7 +158,7 @@ func (c *Client) GetTemplateEventList(id string) ([]TemplateEvent, error) {
 	var templateEvents []TemplateEvent
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		templateEvents = append(templateEvents, TemplateEvent{Properties:properties})
+		templateEvents = append(templateEvents, TemplateEvent{Properties: properties})
 	}
 	return templateEvents, err
 }

@@ -48,7 +48,7 @@ func TestClient_CreateServerNetwork(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerNetwork(dummyUuid, ServerNetworkCreateRequest{
+	err := client.CreateServerNetwork(dummyUuid, ServerNetworkRelationCreateRequest{
 		ObjectUuid:           dummyUuid,
 		Ordering:             1,
 		BootDevice:           false,
@@ -68,7 +68,7 @@ func TestClient_UpdateServerNetwork(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UpdateServerNetwork(dummyUuid, dummyUuid, ServerNetworkUpdateRequest{
+	err := client.UpdateServerNetwork(dummyUuid, dummyUuid, ServerNetworkRelationUpdateRequest{
 		Ordering:             0,
 		BootDevice:           true,
 		FirewallTemplateUuid: dummyUuid,
@@ -120,8 +120,8 @@ func TestClient_UnlinkNetwork(t *testing.T) {
 	}
 }
 
-func getMockServerNetwork() ServerNetwork {
-	mock := ServerNetwork{
+func getMockServerNetwork() ServerNetworkRelationProperties {
+	mock := ServerNetworkRelationProperties{
 		L2security:           true,
 		ServerUuid:           dummyUuid,
 		CreateTime:           dummyTime,
