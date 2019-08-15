@@ -5,17 +5,17 @@ import (
 	"path"
 )
 
-//LoadBalancers is the JSON struct of a list of load balancers
+//LoadBalancers is the JSON struct of a list of loadbalancers
 type LoadBalancers struct {
 	List map[string]LoadBalancerProperties `json:"loadbalancers"`
 }
 
-//LoadBalancer is the JSON struct of a load balancer
+//LoadBalancer is the JSON struct of a loadbalancer
 type LoadBalancer struct {
 	Properties LoadBalancerProperties `json:"loadbalancer"`
 }
 
-//LoadBalancerProperties is the properties of a load balancer
+//LoadBalancerProperties is the properties of a loadbalancer
 type LoadBalancerProperties struct {
 	ObjectUuid          string           `json:"object_uuid"`
 	LocationSite        int              `json:"location_site"`
@@ -52,7 +52,7 @@ type ForwardingRule struct {
 	TargetPort     int         `json:"target_port"`
 }
 
-//LoadBalancerCreateRequest is the JSON struct for creating a load balancer request
+//LoadBalancerCreateRequest is the JSON struct for creating a loadbalancer request
 type LoadBalancerCreateRequest struct {
 	Name                string           `json:"name"`
 	ListenIPv6Uuid      string           `json:"listen_ipv6_uuid"`
@@ -66,7 +66,7 @@ type LoadBalancerCreateRequest struct {
 	Status              string           `json:"status,omitempty"`
 }
 
-//LoadBalancerUpdateRequest is the JSON struct for updating a load balancer request
+//LoadBalancerUpdateRequest is the JSON struct for updating a loadbalancer request
 type LoadBalancerUpdateRequest struct {
 	Name                string           `json:"name"`
 	ListenIPv6Uuid      string           `json:"listen_ipv6_uuid"`
@@ -80,13 +80,13 @@ type LoadBalancerUpdateRequest struct {
 	Status              string           `json:"status,omitempty"`
 }
 
-//LoadBalancerCreateResponse is the JSON struct for a load balancer response
+//LoadBalancerCreateResponse is the JSON struct for a loadbalancer response
 type LoadBalancerCreateResponse struct {
 	RequestUuid string `json:"request_uuid"`
 	ObjectUuid  string `json:"object_uuid"`
 }
 
-//LoadBalancerEventList is the JSON struct for a load alancer's events
+//LoadBalancerEventList is the JSON struct for a loadbalancer's events
 type LoadBalancerEventList struct {
 	List []LoadBalancerEventProperties `json:"events"`
 }
@@ -96,7 +96,7 @@ type LoadBalancerEvent struct {
 	Properties LoadBalancerEventProperties `json:"event"`
 }
 
-//LoadBalancerEventProperties is the properties of a load balancer's event
+//LoadBalancerEventProperties is the properties of a loadbalancer's event
 type LoadBalancerEventProperties struct {
 	ObjectUuid    string `json:"object_uuid"`
 	ObjectType    string `json:"object_type"`
@@ -109,7 +109,7 @@ type LoadBalancerEventProperties struct {
 	UserUuid      string `json:"user_uuid"`
 }
 
-//GetLoadBalancerList returns a list of load balancers
+//GetLoadBalancerList returns a list of loadbalancers
 func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
 	r := Request{
 		uri:    apiLoadBalancerBase,
@@ -124,7 +124,7 @@ func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
 	return loadBalancers, err
 }
 
-//GetLoadBalancer returns a load balancer of a given uuid
+//GetLoadBalancer returns a loadbalancer of a given uuid
 func (c *Client) GetLoadBalancer(id string) (LoadBalancer, error) {
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
@@ -135,7 +135,7 @@ func (c *Client) GetLoadBalancer(id string) (LoadBalancer, error) {
 	return response, err
 }
 
-//CreateLoadBalancer creates a new load balancer
+//CreateLoadBalancer creates a new loadbalancer
 func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error) {
 	r := Request{
 		uri:    apiLoadBalancerBase,
@@ -151,7 +151,7 @@ func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalance
 	return response, err
 }
 
-//UpdateLoadBalancer update configuration of a load balancer
+//UpdateLoadBalancer update configuration of a loadbalancer
 func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) error {
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
@@ -176,7 +176,7 @@ func (c *Client) GetLoadBalancerEventList(id string) ([]LoadBalancerEvent, error
 	return loadBalancerEvents, err
 }
 
-//DeleteLoadBalancer deletes a load balancer
+//DeleteLoadBalancer deletes a loadbalancer
 func (c *Client) DeleteLoadBalancer(id string) error {
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
