@@ -113,7 +113,7 @@ func getMockStorageSnapshotSchedule() StorageSnapshotSchedule {
 		Name:          "test",
 		NextRuntime:   dummyTime,
 		ObjectUuid:    dummyUuid,
-		Relations:     StorageSnapshotRelations{Snapshots: []StorageSnapshotRelation{
+		Relations:     StorageSnapshotSchedulerRelations{Snapshots: []StorageSnapshotSchedulerRelation{
 			{
 				CreateTime: dummyTime,
 				Name:       "test",

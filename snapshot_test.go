@@ -23,7 +23,7 @@ func TestClient_GetStorageSnapshotList(t *testing.T) {
 		t.Errorf("GetStorageSnapshotList returned an error %v", err)
 	}
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshotSingle()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshot()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_GetStorageSnapshot(t *testing.T) {
@@ -39,7 +39,7 @@ func TestClient_GetStorageSnapshot(t *testing.T) {
 	if err != nil {
 		t.Errorf("GetStorageSnapshot returned an error %v", err)
 	}
-	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotSingle()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshot()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateStorageSnapshot(t *testing.T) {
@@ -146,8 +146,8 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 	}
 }
 
-func getMockStorageSnapshotSingle() StorageSnapshotSingle {
-	mock := StorageSnapshotSingle{Properties:StorageSnapshotProperties{
+func getMockStorageSnapshot() StorageSnapshot {
+	mock := StorageSnapshot{Properties:StorageSnapshotProperties{
 		Labels:           []string{"label"},
 		ObjectUuid:       dummyUuid,
 		Name:             "test",
@@ -168,13 +168,13 @@ func getMockStorageSnapshotSingle() StorageSnapshotSingle {
 }
 
 func prepareStorageSnapshotHTTPGet() string {
-	snapshot := getMockStorageSnapshotSingle()
+	snapshot := getMockStorageSnapshot()
 	res, _ := json.Marshal(snapshot)
 	return string(res)
 }
 
 func prepareStorageSnapshotListHTTPGet() string {
-	snapshot := getMockStorageSnapshotSingle()
+	snapshot := getMockStorageSnapshot()
 	res, _ := json.Marshal(snapshot.Properties)
 	return fmt.Sprintf(`{"snapshots" : {"%s" : %s}}`, dummyUuid, string(res))
 }

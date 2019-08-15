@@ -10,8 +10,8 @@ type StorageSnapshotList struct {
 	List map[string]StorageSnapshotProperties `json:"snapshots"`
 }
 
-//StorageSnapshotSingle is JSON structure of a single storage snapshot
-type StorageSnapshotSingle struct {
+//StorageSnapshot is JSON structure of a single storage snapshot
+type StorageSnapshot struct {
 	Properties StorageSnapshotProperties `json:"snapshot"`
 }
 
@@ -67,27 +67,27 @@ type StorageSnapshotExportToS3Request struct {
 }
 
 //GetStorageSnapshotList gets a list of storage snapshots
-func (c *Client) GetStorageSnapshotList(id string) ([]StorageSnapshotSingle, error) {
+func (c *Client) GetStorageSnapshotList(id string) ([]StorageSnapshot, error) {
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "snapshots"),
 		method: http.MethodGet,
 	}
 	var response StorageSnapshotList
-	var list []StorageSnapshotSingle
+	var snapshots []StorageSnapshot
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		list = append(list, StorageSnapshotSingle{Properties: properties})
+		snapshots = append(snapshots, StorageSnapshot{Properties: properties})
 	}
-	return list, err
+	return snapshots, err
 }
 
 //GetStorageSnapshot gets a specific storage's snapshot based on given storage id and snapshot id.
-func (c *Client) GetStorageSnapshot(storageId, snapshotId string) (StorageSnapshotSingle, error) {
+func (c *Client) GetStorageSnapshot(storageId, snapshotId string) (StorageSnapshot, error) {
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageId, "snapshots", snapshotId),
 		method: http.MethodGet,
 	}
-	var response StorageSnapshotSingle
+	var response StorageSnapshot
 	err := r.execute(*c, &response)
 	return response, err
 }

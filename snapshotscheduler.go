@@ -14,24 +14,24 @@ type StorageSnapshotSchedule struct {
 }
 
 type StorageSnapshotSchedulerProperties struct {
-	ChangeTime    string                   `json:"change_time"`
-	CreateTime    string                   `json:"create_time"`
-	KeepSnapshots int                      `json:"keep_snapshots"`
-	Labels        []string                 `json:"labels"`
-	Name          string                   `json:"name"`
-	NextRuntime   string                   `json:"next_runtime"`
-	ObjectUuid    string                   `json:"object_uuid"`
-	Relations     StorageSnapshotRelations `json:"relations"`
-	RunInterval   int                      `json:"run_interval"`
-	Status        string                   `json:"status"`
-	StorageUuid   string                   `json:"storage_uuid"`
+	ChangeTime    string                            `json:"change_time"`
+	CreateTime    string                            `json:"create_time"`
+	KeepSnapshots int                               `json:"keep_snapshots"`
+	Labels        []string                          `json:"labels"`
+	Name          string                            `json:"name"`
+	NextRuntime   string                            `json:"next_runtime"`
+	ObjectUuid    string                            `json:"object_uuid"`
+	Relations     StorageSnapshotSchedulerRelations `json:"relations"`
+	RunInterval   int                               `json:"run_interval"`
+	Status        string                            `json:"status"`
+	StorageUuid   string                            `json:"storage_uuid"`
 }
 
-type StorageSnapshotRelations struct {
-	Snapshots []StorageSnapshotRelation `json:"snapshots"`
+type StorageSnapshotSchedulerRelations struct {
+	Snapshots []StorageSnapshotSchedulerRelation `json:"snapshots"`
 }
 
-type StorageSnapshotRelation struct {
+type StorageSnapshotSchedulerRelation struct {
 	CreateTime string `json:"create_time"`
 	Name       string `json:"name"`
 	ObjectUuid string `json:"object_uuid"`
@@ -104,12 +104,12 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 //UpdateStorageSnapshotSchedule updates specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
 func (c *Client) UpdateStorageSnapshotSchedule(storageId, scheduleId string,
 	body StorageSnapshotScheduleUpdateRequest) error {
-		r := Request{
-			uri:    path.Join(apiStorageBase, storageId, "snapshot_schedules", scheduleId),
-			method: http.MethodPatch,
-			body:   body,
-		}
-		return r.execute(*c, nil)
+	r := Request{
+		uri:    path.Join(apiStorageBase, storageId, "snapshot_schedules", scheduleId),
+		method: http.MethodPatch,
+		body:   body,
+	}
+	return r.execute(*c, nil)
 }
 
 //DeleteStorageSnapshotSchedule deletes specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
