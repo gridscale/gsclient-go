@@ -182,7 +182,7 @@ func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
 //GetIpEventList gets a list of an IP's events
 func (c *Client) GetIpEventList(id string) ([]IpEvent, error) {
 	r := Request{
-		uri:    path.Join(apiNetworkBase, id, "events"),
+		uri:    path.Join(apiIpBase, id, "events"),
 		method: http.MethodGet,
 	}
 	var response IpEventList
