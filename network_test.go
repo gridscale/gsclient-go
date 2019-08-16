@@ -77,7 +77,6 @@ func TestClient_UpdateNetwork(t *testing.T) {
 
 	err := client.UpdateNetwork(dummyUuid, NetworkUpdateRequest{
 		Name:       "test",
-		Labels:     []string{"label"},
 		L2Security: false,
 	})
 	if err != nil {
