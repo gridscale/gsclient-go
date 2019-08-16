@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"net/http/httptest"
 )
@@ -19,6 +20,7 @@ func setupTestClient() (*httptest.Server, *Client, *http.ServeMux) {
 		UserUUID:   "uuid",
 		APIToken:   "token",
 		HTTPClient: http.DefaultClient,
+		LogLevel:   logrus.DebugLevel,
 	}
 	return server, NewClient(&config), mux
 }
