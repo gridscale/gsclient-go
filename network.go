@@ -77,7 +77,6 @@ type NetworkCreateResponse struct {
 //NetworkUpdateRequest is JSON of a request for updating a network
 type NetworkUpdateRequest struct {
 	Name       string   `json:"name,omitempty"`
-	Labels     []string `json:"labels"`
 	L2Security bool     `json:"l2security"`
 }
 
