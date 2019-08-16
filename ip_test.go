@@ -103,7 +103,7 @@ func TestClient_DeleteIp(t *testing.T) {
 func TestClient_GetIpEventList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiNetworkBase, dummyUuid, "events")
+	uri := path.Join(apiIpBase, dummyUuid, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareIpEventListHTTPGet())
