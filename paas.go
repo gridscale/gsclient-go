@@ -316,7 +316,7 @@ func (c *Client) GetPaaSSecurityZoneList() ([]PaaSSecurityZone, error) {
 //CreateSecurityZone creates a new PaaS security zone
 func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (PaaSSecurityZoneCreateResponse, error) {
 	r := Request{
-		uri:    path.Join(apiPaaSBase, "security_zone"),
+		uri:    path.Join(apiPaaSBase, "security_zones"),
 		method: http.MethodPost,
 		body:   body,
 	}
