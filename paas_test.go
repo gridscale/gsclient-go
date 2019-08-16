@@ -167,7 +167,7 @@ func TestClient_GetSecurityZoneList(t *testing.T) {
 func TestClient_CreatePaaSSecurityZone(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiPaaSBase, "security_zone")
+	uri := path.Join(apiPaaSBase, "security_zones")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodPost)
 		fmt.Fprintf(writer, preparePaaSHTTPCreateSecurityZone())
