@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"path"
 	"time"
 )
 
@@ -101,7 +102,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 //WaitForRequestCompletion allows to wait for a request to complete. Timeouts are currently hardcoded
 func (c *Client) WaitForRequestCompletion(id string) error {
 	r := Request{
-		uri:    "/requests/" + id,
+		uri:    path.Join("/requests/", id),
 		method: "GET",
 	}
 
