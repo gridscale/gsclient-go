@@ -70,7 +70,7 @@ type ServerCreateResponse struct {
 
 //ServerPowerUpdateRequest JSON struct of a request for updating server's power state
 type ServerPowerUpdateRequest struct {
-	Power bool `json:"power,omitempty"`
+	Power bool `json:"power"`
 }
 
 //ServerCreateRequestRelations JSOn struct of a list of a server's relations
