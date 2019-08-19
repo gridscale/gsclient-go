@@ -14,12 +14,6 @@ const (
 func setupTestClient() (*httptest.Server, *Client, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
-	config := Config{
-		APIUrl:     server.URL,
-		UserUUID:   "uuid",
-		APIToken:   "token",
-		HTTPClient: http.DefaultClient,
-		DebugMode:  true,
-	}
-	return server, NewClient(&config), mux
+	config := NewConfiguration(server.URL, "uuid", "token", true)
+	return server, NewClient(config), mux
 }

@@ -2,12 +2,12 @@ package main
 
 import (
 	"bufio"
-	"net/http"
 	"os"
 	"time"
 
-	"github.com/gridscale/gsclient-go"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/gridscale/gsclient-go"
 )
 
 const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
@@ -15,13 +15,8 @@ const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.Config{
-		APIUrl:     "https://api.gridscale.io",
-		UserUUID:   uuid,
-		APIToken:   token,
-		HTTPClient: http.DefaultClient,
-	}
-	client := gsclient.NewClient(&config)
+	config := gsclient.NewConfiguration("https://api.gridscale.io", uuid, token, false)
+	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
 	log.Info("Create IPs and loadbalancer: Press 'Enter' to continue...")

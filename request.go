@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -52,9 +51,7 @@ func (r RequestError) Error() string {
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *Request) execute(c Client, output interface{}) error {
 	url := c.cfg.APIUrl + r.uri
-	if c.cfg.DebugMode {
-		log.Infof("%v request sent to URL: %v", r.method, url)
-	}
+	c.cfg.logger.Debugf("%v request sent to URL: %v", r.method, url)
 
 	//Convert the body of the request to json
 	jsonBody := new(bytes.Buffer)
@@ -73,9 +70,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	request.Header.Add("X-Auth-UserId", c.cfg.UserUUID)
 	request.Header.Add("X-Auth-Token", c.cfg.APIToken)
 	request.Header.Add("Content-Type", "application/json")
-	if c.cfg.DebugMode {
-		log.Infof("Request body: %v", request.Body)
-	}
+	c.cfg.logger.Debugf("Request body: %v", request.Body)
 
 	//execute the request
 	result, err := c.cfg.HTTPClient.Do(request)
@@ -87,23 +82,18 @@ func (r *Request) execute(c Client, output interface{}) error {
 	if err != nil {
 		return err
 	}
-	if c.cfg.DebugMode {
-		log.Infof("Status code returned: %v", result.StatusCode)
-	}
+
+	c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
 
 	if result.StatusCode >= 300 {
 		errorMessage := new(RequestError) //error messages have a different structure, so they are read with a different struct
 		errorMessage.StatusCode = result.StatusCode
 		json.Unmarshal(iostream, &errorMessage)
-		if c.cfg.DebugMode {
-			log.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
-		}
+		c.cfg.logger.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
 		return errorMessage
 	} else {
 		json.Unmarshal(iostream, output) //Edit the given struct
-		if c.cfg.DebugMode {
-			log.Infof("Response body: %v", string(iostream))
-		}
+		c.cfg.logger.Debugf("Response body: %v", string(iostream))
 		return nil
 	}
 }
@@ -119,9 +109,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 	for {
 		select {
 		case <-timer:
-			if c.cfg.DebugMode {
-				log.Errorf("Timeout reached when waiting for request %v to complete", id)
-			}
+			c.cfg.logger.Errorf("Timeout reached when waiting for request %v to complete", id)
 			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
@@ -129,9 +117,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 			r.execute(*c, &response)
 			output := *response //Without this cast reading indexes doesn't work
 			if output[id].Status == "done" {
-				if c.cfg.DebugMode {
-					log.Info("Done with creating")
-				}
+				c.cfg.logger.Info("Done with creating")
 				return nil
 			}
 		}
@@ -144,9 +130,7 @@ func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 	for {
 		select {
 		case <-timer:
-			if c.cfg.DebugMode {
-				log.Errorf("Timeout reached when trying to shut down system with id %v", id)
-			}
+			c.cfg.logger.Errorf("Timeout reached when trying to shut down system with id %v", id)
 			return fmt.Errorf("Timeout reached when trying to shut down system with id %v", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
@@ -155,9 +139,7 @@ func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 				return err
 			}
 			if server.Properties.Power == status {
-				if c.cfg.DebugMode {
-					log.Infof("The power status of the server with id %v has changed to %t", id, status)
-				}
+				c.cfg.logger.Infof("The power status of the server with id %v has changed to %t", id, status)
 				return nil
 			}
 		}
