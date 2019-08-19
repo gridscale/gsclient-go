@@ -82,7 +82,7 @@ type StorageAndSnapshotScheduleRelation struct {
 //StorageTemplate JSON struct of a storage template
 type StorageTemplate struct {
 	Sshkeys      []string `json:"sshkeys,omitempty"`
-	TemplateUuid string   `json:"template_uuid,omitempty"`
+	TemplateUuid string   `json:"template_uuid"`
 	Password     string   `json:"password,omitempty"`
 	PasswordType string   `json:"password_type,omitempty"`
 	Hostname     string   `json:"hostname,omitempty"`
@@ -90,12 +90,12 @@ type StorageTemplate struct {
 
 //StorageCreateRequest JSON struct of a request for creating a storage
 type StorageCreateRequest struct {
-	Capacity     int             `json:"capacity"`
-	LocationUuid string          `json:"location_uuid"`
-	Name         string          `json:"name"`
-	StorageType  string          `json:"storage_type,omitempty"`
-	Template     StorageTemplate `json:"template,omitempty"`
-	Labels       []string        `json:"labels,omitempty"`
+	Capacity     int              `json:"capacity"`
+	LocationUuid string           `json:"location_uuid"`
+	Name         string           `json:"name"`
+	StorageType  string           `json:"storage_type,omitempty"`
+	Template     *StorageTemplate `json:"template,omitempty"`
+	Labels       []string         `json:"labels,omitempty"`
 }
 
 //StorageUpdateRequest JSON struct of a request for updating a storage

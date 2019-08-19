@@ -46,16 +46,16 @@ type ServerRelations struct {
 
 //ServerCreateRequest JSON struct of a request for creating a server
 type ServerCreateRequest struct {
-	Name            string                       `json:"name"`
-	Memory          int                          `json:"memory"`
-	Cores           int                          `json:"cores"`
-	LocationUuid    string                       `json:"location_uuid"`
-	HardwareProfile string                       `json:"hardware_profile,omitempty"`
-	AvailablityZone string                       `json:"availability_zone,omitempty"`
-	Labels          []string                     `json:"labels,omitempty"`
+	Name            string                        `json:"name"`
+	Memory          int                           `json:"memory"`
+	Cores           int                           `json:"cores"`
+	LocationUuid    string                        `json:"location_uuid"`
+	HardwareProfile string                        `json:"hardware_profile,omitempty"`
+	AvailablityZone string                        `json:"availability_zone,omitempty"`
+	Labels          []string                      `json:"labels,omitempty"`
 	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
-	Status          string                       `json:"status,omitempty"`
-	AutoRecovery    bool                         `json:"auto_recovery,omitempty"`
+	Status          string                        `json:"status,omitempty"`
+	AutoRecovery    bool                          `json:"auto_recovery,omitempty"`
 }
 
 //ServerCreateResponse JSON struct of a response for creating a server
