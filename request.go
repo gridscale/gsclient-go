@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -51,8 +52,9 @@ func (r RequestError) Error() string {
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *Request) execute(c Client, output interface{}) error {
 	url := c.cfg.APIUrl + r.uri
-	log := c.logger
-	log.Infof("%v request sent to URL: %v", r.method, url)
+	if c.cfg.DebugMode {
+		log.Infof("%v request sent to URL: %v", r.method, url)
+	}
 
 	//Convert the body of the request to json
 	jsonBody := new(bytes.Buffer)
@@ -71,7 +73,9 @@ func (r *Request) execute(c Client, output interface{}) error {
 	request.Header.Add("X-Auth-UserId", c.cfg.UserUUID)
 	request.Header.Add("X-Auth-Token", c.cfg.APIToken)
 	request.Header.Add("Content-Type", "application/json")
-	log.Infof("Request body: %v", request.Body)
+	if c.cfg.DebugMode {
+		log.Infof("Request body: %v", request.Body)
+	}
 
 	//execute the request
 	result, err := c.cfg.HTTPClient.Do(request)
@@ -83,18 +87,23 @@ func (r *Request) execute(c Client, output interface{}) error {
 	if err != nil {
 		return err
 	}
-
-	log.Infof("Status code returned: %v", result.StatusCode)
+	if c.cfg.DebugMode {
+		log.Infof("Status code returned: %v", result.StatusCode)
+	}
 
 	if result.StatusCode >= 300 {
 		errorMessage := new(RequestError) //error messages have a different structure, so they are read with a different struct
 		errorMessage.StatusCode = result.StatusCode
 		json.Unmarshal(iostream, &errorMessage)
-		log.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
+		if c.cfg.DebugMode {
+			log.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
+		}
 		return errorMessage
 	} else {
 		json.Unmarshal(iostream, output) //Edit the given struct
-		log.Infof("Response body: %v", string(iostream))
+		if c.cfg.DebugMode {
+			log.Infof("Response body: %v", string(iostream))
+		}
 		return nil
 	}
 }
@@ -105,14 +114,14 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 		uri:    path.Join("/requests/", id),
 		method: "GET",
 	}
-	log := c.logger
-
 	timer := time.After(time.Minute)
 
 	for {
 		select {
 		case <-timer:
-			log.Errorf("Timeout reached when waiting for request %v to complete", id)
+			if c.cfg.DebugMode {
+				log.Errorf("Timeout reached when waiting for request %v to complete", id)
+			}
 			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
@@ -120,7 +129,9 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 			r.execute(*c, &response)
 			output := *response //Without this cast reading indexes doesn't work
 			if output[id].Status == "done" {
-				log.Info("Done with creating")
+				if c.cfg.DebugMode {
+					log.Info("Done with creating")
+				}
 				return nil
 			}
 		}
@@ -130,12 +141,12 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 //WaitForServerPowerStatus  allows to wait for a server changing its power status. Timeouts are currently hardcoded
 func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 	timer := time.After(2 * time.Minute)
-	log := c.logger
-
 	for {
 		select {
 		case <-timer:
-			log.Errorf("Timeout reached when trying to shut down system with id %v", id)
+			if c.cfg.DebugMode {
+				log.Errorf("Timeout reached when trying to shut down system with id %v", id)
+			}
 			return fmt.Errorf("Timeout reached when trying to shut down system with id %v", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
@@ -144,7 +155,9 @@ func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 				return err
 			}
 			if server.Properties.Power == status {
-				log.Infof("The power status of the server with id %v has changed to %t", id, status)
+				if c.cfg.DebugMode {
+					log.Infof("The power status of the server with id %v has changed to %t", id, status)
+				}
 				return nil
 			}
 		}
