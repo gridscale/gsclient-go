@@ -1,0 +1,76 @@
+package main
+
+import (
+	"bufio"
+	"github.com/gridscale/gsclient-go"
+	"github.com/sirupsen/logrus"
+	"os"
+)
+
+const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
+
+func main() {
+	uuid := os.Getenv("GRIDSCALE_UUID")
+	token := os.Getenv("GRIDSCALE_TOKEN")
+	config := gsclient.NewConfiguration(
+		"https://api.gridscale.io",
+		uuid,
+		token,
+		true,
+	)
+	client := gsclient.NewClient(config)
+	logrus.Info("gridscale client configured")
+
+	logrus.Info("Create ISO-image: Press 'Enter' to continue...")
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
+
+	isoRequest := gsclient.ISOImageCreateRequest{
+		Name:         "go-client-iso",
+		SourceUrl:    "http://releases.ubuntu.com/16.04.4/ubuntu-16.04.4-server-amd64.iso?_ga=2.188975915.108704605.1521033305-403279979.1521033305",
+		LocationUuid: LocationUuid,
+	}
+	cIso, err := client.CreateISOImage(isoRequest)
+	if err != nil {
+		logrus.Fatal("Create ISO-image has failed with error", err)
+	}
+	logrus.WithFields(logrus.Fields{"isoimage_uuid": cIso.ObjectUuid}).Info("ISO Image successfully created")
+
+	logrus.Info("Update ISO image: Press 'Enter' to continue...")
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
+
+	//Get ISO-image to update
+	iso, err := client.GetISOImage(cIso.ObjectUuid)
+	if err != nil {
+		logrus.Fatal("Get ISO-image has failed with error", err)
+	}
+
+	isoUpdateRequest := gsclient.ISOImageUpdateRequest{
+		Name:   "updated ISO",
+		Labels: iso.Properties.Labels,
+	}
+	err = client.UpdateISOImage(iso.Properties.ObjectUuid, isoUpdateRequest)
+	if err != nil {
+		logrus.Fatal("Update ISO-image has failed with error", err)
+	}
+	logrus.WithFields(logrus.Fields{"isoimage_uuid": iso.Properties.ObjectUuid}).Info("ISO image successfully updated")
+
+	//get ISO-image's events
+	events, err := client.GetISOImageEventList(iso.Properties.ObjectUuid)
+	if err != nil {
+		logrus.Fatal("Get ISO-image's events has failed with error", err)
+	}
+	logrus.WithFields(logrus.Fields{
+		"isoimage_uuid": iso.Properties.ObjectUuid,
+		"events":        events,
+	}).Info("Events successfully retrieved")
+
+	logrus.Info("Delete ISO-image: Press 'Enter' to continue...")
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
+
+	//Delete ISO-image
+	err = client.DeleteISOImage(iso.Properties.ObjectUuid)
+	if err != nil {
+		logrus.Fatal("Delete ISO-image has failed with error", err)
+	}
+	logrus.Info("ISO-image successfully deleted")
+}
