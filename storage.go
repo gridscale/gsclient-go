@@ -82,7 +82,7 @@ type StorageAndSnapshotScheduleRelation struct {
 //StorageTemplate JSON struct of a storage template
 type StorageTemplate struct {
 	Sshkeys      []string `json:"sshkeys,omitempty"`
-	TemplateUuid string   `json:"template_uuid"`
+	TemplateUuid string   `json:"template_uuid,omitempty"`
 	Password     string   `json:"password,omitempty"`
 	PasswordType string   `json:"password_type,omitempty"`
 	Hostname     string   `json:"hostname,omitempty"`
