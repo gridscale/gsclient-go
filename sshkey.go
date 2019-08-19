@@ -30,7 +30,7 @@ type SshkeyProperties struct {
 //SshkeyCreateRequest JSON struct of a request for creating a SSH-key
 type SshkeyCreateRequest struct {
 	Name   string   `json:"name"`
-	Sshkey string   `json:"sshkey,omitempty"`
+	Sshkey string   `json:"sshkey"`
 	Labels []string `json:"labels,omitempty"`
 }
 
