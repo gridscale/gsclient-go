@@ -53,7 +53,7 @@ type ServerCreateRequest struct {
 	HardwareProfile string                       `json:"hardware_profile,omitempty"`
 	AvailablityZone string                       `json:"availability_zone,omitempty"`
 	Labels          []string                     `json:"labels,omitempty"`
-	Relations       ServerCreateRequestRelations `json:"relations,omitempty"`
+	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
 	Status          string                       `json:"status,omitempty"`
 	AutoRecovery    bool                         `json:"auto_recovery,omitempty"`
 }

@@ -61,7 +61,7 @@ func TestClient_CreateServer(t *testing.T) {
 		HardwareProfile: "default",
 		AvailablityZone: "",
 		Labels:          []string{"label"},
-		Relations:       ServerCreateRequestRelations{},
+		Relations:       &ServerCreateRequestRelations{},
 	})
 	if err != nil {
 		t.Errorf("CreateServer returned an error %v", err)
