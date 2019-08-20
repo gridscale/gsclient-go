@@ -22,6 +22,5 @@ func NewClient(c *Config) *Client {
 	client := &Client{
 		cfg: c,
 	}
-
 	return client
 }

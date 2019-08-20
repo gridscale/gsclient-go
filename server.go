@@ -53,7 +53,7 @@ type ServerCreateRequest struct {
 	HardwareProfile string                       `json:"hardware_profile,omitempty"`
 	AvailablityZone string                       `json:"availability_zone,omitempty"`
 	Labels          []string                     `json:"labels,omitempty"`
-	Relations       ServerCreateRequestRelations `json:"relations,omitempty"`
+	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
 	Status          string                       `json:"status,omitempty"`
 	AutoRecovery    bool                         `json:"auto_recovery,omitempty"`
 }
@@ -75,10 +75,10 @@ type ServerPowerUpdateRequest struct {
 
 //ServerCreateRequestRelations JSOn struct of a list of a server's relations
 type ServerCreateRequestRelations struct {
-	IsoImages []ServerCreateRequestIsoimage `json:"isoimages"`
-	Networks  []ServerCreateRequestNetwork  `json:"networks"`
-	PublicIps []ServerCreateRequestIp       `json:"public_ips"`
-	Storages  []ServerCreateRequestStorage  `json:"storages"`
+	IsoImages []ServerCreateRequestIsoimage `json:"isoimages,omitempty"`
+	Networks  []ServerCreateRequestNetwork  `json:"networks,omitempty"`
+	PublicIps []ServerCreateRequestIp       `json:"public_ips,omitempty"`
+	Storages  []ServerCreateRequestStorage  `json:"storages,omitempty"`
 }
 
 //ServerCreateRequestStorage JSON struct of a relation between a server and a storage

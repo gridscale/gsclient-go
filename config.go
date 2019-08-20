@@ -1,21 +1,41 @@
 package gsclient
 
-import "net/http"
+import (
+	"net/http"
+	"os"
+
+	"github.com/sirupsen/logrus"
+)
 
 type Config struct {
-	APIUrl   string
-	UserUUID string
-	APIToken string
-
+	APIUrl     string
+	UserUUID   string
+	APIToken   string
 	HTTPClient *http.Client
+	logger     logrus.Logger
 }
 
-func NewConfiguration(uuid string, token string) *Config {
+func NewConfiguration(apiURL string, uuid string, token string, debugMode bool) *Config {
+	logLevel := logrus.InfoLevel
+	if debugMode {
+		logLevel = logrus.DebugLevel
+	}
+
+	logger := logrus.Logger{
+		Out:   os.Stderr,
+		Level: logLevel,
+		Formatter: &logrus.TextFormatter{
+			FullTimestamp: true,
+			DisableColors: false,
+		},
+	}
+
 	cfg := &Config{
-		APIUrl:     "https://api.gridscale.io",
+		APIUrl:     apiURL,
 		UserUUID:   uuid,
 		APIToken:   token,
 		HTTPClient: http.DefaultClient,
+		logger:     logger,
 	}
 	return cfg
 }
