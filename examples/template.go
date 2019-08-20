@@ -19,7 +19,7 @@ func main() {
 		"https://api.gridscale.io",
 		uuid,
 		token,
-		false,
+		true,
 	)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
@@ -29,7 +29,7 @@ func main() {
 	//In order to create a template, we need to create a storage and its snapshot
 	//Create storage
 	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
-		Capacity:     0,
+		Capacity:     1,
 		LocationUuid: LocationUuid,
 		Name:         "go-client-storage",
 	})
