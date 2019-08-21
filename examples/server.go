@@ -62,7 +62,8 @@ func main() {
 	//get a server to interact with
 	server, err := client.GetServer(cServer.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get server has failed with error", err)
+		log.Error("Get server has failed with error", err)
+		return
 	}
 
 	log.Info("Start server: press 'Enter' to continue...")
@@ -70,7 +71,8 @@ func main() {
 	//Turn on server
 	err = client.StartServer(server.Properties.ObjectUuid)
 	if err != nil {
-		log.Fatal("Start server has failed with error", err)
+		log.Error("Start server has failed with error", err)
+		return
 	}
 	log.Info("Server successfully started")
 
@@ -79,7 +81,8 @@ func main() {
 	//Turn off server
 	err = client.StopServer(server.Properties.ObjectUuid)
 	if err != nil {
-		log.Fatal("Stop server has failed with error", err)
+		log.Error("Stop server has failed with error", err)
+		return
 	}
 	log.Info("Server successfully stop")
 
@@ -87,17 +90,19 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	err = client.UpdateServer(server.Properties.ObjectUuid, gsclient.ServerUpdateRequest{
 		Name:   "updated server",
-		Memory: 2,
+		Memory: 1,
 	})
 	if err != nil {
-		log.Fatal("Update server has failed with error", err)
+		log.Error("Update server has failed with error", err)
+		return
 	}
 	log.Info("Server successfully updated")
 
 	//Get events of server
 	events, err := client.GetServerEventList(server.Properties.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get events has failed with error", err)
+		log.Error("Get events has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"events": events,
@@ -112,7 +117,8 @@ func main() {
 		Name:         "go-client-storage",
 	})
 	if err != nil {
-		log.Fatal("Create storage has failed with error", err)
+		log.Error("Create storage has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"storage_uuid": cStorage.ObjectUuid,
@@ -124,7 +130,8 @@ func main() {
 		LocationUuid: LocationUuid,
 	})
 	if err != nil {
-		log.Fatal("Create network has failed with error", err)
+		log.Error("Create network has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"network_uuid": cNetwork.ObjectUuid,
@@ -137,7 +144,8 @@ func main() {
 		LocationUuid: LocationUuid,
 	})
 	if err != nil {
-		log.Fatal("Create IP has failed with error", err)
+		log.Error("Create IP has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"IP_uuid": cIp.ObjectUuid,
@@ -146,11 +154,12 @@ func main() {
 
 	cISOimage, err := client.CreateISOImage(gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
-		SourceUrl:    "http://releases.ubuntu.com/16.04.4/ubuntu-16.04.4-server-amd64.iso?_ga=2.188975915.108704605.1521033305-403279979.1521033305",
+		SourceUrl:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
 		LocationUuid: LocationUuid,
 	})
 	if err != nil {
-		log.Fatal("Create ISO-image has failed with error", err)
+		log.Error("Create ISO-image has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"isoimage_uuid": cISOimage.ObjectUuid,
@@ -160,7 +169,8 @@ func main() {
 	//Attach storage, network, IP, and ISO-image to a server
 	err = client.LinkStorage(server.Properties.ObjectUuid, cStorage.ObjectUuid, false)
 	if err != nil {
-		log.Fatal("Link storage has failed with error", err)
+		log.Error("Link storage has failed with error", err)
+		return
 	}
 	log.Info("Storage successfully attached")
 	defer client.unlinkService(Storage, server.Properties.ObjectUuid, cStorage.ObjectUuid)
@@ -175,21 +185,24 @@ func main() {
 		gsclient.FirewallRules{},
 	)
 	if err != nil {
-		log.Fatal("Link network has failed with error", err)
+		log.Error("Link network has failed with error", err)
+		return
 	}
 	log.Info("Network successfully linked")
 	defer client.unlinkService(Network, server.Properties.ObjectUuid, cNetwork.ObjectUuid)
 
 	err = client.LinkIp(server.Properties.ObjectUuid, cIp.ObjectUuid)
 	if err != nil {
-		log.Fatal("Link IP has failed with error", err)
+		log.Error("Link IP has failed with error", err)
+		return
 	}
 	log.Info("IP successfully linked")
 	defer client.unlinkService(IP, server.Properties.ObjectUuid, cIp.ObjectUuid)
 
 	err = client.LinkIsoImage(server.Properties.ObjectUuid, cISOimage.ObjectUuid)
 	if err != nil {
-		log.Fatal("Link ISO-image has failed with error", err)
+		log.Error("Link ISO-image has failed with error", err)
+		return
 	}
 	log.Info("ISO-image successfully linked")
 	defer client.unlinkService(ISOImage, server.Properties.ObjectUuid, cISOimage.ObjectUuid)
@@ -201,37 +214,49 @@ func main() {
 func (c *enhancedClient) deleteService(serviceType ServiceType, id string) {
 	switch serviceType {
 	case Server:
-		err := c.DeleteServer(id)
+		//turn off server before deleting
+		err := c.StopServer(id)
 		if err != nil {
-			log.Fatal("Delete server has failed with error", err)
+			log.Error("Stop server has failed with error", err)
+			return
+		}
+		err = c.DeleteServer(id)
+		if err != nil {
+			log.Error("Delete server has failed with error", err)
+			return
 		}
 		log.Info("Server successfully deleted")
 	case Storage:
 		err := c.DeleteStorage(id)
 		if err != nil {
-			log.Fatal("Delete storage has failed with error", err)
+			log.Error("Delete storage has failed with error", err)
+			return
 		}
 		log.Info("Storage successfully deleted")
 	case Network:
 		err := c.DeleteNetwork(id)
 		if err != nil {
-			log.Fatal("Delete network has failed with error", err)
+			log.Error("Delete network has failed with error", err)
+			return
 		}
 		log.Info("Network successfully deleted")
 	case IP:
 		err := c.DeleteIp(id)
 		if err != nil {
-			log.Fatal("Delete IP has failed with error", err)
+			log.Error("Delete IP has failed with error", err)
+			return
 		}
 		log.Info("IP successfully deleted")
 	case ISOImage:
 		err := c.DeleteISOImage(id)
 		if err != nil {
-			log.Fatal("Delete ISO-image has failed with error", err)
+			log.Error("Delete ISO-image has failed with error", err)
+			return
 		}
 		log.Info("ISO-image successfully deleted")
 	default:
-		log.Fatal("Unknown service type")
+		log.Error("Unknown service type")
+		return
 	}
 }
 
@@ -240,28 +265,33 @@ func (c *enhancedClient) unlinkService(serviceType ServiceType, serverId, servic
 	case Storage:
 		err := c.UnlinkStorage(serverId, serviceId)
 		if err != nil {
-			log.Fatal("Unlink storage has failed with error", err)
+			log.Error("Unlink storage has failed with error", err)
+			return
 		}
 		log.Info("Storage successfully unlinked")
 	case Network:
 		err := c.UnlinkNetwork(serverId, serviceId)
 		if err != nil {
-			log.Fatal("Unlink network has failed with error", err)
+			log.Error("Unlink network has failed with error", err)
+			return
 		}
 		log.Info("Network successfully unlinked")
 	case IP:
 		err := c.UnlinkIp(serverId, serviceId)
 		if err != nil {
-			log.Fatal("Unlink IP has failed with error", err)
+			log.Error("Unlink IP has failed with error", err)
+			return
 		}
 		log.Info("IP successfully unlinked")
 	case ISOImage:
 		err := c.UnlinkIsoImage(serverId, serviceId)
 		if err != nil {
-			log.Fatal("Unlink ISO-image has failed with error", err)
+			log.Error("Unlink ISO-image has failed with error", err)
+			return
 		}
 		log.Info("ISO-image successfully unlinked")
 	default:
-		log.Fatal("Unknown service type")
+		log.Error("Unknown service type")
+		return
 	}
 }
