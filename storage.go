@@ -90,12 +90,12 @@ type StorageTemplate struct {
 
 //StorageCreateRequest JSON struct of a request for creating a storage
 type StorageCreateRequest struct {
-	Capacity     int             `json:"capacity"`
-	LocationUuid string          `json:"location_uuid"`
-	Name         string          `json:"name"`
-	StorageType  string          `json:"storage_type,omitempty"`
-	Template     StorageTemplate `json:"template,omitempty"`
-	Labels       []string        `json:"labels,omitempty"`
+	Capacity     int              `json:"capacity"`
+	LocationUuid string           `json:"location_uuid"`
+	Name         string           `json:"name"`
+	StorageType  string           `json:"storage_type,omitempty"`
+	Template     *StorageTemplate `json:"template,omitempty"`
+	Labels       []string         `json:"labels,omitempty"`
 }
 
 //StorageUpdateRequest JSON struct of a request for updating a storage
