@@ -12,6 +12,7 @@ const (
 	apiISOBase           = "/objects/isoimages"
 	apiObjectStorageBase = "/objects/objectstorages"
 	apiFirewallBase      = "/objects/firewalls"
+	apiLocationBase      = "/objects/locations"
 )
 
 type Client struct {
