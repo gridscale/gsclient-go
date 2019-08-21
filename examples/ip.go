@@ -32,9 +32,18 @@ func main() {
 	//Create new IP
 	ipc, err := client.CreateIp(ipRequest)
 	if err != nil {
-		log.Fatal("Create IP address has failed with error", err)
+		log.Error("Create IP address has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{"ip_uuid": ipc.ObjectUuid}).Info("IP address successfully created")
+	defer func() {
+		err := client.DeleteIp(ipc.ObjectUuid)
+		if err != nil {
+			log.Error("Delete IP address has failed with error", err)
+			return
+		}
+		log.Info("Delete IP address successfully")
+	}()
 
 	log.Info("Update IP address: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
@@ -42,7 +51,8 @@ func main() {
 	//Get IP to update
 	ip, err := client.GetIp(ipc.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get IP address has failed with error", err)
+		log.Error("Get IP address has failed with error", err)
+		return
 	}
 	updateRequest := gsclient.IpUpdateRequest{
 		Name:       "Updated IP address",
@@ -52,7 +62,8 @@ func main() {
 	}
 	err = client.UpdateIp(ip.Properties.ObjectUuid, updateRequest)
 	if err != nil {
-		log.Fatal("Update IP address has failed with error", err)
+		log.Error("Update IP address has failed with error", err)
+		return
 	}
 	log.Info("Retrive IP address events: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
@@ -60,7 +71,8 @@ func main() {
 	//Get IP address events
 	response, err := client.GetIpEventList(ip.Properties.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get IP address events has failed with error", err)
+		log.Error("Get IP address events has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"ip_uuid": ip.Properties.ObjectUuid,
@@ -68,10 +80,4 @@ func main() {
 	}).Info("Events successfully events retrieved")
 	log.Info("Delete IP address: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-
-	err = client.DeleteIp(ip.Properties.ObjectUuid)
-	if err != nil {
-		log.Fatal("Delete IP address has failed with error", err)
-	}
-	log.Info("Delete IP address successfully")
 }
