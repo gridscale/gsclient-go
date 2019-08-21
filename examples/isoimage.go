@@ -31,9 +31,19 @@ func main() {
 	}
 	cIso, err := client.CreateISOImage(isoRequest)
 	if err != nil {
-		logrus.Fatal("Create ISO-image has failed with error", err)
+		logrus.Error("Create ISO-image has failed with error", err)
+		return
 	}
 	logrus.WithFields(logrus.Fields{"isoimage_uuid": cIso.ObjectUuid}).Info("ISO Image successfully created")
+	defer func() {
+		//Delete ISO-image
+		err := client.DeleteISOImage(cIso.ObjectUuid)
+		if err != nil {
+			logrus.Error("Delete ISO-image has failed with error", err)
+			return
+		}
+		logrus.Info("ISO-image successfully deleted")
+	}()
 
 	logrus.Info("Update ISO image: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
@@ -41,7 +51,8 @@ func main() {
 	//Get ISO-image to update
 	iso, err := client.GetISOImage(cIso.ObjectUuid)
 	if err != nil {
-		logrus.Fatal("Get ISO-image has failed with error", err)
+		logrus.Error("Get ISO-image has failed with error", err)
+		return
 	}
 
 	isoUpdateRequest := gsclient.ISOImageUpdateRequest{
@@ -50,14 +61,16 @@ func main() {
 	}
 	err = client.UpdateISOImage(iso.Properties.ObjectUuid, isoUpdateRequest)
 	if err != nil {
-		logrus.Fatal("Update ISO-image has failed with error", err)
+		logrus.Error("Update ISO-image has failed with error", err)
+		return
 	}
 	logrus.WithFields(logrus.Fields{"isoimage_uuid": iso.Properties.ObjectUuid}).Info("ISO image successfully updated")
 
 	//get ISO-image's events
 	events, err := client.GetISOImageEventList(iso.Properties.ObjectUuid)
 	if err != nil {
-		logrus.Fatal("Get ISO-image's events has failed with error", err)
+		logrus.Error("Get ISO-image's events has failed with error", err)
+		return
 	}
 	logrus.WithFields(logrus.Fields{
 		"isoimage_uuid": iso.Properties.ObjectUuid,
@@ -66,11 +79,4 @@ func main() {
 
 	logrus.Info("Delete ISO-image: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-
-	//Delete ISO-image
-	err = client.DeleteISOImage(iso.Properties.ObjectUuid)
-	if err != nil {
-		logrus.Fatal("Delete ISO-image has failed with error", err)
-	}
-	logrus.Info("ISO-image successfully deleted")
 }
