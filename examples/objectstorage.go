@@ -28,16 +28,27 @@ func main() {
 	cobj, err := client.CreateObjectStorageAccessKey()
 	if err != nil {
 		log.Error("Create object storage access key has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"accesskey_uuid": cobj.AccessKey,
 	}).Info("Create access key successfully")
+	defer func() {
+		//Delete access key
+		err := client.DeleteObjectStorageAccessKey(cobj.AccessKey.AccessKey)
+		if err != nil {
+			log.Error("Delete access key has failed with error", err)
+			return
+		}
+		log.Info("Access key successfully deleted")
+	}()
 
 	log.Info("Get object storage access key: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	key, err := client.GetObjectStorageAccessKey(cobj.AccessKey.AccessKey)
 	if err != nil {
 		log.Error("Retrieve object storage access key has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"accesskey": key,
@@ -48,6 +59,7 @@ func main() {
 	buckets, err := client.GetObjectStorageBucketList()
 	if err != nil {
 		log.Error("Retrieve buckets has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"buckets": buckets,
@@ -55,10 +67,4 @@ func main() {
 
 	log.Info("Delete object storage access key: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Delete access key
-	err = client.DeleteObjectStorageAccessKey(key.Properties.AccessKey)
-	if err != nil {
-		log.Error("Delete access key has failed with error", err)
-	}
-	log.Info("Access key successfully deleted")
 }
