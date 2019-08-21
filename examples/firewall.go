@@ -37,16 +37,26 @@ func main() {
 	//Create a new firewall
 	cfw, err := client.CreateFirewall(fwRequest)
 	if err != nil {
-		log.Fatal("Create firewall has failed with error", err)
+		log.Error("Create firewall has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{"Firewall_uuid": cfw.ObjectUuid}).Info("Firewall successfully created")
 	log.Info("Update firewall: Press 'Enter' to continue...")
+	defer func() {
+		err := client.DeleteFirewall(cfw.ObjectUuid)
+		if err != nil {
+			log.Error("Delete firewall has failed with error", err)
+			return
+		}
+		log.Info("Firewall has successfully deleted")
+	}()
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get a firewall to update
 	fw, err := client.GetFirewall(cfw.ObjectUuid)
 	if err != nil {
-		log.Fatalf("Get firewall %s has failed with error %v", cfw.ObjectUuid, err)
+		log.Errorf("Get firewall %s has failed with error %v", cfw.ObjectUuid, err)
+		return
 	}
 	fwUpdateRequest := gsclient.FirewallUpdateRequest{
 		Name:   "Updated name",
@@ -55,23 +65,19 @@ func main() {
 	}
 	err = client.UpdateFirewall(fw.Properties.ObjectUuid, fwUpdateRequest)
 	if err != nil {
-		log.Fatal("Update firewall has failed with error", err)
+		log.Error("Update firewall has failed with error", err)
+		return
 	}
 
 	//Get firewall events
 	events, err := client.GetFirewallEventList(fw.Properties.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get firewall's events has failed with error", err)
+		log.Error("Get firewall's events has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"firewall_uuid": fw.Properties.ObjectUuid,
 		"events":        events}).Info("Firewall's events successfully retrieved")
 	log.Info("Delete firewall: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-
-	err = client.DeleteFirewall(fw.Properties.ObjectUuid)
-	if err != nil {
-		log.Fatal("Delete firewall has failed with error", err)
-	}
-	log.Info("Firewall has successfully deleted")
 }
