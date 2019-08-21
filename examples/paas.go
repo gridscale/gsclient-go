@@ -29,7 +29,8 @@ func main() {
 	//Get template for creating paas
 	paasTemplates, err := client.GetPaaSTemplateList()
 	if err != nil {
-		log.Fatal("Get PaaS templates has failed with error", err)
+		log.Error("Get PaaS templates has failed with error", err)
+		return
 	}
 
 	//Create security zone
@@ -39,11 +40,23 @@ func main() {
 	}
 	cSCZ, err := client.CreatePaaSSecurityZone(secZoneRequest)
 	if err != nil {
-		log.Fatal("Create security zone has failed with error", err)
+		log.Error("Create security zone has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"securityzone_uuid": cSCZ.ObjectUuid,
 	}).Info("Security zone successfully created")
+	defer func() {
+		//Wait until paas deleted successfully
+		//it takes around a minute
+		time.Sleep(60 * time.Second)
+		err := client.DeletePaaSSecurityZone(cSCZ.ObjectUuid)
+		if err != nil {
+			log.Error("Delete security zone has failed with error", err)
+			return
+		}
+		log.Info("Security zone successfully deleted")
+	}()
 
 	//Create PaaS service
 	paasRequest := gsclient.PaaSServiceCreateRequest{
@@ -53,11 +66,20 @@ func main() {
 	}
 	cPaaS, err := client.CreatePaaSService(paasRequest)
 	if err != nil {
-		log.Fatal("Create PaaS service has failed with error", err)
+		log.Error("Create PaaS service has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"paas_uuid": cPaaS.ObjectUuid,
 	}).Info("PaaS service create successfully")
+	defer func() {
+		err := client.DeletePaaSService(cPaaS.ObjectUuid)
+		if err != nil {
+			log.Error("Delete PaaS service has failed with error", err)
+			return
+		}
+		log.Info("PaaS service successfully deleted")
+	}()
 
 	log.Info("Update PaaS and Security zone: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
@@ -65,7 +87,8 @@ func main() {
 	//Get a security zone to update
 	secZone, err := client.GetPaaSSecurityZone(cSCZ.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get security zone has failed with error", err)
+		log.Error("Get security zone has failed with error", err)
+		return
 	}
 	secZoneUpdateRequest := gsclient.PaaSSecurityZoneUpdateRequest{
 		Name:                 "updated security zone",
@@ -75,14 +98,16 @@ func main() {
 	//Update security zone
 	err = client.UpdatePaaSSecurityZone(secZone.Properties.ObjectUuid, secZoneUpdateRequest)
 	if err != nil {
-		log.Fatal("Update security zone has failed with error", err)
+		log.Error("Update security zone has failed with error", err)
+		return
 	}
 	log.Info("Security Zone successfully updated")
 
 	//Get a PaaS service to update
 	paas, err := client.GetPaaSService(cPaaS.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get PaaS service has failed with error", err)
+		log.Error("Get PaaS service has failed with error", err)
+		return
 	}
 
 	//Update PaaS service
@@ -94,28 +119,12 @@ func main() {
 	}
 	err = client.UpdatePaaSService(paas.Properties.ObjectUuid, paasUpdateRequest)
 	if err != nil {
-		log.Fatal("Update PaaS service has failed with error", err)
+		log.Error("Update PaaS service has failed with error", err)
+		return
 	}
 	log.Info("PaaS service successfully updated")
 
 	//Clean up
 	log.Info("Delete PaaS and Security zone: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-
-	//PaaS has to be deleted before deleting Security zone
-	//because we cannot delete security zone when it is in use
-	err = client.DeletePaaSService(paas.Properties.ObjectUuid)
-	if err != nil {
-		log.Fatal("Delete PaaS service has failed with error", err)
-	}
-	log.Info("PaaS service successfully deleted")
-
-	//Wait until paas deleted successfully
-	//it takes around a minute
-	time.Sleep(60 * time.Second)
-	err = client.DeletePaaSSecurityZone(secZone.Properties.ObjectUuid)
-	if err != nil {
-		log.Fatal("Delete security zone has failed with error", err)
-	}
-	log.Info("Security zone successfully deleted")
 }
