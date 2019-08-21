@@ -28,7 +28,8 @@ func main() {
 		Name:         "go-client-storage",
 	})
 	if err != nil {
-		log.Fatal("Create storage has failed with error", err)
+		log.Error("Create storage has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"storage_uuid": cStorage.ObjectUuid,
@@ -38,19 +39,22 @@ func main() {
 		//Delete all snapshots has been made so far
 		snapshots, err := client.GetStorageSnapshotList(cStorage.ObjectUuid)
 		if err != nil {
-			log.Fatal("Get storage's snapshots has failed with error", err)
+			log.Error("Get storage's snapshots has failed with error", err)
+			return
 		}
 		for _, snapshot := range snapshots {
 			err = client.DeleteStorageSnapshot(cStorage.ObjectUuid, snapshot.Properties.ObjectUuid)
 			if err != nil {
-				log.Fatal("Delete storage's snapshot has failed with error", err)
+				log.Error("Delete storage's snapshot has failed with error", err)
+				return
 			}
 		}
 		//we have to wait for the snapshot getting deleted firstly
 		time.Sleep(30 * time.Second)
 		err = client.DeleteStorage(cStorage.ObjectUuid)
 		if err != nil {
-			log.Fatal("Delete storage has failed with error", err)
+			log.Error("Delete storage has failed with error", err)
+			return
 		}
 		log.Info("Storage successfully deleted")
 	}()
@@ -62,7 +66,8 @@ func main() {
 		KeepSnapshots: 2,
 	})
 	if err != nil {
-		log.Fatal("Create snapshot schedule has failed with error", err)
+		log.Error("Create snapshot schedule has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"snapshotschedule_uuid": cSnapshotSchedule.ObjectUuid,
@@ -70,7 +75,8 @@ func main() {
 	defer func() {
 		err := client.DeleteStorageSnapshotSchedule(cStorage.ObjectUuid, cSnapshotSchedule.ObjectUuid)
 		if err != nil {
-			log.Fatal("Delete snapshot schedule has failed with error", err)
+			log.Error("Delete snapshot schedule has failed with error", err)
+			return
 		}
 		log.Info("Snapshot schedule successfully deleted")
 	}()
@@ -78,7 +84,8 @@ func main() {
 	//Get snapshot schedule to update
 	snapshotSchedule, err := client.GetStorageSnapshotSchedule(cStorage.ObjectUuid, cSnapshotSchedule.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get snapshot schedule has failed with error", err)
+		log.Error("Get snapshot schedule has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"snapshotchedule_uuid": snapshotSchedule.Properties.ObjectUuid,
@@ -92,7 +99,8 @@ func main() {
 		KeepSnapshots: snapshotSchedule.Properties.KeepSnapshots,
 	})
 	if err != nil {
-		log.Fatal("Update snapshot schedule has failed with error", err)
+		log.Error("Update snapshot schedule has failed with error", err)
+		return
 	}
 	log.Info("Snapshot schedule successfully updated")
 
