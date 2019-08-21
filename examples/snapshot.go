@@ -28,7 +28,8 @@ func main() {
 		Name:         "go-client-storage",
 	})
 	if err != nil {
-		log.Fatal("Create storage has failed with error", err)
+		log.Error("Create storage has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"storage_uuid": cStorage.ObjectUuid,
@@ -38,7 +39,8 @@ func main() {
 		time.Sleep(1 * time.Minute)
 		err := client.DeleteStorage(cStorage.ObjectUuid)
 		if err != nil {
-			log.Fatal("Delete storage has failed with error", err)
+			log.Error("Delete storage has failed with error", err)
+			return
 		}
 		log.Info("Storage successfully deleted")
 	}()
@@ -48,7 +50,8 @@ func main() {
 		Name: "go-client-snapshot",
 	})
 	if err != nil {
-		log.Fatal("Create snapshot has failed with error", err)
+		log.Error("Create snapshot has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"snapshot_uuid": cStorage.ObjectUuid,
@@ -56,7 +59,8 @@ func main() {
 	defer func() {
 		err := client.DeleteStorageSnapshot(cStorage.ObjectUuid, cSnapshot.ObjectUuid)
 		if err != nil {
-			log.Fatal("Delete storage snapshot has failed with error", err)
+			log.Error("Delete storage snapshot has failed with error", err)
+			return
 		}
 		log.Info("Storage snapshot successfully deleted")
 	}()
@@ -64,7 +68,8 @@ func main() {
 	//Get a snapshot to update
 	snapshot, err := client.GetStorageSnapshot(cStorage.ObjectUuid, cSnapshot.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get snapshot has failed with error", err)
+		log.Error("Get snapshot has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"snapshot_uuid": snapshot.Properties.ObjectUuid,
@@ -77,7 +82,8 @@ func main() {
 		Name: "updated snapshot",
 	})
 	if err != nil {
-		log.Fatal("Update snapshot has failed with error", err)
+		log.Error("Update snapshot has failed with error", err)
+		return
 	}
 	log.Info("Snapshot successfully updated")
 
@@ -88,7 +94,8 @@ func main() {
 		Rollback: true,
 	})
 	if err != nil {
-		log.Fatal("Rollback storage has failed with error", err)
+		log.Error("Rollback storage has failed with error", err)
+		return
 	}
 	log.Info("Storage successfully rollbacked")
 
