@@ -31,16 +31,27 @@ func main() {
 	}
 	cnetwork, err := client.CreateNetwork(networkRequest)
 	if err != nil {
-		log.Fatal("Create network has failed with error", err)
+		log.Error("Create network has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"network_uuid": cnetwork.ObjectUuid,
 	}).Info("Network successfully created")
+	defer func() {
+		//delete network
+		err := client.DeleteNetwork(cnetwork.ObjectUuid)
+		if err != nil {
+			log.Error("Delete network has failed with error", err)
+			return
+		}
+		log.Info("Network successfully deleted")
+	}()
 
 	//Get network to update
 	net, err := client.GetNetwork(cnetwork.ObjectUuid)
 	if err != nil {
-		log.Fatal("Create network has failed ")
+		log.Error("Create network has failed ")
+		return
 	}
 
 	log.Info("Update network: Press 'Enter' to continue...")
@@ -51,7 +62,8 @@ func main() {
 	}
 	err = client.UpdateNetwork(net.Properties.ObjectUuid, netUpdateRequest)
 	if err != nil {
-		log.Fatal("Update network has failed with error", err)
+		log.Error("Update network has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"network_uuid": net.Properties.ObjectUuid,
@@ -62,7 +74,8 @@ func main() {
 	//get network's events
 	events, err := client.GetNetworkEventList(net.Properties.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get network's events has failed with error", err)
+		log.Error("Get network's events has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"network_uuid": net.Properties.ObjectUuid,
@@ -71,10 +84,4 @@ func main() {
 
 	log.Info("Delete network: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//delete network
-	err = client.DeleteNetwork(net.Properties.ObjectUuid)
-	if err != nil {
-		log.Fatal("Delete network has failed with error", err)
-	}
-	log.Info("Network successfully deleted")
 }
