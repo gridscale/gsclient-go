@@ -26,7 +26,8 @@ func main() {
 		Sshkey: exampleSSHkey,
 	})
 	if err != nil {
-		log.Fatal("Create SSH-key has failed with error", err)
+		log.Error("Create SSH-key has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"sshkey_uuid": cSSHkey.ObjectUuid,
@@ -34,7 +35,8 @@ func main() {
 	defer func() {
 		err := client.DeleteSshkey(cSSHkey.ObjectUuid)
 		if err != nil {
-			log.Fatal("Delete SSH-key has failed with error", err)
+			log.Error("Delete SSH-key has failed with error", err)
+			return
 		}
 		log.Info("SSH-key successfully deleted")
 	}()
@@ -42,7 +44,8 @@ func main() {
 	//Get a SSH-key to update
 	sshkey, err := client.GetSshkey(cSSHkey.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get SSH-key has failed with error", err)
+		log.Error("Get SSH-key has failed with error", err)
+		return
 	}
 
 	log.Info("Update SSH-key: Press 'Enter' to continue...")
@@ -53,7 +56,8 @@ func main() {
 		Labels: sshkey.Properties.Labels,
 	})
 	if err != nil {
-		log.Fatal("Update SSH-key has failed with error", err)
+		log.Error("Update SSH-key has failed with error", err)
+		return
 	}
 	log.Info("SSH-key successfully updated")
 
@@ -61,7 +65,8 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	events, err := client.GetSshkeyEventList(sshkey.Properties.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get SSH-key's events has failed with error", err)
+		log.Error("Get SSH-key's events has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"events": events,
