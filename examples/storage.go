@@ -33,7 +33,8 @@ func main() {
 		Name:         "go-client-storage",
 	})
 	if err != nil {
-		log.Fatal("Create storage has failed with error", err)
+		log.Error("Create storage has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"storage_uuid": cStorage.ObjectUuid,
@@ -41,7 +42,8 @@ func main() {
 	defer func() {
 		err := client.DeleteStorage(cStorage.ObjectUuid)
 		if err != nil {
-			log.Fatal("Delete storage has failed with error", err)
+			log.Error("Delete storage has failed with error", err)
+			return
 		}
 		log.Info("Storage successfully deleted")
 	}()
@@ -49,7 +51,8 @@ func main() {
 	//Get storage to update
 	storage, err := client.GetStorage(cStorage.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get storage has failed with error", err)
+		log.Error("Get storage has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"storage_uuid": storage.Properties.ObjectUuid,
@@ -64,7 +67,8 @@ func main() {
 		Capacity: storage.Properties.Capacity,
 	})
 	if err != nil {
-		log.Fatal("Update storage has failed with error", err)
+		log.Error("Update storage has failed with error", err)
+		return
 	}
 	log.Info("Storage successfully updated")
 
@@ -73,7 +77,8 @@ func main() {
 
 	events, err := client.GetStorageEventList(storage.Properties.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get storage's events has failed with error", err)
+		log.Error("Get storage's events has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"events": events,
