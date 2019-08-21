@@ -34,13 +34,15 @@ func main() {
 		Name:         "go-client-storage",
 	})
 	if err != nil {
-		log.Fatal("Create storage has failed with error", err)
+		log.Error("Create storage has failed with error", err)
+		return
 	}
 	defer func() {
 		time.Sleep(30 * time.Second)
 		err := client.DeleteStorage(cStorage.ObjectUuid)
 		if err != nil {
-			log.Fatal("Delete storage has failed with error", err)
+			log.Error("Delete storage has failed with error", err)
+			return
 		}
 		log.Info("Storage successfully deleted")
 	}()
@@ -50,13 +52,15 @@ func main() {
 		Name: "go-client-snapshot",
 	})
 	if err != nil {
-		log.Fatal("Create storage snapshot has failed with error", err)
+		log.Error("Create storage snapshot has failed with error", err)
+		return
 	}
 	defer func() {
 		time.Sleep(40 * time.Second)
 		err := client.DeleteStorageSnapshot(cStorage.ObjectUuid, cSnapshot.ObjectUuid)
 		if err != nil {
-			log.Fatal("Delete storage snapshot has failed with error", err)
+			log.Error("Delete storage snapshot has failed with error", err)
+			return
 		}
 		log.Info("Storage snapshot successfully deleted")
 	}()
@@ -67,7 +71,8 @@ func main() {
 		SnapshotUuid: cSnapshot.ObjectUuid,
 	})
 	if err != nil {
-		log.Fatal("Create template has failed with error", err)
+		log.Error("Create template has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"template_uuid": cTemplate.ObjectUuid,
@@ -75,7 +80,8 @@ func main() {
 	defer func() {
 		err := client.DeleteTemplate(cTemplate.ObjectUuid)
 		if err != nil {
-			log.Fatal("Delete template has failed with error", err)
+			log.Error("Delete template has failed with error", err)
+			return
 		}
 		log.Info("Template successfully deleted")
 	}()
@@ -83,7 +89,8 @@ func main() {
 	//get a template to update
 	template, err := client.GetTemplate(cTemplate.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get template has failed with error", err)
+		log.Error("Get template has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"template_uuid": template.Properties.ObjectUuid,
@@ -97,7 +104,8 @@ func main() {
 		Labels: template.Properties.Labels,
 	})
 	if err != nil {
-		log.Fatal("Update template has failed with error", err)
+		log.Error("Update template has failed with error", err)
+		return
 	}
 	log.Info("Template successfully updated")
 
@@ -106,7 +114,8 @@ func main() {
 	//Get template's events
 	events, err := client.GetTemplateEventList(template.Properties.ObjectUuid)
 	if err != nil {
-		log.Fatal("Get template's events has failed with error", err)
+		log.Error("Get template's events has failed with error", err)
+		return
 	}
 	log.WithFields(log.Fields{
 		"events": events,
