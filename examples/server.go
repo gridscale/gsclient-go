@@ -11,14 +11,14 @@ import (
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 const webServerFirewallTemplateUUID = "82aa235b-61ba-48ca-8f47-7060a0435de7"
 
-type ServiceType string
+type serviceType string
 
 const (
-	Server   ServiceType = "server"
-	Storage  ServiceType = "storage"
-	Network  ServiceType = "network"
-	IP       ServiceType = "ip"
-	ISOImage ServiceType = "isoimage"
+	Server   serviceType = "server"
+	Storage  serviceType = "storage"
+	Network  serviceType = "network"
+	IP       serviceType = "ip"
+	ISOImage serviceType = "isoimage"
 )
 
 //enhancedClient inherits all methods from gsclient.Client
@@ -211,7 +211,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 }
 
-func (c *enhancedClient) deleteService(serviceType ServiceType, id string) {
+func (c *enhancedClient) deleteService(serviceType serviceType, id string) {
 	switch serviceType {
 	case Server:
 		//turn off server before deleting
@@ -260,7 +260,7 @@ func (c *enhancedClient) deleteService(serviceType ServiceType, id string) {
 	}
 }
 
-func (c *enhancedClient) unlinkService(serviceType ServiceType, serverId, serviceId string) {
+func (c *enhancedClient) unlinkService(serviceType serviceType, serverId, serviceId string) {
 	switch serviceType {
 	case Storage:
 		err := c.UnlinkStorage(serverId, serviceId)
