@@ -60,7 +60,7 @@ What options are available for each create and update request can be found in th
 ~/go/src/github.com/gridscale/gsclient-go
 ```
 ## Examples
-Examples are in example folder:
+Examples are in examples folder:
 * Firewall (firewall.go)
 * IP (ip.go)
 * ISO-image (isoimage.go)
