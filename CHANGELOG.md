@@ -15,6 +15,9 @@ IMPROVEMENTS:
 
 * Avoid use of fmt.errorf
 * Unit Tests for all functionality
+* Logging support
+* Many examples have been added
+* Consistency as well as language styles improved
 
 ## 0.1.0 (January 2, 2019)
 
