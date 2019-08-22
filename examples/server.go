@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 const webServerFirewallTemplateUUID = "82aa235b-61ba-48ca-8f47-7060a0435de7"
 
 type ServiceType string
@@ -48,7 +48,7 @@ func main() {
 		Name:         "go-client-server",
 		Memory:       1,
 		Cores:        1,
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	}
 	cServer, err := client.CreateServer(serverCreateRequest)
 	if err != nil {
@@ -113,7 +113,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
 		Capacity:     1,
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 		Name:         "go-client-storage",
 	})
 	if err != nil {
@@ -127,7 +127,7 @@ func main() {
 
 	cNetwork, err := client.CreateNetwork(gsclient.NetworkCreateRequest{
 		Name:         "go-client-network",
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	})
 	if err != nil {
 		log.Error("Create network has failed with error", err)
@@ -141,7 +141,7 @@ func main() {
 	cIp, err := client.CreateIp(gsclient.IpCreateRequest{
 		Name:         "go-client-ip",
 		Family:       4,
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	})
 	if err != nil {
 		log.Error("Create IP has failed with error", err)
@@ -155,7 +155,7 @@ func main() {
 	cISOimage, err := client.CreateISOImage(gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
 		SourceUrl:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	})
 	if err != nil {
 		log.Error("Create ISO-image has failed with error", err)

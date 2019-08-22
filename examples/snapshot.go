@@ -10,7 +10,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -24,7 +24,7 @@ func main() {
 	//Create storage
 	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
 		Capacity:     1,
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 		Name:         "go-client-storage",
 	})
 	if err != nil {

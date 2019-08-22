@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -27,7 +27,7 @@ func main() {
 	ipRequest := gsclient.IpCreateRequest{
 		Name:         "go-client-ip",
 		Family:       4,
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	}
 	//Create new IP
 	ipc, err := client.CreateIp(ipRequest)

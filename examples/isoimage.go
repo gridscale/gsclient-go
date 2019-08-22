@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -27,7 +27,7 @@ func main() {
 	isoRequest := gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
 		SourceUrl:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	}
 	cIso, err := client.CreateISOImage(isoRequest)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -36,7 +36,7 @@ func main() {
 	//Create security zone
 	secZoneRequest := gsclient.PaaSSecurityZoneCreateRequest{
 		Name:         "go-client-security-zone",
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	}
 	cSCZ, err := client.CreatePaaSSecurityZone(secZoneRequest)
 	if err != nil {

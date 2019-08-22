@@ -10,7 +10,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -24,13 +24,13 @@ func main() {
 	// required to create IPv6 and IPv4 to create LB
 	ipv4, _ := client.CreateIp(gsclient.IpCreateRequest{
 		Family:       4,
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	})
 	log.Info("IPv4 has been created")
 
 	ipv6, _ := client.CreateIp(gsclient.IpCreateRequest{
 		Family:       6,
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	})
 	log.Info("[INFO] IPv6 has been created")
 
@@ -40,7 +40,7 @@ func main() {
 	lbRequest := gsclient.LoadBalancerCreateRequest{
 		Name:                "go-client-lb",
 		Algorithm:           "leastconn",
-		LocationUUID:        LocationUUID,
+		LocationUUID:        locationUUID,
 		ListenIPv6UUID:      ipv6.ObjectUUID,
 		ListenIPv4UUID:      ipv4.ObjectUUID,
 		RedirectHTTPToHTTPS: false,

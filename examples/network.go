@@ -8,8 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//LocationUUID example LocationUUID
-const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -28,7 +27,7 @@ func main() {
 
 	networkRequest := gsclient.NetworkCreateRequest{
 		Name:         "go-client-network",
-		LocationUUID: LocationUUID,
+		LocationUUID: locationUUID,
 	}
 	cnetwork, err := client.CreateNetwork(networkRequest)
 	if err != nil {
