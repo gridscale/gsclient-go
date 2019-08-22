@@ -3,4 +3,8 @@ language: go
 go:
   - 1.12.x
 script:
-  - env GO111MODULE=on go test -v
+  - go test -v -cover $(go list ./... | grep -v /examples)
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
