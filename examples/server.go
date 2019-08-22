@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"os"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -14,11 +14,11 @@ const webServerFirewallTemplateUUID = "82aa235b-61ba-48ca-8f47-7060a0435de7"
 type serviceType string
 
 const (
-	Server   serviceType = "server"
-	Storage  serviceType = "storage"
-	Network  serviceType = "network"
-	IP       serviceType = "ip"
-	ISOImage serviceType = "isoimage"
+	serverType   serviceType = "server"
+	storageType  serviceType = "storage"
+	networkType  serviceType = "network"
+	ipType       serviceType = "ip"
+	isoImageType serviceType = "isoimage"
 )
 
 //enhancedClient inherits all methods from gsclient.Client
@@ -57,7 +57,7 @@ func main() {
 	log.WithFields(log.Fields{
 		"server_uuid": cServer.ObjectUUID,
 	}).Info("Server successfully created")
-	defer client.deleteService(Server, cServer.ObjectUUID)
+	defer client.deleteService(serverType, cServer.ObjectUUID)
 
 	//get a server to interact with
 	server, err := client.GetServer(cServer.ObjectUUID)
@@ -123,7 +123,7 @@ func main() {
 	log.WithFields(log.Fields{
 		"storage_uuid": cStorage.ObjectUUID,
 	}).Info("Storage successfully created")
-	defer client.deleteService(Storage, cStorage.ObjectUUID)
+	defer client.deleteService(storageType, cStorage.ObjectUUID)
 
 	cNetwork, err := client.CreateNetwork(gsclient.NetworkCreateRequest{
 		Name:         "go-client-network",
@@ -136,7 +136,7 @@ func main() {
 	log.WithFields(log.Fields{
 		"network_uuid": cNetwork.ObjectUUID,
 	}).Info("Network successfully created")
-	defer client.deleteService(Network, cNetwork.ObjectUUID)
+	defer client.deleteService(networkType, cNetwork.ObjectUUID)
 
 	cIp, err := client.CreateIp(gsclient.IpCreateRequest{
 		Name:         "go-client-ip",
@@ -150,7 +150,7 @@ func main() {
 	log.WithFields(log.Fields{
 		"IP_uuid": cIp.ObjectUUID,
 	}).Info("IP successfully created")
-	defer client.deleteService(IP, cIp.ObjectUUID)
+	defer client.deleteService(ipType, cIp.ObjectUUID)
 
 	cISOimage, err := client.CreateISOImage(gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
@@ -164,7 +164,7 @@ func main() {
 	log.WithFields(log.Fields{
 		"isoimage_uuid": cISOimage.ObjectUUID,
 	}).Info("ISO-image successfully created")
-	defer client.deleteService(ISOImage, cISOimage.ObjectUUID)
+	defer client.deleteService(isoImageType, cISOimage.ObjectUUID)
 
 	//Attach storage, network, IP, and ISO-image to a server
 	err = client.LinkStorage(server.Properties.ObjectUUID, cStorage.ObjectUUID, false)
@@ -173,7 +173,7 @@ func main() {
 		return
 	}
 	log.Info("Storage successfully attached")
-	defer client.unlinkService(Storage, server.Properties.ObjectUUID, cStorage.ObjectUUID)
+	defer client.unlinkService(storageType, server.Properties.ObjectUUID, cStorage.ObjectUUID)
 
 	err = client.LinkNetwork(
 		server.Properties.ObjectUUID,
@@ -189,7 +189,7 @@ func main() {
 		return
 	}
 	log.Info("Network successfully linked")
-	defer client.unlinkService(Network, server.Properties.ObjectUUID, cNetwork.ObjectUUID)
+	defer client.unlinkService(networkType, server.Properties.ObjectUUID, cNetwork.ObjectUUID)
 
 	err = client.LinkIp(server.Properties.ObjectUUID, cIp.ObjectUUID)
 	if err != nil {
@@ -197,7 +197,7 @@ func main() {
 		return
 	}
 	log.Info("IP successfully linked")
-	defer client.unlinkService(IP, server.Properties.ObjectUUID, cIp.ObjectUUID)
+	defer client.unlinkService(ipType, server.Properties.ObjectUUID, cIp.ObjectUUID)
 
 	err = client.LinkIsoImage(server.Properties.ObjectUUID, cISOimage.ObjectUUID)
 	if err != nil {
@@ -205,7 +205,7 @@ func main() {
 		return
 	}
 	log.Info("ISO-image successfully linked")
-	defer client.unlinkService(ISOImage, server.Properties.ObjectUUID, cISOimage.ObjectUUID)
+	defer client.unlinkService(isoImageType, server.Properties.ObjectUUID, cISOimage.ObjectUUID)
 
 	log.Info("Unlink and delete: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
@@ -213,7 +213,7 @@ func main() {
 
 func (c *enhancedClient) deleteService(serviceType serviceType, id string) {
 	switch serviceType {
-	case Server:
+	case serverType:
 		//turn off server before deleting
 		err := c.StopServer(id)
 		if err != nil {
@@ -226,28 +226,28 @@ func (c *enhancedClient) deleteService(serviceType serviceType, id string) {
 			return
 		}
 		log.Info("Server successfully deleted")
-	case Storage:
+	case storageType:
 		err := c.DeleteStorage(id)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)
 			return
 		}
 		log.Info("Storage successfully deleted")
-	case Network:
+	case networkType:
 		err := c.DeleteNetwork(id)
 		if err != nil {
 			log.Error("Delete network has failed with error", err)
 			return
 		}
 		log.Info("Network successfully deleted")
-	case IP:
+	case ipType:
 		err := c.DeleteIp(id)
 		if err != nil {
 			log.Error("Delete IP has failed with error", err)
 			return
 		}
 		log.Info("IP successfully deleted")
-	case ISOImage:
+	case isoImageType:
 		err := c.DeleteISOImage(id)
 		if err != nil {
 			log.Error("Delete ISO-image has failed with error", err)
@@ -262,28 +262,28 @@ func (c *enhancedClient) deleteService(serviceType serviceType, id string) {
 
 func (c *enhancedClient) unlinkService(serviceType serviceType, serverId, serviceId string) {
 	switch serviceType {
-	case Storage:
+	case storageType:
 		err := c.UnlinkStorage(serverId, serviceId)
 		if err != nil {
 			log.Error("Unlink storage has failed with error", err)
 			return
 		}
 		log.Info("Storage successfully unlinked")
-	case Network:
+	case networkType:
 		err := c.UnlinkNetwork(serverId, serviceId)
 		if err != nil {
 			log.Error("Unlink network has failed with error", err)
 			return
 		}
 		log.Info("Network successfully unlinked")
-	case IP:
+	case ipType:
 		err := c.UnlinkIp(serverId, serviceId)
 		if err != nil {
 			log.Error("Unlink IP has failed with error", err)
 			return
 		}
 		log.Info("IP successfully unlinked")
-	case ISOImage:
+	case isoImageType:
 		err := c.UnlinkIsoImage(serverId, serviceId)
 		if err != nil {
 			log.Error("Unlink ISO-image has failed with error", err)
