@@ -4,10 +4,9 @@ go:
   - 1.12.x
 install:
   - go get -v -t $(go list ./... | grep -v /examples)
+  - go get -u github.com/golang/lint/golint
 
 script:
   - go test -v -cover $(go list ./... | grep -v /examples)
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - golint  ./...
 
