@@ -26,7 +26,7 @@ func main() {
 
 	isoRequest := gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
-		SourceUrl:    "http://releases.ubuntu.com/16.04.4/ubuntu-16.04.4-server-amd64.iso?_ga=2.188975915.108704605.1521033305-403279979.1521033305",
+		SourceUrl:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
 		LocationUuid: LocationUuid,
 	}
 	cIso, err := client.CreateISOImage(isoRequest)
