@@ -30,7 +30,7 @@ type IPProperties struct {
 	LocationIata    string      `json:"location_iata"`
 	LocationName    string      `json:"location_name"`
 	Prefix          string      `json:"prefix"`
-	Ip              string      `json:"ip"`
+	IP              string      `json:"ip"`
 	DeleteBlock     string      `json:"delete_block"`
 	UsagesInMinutes float64     `json:"usage_in_minutes"`
 	CurrentPrice    float64     `json:"current_price"`
@@ -42,7 +42,7 @@ type IPProperties struct {
 type IPRelations struct {
 	Loadbalancers []IPLoadbalancer                  `json:"loadbalancers"`
 	Servers       []IPServer                        `json:"servers"`
-	PublicIps     []ServerIpRelationProperties      `json:"public_ips"`
+	PublicIPs     []ServerIPRelationProperties      `json:"public_ips"`
 	Storages      []ServerStorageRelationProperties `json:"storages"`
 }
 
@@ -65,7 +65,7 @@ type IPCreateResponse struct {
 	RequestUUID string `json:"request_uuid"`
 	ObjectUUID  string `json:"object_uuid"`
 	Prefix      string `json:"prefix"`
-	Ip          string `json:"ip"`
+	IP          string `json:"ip"`
 }
 
 //IPCreateRequest is JSON struct of a request for creating an IP
@@ -110,7 +110,7 @@ type IPEventProperties struct {
 }
 
 //GetIP get a specific IP based on given id
-func (c *Client) GetIp(id string) (IP, error) {
+func (c *Client) GetIP(id string) (IP, error) {
 	r := Request{
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodGet,
@@ -122,8 +122,8 @@ func (c *Client) GetIp(id string) (IP, error) {
 	return response, err
 }
 
-//GetIpList gets a list of available IPs
-func (c *Client) GetIpList() ([]IP, error) {
+//GetIPList gets a list of available IPs
+func (c *Client) GetIPList() ([]IP, error) {
 	r := Request{
 		uri:    apiIPBase,
 		method: http.MethodGet,
@@ -139,8 +139,8 @@ func (c *Client) GetIpList() ([]IP, error) {
 	return IPs, err
 }
 
-//CreateIp creates an IP
-func (c *Client) CreateIp(body IPCreateRequest) (IPCreateResponse, error) {
+//CreateIP creates an IP
+func (c *Client) CreateIP(body IPCreateRequest) (IPCreateResponse, error) {
 	r := Request{
 		uri:    apiIPBase,
 		method: http.MethodPost,
@@ -158,8 +158,8 @@ func (c *Client) CreateIp(body IPCreateRequest) (IPCreateResponse, error) {
 	return response, err
 }
 
-//DeleteIp deletes a specific IP based on given id
-func (c *Client) DeleteIp(id string) error {
+//DeleteIP deletes a specific IP based on given id
+func (c *Client) DeleteIP(id string) error {
 	r := Request{
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodDelete,
@@ -168,8 +168,8 @@ func (c *Client) DeleteIp(id string) error {
 	return r.execute(*c, nil)
 }
 
-//UpdateIp updates a specific IP based on given id
-func (c *Client) UpdateIp(id string, body IPUpdateRequest) error {
+//UpdateIP updates a specific IP based on given id
+func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
 	r := Request{
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodPatch,
@@ -179,8 +179,8 @@ func (c *Client) UpdateIp(id string, body IPUpdateRequest) error {
 	return r.execute(*c, nil)
 }
 
-//GetIpEventList gets a list of an IP's events
-func (c *Client) GetIpEventList(id string) ([]IPEvent, error) {
+//GetIPEventList gets a list of an IP's events
+func (c *Client) GetIPEventList(id string) ([]IPEvent, error) {
 	r := Request{
 		uri:    path.Join(apiIPBase, id, "events"),
 		method: http.MethodGet,
@@ -194,9 +194,9 @@ func (c *Client) GetIpEventList(id string) ([]IPEvent, error) {
 	return IPEvents, err
 }
 
-//GetIpVersion gets IP's version, returns 0 if an error was encountered
-func (c *Client) GetIpVersion(id string) int {
-	ip, err := c.GetIp(id)
+//GetIPVersion gets IP's version, returns 0 if an error was encountered
+func (c *Client) GetIPVersion(id string) int {
+	ip, err := c.GetIP(id)
 	if err != nil {
 		return 0
 	}

@@ -40,7 +40,7 @@ type ServerProperties struct {
 type ServerRelations struct {
 	IsoImages []ServerIsoImageRelationProperties `json:"isoimages"`
 	Networks  []ServerNetworkRelationProperties  `json:"networks"`
-	PublicIps []ServerIpRelationProperties       `json:"public_ips"`
+	PublicIPs []ServerIPRelationProperties       `json:"public_ips"`
 	Storages  []ServerStorageRelationProperties  `json:"storages"`
 }
 
@@ -65,7 +65,7 @@ type ServerCreateResponse struct {
 	SeverUUID    string   `json:"sever_uuid"`
 	NetworkUUIDs []string `json:"network_uuids"`
 	StorageUUIDs []string `json:"storage_uuids"`
-	IpaddrUUIDs  []string `json:"ipaddr_uuids"`
+	IPaddrUUIDs  []string `json:"ipaddr_uuids"`
 }
 
 //ServerPowerUpdateRequest JSON struct of a request for updating server's power state
@@ -77,7 +77,7 @@ type ServerPowerUpdateRequest struct {
 type ServerCreateRequestRelations struct {
 	IsoImages []ServerCreateRequestIsoimage `json:"isoimages,omitempty"`
 	Networks  []ServerCreateRequestNetwork  `json:"networks,omitempty"`
-	PublicIps []ServerCreateRequestIp       `json:"public_ips,omitempty"`
+	PublicIPs []ServerCreateRequestIP       `json:"public_ips,omitempty"`
 	Storages  []ServerCreateRequestStorage  `json:"storages,omitempty"`
 }
 
@@ -93,9 +93,9 @@ type ServerCreateRequestNetwork struct {
 	BootDevice  bool   `json:"bootdevice,omitempty"`
 }
 
-//ServerCreateRequestIp JSON struct of a relation between a server and an IP address
-type ServerCreateRequestIp struct {
-	IpaddrUUID string `json:"ipaddr_uuid,omitempty"`
+//ServerCreateRequestIP JSON struct of a relation between a server and an IP address
+type ServerCreateRequestIP struct {
+	IPaddrUUID string `json:"ipaddr_uuid,omitempty"`
 }
 
 //ServerCreateRequestIsoimage JSON struct of a relation between a server and an ISO-Image

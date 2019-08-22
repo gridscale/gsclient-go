@@ -24,20 +24,20 @@ func main() {
 	log.Info("Create IP address: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	ipRequest := gsclient.IpCreateRequest{
+	ipRequest := gsclient.IPCreateRequest{
 		Name:         "go-client-ip",
 		Family:       4,
 		LocationUUID: locationUUID,
 	}
 	//Create new IP
-	ipc, err := client.CreateIp(ipRequest)
+	ipc, err := client.CreateIP(ipRequest)
 	if err != nil {
 		log.Error("Create IP address has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{"ip_uuid": ipc.ObjectUUID}).Info("IP address successfully created")
 	defer func() {
-		err := client.DeleteIp(ipc.ObjectUUID)
+		err := client.DeleteIP(ipc.ObjectUUID)
 		if err != nil {
 			log.Error("Delete IP address has failed with error", err)
 			return
@@ -49,18 +49,18 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get IP to update
-	ip, err := client.GetIp(ipc.ObjectUUID)
+	ip, err := client.GetIP(ipc.ObjectUUID)
 	if err != nil {
 		log.Error("Get IP address has failed with error", err)
 		return
 	}
-	updateRequest := gsclient.IpUpdateRequest{
+	updateRequest := gsclient.IPUpdateRequest{
 		Name:       "Updated IP address",
 		Failover:   ip.Properties.Failover,
 		ReverseDns: ip.Properties.ReverseDns,
 		Labels:     ip.Properties.Labels,
 	}
-	err = client.UpdateIp(ip.Properties.ObjectUUID, updateRequest)
+	err = client.UpdateIP(ip.Properties.ObjectUUID, updateRequest)
 	if err != nil {
 		log.Error("Update IP address has failed with error", err)
 		return
@@ -69,7 +69,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get IP address events
-	response, err := client.GetIpEventList(ip.Properties.ObjectUUID)
+	response, err := client.GetIPEventList(ip.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get IP address events has failed with error", err)
 		return

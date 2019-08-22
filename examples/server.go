@@ -138,7 +138,7 @@ func main() {
 	}).Info("Network successfully created")
 	defer client.deleteService(networkType, cNetwork.ObjectUUID)
 
-	cIp, err := client.CreateIp(gsclient.IpCreateRequest{
+	cIP, err := client.CreateIP(gsclient.IPCreateRequest{
 		Name:         "go-client-ip",
 		Family:       4,
 		LocationUUID: locationUUID,
@@ -148,9 +148,9 @@ func main() {
 		return
 	}
 	log.WithFields(log.Fields{
-		"IP_uuid": cIp.ObjectUUID,
+		"IP_uuid": cIP.ObjectUUID,
 	}).Info("IP successfully created")
-	defer client.deleteService(ipType, cIp.ObjectUUID)
+	defer client.deleteService(ipType, cIP.ObjectUUID)
 
 	cISOimage, err := client.CreateISOImage(gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
@@ -191,13 +191,13 @@ func main() {
 	log.Info("Network successfully linked")
 	defer client.unlinkService(networkType, server.Properties.ObjectUUID, cNetwork.ObjectUUID)
 
-	err = client.LinkIp(server.Properties.ObjectUUID, cIp.ObjectUUID)
+	err = client.LinkIP(server.Properties.ObjectUUID, cIP.ObjectUUID)
 	if err != nil {
 		log.Error("Link IP has failed with error", err)
 		return
 	}
 	log.Info("IP successfully linked")
-	defer client.unlinkService(ipType, server.Properties.ObjectUUID, cIp.ObjectUUID)
+	defer client.unlinkService(ipType, server.Properties.ObjectUUID, cIP.ObjectUUID)
 
 	err = client.LinkIsoImage(server.Properties.ObjectUUID, cISOimage.ObjectUUID)
 	if err != nil {
@@ -241,7 +241,7 @@ func (c *enhancedClient) deleteService(serviceType serviceType, id string) {
 		}
 		log.Info("Network successfully deleted")
 	case ipType:
-		err := c.DeleteIp(id)
+		err := c.DeleteIP(id)
 		if err != nil {
 			log.Error("Delete IP has failed with error", err)
 			return
@@ -277,7 +277,7 @@ func (c *enhancedClient) unlinkService(serviceType serviceType, serverId, servic
 		}
 		log.Info("Network successfully unlinked")
 	case ipType:
-		err := c.UnlinkIp(serverId, serviceId)
+		err := c.UnlinkIP(serverId, serviceId)
 		if err != nil {
 			log.Error("Unlink IP has failed with error", err)
 			return

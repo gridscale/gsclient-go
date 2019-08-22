@@ -271,7 +271,7 @@ func getMockServerCreateResponse() ServerCreateResponse {
 		SeverUUID:    dummyUUID,
 		NetworkUUIDs: nil,
 		StorageUUIDs: nil,
-		IpaddrUUIDs:  nil,
+		IPaddrUUIDs:  nil,
 	}
 	return mock
 }

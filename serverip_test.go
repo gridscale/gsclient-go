@@ -9,38 +9,38 @@ import (
 	"testing"
 )
 
-func TestClient_GetServerIpList(t *testing.T) {
+func TestClient_GetServerIPList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "ips")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareServerIpListHTTPGet())
+		fmt.Fprintf(writer, prepareServerIPListHTTPGet())
 	})
-	res, err := client.GetServerIpList(dummyUUID)
+	res, err := client.GetServerIPList(dummyUUID)
 	if err != nil {
-		t.Errorf("GetServerIpList returned an error %v", err)
+		t.Errorf("GetServerIPList returned an error %v", err)
 	}
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerIp()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerIP()), fmt.Sprintf("%v", res))
 }
 
-func TestClient_GetServerIp(t *testing.T) {
+func TestClient_GetServerIP(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "ips", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareServerIpHTTPGet())
+		fmt.Fprintf(writer, prepareServerIPHTTPGet())
 	})
-	res, err := client.GetServerIp(dummyUUID, dummyUUID)
+	res, err := client.GetServerIP(dummyUUID, dummyUUID)
 	if err != nil {
-		t.Errorf("GetServerIp returned an error %v", err)
+		t.Errorf("GetServerIP returned an error %v", err)
 	}
-	assert.Equal(t, fmt.Sprintf("%v", getMockServerIp()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("%v", getMockServerIP()), fmt.Sprintf("%v", res))
 }
 
-func TestClient_CreateServerIp(t *testing.T) {
+func TestClient_CreateServerIP(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "ips")
@@ -48,15 +48,15 @@ func TestClient_CreateServerIp(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerIp(dummyUUID, ServerIpRelationCreateRequest{
+	err := client.CreateServerIP(dummyUUID, ServerIPRelationCreateRequest{
 		ObjectUUID: dummyUUID,
 	})
 	if err != nil {
-		t.Errorf("CreateServerIp returned an error %v", err)
+		t.Errorf("CreateServerIP returned an error %v", err)
 	}
 }
 
-func TestClient_DeleteServerIp(t *testing.T) {
+func TestClient_DeleteServerIP(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "ips", dummyUUID)
@@ -64,13 +64,13 @@ func TestClient_DeleteServerIp(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteServerIp(dummyUUID, dummyUUID)
+	err := client.DeleteServerIP(dummyUUID, dummyUUID)
 	if err != nil {
-		t.Errorf("DeleteServerIp returned an error %v", err)
+		t.Errorf("DeleteServerIP returned an error %v", err)
 	}
 }
 
-func TestClient_LinkIp(t *testing.T) {
+func TestClient_LinkIP(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "ips")
@@ -78,13 +78,13 @@ func TestClient_LinkIp(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.LinkIp(dummyUUID, dummyUUID)
+	err := client.LinkIP(dummyUUID, dummyUUID)
 	if err != nil {
-		t.Errorf("LinkIp returned an error %v", err)
+		t.Errorf("LinkIP returned an error %v", err)
 	}
 }
 
-func TestClient_UnlinkIp(t *testing.T) {
+func TestClient_UnlinkIP(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "ips", dummyUUID)
@@ -92,32 +92,32 @@ func TestClient_UnlinkIp(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UnlinkIp(dummyUUID, dummyUUID)
+	err := client.UnlinkIP(dummyUUID, dummyUUID)
 	if err != nil {
-		t.Errorf("UnlinkIp returned an error %v", err)
+		t.Errorf("UnlinkIP returned an error %v", err)
 	}
 }
 
-func getMockServerIp() ServerIpRelationProperties {
-	mock := ServerIpRelationProperties{
+func getMockServerIP() ServerIPRelationProperties {
+	mock := ServerIPRelationProperties{
 		ServerUUID: dummyUUID,
 		CreateTime: dummyTime,
 		Prefix:     "pre",
 		Family:     1,
 		ObjectUUID: dummyUUID,
-		Ip:         "192.168.0.1",
+		IP:         "192.168.0.1",
 	}
 	return mock
 }
 
-func prepareServerIpListHTTPGet() string {
-	ip := getMockServerIp()
+func prepareServerIPListHTTPGet() string {
+	ip := getMockServerIP()
 	res, _ := json.Marshal(ip)
 	return fmt.Sprintf(`{"ip_relations": [%s]}`, string(res))
 }
 
-func prepareServerIpHTTPGet() string {
-	ip := getMockServerIp()
+func prepareServerIPHTTPGet() string {
+	ip := getMockServerIP()
 	res, _ := json.Marshal(ip)
 	return fmt.Sprintf(`{"ip_relation": %s}`, string(res))
 }

@@ -22,13 +22,13 @@ func main() {
 	log.Info("Create IPs and loadbalancer: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	// required to create IPv6 and IPv4 to create LB
-	ipv4, _ := client.CreateIp(gsclient.IpCreateRequest{
+	ipv4, _ := client.CreateIP(gsclient.IPCreateRequest{
 		Family:       4,
 		LocationUUID: locationUUID,
 	})
 	log.Info("IPv4 has been created")
 
-	ipv6, _ := client.CreateIp(gsclient.IpCreateRequest{
+	ipv6, _ := client.CreateIP(gsclient.IPCreateRequest{
 		Family:       6,
 		LocationUUID: locationUUID,
 	})
@@ -128,13 +128,13 @@ func main() {
 
 	time.Sleep(10 * time.Second)
 
-	err = client.DeleteIp(ipv4.ObjectUUID)
+	err = client.DeleteIP(ipv4.ObjectUUID)
 	if err != nil {
 		log.Fatal("Delete ipv4 has failed with error", err)
 	}
 	log.Info("IPv4 successfully deleted")
 
-	err = client.DeleteIp(ipv6.ObjectUUID)
+	err = client.DeleteIP(ipv6.ObjectUUID)
 	if err != nil {
 		log.Fatal("Delete ipv6 has failed with error", err)
 	}
