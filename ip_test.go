@@ -12,7 +12,7 @@ import (
 func TestClient_GetIpList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := apiIpBase
+	uri := apiIPBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareIpListHTTPGet())
@@ -28,7 +28,7 @@ func TestClient_GetIpList(t *testing.T) {
 func TestClient_GetIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiIpBase, dummyUUID)
+	uri := path.Join(apiIPBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareIpHTTPGet())
@@ -43,7 +43,7 @@ func TestClient_GetIp(t *testing.T) {
 func TestClient_CreateIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := apiIpBase
+	uri := apiIPBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprintf(writer, prepareIpCreateResponse())
@@ -53,7 +53,7 @@ func TestClient_CreateIp(t *testing.T) {
 		fmt.Fprint(w, httpResponse)
 	})
 
-	response, err := client.CreateIp(IpCreateRequest{
+	response, err := client.CreateIp(IPCreateRequest{
 		Name:         "test",
 		Family:       1,
 		LocationUUID: dummyUUID,
@@ -70,13 +70,13 @@ func TestClient_CreateIp(t *testing.T) {
 func TestClient_UpdateIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiIpBase, dummyUUID)
+	uri := path.Join(apiIPBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
 
-	err := client.UpdateIp(dummyUUID, IpUpdateRequest{
+	err := client.UpdateIp(dummyUUID, IPUpdateRequest{
 		Name:       "test",
 		Failover:   false,
 		ReverseDns: "8.8.4.4",
@@ -89,7 +89,7 @@ func TestClient_UpdateIp(t *testing.T) {
 func TestClient_DeleteIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiIpBase, dummyUUID)
+	uri := path.Join(apiIPBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
@@ -103,7 +103,7 @@ func TestClient_DeleteIp(t *testing.T) {
 func TestClient_GetIpEventList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiIpBase, dummyUUID, "events")
+	uri := path.Join(apiIPBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareIpEventListHTTPGet())
@@ -119,7 +119,7 @@ func TestClient_GetIpEventList(t *testing.T) {
 func TestClient_GetIpVersion(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiIpBase, dummyUUID)
+	uri := path.Join(apiIPBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareIpHTTPGet())
@@ -132,8 +132,8 @@ func TestClient_GetIpVersion(t *testing.T) {
 
 }
 
-func getMockIP() Ip {
-	mock := Ip{Properties: IpProperties{
+func getMockIP() IP {
+	mock := IP{Properties: IPProperties{
 		Name:            "test",
 		LocationCountry: "Germany",
 		LocationUUID:    dummyUUID,
@@ -152,8 +152,8 @@ func getMockIP() Ip {
 		UsagesInMinutes: 10,
 		CurrentPrice:    0.9,
 		Labels:          []string{"label"},
-		Relations: IpRelations{
-			Loadbalancers: []IpLoadbalancer{
+		Relations: IPRelations{
+			Loadbalancers: []IPLoadbalancer{
 				{
 					CreateTime:       dummyTime,
 					LoadbalancerName: "test",
@@ -177,8 +177,8 @@ func prepareIpHTTPGet() string {
 	return string(res)
 }
 
-func getMockIpCreateResponse() IpCreateResponse {
-	mock := IpCreateResponse{
+func getMockIpCreateResponse() IPCreateResponse {
+	mock := IPCreateResponse{
 		RequestUUID: dummyRequestUUID,
 		ObjectUUID:  dummyUUID,
 		Prefix:      "ip",
@@ -192,8 +192,8 @@ func prepareIpCreateResponse() string {
 	return string(res)
 }
 
-func getMockIpEvent() IpEvent {
-	mock := IpEvent{Properties: IpEventProperties{
+func getMockIpEvent() IPEvent {
+	mock := IPEvent{Properties: IPEventProperties{
 		ObjectType:    "type",
 		RequestUUID:   dummyRequestUUID,
 		ObjectUUID:    dummyUUID,

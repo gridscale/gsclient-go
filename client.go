@@ -4,7 +4,7 @@ const (
 	apiServerBase        = "/objects/servers"
 	apiStorageBase       = "/objects/storages"
 	apiNetworkBase       = "/objects/networks"
-	apiIpBase            = "/objects/ips"
+	apiIPBase            = "/objects/ips"
 	apiSshkeyBase        = "/objects/sshkeys"
 	apiTemplateBase      = "/objects/templates"
 	apiLoadBalancerBase  = "/objects/loadbalancers"

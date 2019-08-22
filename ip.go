@@ -5,18 +5,18 @@ import (
 	"path"
 )
 
-//IpList is JSON struct of a list of IPs
-type IpList struct {
-	List map[string]IpProperties `json:"ips"`
+//IPList is JSON struct of a list of IPs
+type IPList struct {
+	List map[string]IPProperties `json:"ips"`
 }
 
-//Ip is JSON struct if a single IP
-type Ip struct {
-	Properties IpProperties `json:"ip"`
+//IP is JSON struct if a single IP
+type IP struct {
+	Properties IPProperties `json:"ip"`
 }
 
-//IpProperties is JSON struct of an IP's properties
-type IpProperties struct {
+//IPProperties is JSON struct of an IP's properties
+type IPProperties struct {
 	Name            string      `json:"name"`
 	LocationCountry string      `json:"location_country"`
 	LocationUUID    string      `json:"location_uuid"`
@@ -35,41 +35,41 @@ type IpProperties struct {
 	UsagesInMinutes float64     `json:"usage_in_minutes"`
 	CurrentPrice    float64     `json:"current_price"`
 	Labels          []string    `json:"labels"`
-	Relations       IpRelations `json:"relations"`
+	Relations       IPRelations `json:"relations"`
 }
 
-//IpRelations is JSON struct of a list of an IP's relations
-type IpRelations struct {
-	Loadbalancers []IpLoadbalancer                  `json:"loadbalancers"`
-	Servers       []IpServer                        `json:"servers"`
+//IPRelations is JSON struct of a list of an IP's relations
+type IPRelations struct {
+	Loadbalancers []IPLoadbalancer                  `json:"loadbalancers"`
+	Servers       []IPServer                        `json:"servers"`
 	PublicIps     []ServerIpRelationProperties      `json:"public_ips"`
 	Storages      []ServerStorageRelationProperties `json:"storages"`
 }
 
-//IpLoadbalancer is JSON struct of the relation between an IP and a Load Balancer
-type IpLoadbalancer struct {
+//IPLoadbalancer is JSON struct of the relation between an IP and a Load Balancer
+type IPLoadbalancer struct {
 	CreateTime       string `json:"create_time"`
 	LoadbalancerName string `json:"loadbalancer_name"`
 	LoadbalancerUUID string `json:"loadbalancer_uuid"`
 }
 
-//IpServer is JSON struct of the relation between an IP and a Server
-type IpServer struct {
+//IPServer is JSON struct of the relation between an IP and a Server
+type IPServer struct {
 	CreateTime string `json:"create_time"`
 	ServerName string `json:"server_name"`
 	ServerUUID string `json:"server_uuid"`
 }
 
-//IpCreateResponse is JSON struct of a response for creating an IP
-type IpCreateResponse struct {
+//IPCreateResponse is JSON struct of a response for creating an IP
+type IPCreateResponse struct {
 	RequestUUID string `json:"request_uuid"`
 	ObjectUUID  string `json:"object_uuid"`
 	Prefix      string `json:"prefix"`
 	Ip          string `json:"ip"`
 }
 
-//IpCreateRequest is JSON struct of a request for creating an IP
-type IpCreateRequest struct {
+//IPCreateRequest is JSON struct of a request for creating an IP
+type IPCreateRequest struct {
 	Name         string   `json:"name,omitempty"`
 	Family       int      `json:"family"`
 	LocationUUID string   `json:"location_uuid"`
@@ -78,26 +78,26 @@ type IpCreateRequest struct {
 	Labels       []string `json:"labels,omitempty"`
 }
 
-//IpUpdateRequest is JSON struct of a request for updating an IP
-type IpUpdateRequest struct {
+//IPUpdateRequest is JSON struct of a request for updating an IP
+type IPUpdateRequest struct {
 	Name       string   `json:"name,omitempty"`
 	Failover   bool     `json:"failover"`
 	ReverseDns string   `json:"reverse_dns,omitempty"`
 	Labels     []string `json:"labels,omitempty"`
 }
 
-//IpEventList is JSON struct of a list of an IP's events
-type IpEventList struct {
-	List []IpEventProperties `json:"events"`
+//IPEventList is JSON struct of a list of an IP's events
+type IPEventList struct {
+	List []IPEventProperties `json:"events"`
 }
 
-//IpEvent is JSON struct of a single IP
-type IpEvent struct {
-	Properties IpEventProperties `json:"event"`
+//IPEvent is JSON struct of a single IP
+type IPEvent struct {
+	Properties IPEventProperties `json:"event"`
 }
 
-//IpEventProperties is JSON struct of an IP's properties
-type IpEventProperties struct {
+//IPEventProperties is JSON struct of an IP's properties
+type IPEventProperties struct {
 	ObjectType    string `json:"object_type"`
 	RequestUUID   string `json:"request_uuid"`
 	ObjectUUID    string `json:"object_uuid"`
@@ -109,48 +109,48 @@ type IpEventProperties struct {
 	UserUUID      string `json:"user_uuid"`
 }
 
-//GetIp get a specific IP based on given id
-func (c *Client) GetIp(id string) (Ip, error) {
+//GetIP get a specific IP based on given id
+func (c *Client) GetIp(id string) (IP, error) {
 	r := Request{
-		uri:    path.Join(apiIpBase, id),
+		uri:    path.Join(apiIPBase, id),
 		method: http.MethodGet,
 	}
 
-	var response Ip
+	var response IP
 	err := r.execute(*c, &response)
 
 	return response, err
 }
 
 //GetIpList gets a list of available IPs
-func (c *Client) GetIpList() ([]Ip, error) {
+func (c *Client) GetIpList() ([]IP, error) {
 	r := Request{
-		uri:    apiIpBase,
+		uri:    apiIPBase,
 		method: http.MethodGet,
 	}
 
-	var response IpList
-	var IPs []Ip
+	var response IPList
+	var IPs []IP
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		IPs = append(IPs, Ip{Properties: properties})
+		IPs = append(IPs, IP{Properties: properties})
 	}
 
 	return IPs, err
 }
 
 //CreateIp creates an IP
-func (c *Client) CreateIp(body IpCreateRequest) (IpCreateResponse, error) {
+func (c *Client) CreateIp(body IPCreateRequest) (IPCreateResponse, error) {
 	r := Request{
-		uri:    apiIpBase,
+		uri:    apiIPBase,
 		method: http.MethodPost,
 		body:   body,
 	}
 
-	var response IpCreateResponse
+	var response IPCreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
-		return IpCreateResponse{}, err
+		return IPCreateResponse{}, err
 	}
 
 	err = c.WaitForRequestCompletion(response.RequestUUID)
@@ -161,7 +161,7 @@ func (c *Client) CreateIp(body IpCreateRequest) (IpCreateResponse, error) {
 //DeleteIp deletes a specific IP based on given id
 func (c *Client) DeleteIp(id string) error {
 	r := Request{
-		uri:    path.Join(apiIpBase, id),
+		uri:    path.Join(apiIPBase, id),
 		method: http.MethodDelete,
 	}
 
@@ -169,9 +169,9 @@ func (c *Client) DeleteIp(id string) error {
 }
 
 //UpdateIp updates a specific IP based on given id
-func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
+func (c *Client) UpdateIp(id string, body IPUpdateRequest) error {
 	r := Request{
-		uri:    path.Join(apiIpBase, id),
+		uri:    path.Join(apiIPBase, id),
 		method: http.MethodPatch,
 		body:   body,
 	}
@@ -180,16 +180,16 @@ func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
 }
 
 //GetIpEventList gets a list of an IP's events
-func (c *Client) GetIpEventList(id string) ([]IpEvent, error) {
+func (c *Client) GetIpEventList(id string) ([]IPEvent, error) {
 	r := Request{
-		uri:    path.Join(apiIpBase, id, "events"),
+		uri:    path.Join(apiIPBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response IpEventList
-	var IPEvents []IpEvent
+	var response IPEventList
+	var IPEvents []IPEvent
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		IPEvents = append(IPEvents, IpEvent{Properties: properties})
+		IPEvents = append(IPEvents, IPEvent{Properties: properties})
 	}
 	return IPEvents, err
 }
