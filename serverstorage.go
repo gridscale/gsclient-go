@@ -17,7 +17,7 @@ type ServerStorageRelationSingle struct {
 
 //ServerStorageRelationProperties JSON struct of properties of a relation between a server and a storage
 type ServerStorageRelationProperties struct {
-	ObjectUuid       string `json:"object_uuid"`
+	ObjectUUID       string `json:"object_uuid"`
 	ObjectName       string `json:"object_name"`
 	Capacity         int    `json:"capacity"`
 	StorageType      string `json:"storage_type"`
@@ -29,12 +29,12 @@ type ServerStorageRelationProperties struct {
 	Bus              int    `json:"bus"`
 	LastUsedTemplate string `json:"last_used_template"`
 	LicenseProductNo int    `json:"license_product_no"`
-	ServerUuid       string `json:"server_uuid"`
+	ServerUUID       string `json:"server_uuid"`
 }
 
 //ServerStorageRelationCreateRequest JSON struct of a request for creating a relation between a server and a storage
 type ServerStorageRelationCreateRequest struct {
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 	BootDevice bool   `json:"bootdevice,omitempty"`
 }
 
@@ -99,7 +99,7 @@ func (c *Client) DeleteServerStorage(serverId, storageId string) error {
 //LinkStorage attaches a storage to a server
 func (c *Client) LinkStorage(serverId string, storageId string, bootdevice bool) error {
 	body := ServerStorageRelationCreateRequest{
-		ObjectUuid: storageId,
+		ObjectUUID: storageId,
 		BootDevice: bootdevice,
 	}
 	return c.CreateServerStorage(serverId, body)

@@ -19,9 +19,9 @@ type Network struct {
 //NetworkProperties is JSON struct of a network's properties
 type NetworkProperties struct {
 	LocationCountry string           `json:"location_country"`
-	LocationUuid    string           `json:"location_uuid"`
+	LocationUUID    string           `json:"location_uuid"`
 	PublicNet       bool             `json:"public_net"`
-	ObjectUuid      string           `json:"object_uuid"`
+	ObjectUUID      string           `json:"object_uuid"`
 	NetworkType     string           `json:"network_type"`
 	Name            string           `json:"name"`
 	Status          string           `json:"status"`
@@ -45,18 +45,18 @@ type NetworkRelations struct {
 type NetworkVlan struct {
 	Vlan       int    `json:"vlan"`
 	TenantName string `json:"tenant_name"`
-	TenantUuid string `json:"tenant_uuid"`
+	TenantUUID string `json:"tenant_uuid"`
 }
 
 //NetworkServer is JSON struct of a relation between a network and a server
 type NetworkServer struct {
-	ObjectUuid  string   `json:"object_uuid"`
+	ObjectUUID  string   `json:"object_uuid"`
 	Mac         string   `json:"mac"`
 	Bootdevice  bool     `json:"bootdevice"`
 	CreateTime  string   `json:"create_time"`
 	L3security  []string `json:"l3security"`
 	ObjectName  string   `json:"object_name"`
-	NetworkUuid string   `json:"network_uuid"`
+	NetworkUUID string   `json:"network_uuid"`
 	Ordering    int      `json:"ordering"`
 }
 
@@ -64,14 +64,14 @@ type NetworkServer struct {
 type NetworkCreateRequest struct {
 	Name         string   `json:"name"`
 	Labels       []string `json:"labels,omitempty"`
-	LocationUuid string   `json:"location_uuid"`
+	LocationUUID string   `json:"location_uuid"`
 	L2Security   bool     `json:"l2security,omitempty"`
 }
 
 //NetworkCreateResponse is JSON of a response for creating a network
 type NetworkCreateResponse struct {
-	ObjectUuid  string `json:"object_uuid"`
-	RequestUuid string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
 }
 
 //NetworkUpdateRequest is JSON of a request for updating a network
@@ -93,14 +93,14 @@ type NetworkEvent struct {
 //NetworkEventProperties is JSON struct of properties of an event
 type NetworkEventProperties struct {
 	ObjectType    string `json:"object_type"`
-	RequestUuid   string `json:"request_uuid"`
-	ObjectUuid    string `json:"object_uuid"`
+	RequestUUID   string `json:"request_uuid"`
+	ObjectUUID    string `json:"object_uuid"`
 	Activity      string `json:"activity"`
 	RequestType   string `json:"request_type"`
 	RequestStatus string `json:"request_status"`
 	Change        string `json:"change"`
 	Timestamp     string `json:"timestamp"`
-	UserUuid      string `json:"user_uuid"`
+	UserUUID      string `json:"user_uuid"`
 }
 
 //GetNetwork get a specific network based on given id
@@ -126,7 +126,7 @@ func (c *Client) CreateNetwork(body NetworkCreateRequest) (NetworkCreateResponse
 	if err != nil {
 		return NetworkCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 

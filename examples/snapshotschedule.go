@@ -10,7 +10,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -24,7 +24,7 @@ func main() {
 	//Create storage
 	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
 		Capacity:     1,
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 		Name:         "go-client-storage",
 	})
 	if err != nil {
@@ -32,18 +32,18 @@ func main() {
 		return
 	}
 	log.WithFields(log.Fields{
-		"storage_uuid": cStorage.ObjectUuid,
+		"storage_uuid": cStorage.ObjectUUID,
 	}).Info("Storage successfully created")
 	defer func() {
 		time.Sleep(30 * time.Second)
 		//Delete all snapshots has been made so far
-		snapshots, err := client.GetStorageSnapshotList(cStorage.ObjectUuid)
+		snapshots, err := client.GetStorageSnapshotList(cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Get storage's snapshots has failed with error", err)
 			return
 		}
 		for _, snapshot := range snapshots {
-			err = client.DeleteStorageSnapshot(cStorage.ObjectUuid, snapshot.Properties.ObjectUuid)
+			err = client.DeleteStorageSnapshot(cStorage.ObjectUUID, snapshot.Properties.ObjectUUID)
 			if err != nil {
 				log.Error("Delete storage's snapshot has failed with error", err)
 				return
@@ -51,7 +51,7 @@ func main() {
 		}
 		//we have to wait for the snapshot getting deleted firstly
 		time.Sleep(30 * time.Second)
-		err = client.DeleteStorage(cStorage.ObjectUuid)
+		err = client.DeleteStorage(cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)
 			return
@@ -60,7 +60,7 @@ func main() {
 	}()
 
 	//Create Snapshot Schedule
-	cSnapshotSchedule, err := client.CreateStorageSnapshotSchedule(cStorage.ObjectUuid, gsclient.StorageSnapshotScheduleCreateRequest{
+	cSnapshotSchedule, err := client.CreateStorageSnapshotSchedule(cStorage.ObjectUUID, gsclient.StorageSnapshotScheduleCreateRequest{
 		Name:          "go-client-snapshot-schedule",
 		RunInterval:   120,
 		KeepSnapshots: 2,
@@ -70,10 +70,10 @@ func main() {
 		return
 	}
 	log.WithFields(log.Fields{
-		"snapshotschedule_uuid": cSnapshotSchedule.ObjectUuid,
+		"snapshotschedule_uuid": cSnapshotSchedule.ObjectUUID,
 	}).Info("Snapshot schedule successfully created")
 	defer func() {
-		err := client.DeleteStorageSnapshotSchedule(cStorage.ObjectUuid, cSnapshotSchedule.ObjectUuid)
+		err := client.DeleteStorageSnapshotSchedule(cStorage.ObjectUUID, cSnapshotSchedule.ObjectUUID)
 		if err != nil {
 			log.Error("Delete snapshot schedule has failed with error", err)
 			return
@@ -82,18 +82,18 @@ func main() {
 	}()
 
 	//Get snapshot schedule to update
-	snapshotSchedule, err := client.GetStorageSnapshotSchedule(cStorage.ObjectUuid, cSnapshotSchedule.ObjectUuid)
+	snapshotSchedule, err := client.GetStorageSnapshotSchedule(cStorage.ObjectUUID, cSnapshotSchedule.ObjectUUID)
 	if err != nil {
 		log.Error("Get snapshot schedule has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{
-		"snapshotchedule_uuid": snapshotSchedule.Properties.ObjectUuid,
+		"snapshotchedule_uuid": snapshotSchedule.Properties.ObjectUUID,
 	}).Info("Snapshot schedule successfully retrieved")
 
 	log.Info("Update snapshot schedule: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	err = client.UpdateStorageSnapshotSchedule(cStorage.ObjectUuid, snapshotSchedule.Properties.ObjectUuid, gsclient.StorageSnapshotScheduleUpdateRequest{
+	err = client.UpdateStorageSnapshotSchedule(cStorage.ObjectUUID, snapshotSchedule.Properties.ObjectUUID, gsclient.StorageSnapshotScheduleUpdateRequest{
 		Name:          "updated snapshot schedule",
 		RunInterval:   snapshotSchedule.Properties.RunInterval,
 		KeepSnapshots: snapshotSchedule.Properties.KeepSnapshots,

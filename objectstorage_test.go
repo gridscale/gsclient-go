@@ -29,13 +29,13 @@ func TestClient_GetObjectStorageAccessKeyList(t *testing.T) {
 func TestClient_GetObjectStorageAccessKey(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiObjectStorageBase, "access_keys", dummyUuid)
+	uri := path.Join(apiObjectStorageBase, "access_keys", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareObjectStorageAccessKeyHTTPGet())
 	})
 
-	res, err := client.GetObjectStorageAccessKey(dummyUuid)
+	res, err := client.GetObjectStorageAccessKey(dummyUUID)
 	if err != nil {
 		t.Errorf("GetObjectStorageAccessKey returned an error %v", err)
 	}
@@ -65,13 +65,13 @@ func TestClient_CreateObjectStorageAccessKey(t *testing.T) {
 func TestClient_DeleteObjectStorageAccessKey(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiObjectStorageBase, "access_keys", dummyUuid)
+	uri := path.Join(apiObjectStorageBase, "access_keys", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
 
-	err := client.DeleteObjectStorageAccessKey(dummyUuid)
+	err := client.DeleteObjectStorageAccessKey(dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteObjectStorageAccessKey returned an error %v", err)
 	}
@@ -124,7 +124,7 @@ func getMockObjectStorageAccessKeyCreateResponse() ObjectStorageAccessKeyCreateR
 			SecretKey: "dummy-secret-key",
 			AccessKey: "dummy-access-key",
 		},
-		RequestUuid: dummyRequestUUID,
+		RequestUUID: dummyRequestUUID,
 	}
 	return mock
 }

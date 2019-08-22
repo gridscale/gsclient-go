@@ -28,12 +28,12 @@ func TestClient_GetServerList(t *testing.T) {
 func TestClient_GetServer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerHTTPGet(true))
 	})
-	res, err := client.GetServer(dummyUuid)
+	res, err := client.GetServer(dummyUUID)
 	if err != nil {
 		t.Errorf("GetServer returned an error %v", err)
 	}
@@ -57,7 +57,7 @@ func TestClient_CreateServer(t *testing.T) {
 		Name:            "test",
 		Memory:          10,
 		Cores:           4,
-		LocationUuid:    dummyUuid,
+		LocationUUID:    dummyUUID,
 		HardwareProfile: "default",
 		AvailablityZone: "",
 		Labels:          []string{"label"},
@@ -73,13 +73,13 @@ func TestClient_CreateServer(t *testing.T) {
 func TestClient_UpdateServer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
 
-	err := client.UpdateServer(dummyUuid, ServerUpdateRequest{
+	err := client.UpdateServer(dummyUUID, ServerUpdateRequest{
 		Name:            "test",
 		AvailablityZone: "test zone",
 		Memory:          4,
@@ -94,12 +94,12 @@ func TestClient_UpdateServer(t *testing.T) {
 func TestClient_DeleteServer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteServer(dummyUuid)
+	err := client.DeleteServer(dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteServer returned an error %v", err)
 	}
@@ -108,12 +108,12 @@ func TestClient_DeleteServer(t *testing.T) {
 func TestClient_GetServerEventList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "events")
+	uri := path.Join(apiServerBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerEventListHTTPGet())
 	})
-	res, err := client.GetServerEventList(dummyUuid)
+	res, err := client.GetServerEventList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerEventList returned an error %v", err)
 	}
@@ -124,12 +124,12 @@ func TestClient_GetServerEventList(t *testing.T) {
 func TestClient_GetServerMetricList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "metrics")
+	uri := path.Join(apiServerBase, dummyUUID, "metrics")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerMetricListHTTPGet())
 	})
-	res, err := client.GetServerMetricList(dummyUuid)
+	res, err := client.GetServerMetricList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerMetricList returned an error %v", err)
 	}
@@ -140,12 +140,12 @@ func TestClient_GetServerMetricList(t *testing.T) {
 func TestClient_IsServerOn(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerHTTPGet(true))
 	})
-	isOn, err := client.IsServerOn(dummyUuid)
+	isOn, err := client.IsServerOn(dummyUUID)
 	if err != nil {
 		t.Errorf("IsServerOn returned an error %v", err)
 	}
@@ -155,7 +155,7 @@ func TestClient_IsServerOn(t *testing.T) {
 func TestClient_setServerPowerState(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID)
 	power := true
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
@@ -166,7 +166,7 @@ func TestClient_setServerPowerState(t *testing.T) {
 		power = false
 		fmt.Fprint(writer, "")
 	})
-	err := client.setServerPowerState(dummyUuid, false)
+	err := client.setServerPowerState(dummyUUID, false)
 	if err != nil {
 		t.Errorf("turnOnOffServer returned an error %v", err)
 	}
@@ -175,7 +175,7 @@ func TestClient_setServerPowerState(t *testing.T) {
 func TestClient_StartServer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID)
 	power := false
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
@@ -186,7 +186,7 @@ func TestClient_StartServer(t *testing.T) {
 		power = true
 		fmt.Fprint(writer, "")
 	})
-	err := client.StartServer(dummyUuid)
+	err := client.StartServer(dummyUUID)
 	if err != nil {
 		t.Errorf("StartServer returned an error %v", err)
 	}
@@ -195,7 +195,7 @@ func TestClient_StartServer(t *testing.T) {
 func TestClient_StopServer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID)
 	power := true
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
@@ -206,7 +206,7 @@ func TestClient_StopServer(t *testing.T) {
 		power = false
 		fmt.Fprint(writer, "")
 	})
-	err := client.StopServer(dummyUuid)
+	err := client.StopServer(dummyUUID)
 	if err != nil {
 		t.Errorf("StopServer returned an error %v", err)
 	}
@@ -215,7 +215,7 @@ func TestClient_StopServer(t *testing.T) {
 func TestClient_ShutdownServer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID)
 	power := true
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
@@ -226,7 +226,7 @@ func TestClient_ShutdownServer(t *testing.T) {
 		power = false
 		fmt.Fprint(writer, "")
 	})
-	err := client.ShutdownServer(dummyUuid)
+	err := client.ShutdownServer(dummyUUID)
 	if err != nil {
 		t.Errorf("ShutdownServer returned an error %v", err)
 	}
@@ -234,13 +234,13 @@ func TestClient_ShutdownServer(t *testing.T) {
 
 func getMockServer(power bool) Server {
 	mock := Server{Properties: ServerProperties{
-		ObjectUuid:           dummyUuid,
+		ObjectUUID:           dummyUUID,
 		Name:                 "Test",
 		Memory:               2,
 		Cores:                4,
 		HardwareProfile:      "default",
 		Status:               "active",
-		LocationUuid:         dummyUuid,
+		LocationUUID:         dummyUUID,
 		Power:                power,
 		CurrentPrice:         9.5,
 		AvailablityZone:      "",
@@ -253,7 +253,7 @@ func getMockServer(power bool) Server {
 		Relations: ServerRelations{
 			IsoImages: []ServerIsoImageRelationProperties{
 				{
-					ObjectUuid: dummyUuid,
+					ObjectUUID: dummyUUID,
 					ObjectName: "test",
 					Private:    false,
 					CreateTime: dummyTime,
@@ -266,12 +266,12 @@ func getMockServer(power bool) Server {
 
 func getMockServerCreateResponse() ServerCreateResponse {
 	mock := ServerCreateResponse{
-		ObjectUuid:   dummyUuid,
-		RequestUuid:  dummyRequestUUID,
-		SeverUuid:    dummyUuid,
-		NetworkUuids: nil,
-		StorageUuids: nil,
-		IpaddrUuids:  nil,
+		ObjectUUID:   dummyUUID,
+		RequestUUID:  dummyRequestUUID,
+		SeverUUID:    dummyUUID,
+		NetworkUUIDs: nil,
+		StorageUUIDs: nil,
+		IpaddrUUIDs:  nil,
 	}
 	return mock
 }
@@ -279,14 +279,14 @@ func getMockServerCreateResponse() ServerCreateResponse {
 func getMockServerEvent() ServerEvent {
 	mock := ServerEvent{Properties: ServerEventProperties{
 		ObjectType:    "type",
-		RequestUuid:   dummyRequestUUID,
-		ObjectUuid:    dummyUuid,
+		RequestUUID:   dummyRequestUUID,
+		ObjectUUID:    dummyUUID,
 		Activity:      "activity",
 		RequestType:   "turn on",
 		RequestStatus: "done",
 		Change:        "change note",
 		Timestamp:     dummyTime,
-		UserUuid:      dummyUuid,
+		UserUUID:      dummyUUID,
 	}}
 	return mock
 }
@@ -295,7 +295,7 @@ func getMockServerMetric() ServerMetric {
 	mock := ServerMetric{Properties: ServerMetricProperties{
 		BeginTime:       dummyTime,
 		EndTime:         dummyTime,
-		PaaSServiceUuid: dummyUuid,
+		PaaSServiceUUID: dummyUUID,
 		CoreUsage: struct {
 			Value float64 `json:"value"`
 			Unit  string  `json:"unit"`
@@ -317,7 +317,7 @@ func getMockServerMetric() ServerMetric {
 func prepareServerListHTTPGet() string {
 	server := getMockServer(true)
 	res, _ := json.Marshal(server.Properties)
-	return fmt.Sprintf(`{"servers": {"%s": %s}}`, dummyUuid, string(res))
+	return fmt.Sprintf(`{"servers": {"%s": %s}}`, dummyUUID, string(res))
 }
 
 func prepareServerHTTPGet(power bool) string {

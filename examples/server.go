@@ -8,8 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
-const webServerFirewallTemplateUuid = "82aa235b-61ba-48ca-8f47-7060a0435de7"
+const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const webServerFirewallTemplateUUID = "82aa235b-61ba-48ca-8f47-7060a0435de7"
 
 type ServiceType string
 
@@ -48,19 +48,19 @@ func main() {
 		Name:         "go-client-server",
 		Memory:       1,
 		Cores:        1,
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 	}
 	cServer, err := client.CreateServer(serverCreateRequest)
 	if err != nil {
 		log.Fatal("Create server has failed with error", err)
 	}
 	log.WithFields(log.Fields{
-		"server_uuid": cServer.ObjectUuid,
+		"server_uuid": cServer.ObjectUUID,
 	}).Info("Server successfully created")
-	defer client.deleteService(Server, cServer.ObjectUuid)
+	defer client.deleteService(Server, cServer.ObjectUUID)
 
 	//get a server to interact with
-	server, err := client.GetServer(cServer.ObjectUuid)
+	server, err := client.GetServer(cServer.ObjectUUID)
 	if err != nil {
 		log.Error("Get server has failed with error", err)
 		return
@@ -69,7 +69,7 @@ func main() {
 	log.Info("Start server: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//Turn on server
-	err = client.StartServer(server.Properties.ObjectUuid)
+	err = client.StartServer(server.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Start server has failed with error", err)
 		return
@@ -79,7 +79,7 @@ func main() {
 	log.Info("Stop server: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//Turn off server
-	err = client.StopServer(server.Properties.ObjectUuid)
+	err = client.StopServer(server.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Stop server has failed with error", err)
 		return
@@ -88,7 +88,7 @@ func main() {
 
 	log.Info("Update server: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	err = client.UpdateServer(server.Properties.ObjectUuid, gsclient.ServerUpdateRequest{
+	err = client.UpdateServer(server.Properties.ObjectUUID, gsclient.ServerUpdateRequest{
 		Name:   "updated server",
 		Memory: 1,
 	})
@@ -99,7 +99,7 @@ func main() {
 	log.Info("Server successfully updated")
 
 	//Get events of server
-	events, err := client.GetServerEventList(server.Properties.ObjectUuid)
+	events, err := client.GetServerEventList(server.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get events has failed with error", err)
 		return
@@ -113,7 +113,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
 		Capacity:     1,
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 		Name:         "go-client-storage",
 	})
 	if err != nil {
@@ -121,64 +121,64 @@ func main() {
 		return
 	}
 	log.WithFields(log.Fields{
-		"storage_uuid": cStorage.ObjectUuid,
+		"storage_uuid": cStorage.ObjectUUID,
 	}).Info("Storage successfully created")
-	defer client.deleteService(Storage, cStorage.ObjectUuid)
+	defer client.deleteService(Storage, cStorage.ObjectUUID)
 
 	cNetwork, err := client.CreateNetwork(gsclient.NetworkCreateRequest{
 		Name:         "go-client-network",
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 	})
 	if err != nil {
 		log.Error("Create network has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{
-		"network_uuid": cNetwork.ObjectUuid,
+		"network_uuid": cNetwork.ObjectUUID,
 	}).Info("Network successfully created")
-	defer client.deleteService(Network, cNetwork.ObjectUuid)
+	defer client.deleteService(Network, cNetwork.ObjectUUID)
 
 	cIp, err := client.CreateIp(gsclient.IpCreateRequest{
 		Name:         "go-client-ip",
 		Family:       4,
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 	})
 	if err != nil {
 		log.Error("Create IP has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{
-		"IP_uuid": cIp.ObjectUuid,
+		"IP_uuid": cIp.ObjectUUID,
 	}).Info("IP successfully created")
-	defer client.deleteService(IP, cIp.ObjectUuid)
+	defer client.deleteService(IP, cIp.ObjectUUID)
 
 	cISOimage, err := client.CreateISOImage(gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
 		SourceUrl:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 	})
 	if err != nil {
 		log.Error("Create ISO-image has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{
-		"isoimage_uuid": cISOimage.ObjectUuid,
+		"isoimage_uuid": cISOimage.ObjectUUID,
 	}).Info("ISO-image successfully created")
-	defer client.deleteService(ISOImage, cISOimage.ObjectUuid)
+	defer client.deleteService(ISOImage, cISOimage.ObjectUUID)
 
 	//Attach storage, network, IP, and ISO-image to a server
-	err = client.LinkStorage(server.Properties.ObjectUuid, cStorage.ObjectUuid, false)
+	err = client.LinkStorage(server.Properties.ObjectUUID, cStorage.ObjectUUID, false)
 	if err != nil {
 		log.Error("Link storage has failed with error", err)
 		return
 	}
 	log.Info("Storage successfully attached")
-	defer client.unlinkService(Storage, server.Properties.ObjectUuid, cStorage.ObjectUuid)
+	defer client.unlinkService(Storage, server.Properties.ObjectUUID, cStorage.ObjectUUID)
 
 	err = client.LinkNetwork(
-		server.Properties.ObjectUuid,
-		cNetwork.ObjectUuid,
-		webServerFirewallTemplateUuid,
+		server.Properties.ObjectUUID,
+		cNetwork.ObjectUUID,
+		webServerFirewallTemplateUUID,
 		false,
 		1,
 		nil,
@@ -189,23 +189,23 @@ func main() {
 		return
 	}
 	log.Info("Network successfully linked")
-	defer client.unlinkService(Network, server.Properties.ObjectUuid, cNetwork.ObjectUuid)
+	defer client.unlinkService(Network, server.Properties.ObjectUUID, cNetwork.ObjectUUID)
 
-	err = client.LinkIp(server.Properties.ObjectUuid, cIp.ObjectUuid)
+	err = client.LinkIp(server.Properties.ObjectUUID, cIp.ObjectUUID)
 	if err != nil {
 		log.Error("Link IP has failed with error", err)
 		return
 	}
 	log.Info("IP successfully linked")
-	defer client.unlinkService(IP, server.Properties.ObjectUuid, cIp.ObjectUuid)
+	defer client.unlinkService(IP, server.Properties.ObjectUUID, cIp.ObjectUUID)
 
-	err = client.LinkIsoImage(server.Properties.ObjectUuid, cISOimage.ObjectUuid)
+	err = client.LinkIsoImage(server.Properties.ObjectUUID, cISOimage.ObjectUUID)
 	if err != nil {
 		log.Error("Link ISO-image has failed with error", err)
 		return
 	}
 	log.Info("ISO-image successfully linked")
-	defer client.unlinkService(ISOImage, server.Properties.ObjectUuid, cISOimage.ObjectUuid)
+	defer client.unlinkService(ISOImage, server.Properties.ObjectUUID, cISOimage.ObjectUUID)
 
 	log.Info("Unlink and delete: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')

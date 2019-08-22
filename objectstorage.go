@@ -28,7 +28,7 @@ type ObjectStorageAccessKeyCreateResponse struct {
 		SecretKey string `json:"secret_key"`
 		AccessKey string `json:"access_key"`
 	} `json:"access_key"`
-	RequestUuid string `json:"request_uuid"`
+	RequestUUID string `json:"request_uuid"`
 }
 
 //ObjectStorageBucketList is JSON struct of a list of buckets
@@ -87,7 +87,7 @@ func (c *Client) CreateObjectStorageAccessKey() (ObjectStorageAccessKeyCreateRes
 	if err != nil {
 		return ObjectStorageAccessKeyCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 

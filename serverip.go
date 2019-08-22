@@ -17,17 +17,17 @@ type ServerIpRelation struct {
 
 //ServerIpRelationProperties JSON struct of properties of a relation between a server and a IP address
 type ServerIpRelationProperties struct {
-	ServerUuid string `json:"server_uuid"`
+	ServerUUID string `json:"server_uuid"`
 	CreateTime string `json:"create_time"`
 	Prefix     string `json:"prefix"`
 	Family     int    `json:"family"`
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 	Ip         string `json:"ip"`
 }
 
 //ServerIpRelationCreateRequest JSON struct of request for creating a relation between a server and a IP address
 type ServerIpRelationCreateRequest struct {
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 }
 
 //GetServerIpList gets a list of a specific server's IPs
@@ -74,7 +74,7 @@ func (c *Client) DeleteServerIp(serverId, ipID string) error {
 //LinkIp attaches an IP to a server
 func (c *Client) LinkIp(serverId string, ipID string) error {
 	body := ServerIpRelationCreateRequest{
-		ObjectUuid: ipID,
+		ObjectUUID: ipID,
 	}
 	return c.CreateServerIp(serverId, body)
 }

@@ -18,12 +18,12 @@ type StorageSnapshot struct {
 //StorageSnapshotProperties JSON struct of properties of a storage snapshot
 type StorageSnapshotProperties struct {
 	Labels           []string `json:"labels"`
-	ObjectUuid       string   `json:"object_uuid"`
+	ObjectUUID       string   `json:"object_uuid"`
 	Name             string   `json:"name"`
 	Status           string   `json:"status"`
 	LocationCountry  string   `json:"location_country"`
 	UsageInMinutes   int      `json:"usage_in_minutes"`
-	LocationUuid     string   `json:"location_uuid"`
+	LocationUUID     string   `json:"location_uuid"`
 	ChangeTime       string   `json:"change_time"`
 	LicenseProductNo int      `json:"license_product_no"`
 	CurrentPrice     float64  `json:"current_price"`
@@ -31,7 +31,7 @@ type StorageSnapshotProperties struct {
 	Capacity         int      `json:"capacity"`
 	LocationName     string   `json:"location_name"`
 	LocationIata     string   `json:"location_iata"`
-	ParentUuid       string   `json:"parent_uuid"`
+	ParentUUID       string   `json:"parent_uuid"`
 }
 
 //StorageSnapshotCreateRequest JSON struct of a request for creating a storage snapshot
@@ -42,8 +42,8 @@ type StorageSnapshotCreateRequest struct {
 
 //StorageSnapshotCreateResponse JSON struct of a response for creating a storage snapshot
 type StorageSnapshotCreateResponse struct {
-	RequestUuid string `json:"request_uuid"`
-	ObjectUuid  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
 }
 
 //StorageSnapshotUpdateRequest JSON struct of a request for updating a storage snapshot
@@ -110,7 +110,7 @@ func (c *Client) CreateStorageSnapshot(id string, body StorageSnapshotCreateRequ
 	if err != nil {
 		return StorageSnapshotCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 

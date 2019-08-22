@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//Config config for client
 type Config struct {
 	APIUrl     string
 	UserUUID   string
@@ -15,6 +16,7 @@ type Config struct {
 	logger     logrus.Logger
 }
 
+//NewConfiguration creates a new config
 func NewConfiguration(apiURL string, uuid string, token string, debugMode bool) *Config {
 	logLevel := logrus.InfoLevel
 	if debugMode {

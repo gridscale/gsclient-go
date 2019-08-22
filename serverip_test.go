@@ -12,12 +12,12 @@ import (
 func TestClient_GetServerIpList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "ips")
+	uri := path.Join(apiServerBase, dummyUUID, "ips")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerIpListHTTPGet())
 	})
-	res, err := client.GetServerIpList(dummyUuid)
+	res, err := client.GetServerIpList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerIpList returned an error %v", err)
 	}
@@ -28,12 +28,12 @@ func TestClient_GetServerIpList(t *testing.T) {
 func TestClient_GetServerIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "ips", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "ips", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerIpHTTPGet())
 	})
-	res, err := client.GetServerIp(dummyUuid, dummyUuid)
+	res, err := client.GetServerIp(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerIp returned an error %v", err)
 	}
@@ -43,13 +43,13 @@ func TestClient_GetServerIp(t *testing.T) {
 func TestClient_CreateServerIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "ips")
+	uri := path.Join(apiServerBase, dummyUUID, "ips")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerIp(dummyUuid, ServerIpRelationCreateRequest{
-		ObjectUuid: dummyUuid,
+	err := client.CreateServerIp(dummyUUID, ServerIpRelationCreateRequest{
+		ObjectUUID: dummyUUID,
 	})
 	if err != nil {
 		t.Errorf("CreateServerIp returned an error %v", err)
@@ -59,12 +59,12 @@ func TestClient_CreateServerIp(t *testing.T) {
 func TestClient_DeleteServerIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "ips", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "ips", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteServerIp(dummyUuid, dummyUuid)
+	err := client.DeleteServerIp(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteServerIp returned an error %v", err)
 	}
@@ -73,12 +73,12 @@ func TestClient_DeleteServerIp(t *testing.T) {
 func TestClient_LinkIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "ips")
+	uri := path.Join(apiServerBase, dummyUUID, "ips")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.LinkIp(dummyUuid, dummyUuid)
+	err := client.LinkIp(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("LinkIp returned an error %v", err)
 	}
@@ -87,12 +87,12 @@ func TestClient_LinkIp(t *testing.T) {
 func TestClient_UnlinkIp(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "ips", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "ips", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UnlinkIp(dummyUuid, dummyUuid)
+	err := client.UnlinkIp(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("UnlinkIp returned an error %v", err)
 	}
@@ -100,11 +100,11 @@ func TestClient_UnlinkIp(t *testing.T) {
 
 func getMockServerIp() ServerIpRelationProperties {
 	mock := ServerIpRelationProperties{
-		ServerUuid: dummyUuid,
+		ServerUUID: dummyUUID,
 		CreateTime: dummyTime,
 		Prefix:     "pre",
 		Family:     1,
-		ObjectUuid: dummyUuid,
+		ObjectUUID: dummyUUID,
 		Ip:         "192.168.0.1",
 	}
 	return mock

@@ -18,19 +18,19 @@ type ServerNetworkRelation struct {
 //ServerNetworkRelationProperties JSON struct of properties of a relation between a server and a network
 type ServerNetworkRelationProperties struct {
 	L2security           bool     `json:"l2security"`
-	ServerUuid           string   `json:"server_uuid"`
+	ServerUUID           string   `json:"server_uuid"`
 	CreateTime           string   `json:"create_time"`
 	PublicNet            bool     `json:"public_net"`
-	FirewallTemplateUuid string   `json:"firewall_template_uuid,omitempty"`
+	FirewallTemplateUUID string   `json:"firewall_template_uuid,omitempty"`
 	ObjectName           string   `json:"object_name"`
 	Mac                  string   `json:"mac"`
 	BootDevice           bool     `json:"bootdevice"`
-	PartnerUuid          string   `json:"partner_uuid"`
+	PartnerUUID          string   `json:"partner_uuid"`
 	Ordering             int      `json:"ordering"`
 	Firewall             string   `json:"firewall,omitempty"`
 	NetworkType          string   `json:"network_type"`
-	NetworkUuid          string   `json:"network_uuid"`
-	ObjectUuid           string   `json:"object_uuid"`
+	NetworkUUID          string   `json:"network_uuid"`
+	ObjectUUID           string   `json:"object_uuid"`
 	L3security           []string `json:"l3security"`
 	//Vlan                 int          `json:"vlan,omitempty"`
 	//Vxlan                int          `json:"vxlan,omitempty"`
@@ -39,12 +39,12 @@ type ServerNetworkRelationProperties struct {
 
 //ServerNetworkRelationCreateRequest JSON struct of a request for creating a relation between a server and a network
 type ServerNetworkRelationCreateRequest struct {
-	ObjectUuid           string        `json:"object_uuid"`
+	ObjectUUID           string        `json:"object_uuid"`
 	Ordering             int           `json:"ordering,omitempty"`
 	BootDevice           bool          `json:"bootdevice,omitempty"`
 	L3security           []string      `json:"l3security,omitempty"`
 	Firewall             FirewallRules `json:"firewall,omitempty"`
-	FirewallTemplateUuid string        `json:"firewall_template_uuid,omitempty"`
+	FirewallTemplateUUID string        `json:"firewall_template_uuid,omitempty"`
 }
 
 //ServerNetworkRelationUpdateRequest JSON struct of a request for updating a relation between a server and a network
@@ -53,7 +53,7 @@ type ServerNetworkRelationUpdateRequest struct {
 	BootDevice           bool          `json:"bootdevice"`
 	L3security           []string      `json:"l3security"`
 	Firewall             FirewallRules `json:"firewall"`
-	FirewallTemplateUuid string        `json:"firewall_template_uuid"`
+	FirewallTemplateUUID string        `json:"firewall_template_uuid"`
 }
 
 //GetServerNetworkList gets a list of a specific server's networks
@@ -111,11 +111,11 @@ func (c *Client) DeleteServerNetwork(serverId, networkId string) error {
 func (c *Client) LinkNetwork(serverId, networkId, firewallTemplate string, bootdevice bool, order int,
 	l3security []string, firewall FirewallRules) error {
 	body := ServerNetworkRelationCreateRequest{
-		ObjectUuid:           networkId,
+		ObjectUUID:           networkId,
 		Ordering:             order,
 		BootDevice:           bootdevice,
 		L3security:           l3security,
-		FirewallTemplateUuid: firewallTemplate,
+		FirewallTemplateUUID: firewallTemplate,
 		Firewall:             firewall,
 	}
 	return c.CreateServerNetwork(serverId, body)

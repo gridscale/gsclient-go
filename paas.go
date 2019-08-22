@@ -17,13 +17,13 @@ type PaaSService struct {
 
 //PaaSServiceProperties is the properties of a single PaaS service
 type PaaSServiceProperties struct {
-	ObjectUuid          string                    `json:"object_uuid"`
+	ObjectUUID          string                    `json:"object_uuid"`
 	Labels              []string                  `json:"labels"`
 	Credentials         []Credential              `json:"credentials"`
 	CreateTime          string                    `json:"create_time"`
 	ListenPorts         map[string]map[string]int `json:"listen_ports"`
-	SecurityZoneUuid    string                    `json:"security_zone_uuid"`
-	ServiceTemplateUuid string                    `json:"service_template_uuid"`
+	SecurityZoneUUID    string                    `json:"security_zone_uuid"`
+	ServiceTemplateUUID string                    `json:"service_template_uuid"`
 	UsageInMinutes      int                       `json:"usage_in_minutes"`
 	//UsageInMinutesStorage int                       `json:"usage_in_minutes_storage"`
 	//UsageInMinutesCores   int                       `json:"usage_in_minutes_cores"`
@@ -45,9 +45,9 @@ type Credential struct {
 //PaaSServiceCreateRequest is JSON struct of a request for creating a PaaS service
 type PaaSServiceCreateRequest struct {
 	Name                    string                 `json:"name"`
-	PaaSServiceTemplateUuid string                 `json:"paas_service_template_uuid"`
+	PaaSServiceTemplateUUID string                 `json:"paas_service_template_uuid"`
 	Labels                  []string               `json:"labels,omitempty"`
-	PaaSSecurityZoneUuid    string                 `json:"paas_security_zone_uuid,omitempty"`
+	PaaSSecurityZoneUUID    string                 `json:"paas_security_zone_uuid,omitempty"`
 	ResourceLimits          []ResourceLimit        `json:"resource_limits,omitempty"`
 	Parameters              map[string]interface{} `json:"parameters,omitempty"`
 }
@@ -60,11 +60,11 @@ type ResourceLimit struct {
 
 //PaaSServiceCreateResponse is JSON struct of a response for creating a PaaS service
 type PaaSServiceCreateResponse struct {
-	RequestUuid     string                       `json:"request_uuid"`
+	RequestUUID     string                       `json:"request_uuid"`
 	ListenPorts     map[string]map[string]string `json:"listen_ports"`
-	PaaSServiceUuid string                       `json:"paas_service_uuid"`
+	PaaSServiceUUID string                       `json:"paas_service_uuid"`
 	Credentials     []Credential                 `json:"credentials"`
-	ObjectUuid      string                       `json:"object_uuid"`
+	ObjectUUID      string                       `json:"object_uuid"`
 	ResourceLimits  []ResourceLimit              `json:"resource_limits"`
 	Parameters      map[string]interface{}       `json:"parameters"`
 }
@@ -82,7 +82,7 @@ type PaaSTemplate struct {
 //PaaSTemplateProperties is JSOn struct of properties of a PaaS template
 type PaaSTemplateProperties struct {
 	Name             string               `json:"name"`
-	ObjectUuid       string               `json:"object_uuid"`
+	ObjectUUID       string               `json:"object_uuid"`
 	Category         string               `json:"category"`
 	ProductNo        int                  `json:"product_no"`
 	Labels           []string             `json:"labels"`
@@ -132,7 +132,7 @@ type PaaSServiceMetric struct {
 type PaaSMetricProperties struct {
 	BeginTime       string          `json:"begin_time"`
 	EndTime         string          `json:"end_time"`
-	PaaSServiceUuid string          `json:"paas_service_uuid"`
+	PaaSServiceUUID string          `json:"paas_service_uuid"`
 	CoreUsage       PaaSMetricValue `json:"core_usage"`
 	StorageSize     PaaSMetricValue `json:"storage_size"`
 }
@@ -158,11 +158,11 @@ type PaaSSecurityZoneProperties struct {
 	LocationCountry string              `json:"location_country"`
 	CreateTime      string              `json:"create_time"`
 	LocationIata    string              `json:"location_iata"`
-	ObjectUuid      string              `json:"object_uuid"`
+	ObjectUUID      string              `json:"object_uuid"`
 	Labels          []string            `json:"labels"`
 	LocationName    string              `json:"location_name"`
 	Status          string              `json:"status"`
-	LocationUuid    string              `json:"location_uuid"`
+	LocationUUID    string              `json:"location_uuid"`
 	ChangeTime      string              `json:"change_time"`
 	Name            string              `json:"name"`
 	Relation        PaaSRelationService `json:"relation"`
@@ -175,27 +175,27 @@ type PaaSRelationService struct {
 
 //ServiceObject JSON struct of a service object
 type ServiceObject struct {
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 }
 
 //PaaSSecurityZoneCreateRequest JSON struct of a request for creating a PaaS security zone
 type PaaSSecurityZoneCreateRequest struct {
 	Name         string `json:"name,omitempty"`
-	LocationUuid string `json:"location_uuid,omitempty"`
+	LocationUUID string `json:"location_uuid,omitempty"`
 }
 
 //PaaSSecurityZoneCreateResponse JSON struct of a response for creating a PaaS security zone
 type PaaSSecurityZoneCreateResponse struct {
-	RequestUuid          string `json:"request_uuid"`
-	PaaSSecurityZoneUuid string `json:"paas_security_zone_uuid"`
-	ObjectUuid           string `json:"object_uuid"`
+	RequestUUID          string `json:"request_uuid"`
+	PaaSSecurityZoneUUID string `json:"paas_security_zone_uuid"`
+	ObjectUUID           string `json:"object_uuid"`
 }
 
 //PaaSSecurityZoneUpdateRequest JSON struct of a request for updating a PaaS security zone
 type PaaSSecurityZoneUpdateRequest struct {
 	Name                 string `json:"name,omitempty"`
-	LocationUuid         string `json:"location_uuid,omitempty"`
-	PaaSSecurityZoneUuid string `json:"paas_security_zone_uuid,omitempty"`
+	LocationUUID         string `json:"location_uuid,omitempty"`
+	PaaSSecurityZoneUUID string `json:"paas_security_zone_uuid,omitempty"`
 }
 
 //GetPaaSServiceList returns a list of PaaS Services
@@ -227,7 +227,7 @@ func (c *Client) CreatePaaSService(body PaaSServiceCreateRequest) (PaaSServiceCr
 	if err != nil {
 		return PaaSServiceCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 
@@ -296,7 +296,7 @@ func (c *Client) GetPaaSTemplateList() ([]PaaSTemplate, error) {
 	return paasTemplates, err
 }
 
-//GetSecurityZones get available security zones
+//GetPaaSSecurityZoneList get available security zones
 func (c *Client) GetPaaSSecurityZoneList() ([]PaaSSecurityZone, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones"),
@@ -313,7 +313,7 @@ func (c *Client) GetPaaSSecurityZoneList() ([]PaaSSecurityZone, error) {
 	return securityZones, err
 }
 
-//CreateSecurityZone creates a new PaaS security zone
+//CreatePaaSSecurityZone creates a new PaaS security zone
 func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (PaaSSecurityZoneCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones"),
@@ -325,11 +325,11 @@ func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (Paa
 	if err != nil {
 		return PaaSSecurityZoneCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 
-//GetSecurityZone get a specific PaaS Security Zone based on given id
+//GetPaaSSecurityZone get a specific PaaS Security Zone based on given id
 func (c *Client) GetPaaSSecurityZone(id string) (PaaSSecurityZone, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),

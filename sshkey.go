@@ -18,13 +18,13 @@ type Sshkey struct {
 //SshkeyProperties JSON struct of properties of a single SSH-key
 type SshkeyProperties struct {
 	Name       string   `json:"name"`
-	ObjectUuid string   `json:"object_uuid"`
+	ObjectUUID string   `json:"object_uuid"`
 	Status     string   `json:"status"`
 	CreateTime string   `json:"create_time"`
 	ChangeTime string   `json:"change_time"`
 	Sshkey     string   `json:"sshkey"`
 	Labels     []string `json:"labels"`
-	UserUuid   string   `json:"user_uuid"`
+	UserUUID   string   `json:"user_uuid"`
 }
 
 //SshkeyCreateRequest JSON struct of a request for creating a SSH-key
@@ -54,14 +54,14 @@ type SshkeyEvent struct {
 //SshkeyEventProperties JSON struct of properties of an event of a SSH-key
 type SshkeyEventProperties struct {
 	ObjectType    string `json:"object_type"`
-	RequestUuid   string `json:"request_uuid"`
-	ObjectUuid    string `json:"object_uuid"`
+	RequestUUID   string `json:"request_uuid"`
+	ObjectUUID    string `json:"object_uuid"`
 	Activity      string `json:"activity"`
 	RequestType   string `json:"request_type"`
 	RequestStatus string `json:"request_status"`
 	Change        string `json:"change"`
 	Timestamp     string `json:"timestamp"`
-	UserUuid      string `json:"user_uuid"`
+	UserUUID      string `json:"user_uuid"`
 }
 
 //GetSshkey gets a ssh key
@@ -103,7 +103,7 @@ func (c *Client) CreateSshkey(body SshkeyCreateRequest) (CreateResponse, error) 
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 

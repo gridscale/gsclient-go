@@ -12,12 +12,12 @@ import (
 func TestClient_GetServerStorageList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "storages")
+	uri := path.Join(apiServerBase, dummyUUID, "storages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerStorageListHTTPGet())
 	})
-	res, err := client.GetServerStorageList(dummyUuid)
+	res, err := client.GetServerStorageList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerStorageList returned an error %v", err)
 	}
@@ -28,12 +28,12 @@ func TestClient_GetServerStorageList(t *testing.T) {
 func TestClient_GetServerStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "storages", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerStorageHTTPGet())
 	})
-	res, err := client.GetServerStorage(dummyUuid, dummyUuid)
+	res, err := client.GetServerStorage(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerStorage returned an error %v", err)
 	}
@@ -43,13 +43,13 @@ func TestClient_GetServerStorage(t *testing.T) {
 func TestClient_CreateServerStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "storages")
+	uri := path.Join(apiServerBase, dummyUUID, "storages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerStorage(dummyUuid, ServerStorageRelationCreateRequest{
-		ObjectUuid: dummyUuid,
+	err := client.CreateServerStorage(dummyUUID, ServerStorageRelationCreateRequest{
+		ObjectUUID: dummyUUID,
 		BootDevice: true,
 	})
 	if err != nil {
@@ -60,12 +60,12 @@ func TestClient_CreateServerStorage(t *testing.T) {
 func TestClient_UpdateServerStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "storages", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UpdateServerStorage(dummyUuid, dummyUuid, ServerStorageRelationUpdateRequest{
+	err := client.UpdateServerStorage(dummyUUID, dummyUUID, ServerStorageRelationUpdateRequest{
 		Ordering:   1,
 		BootDevice: true,
 	})
@@ -77,12 +77,12 @@ func TestClient_UpdateServerStorage(t *testing.T) {
 func TestClient_DeleteServerStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "storages", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteServerStorage(dummyUuid, dummyUuid)
+	err := client.DeleteServerStorage(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteServerStorage returned an error %v", err)
 	}
@@ -91,12 +91,12 @@ func TestClient_DeleteServerStorage(t *testing.T) {
 func TestClient_LinkStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "storages")
+	uri := path.Join(apiServerBase, dummyUUID, "storages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.LinkStorage(dummyUuid, dummyUuid, true)
+	err := client.LinkStorage(dummyUUID, dummyUUID, true)
 	if err != nil {
 		t.Errorf("LinkStorage returned an error %v", err)
 	}
@@ -105,12 +105,12 @@ func TestClient_LinkStorage(t *testing.T) {
 func TestClient_UnlinkStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "storages", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UnlinkStorage(dummyUuid, dummyUuid)
+	err := client.UnlinkStorage(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("UnlinkStorage returned an error %v", err)
 	}
@@ -118,7 +118,7 @@ func TestClient_UnlinkStorage(t *testing.T) {
 
 func getMockServerStorage() ServerStorageRelationProperties {
 	mock := ServerStorageRelationProperties{
-		ObjectUuid:       dummyUuid,
+		ObjectUUID:       dummyUUID,
 		ObjectName:       "test",
 		Capacity:         10,
 		StorageType:      "SSD",
@@ -128,9 +128,9 @@ func getMockServerStorage() ServerStorageRelationProperties {
 		CreateTime:       dummyTime,
 		BootDevice:       false,
 		Bus:              1,
-		LastUsedTemplate: dummyUuid,
+		LastUsedTemplate: dummyUUID,
 		LicenseProductNo: 123456789,
-		ServerUuid:       dummyUuid,
+		ServerUUID:       dummyUUID,
 	}
 	return mock
 }

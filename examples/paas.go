@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -36,7 +36,7 @@ func main() {
 	//Create security zone
 	secZoneRequest := gsclient.PaaSSecurityZoneCreateRequest{
 		Name:         "go-client-security-zone",
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 	}
 	cSCZ, err := client.CreatePaaSSecurityZone(secZoneRequest)
 	if err != nil {
@@ -44,13 +44,13 @@ func main() {
 		return
 	}
 	log.WithFields(log.Fields{
-		"securityzone_uuid": cSCZ.ObjectUuid,
+		"securityzone_uuid": cSCZ.ObjectUUID,
 	}).Info("Security zone successfully created")
 	defer func() {
 		//Wait until paas deleted successfully
 		//it takes around a minute
 		time.Sleep(60 * time.Second)
-		err := client.DeletePaaSSecurityZone(cSCZ.ObjectUuid)
+		err := client.DeletePaaSSecurityZone(cSCZ.ObjectUUID)
 		if err != nil {
 			log.Error("Delete security zone has failed with error", err)
 			return
@@ -61,8 +61,8 @@ func main() {
 	//Create PaaS service
 	paasRequest := gsclient.PaaSServiceCreateRequest{
 		Name:                    "go-client-paas",
-		PaaSServiceTemplateUuid: paasTemplates[0].Properties.ObjectUuid,
-		PaaSSecurityZoneUuid:    cSCZ.ObjectUuid,
+		PaaSServiceTemplateUUID: paasTemplates[0].Properties.ObjectUUID,
+		PaaSSecurityZoneUUID:    cSCZ.ObjectUUID,
 	}
 	cPaaS, err := client.CreatePaaSService(paasRequest)
 	if err != nil {
@@ -70,10 +70,10 @@ func main() {
 		return
 	}
 	log.WithFields(log.Fields{
-		"paas_uuid": cPaaS.ObjectUuid,
+		"paas_uuid": cPaaS.ObjectUUID,
 	}).Info("PaaS service create successfully")
 	defer func() {
-		err := client.DeletePaaSService(cPaaS.ObjectUuid)
+		err := client.DeletePaaSService(cPaaS.ObjectUUID)
 		if err != nil {
 			log.Error("Delete PaaS service has failed with error", err)
 			return
@@ -85,18 +85,18 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get a security zone to update
-	secZone, err := client.GetPaaSSecurityZone(cSCZ.ObjectUuid)
+	secZone, err := client.GetPaaSSecurityZone(cSCZ.ObjectUUID)
 	if err != nil {
 		log.Error("Get security zone has failed with error", err)
 		return
 	}
 	secZoneUpdateRequest := gsclient.PaaSSecurityZoneUpdateRequest{
 		Name:                 "updated security zone",
-		LocationUuid:         secZone.Properties.LocationUuid,
-		PaaSSecurityZoneUuid: secZone.Properties.ObjectUuid,
+		LocationUUID:         secZone.Properties.LocationUUID,
+		PaaSSecurityZoneUUID: secZone.Properties.ObjectUUID,
 	}
 	//Update security zone
-	err = client.UpdatePaaSSecurityZone(secZone.Properties.ObjectUuid, secZoneUpdateRequest)
+	err = client.UpdatePaaSSecurityZone(secZone.Properties.ObjectUUID, secZoneUpdateRequest)
 	if err != nil {
 		log.Error("Update security zone has failed with error", err)
 		return
@@ -104,7 +104,7 @@ func main() {
 	log.Info("Security Zone successfully updated")
 
 	//Get a PaaS service to update
-	paas, err := client.GetPaaSService(cPaaS.ObjectUuid)
+	paas, err := client.GetPaaSService(cPaaS.ObjectUUID)
 	if err != nil {
 		log.Error("Get PaaS service has failed with error", err)
 		return
@@ -117,7 +117,7 @@ func main() {
 		Parameters:     paas.Properties.Parameters,
 		ResourceLimits: paas.Properties.ResourceLimits,
 	}
-	err = client.UpdatePaaSService(paas.Properties.ObjectUuid, paasUpdateRequest)
+	err = client.UpdatePaaSService(paas.Properties.ObjectUUID, paasUpdateRequest)
 	if err != nil {
 		log.Error("Update PaaS service has failed with error", err)
 		return

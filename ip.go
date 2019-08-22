@@ -19,8 +19,8 @@ type Ip struct {
 type IpProperties struct {
 	Name            string      `json:"name"`
 	LocationCountry string      `json:"location_country"`
-	LocationUuid    string      `json:"location_uuid"`
-	ObjectUuid      string      `json:"object_uuid"`
+	LocationUUID    string      `json:"location_uuid"`
+	ObjectUUID      string      `json:"object_uuid"`
 	ReverseDns      string      `json:"reverse_dns"`
 	Family          int         `json:"family"`
 	Status          string      `json:"status"`
@@ -50,20 +50,20 @@ type IpRelations struct {
 type IpLoadbalancer struct {
 	CreateTime       string `json:"create_time"`
 	LoadbalancerName string `json:"loadbalancer_name"`
-	LoadbalancerUuid string `json:"loadbalancer_uuid"`
+	LoadbalancerUUID string `json:"loadbalancer_uuid"`
 }
 
 //IpServer is JSON struct of the relation between an IP and a Server
 type IpServer struct {
 	CreateTime string `json:"create_time"`
 	ServerName string `json:"server_name"`
-	ServerUuid string `json:"server_uuid"`
+	ServerUUID string `json:"server_uuid"`
 }
 
 //IpCreateResponse is JSON struct of a response for creating an IP
 type IpCreateResponse struct {
-	RequestUuid string `json:"request_uuid"`
-	ObjectUuid  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
 	Prefix      string `json:"prefix"`
 	Ip          string `json:"ip"`
 }
@@ -72,7 +72,7 @@ type IpCreateResponse struct {
 type IpCreateRequest struct {
 	Name         string   `json:"name,omitempty"`
 	Family       int      `json:"family"`
-	LocationUuid string   `json:"location_uuid"`
+	LocationUUID string   `json:"location_uuid"`
 	Failover     bool     `json:"failover,omitempty"`
 	ReverseDns   string   `json:"reverse_dns,omitempty"`
 	Labels       []string `json:"labels,omitempty"`
@@ -99,14 +99,14 @@ type IpEvent struct {
 //IpEventProperties is JSON struct of an IP's properties
 type IpEventProperties struct {
 	ObjectType    string `json:"object_type"`
-	RequestUuid   string `json:"request_uuid"`
-	ObjectUuid    string `json:"object_uuid"`
+	RequestUUID   string `json:"request_uuid"`
+	ObjectUUID    string `json:"object_uuid"`
 	Activity      string `json:"activity"`
 	RequestType   string `json:"request_type"`
 	RequestStatus string `json:"request_status"`
 	Change        string `json:"change"`
 	Timestamp     string `json:"timestamp"`
-	UserUuid      string `json:"user_uuid"`
+	UserUUID      string `json:"user_uuid"`
 }
 
 //GetIp get a specific IP based on given id
@@ -153,7 +153,7 @@ func (c *Client) CreateIp(body IpCreateRequest) (IpCreateResponse, error) {
 		return IpCreateResponse{}, err
 	}
 
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 
 	return response, err
 }

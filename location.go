@@ -21,7 +21,7 @@ type LocationProperties struct {
 	Status     string   `json:"status"`
 	Labels     []string `json:"labels"`
 	Name       string   `json:"name"`
-	ObjectUuid string   `json:"object_uuid"`
+	ObjectUUID string   `json:"object_uuid"`
 	Country    string   `json:"country"`
 }
 

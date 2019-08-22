@@ -9,7 +9,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -29,7 +29,7 @@ func main() {
 	//Create a storage
 	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
 		Capacity:     1,
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 		Name:         "go-client-storage",
 	})
 	if err != nil {
@@ -37,10 +37,10 @@ func main() {
 		return
 	}
 	log.WithFields(log.Fields{
-		"storage_uuid": cStorage.ObjectUuid,
+		"storage_uuid": cStorage.ObjectUUID,
 	}).Info("Storage successfully created")
 	defer func() {
-		err := client.DeleteStorage(cStorage.ObjectUuid)
+		err := client.DeleteStorage(cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)
 			return
@@ -49,19 +49,19 @@ func main() {
 	}()
 
 	//Get storage to update
-	storage, err := client.GetStorage(cStorage.ObjectUuid)
+	storage, err := client.GetStorage(cStorage.ObjectUUID)
 	if err != nil {
 		log.Error("Get storage has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{
-		"storage_uuid": storage.Properties.ObjectUuid,
+		"storage_uuid": storage.Properties.ObjectUUID,
 	}).Info("Storage successfully retrieved")
 
 	log.Info("Update storage: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	err = client.UpdateStorage(storage.Properties.ObjectUuid, gsclient.StorageUpdateRequest{
+	err = client.UpdateStorage(storage.Properties.ObjectUUID, gsclient.StorageUpdateRequest{
 		Name:     "updated storage",
 		Labels:   storage.Properties.Labels,
 		Capacity: storage.Properties.Capacity,
@@ -75,7 +75,7 @@ func main() {
 	log.Info("Get storage's events: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	events, err := client.GetStorageEventList(storage.Properties.ObjectUuid)
+	events, err := client.GetStorageEventList(storage.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get storage's events has failed with error", err)
 		return

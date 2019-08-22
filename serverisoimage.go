@@ -17,7 +17,7 @@ type ServerIsoImageRelation struct {
 
 //ServerIsoImageRelationProperties JSON struct of properties of a relation between a server and an ISO-Image
 type ServerIsoImageRelationProperties struct {
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 	ObjectName string `json:"object_name"`
 	Private    bool   `json:"private"`
 	CreateTime string `json:"create_time"`
@@ -26,7 +26,7 @@ type ServerIsoImageRelationProperties struct {
 
 //ServerIsoImageRelationCreateRequest JSON struct of a request for creating a relation between a server and an ISO-Image
 type ServerIsoImageRelationCreateRequest struct {
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 }
 
 //ServerIsoImageRelationUpdateRequest JSON struct of a request for updating a relation between a server and an ISO-Image
@@ -89,7 +89,7 @@ func (c *Client) DeleteServerIsoImage(serverId, isoImageId string) error {
 //LinkIsoImage attaches an ISO image to a server
 func (c *Client) LinkIsoImage(serverId string, isoimageId string) error {
 	body := ServerIsoImageRelationCreateRequest{
-		ObjectUuid: isoimageId,
+		ObjectUUID: isoimageId,
 	}
 	return c.CreateServerIsoImage(serverId, body)
 }

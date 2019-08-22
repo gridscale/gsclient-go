@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -27,17 +27,17 @@ func main() {
 	isoRequest := gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
 		SourceUrl:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 	}
 	cIso, err := client.CreateISOImage(isoRequest)
 	if err != nil {
 		logrus.Error("Create ISO-image has failed with error", err)
 		return
 	}
-	logrus.WithFields(logrus.Fields{"isoimage_uuid": cIso.ObjectUuid}).Info("ISO Image successfully created")
+	logrus.WithFields(logrus.Fields{"isoimage_uuid": cIso.ObjectUUID}).Info("ISO Image successfully created")
 	defer func() {
 		//Delete ISO-image
-		err := client.DeleteISOImage(cIso.ObjectUuid)
+		err := client.DeleteISOImage(cIso.ObjectUUID)
 		if err != nil {
 			logrus.Error("Delete ISO-image has failed with error", err)
 			return
@@ -49,7 +49,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get ISO-image to update
-	iso, err := client.GetISOImage(cIso.ObjectUuid)
+	iso, err := client.GetISOImage(cIso.ObjectUUID)
 	if err != nil {
 		logrus.Error("Get ISO-image has failed with error", err)
 		return
@@ -59,21 +59,21 @@ func main() {
 		Name:   "updated ISO",
 		Labels: iso.Properties.Labels,
 	}
-	err = client.UpdateISOImage(iso.Properties.ObjectUuid, isoUpdateRequest)
+	err = client.UpdateISOImage(iso.Properties.ObjectUUID, isoUpdateRequest)
 	if err != nil {
 		logrus.Error("Update ISO-image has failed with error", err)
 		return
 	}
-	logrus.WithFields(logrus.Fields{"isoimage_uuid": iso.Properties.ObjectUuid}).Info("ISO image successfully updated")
+	logrus.WithFields(logrus.Fields{"isoimage_uuid": iso.Properties.ObjectUUID}).Info("ISO image successfully updated")
 
 	//get ISO-image's events
-	events, err := client.GetISOImageEventList(iso.Properties.ObjectUuid)
+	events, err := client.GetISOImageEventList(iso.Properties.ObjectUUID)
 	if err != nil {
 		logrus.Error("Get ISO-image's events has failed with error", err)
 		return
 	}
 	logrus.WithFields(logrus.Fields{
-		"isoimage_uuid": iso.Properties.ObjectUuid,
+		"isoimage_uuid": iso.Properties.ObjectUUID,
 		"events":        events,
 	}).Info("Events successfully retrieved")
 

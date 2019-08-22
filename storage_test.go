@@ -28,12 +28,12 @@ func TestClient_GetStorageList(t *testing.T) {
 func TestClient_GetStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid)
+	uri := path.Join(apiStorageBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareStorageHTTPGet())
 	})
-	response, err := client.GetStorage(dummyUuid)
+	response, err := client.GetStorage(dummyUUID)
 	if err != nil {
 		t.Errorf("GetStorage returned an error %v", err)
 	}
@@ -56,11 +56,11 @@ func TestClient_CreateStorage(t *testing.T) {
 
 	res, err := client.CreateStorage(StorageCreateRequest{
 		Capacity:     10,
-		LocationUuid: dummyUuid,
+		LocationUUID: dummyUUID,
 		Name:         "test",
 		StorageType:  "storage",
 		Template: &StorageTemplate{
-			TemplateUuid: dummyUuid,
+			TemplateUUID: dummyUUID,
 			Password:     "pass",
 			PasswordType: "crypt",
 			Hostname:     "example.com",
@@ -76,12 +76,12 @@ func TestClient_CreateStorage(t *testing.T) {
 func TestClient_UpdateStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid)
+	uri := path.Join(apiStorageBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		fmt.Fprintf(w, "")
 	})
-	err := client.UpdateStorage(dummyUuid, StorageUpdateRequest{
+	err := client.UpdateStorage(dummyUUID, StorageUpdateRequest{
 		Name:     "test",
 		Labels:   []string{"label"},
 		Capacity: 20,
@@ -94,12 +94,12 @@ func TestClient_UpdateStorage(t *testing.T) {
 func TestClient_DeleteStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid)
+	uri := path.Join(apiStorageBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 		fmt.Fprintf(w, "")
 	})
-	err := client.DeleteStorage(dummyUuid)
+	err := client.DeleteStorage(dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteStorage returned an error %v", err)
 	}
@@ -108,12 +108,12 @@ func TestClient_DeleteStorage(t *testing.T) {
 func TestClient_GetStorageEventList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "events")
+	uri := path.Join(apiStorageBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareStorageEventListHTTPGet())
 	})
-	response, err := client.GetStorageEventList(dummyUuid)
+	response, err := client.GetStorageEventList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetStorageEventList returned an error %v", err)
 	}
@@ -129,22 +129,22 @@ func getMockStorage() Storage {
 		LicenseProductNo: 11111,
 		LocationCountry:  "Germany",
 		UsageInMinutes:   10,
-		LastUsedTemplate: dummyUuid,
+		LastUsedTemplate: dummyUUID,
 		CurrentPrice:     9.1,
 		Capacity:         10,
-		LocationUuid:     dummyUuid,
+		LocationUUID:     dummyUUID,
 		StorageType:      "storage",
-		ParentUuid:       dummyUuid,
+		ParentUUID:       dummyUUID,
 		Name:             "test",
 		LocationName:     "Cologne",
-		ObjectUuid:       dummyUuid,
+		ObjectUUID:       dummyUUID,
 		Snapshots: []StorageSnapshotRelation{
 			{
-				LastUsedTemplate:      dummyUuid,
-				ObjectUuid:            dummyUuid,
-				StorageUuid:           dummyUuid,
+				LastUsedTemplate:      dummyUUID,
+				ObjectUUID:            dummyUUID,
+				StorageUUID:           dummyUUID,
 				SchedulesSnapshotName: "test",
-				SchedulesSnapshotUuid: dummyUuid,
+				SchedulesSnapshotUUID: dummyUUID,
 				ObjectCapacity:        10,
 				CreateTime:            dummyTime,
 				ObjectName:            "test",
@@ -159,8 +159,8 @@ func getMockStorage() Storage {
 
 func getMockStorageCreateResponse() CreateResponse {
 	mock := CreateResponse{
-		ObjectUuid:  dummyUuid,
-		RequestUuid: dummyRequestUUID,
+		ObjectUUID:  dummyUUID,
+		RequestUUID: dummyRequestUUID,
 	}
 	return mock
 }
@@ -168,14 +168,14 @@ func getMockStorageCreateResponse() CreateResponse {
 func getMockStorageEvent() StorageEvent {
 	mock := StorageEvent{Properties: StorageEventProperties{
 		ObjectType:    "type",
-		RequestUuid:   dummyRequestUUID,
-		ObjectUuid:    dummyUuid,
+		RequestUUID:   dummyRequestUUID,
+		ObjectUUID:    dummyUUID,
 		Activity:      "sent",
 		RequestType:   "type",
 		RequestStatus: "active",
 		Change:        "change",
 		Timestamp:     dummyTime,
-		UserUuid:      dummyUuid,
+		UserUUID:      dummyUUID,
 	}}
 	return mock
 }
@@ -183,7 +183,7 @@ func getMockStorageEvent() StorageEvent {
 func prepareStorageListHTTPGet() string {
 	storage := getMockStorage()
 	res, _ := json.Marshal(storage.Properties)
-	return fmt.Sprintf(`{"storages": {"%s": %s}}`, dummyUuid, string(res))
+	return fmt.Sprintf(`{"storages": {"%s": %s}}`, dummyUUID, string(res))
 }
 
 func prepareStorageHTTPGet() string {

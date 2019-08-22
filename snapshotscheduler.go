@@ -23,11 +23,11 @@ type StorageSnapshotScheduleProperties struct {
 	Labels        []string                         `json:"labels"`
 	Name          string                           `json:"name"`
 	NextRuntime   string                           `json:"next_runtime"`
-	ObjectUuid    string                           `json:"object_uuid"`
+	ObjectUUID    string                           `json:"object_uuid"`
 	Relations     StorageSnapshotScheduleRelations `json:"relations"`
 	RunInterval   int                              `json:"run_interval"`
 	Status        string                           `json:"status"`
-	StorageUuid   string                           `json:"storage_uuid"`
+	StorageUUID   string                           `json:"storage_uuid"`
 }
 
 //StorageSnapshotScheduleRelations JSON struct of a list of relations of a storage snapshot schedule
@@ -39,7 +39,7 @@ type StorageSnapshotScheduleRelations struct {
 type StorageSnapshotScheduleRelation struct {
 	CreateTime string `json:"create_time"`
 	Name       string `json:"name"`
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 }
 
 //StorageSnapshotScheduleCreateRequest JSON struct of a request for creating a storage snapshot schedule
@@ -53,8 +53,8 @@ type StorageSnapshotScheduleCreateRequest struct {
 
 //StorageSnapshotScheduleCreateResponse JSON struct of a response for creating a storage snapshot schedule
 type StorageSnapshotScheduleCreateResponse struct {
-	RequestUuid string `json:"request_uuid"`
-	ObjectUuid  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
 }
 
 //StorageSnapshotScheduleUpdateRequest JSON struct of a request for updating a storage snapshot schedule
@@ -105,7 +105,7 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 	if err != nil {
 		return StorageSnapshotScheduleCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 

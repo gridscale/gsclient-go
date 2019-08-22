@@ -19,7 +19,7 @@ type Firewall struct {
 type FirewallProperties struct {
 	Status       string           `json:"status"`
 	Labels       []string         `json:"labels"`
-	ObjectUuid   string           `json:"object_uuid"`
+	ObjectUUID   string           `json:"object_uuid"`
 	ChangeTime   string           `json:"change_time"`
 	Rules        FirewallRules    `json:"rules"`
 	CreateTime   string           `json:"create_time"`
@@ -58,9 +58,9 @@ type FirewallRelation struct {
 //NetworkInFirewall is a JSON struct of a firewall's relation
 type NetworkInFirewall struct {
 	CreateTime  string `json:"create_time"`
-	NetworkUuid string `json:"network_uuid"`
+	NetworkUUID string `json:"network_uuid"`
 	NetworkName string `json:"network_name"`
-	ObjectUuid  string `json:"object_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
 	ObjectName  string `json:"object_name"`
 }
 
@@ -73,8 +73,8 @@ type FirewallCreateRequest struct {
 
 //FirewallCreateResponse is JSON struct of a response for creating a firewall
 type FirewallCreateResponse struct {
-	RequestUuid string `json:"request_uuid"`
-	ObjectUuid  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
 }
 
 //FirewallUpdateRequest is JSON struct of a request for updating a firewall
@@ -97,14 +97,14 @@ type FirewallEvent struct {
 //FirewallEventProperties is JSON struct of a firewall's properties
 type FirewallEventProperties struct {
 	ObjectType    string `json:"object_type"`
-	RequestUuid   string `json:"request_uuid"`
-	ObjectUuid    string `json:"object_uuid"`
+	RequestUUID   string `json:"request_uuid"`
+	ObjectUUID    string `json:"object_uuid"`
 	Activity      string `json:"activity"`
 	RequestType   string `json:"request_type"`
 	RequestStatus string `json:"request_status"`
 	Change        string `json:"change"`
 	Timestamp     string `json:"timestamp"`
-	UserUuid      string `json:"user_uuid"`
+	UserUUID      string `json:"user_uuid"`
 }
 
 //GetFirewallList gets a list of available firewalls
@@ -145,7 +145,7 @@ func (c *Client) CreateFirewall(body FirewallCreateRequest) (FirewallCreateRespo
 	if err != nil {
 		return FirewallCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 

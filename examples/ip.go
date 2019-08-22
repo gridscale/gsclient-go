@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const LocationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -27,7 +27,7 @@ func main() {
 	ipRequest := gsclient.IpCreateRequest{
 		Name:         "go-client-ip",
 		Family:       4,
-		LocationUuid: LocationUuid,
+		LocationUUID: LocationUUID,
 	}
 	//Create new IP
 	ipc, err := client.CreateIp(ipRequest)
@@ -35,9 +35,9 @@ func main() {
 		log.Error("Create IP address has failed with error", err)
 		return
 	}
-	log.WithFields(log.Fields{"ip_uuid": ipc.ObjectUuid}).Info("IP address successfully created")
+	log.WithFields(log.Fields{"ip_uuid": ipc.ObjectUUID}).Info("IP address successfully created")
 	defer func() {
-		err := client.DeleteIp(ipc.ObjectUuid)
+		err := client.DeleteIp(ipc.ObjectUUID)
 		if err != nil {
 			log.Error("Delete IP address has failed with error", err)
 			return
@@ -49,7 +49,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get IP to update
-	ip, err := client.GetIp(ipc.ObjectUuid)
+	ip, err := client.GetIp(ipc.ObjectUUID)
 	if err != nil {
 		log.Error("Get IP address has failed with error", err)
 		return
@@ -60,7 +60,7 @@ func main() {
 		ReverseDns: ip.Properties.ReverseDns,
 		Labels:     ip.Properties.Labels,
 	}
-	err = client.UpdateIp(ip.Properties.ObjectUuid, updateRequest)
+	err = client.UpdateIp(ip.Properties.ObjectUUID, updateRequest)
 	if err != nil {
 		log.Error("Update IP address has failed with error", err)
 		return
@@ -69,13 +69,13 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get IP address events
-	response, err := client.GetIpEventList(ip.Properties.ObjectUuid)
+	response, err := client.GetIpEventList(ip.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get IP address events has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{
-		"ip_uuid": ip.Properties.ObjectUuid,
+		"ip_uuid": ip.Properties.ObjectUUID,
 		"events":  response,
 	}).Info("Events successfully events retrieved")
 	log.Info("Delete IP address: Press 'Enter' to continue...")
