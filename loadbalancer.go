@@ -17,12 +17,12 @@ type LoadBalancer struct {
 
 //LoadBalancerProperties is the properties of a loadbalancer
 type LoadBalancerProperties struct {
-	ObjectUuid          string           `json:"object_uuid"`
+	ObjectUUID          string           `json:"object_uuid"`
 	LocationSite        int              `json:"location_site"`
 	Name                string           `json:"name"`
 	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
 	LocationIata        string           `json:"location_iata"`
-	LocationUuid        string           `json:"location_uuid"`
+	LocationUUID        string           `json:"location_uuid"`
 	BackendServers      []BackendServer  `json:"backend_servers"`
 	ChangeTime          string           `json:"change_time"`
 	Status              string           `json:"status"`
@@ -34,8 +34,8 @@ type LoadBalancerProperties struct {
 	UsageInMinutes      int              `json:"usage_in_minutes"`
 	Algorithm           string           `json:"algorithm"`
 	CreateTime          string           `json:"create_time"`
-	ListenIPv6Uuid      string           `json:"listen_ipv6_uuid"`
-	ListenIPv4Uuid      string           `json:"listen_ipv4_uuid"`
+	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
+	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
 }
 
 //BackendServer is the JSON struct of backend server
@@ -55,13 +55,13 @@ type ForwardingRule struct {
 //LoadBalancerCreateRequest is the JSON struct for creating a loadbalancer request
 type LoadBalancerCreateRequest struct {
 	Name                string           `json:"name"`
-	ListenIPv6Uuid      string           `json:"listen_ipv6_uuid"`
-	ListenIPv4Uuid      string           `json:"listen_ipv4_uuid"`
+	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
+	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
 	Algorithm           string           `json:"algorithm"`
 	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
 	BackendServers      []BackendServer  `json:"backend_servers"`
 	Labels              []string         `json:"labels"`
-	LocationUuid        string           `json:"location_uuid"`
+	LocationUUID        string           `json:"location_uuid"`
 	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
 	Status              string           `json:"status,omitempty"`
 }
@@ -69,21 +69,21 @@ type LoadBalancerCreateRequest struct {
 //LoadBalancerUpdateRequest is the JSON struct for updating a loadbalancer request
 type LoadBalancerUpdateRequest struct {
 	Name                string           `json:"name"`
-	ListenIPv6Uuid      string           `json:"listen_ipv6_uuid"`
-	ListenIPv4Uuid      string           `json:"listen_ipv4_uuid"`
+	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
+	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
 	Algorithm           string           `json:"algorithm"`
 	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
 	BackendServers      []BackendServer  `json:"backend_servers"`
 	Labels              []string         `json:"labels"`
-	LocationUuid        string           `json:"location_uuid"`
+	LocationUUID        string           `json:"location_uuid"`
 	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
 	Status              string           `json:"status,omitempty"`
 }
 
 //LoadBalancerCreateResponse is the JSON struct for a loadbalancer response
 type LoadBalancerCreateResponse struct {
-	RequestUuid string `json:"request_uuid"`
-	ObjectUuid  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
 }
 
 //LoadBalancerEventList is the JSON struct for a loadbalancer's events
@@ -98,15 +98,15 @@ type LoadBalancerEvent struct {
 
 //LoadBalancerEventProperties is the properties of a loadbalancer's event
 type LoadBalancerEventProperties struct {
-	ObjectUuid    string `json:"object_uuid"`
+	ObjectUUID    string `json:"object_uuid"`
 	ObjectType    string `json:"object_type"`
-	RequestUuid   string `json:"request_uuid"`
+	RequestUUID   string `json:"request_uuid"`
 	RequestType   string `json:"request_type"`
 	Activity      string `json:"activity"`
 	RequestStatus string `json:"request_status"`
 	Change        string `json:"change"`
 	Timestamp     string `json:"timestamp"`
-	UserUuid      string `json:"user_uuid"`
+	UserUUID      string `json:"user_uuid"`
 }
 
 //GetLoadBalancerList returns a list of loadbalancers
@@ -147,7 +147,7 @@ func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalance
 	if err != nil {
 		return LoadBalancerCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 

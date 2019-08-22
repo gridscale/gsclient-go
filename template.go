@@ -20,12 +20,12 @@ type Template struct {
 type TemplateProperties struct {
 	Status           string   `json:"status"`
 	Ostype           string   `json:"ostype"`
-	LocationUuid     string   `json:"location_uuid"`
+	LocationUUID     string   `json:"location_uuid"`
 	Version          string   `json:"version"`
 	LocationIata     string   `json:"location_iata"`
 	ChangeTime       string   `json:"change_time"`
 	Private          bool     `json:"private"`
-	ObjectUuid       string   `json:"object_uuid"`
+	ObjectUUID       string   `json:"object_uuid"`
 	LicenseProductNo int      `json:"license_product_no"`
 	CreateTime       string   `json:"create_time"`
 	UsageInMinutes   int      `json:"usage_in_minutes"`
@@ -52,20 +52,20 @@ type TemplateEvent struct {
 //TemplateEventProperties JSON struct of properties of an event of a template
 type TemplateEventProperties struct {
 	ObjectType    string `json:"object_type"`
-	RequestUuid   string `json:"request_uuid"`
-	ObjectUuid    string `json:"object_uuid"`
+	RequestUUID   string `json:"request_uuid"`
+	ObjectUUID    string `json:"object_uuid"`
 	Activity      string `json:"activity"`
 	RequestType   string `json:"request_type"`
 	RequestStatus string `json:"request_status"`
 	Change        string `json:"change"`
 	Timestamp     string `json:"timestamp"`
-	UserUuid      string `json:"user_uuid"`
+	UserUUID      string `json:"user_uuid"`
 }
 
 //TemplateCreateRequest JSON struct of a request for creating a template
 type TemplateCreateRequest struct {
 	Name         string   `json:"name"`
-	SnapshotUuid string   `json:"snapshot_uuid"`
+	SnapshotUUID string   `json:"snapshot_uuid"`
 	Labels       []string `json:"labels,omitempty"`
 }
 

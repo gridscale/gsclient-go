@@ -17,7 +17,7 @@ type ServerStorageRelationSingle struct {
 
 //ServerStorageRelationProperties JSON struct of properties of a relation between a server and a storage
 type ServerStorageRelationProperties struct {
-	ObjectUuid       string `json:"object_uuid"`
+	ObjectUUID       string `json:"object_uuid"`
 	ObjectName       string `json:"object_name"`
 	Capacity         int    `json:"capacity"`
 	StorageType      string `json:"storage_type"`
@@ -29,12 +29,12 @@ type ServerStorageRelationProperties struct {
 	Bus              int    `json:"bus"`
 	LastUsedTemplate string `json:"last_used_template"`
 	LicenseProductNo int    `json:"license_product_no"`
-	ServerUuid       string `json:"server_uuid"`
+	ServerUUID       string `json:"server_uuid"`
 }
 
 //ServerStorageRelationCreateRequest JSON struct of a request for creating a relation between a server and a storage
 type ServerStorageRelationCreateRequest struct {
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 	BootDevice bool   `json:"bootdevice,omitempty"`
 }
 
@@ -57,9 +57,9 @@ func (c *Client) GetServerStorageList(id string) ([]ServerStorageRelationPropert
 }
 
 //GetServerStorage gets a storage of a specific server
-func (c *Client) GetServerStorage(serverId, storageId string) (ServerStorageRelationProperties, error) {
+func (c *Client) GetServerStorage(serverID, storageID string) (ServerStorageRelationProperties, error) {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "storages", storageId),
+		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodGet,
 	}
 	var response ServerStorageRelationSingle
@@ -68,9 +68,9 @@ func (c *Client) GetServerStorage(serverId, storageId string) (ServerStorageRela
 }
 
 //UpdateServerStorage updates a link between a storage and a server
-func (c *Client) UpdateServerStorage(serverId, storageId string, body ServerStorageRelationUpdateRequest) error {
+func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStorageRelationUpdateRequest) error {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "storages", storageId),
+		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodPatch,
 		body:   body,
 	}
@@ -88,24 +88,24 @@ func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreate
 }
 
 //DeleteServerStorage delete a link between a storage and a server
-func (c *Client) DeleteServerStorage(serverId, storageId string) error {
+func (c *Client) DeleteServerStorage(serverID, storageID string) error {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "storages", storageId),
+		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)
 }
 
 //LinkStorage attaches a storage to a server
-func (c *Client) LinkStorage(serverId string, storageId string, bootdevice bool) error {
+func (c *Client) LinkStorage(serverID string, storageID string, bootdevice bool) error {
 	body := ServerStorageRelationCreateRequest{
-		ObjectUuid: storageId,
+		ObjectUUID: storageID,
 		BootDevice: bootdevice,
 	}
-	return c.CreateServerStorage(serverId, body)
+	return c.CreateServerStorage(serverID, body)
 }
 
 //UnlinkStorage remove a storage from a server
-func (c *Client) UnlinkStorage(serverId string, storageId string) error {
-	return c.DeleteServerStorage(serverId, storageId)
+func (c *Client) UnlinkStorage(serverID string, storageID string) error {
+	return c.DeleteServerStorage(serverID, storageID)
 }

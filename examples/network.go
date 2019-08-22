@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -27,7 +27,7 @@ func main() {
 
 	networkRequest := gsclient.NetworkCreateRequest{
 		Name:         "go-client-network",
-		LocationUuid: LocationUuid,
+		LocationUUID: locationUUID,
 	}
 	cnetwork, err := client.CreateNetwork(networkRequest)
 	if err != nil {
@@ -35,11 +35,11 @@ func main() {
 		return
 	}
 	log.WithFields(log.Fields{
-		"network_uuid": cnetwork.ObjectUuid,
+		"network_uuid": cnetwork.ObjectUUID,
 	}).Info("Network successfully created")
 	defer func() {
 		//delete network
-		err := client.DeleteNetwork(cnetwork.ObjectUuid)
+		err := client.DeleteNetwork(cnetwork.ObjectUUID)
 		if err != nil {
 			log.Error("Delete network has failed with error", err)
 			return
@@ -48,7 +48,7 @@ func main() {
 	}()
 
 	//Get network to update
-	net, err := client.GetNetwork(cnetwork.ObjectUuid)
+	net, err := client.GetNetwork(cnetwork.ObjectUUID)
 	if err != nil {
 		log.Error("Create network has failed ")
 		return
@@ -60,25 +60,25 @@ func main() {
 	netUpdateRequest := gsclient.NetworkUpdateRequest{
 		Name: "Updated network",
 	}
-	err = client.UpdateNetwork(net.Properties.ObjectUuid, netUpdateRequest)
+	err = client.UpdateNetwork(net.Properties.ObjectUUID, netUpdateRequest)
 	if err != nil {
 		log.Error("Update network has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{
-		"network_uuid": net.Properties.ObjectUuid,
+		"network_uuid": net.Properties.ObjectUUID,
 	}).Info("Network successfully updated")
 
 	log.Info("Retrieve network's events: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//get network's events
-	events, err := client.GetNetworkEventList(net.Properties.ObjectUuid)
+	events, err := client.GetNetworkEventList(net.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get network's events has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{
-		"network_uuid": net.Properties.ObjectUuid,
+		"network_uuid": net.Properties.ObjectUUID,
 		"events":       events,
 	}).Info("Events successfully retrieved")
 

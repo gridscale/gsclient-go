@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+//Request gridscale's custom request struct
 type Request struct {
 	uri    string
 	method string
@@ -18,8 +19,8 @@ type Request struct {
 
 //CreateResponse common struct of a response for creation
 type CreateResponse struct {
-	ObjectUuid  string `json:"object_uuid"`
-	RequestUuid string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
 }
 
 //RequestStatus status of a request
@@ -67,7 +68,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	if err != nil {
 		return err
 	}
-	request.Header.Add("X-Auth-UserId", c.cfg.UserUUID)
+	request.Header.Add("X-Auth-UserID", c.cfg.UserUUID)
 	request.Header.Add("X-Auth-Token", c.cfg.APIToken)
 	request.Header.Add("Content-Type", "application/json")
 	c.cfg.logger.Debugf("Request body: %v", request.Body)
@@ -91,11 +92,10 @@ func (r *Request) execute(c Client, output interface{}) error {
 		json.Unmarshal(iostream, &errorMessage)
 		c.cfg.logger.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
 		return errorMessage
-	} else {
-		json.Unmarshal(iostream, output) //Edit the given struct
-		c.cfg.logger.Debugf("Response body: %v", string(iostream))
-		return nil
 	}
+	json.Unmarshal(iostream, output) //Edit the given struct
+	c.cfg.logger.Debugf("Response body: %v", string(iostream))
+	return nil
 }
 
 //WaitForRequestCompletion allows to wait for a request to complete. Timeouts are currently hardcoded

@@ -28,12 +28,12 @@ func TestClient_GetFirewallList(t *testing.T) {
 func TestClient_GetFirewall(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiFirewallBase, dummyUuid)
+	uri := path.Join(apiFirewallBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareFirewallHTTPGet())
 	})
-	response, err := client.GetFirewall(dummyUuid)
+	response, err := client.GetFirewall(dummyUUID)
 	if err != nil {
 		t.Errorf("GetFirewall returned an error %v", err)
 	}
@@ -77,12 +77,12 @@ func TestClient_CreateFirewall(t *testing.T) {
 func TestClient_UpdateFirewall(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiFirewallBase, dummyUuid)
+	uri := path.Join(apiFirewallBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		fmt.Fprintf(w, "")
 	})
-	err := client.UpdateFirewall(dummyUuid, FirewallUpdateRequest{
+	err := client.UpdateFirewall(dummyUUID, FirewallUpdateRequest{
 		Name:   "test",
 		Labels: []string{"label"},
 		Rules: FirewallRules{
@@ -104,12 +104,12 @@ func TestClient_UpdateFirewall(t *testing.T) {
 func TestClient_DeleteFirewall(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiFirewallBase, dummyUuid)
+	uri := path.Join(apiFirewallBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 		fmt.Fprintf(w, "")
 	})
-	err := client.DeleteFirewall(dummyUuid)
+	err := client.DeleteFirewall(dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteFirewall returned an error %v", err)
 	}
@@ -118,12 +118,12 @@ func TestClient_DeleteFirewall(t *testing.T) {
 func TestClient_GetFirewallEventList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiFirewallBase, dummyUuid, "events")
+	uri := path.Join(apiFirewallBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareFirewallEventListHTTPGet())
 	})
-	response, err := client.GetFirewallEventList(dummyUuid)
+	response, err := client.GetFirewallEventList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetFirewallEventList returned an error %v", err)
 	}
@@ -135,7 +135,7 @@ func getMockFirewall() Firewall {
 	mock := Firewall{Properties: FirewallProperties{
 		Status:     "active",
 		Labels:     []string{"label"},
-		ObjectUuid: dummyUuid,
+		ObjectUUID: dummyUUID,
 		ChangeTime: dummyTime,
 		Rules: FirewallRules{
 			RulesV6In: []FirewallRuleProperties{
@@ -153,9 +153,9 @@ func getMockFirewall() Firewall {
 			Networks: []NetworkInFirewall{
 				{
 					CreateTime:  dummyTime,
-					NetworkUuid: dummyUuid,
+					NetworkUUID: dummyUUID,
 					NetworkName: "network",
-					ObjectUuid:  dummyUuid,
+					ObjectUUID:  dummyUUID,
 					ObjectName:  "name",
 				},
 			},
@@ -170,7 +170,7 @@ func getMockFirewall() Firewall {
 func prepareFirewallListHTTPGet() string {
 	firewall := getMockFirewall()
 	res, _ := json.Marshal(firewall.Properties)
-	return fmt.Sprintf(`{"firewalls": {"%s": %s}}`, dummyUuid, string(res))
+	return fmt.Sprintf(`{"firewalls": {"%s": %s}}`, dummyUUID, string(res))
 }
 
 func prepareFirewallHTTPGet() string {
@@ -181,8 +181,8 @@ func prepareFirewallHTTPGet() string {
 
 func getMockFirewallCreateResponse() FirewallCreateResponse {
 	mock := FirewallCreateResponse{
-		RequestUuid: dummyRequestUUID,
-		ObjectUuid:  dummyUuid,
+		RequestUUID: dummyRequestUUID,
+		ObjectUUID:  dummyUUID,
 	}
 	return mock
 }
@@ -196,14 +196,14 @@ func prepareFirewallCreateResponse() string {
 func getMockFirewallEvent() FirewallEvent {
 	mock := FirewallEvent{Properties: FirewallEventProperties{
 		ObjectType:    "type",
-		RequestUuid:   dummyRequestUUID,
-		ObjectUuid:    dummyUuid,
+		RequestUUID:   dummyRequestUUID,
+		ObjectUUID:    dummyUUID,
 		Activity:      "sent",
 		RequestType:   "type",
 		RequestStatus: "active",
 		Change:        "change",
 		Timestamp:     dummyTime,
-		UserUuid:      dummyUuid,
+		UserUUID:      dummyUUID,
 	}}
 	return mock
 }

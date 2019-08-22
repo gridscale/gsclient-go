@@ -12,13 +12,13 @@ import (
 func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshot_schedules")
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleListHTTPGet())
 	})
 
-	res, err := client.GetStorageSnapshotScheduleList(dummyUuid)
+	res, err := client.GetStorageSnapshotScheduleList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetStorageSnapshotScheduleList returned an error %v", err)
 	}
@@ -29,13 +29,13 @@ func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
 func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshot_schedules", dummyUuid)
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleHTTPGet())
 	})
 
-	res, err := client.GetStorageSnapshotSchedule(dummyUuid, dummyUuid)
+	res, err := client.GetStorageSnapshotSchedule(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("GetStorageSnapshotSchedule returned an error %v", err)
 	}
@@ -45,7 +45,7 @@ func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
 func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshot_schedules")
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleHTTPCreateResponse())
@@ -55,7 +55,7 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 		fmt.Fprint(w, httpResponse)
 	})
 
-	response, err := client.CreateStorageSnapshotSchedule(dummyUuid, StorageSnapshotScheduleCreateRequest{
+	response, err := client.CreateStorageSnapshotSchedule(dummyUUID, StorageSnapshotScheduleCreateRequest{
 		Name:          "test",
 		Labels:        []string{"test"},
 		RunInterval:   60,
@@ -72,13 +72,13 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshot_schedules", dummyUuid)
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
 
-	err := client.UpdateStorageSnapshotSchedule(dummyUuid, dummyUuid, StorageSnapshotScheduleUpdateRequest{
+	err := client.UpdateStorageSnapshotSchedule(dummyUUID, dummyUUID, StorageSnapshotScheduleUpdateRequest{
 		Name:          "test",
 		Labels:        []string{"label"},
 		RunInterval:   60,
@@ -93,12 +93,12 @@ func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshot_schedules", dummyUuid)
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteStorageSnapshotSchedule(dummyUuid, dummyUuid)
+	err := client.DeleteStorageSnapshotSchedule(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteStorageSnapshotSchedule returned an error %v", err)
 	}
@@ -112,17 +112,17 @@ func getMockStorageSnapshotSchedule() StorageSnapshotSchedule {
 		Labels:        []string{"label"},
 		Name:          "test",
 		NextRuntime:   dummyTime,
-		ObjectUuid:    dummyUuid,
+		ObjectUUID:    dummyUUID,
 		Relations: StorageSnapshotScheduleRelations{Snapshots: []StorageSnapshotScheduleRelation{
 			{
 				CreateTime: dummyTime,
 				Name:       "test",
-				ObjectUuid: dummyUuid,
+				ObjectUUID: dummyUUID,
 			},
 		}},
 		RunInterval: 60,
 		Status:      "active",
-		StorageUuid: dummyUuid,
+		StorageUUID: dummyUUID,
 	}}
 	return mock
 }
@@ -130,7 +130,7 @@ func getMockStorageSnapshotSchedule() StorageSnapshotSchedule {
 func prepareStorageSnapshotScheduleListHTTPGet() string {
 	scheduler := getMockStorageSnapshotSchedule()
 	res, _ := json.Marshal(scheduler.Properties)
-	return fmt.Sprintf(`{"snapshot_schedules" : {"%s" : %s}}`, dummyUuid, string(res))
+	return fmt.Sprintf(`{"snapshot_schedules" : {"%s" : %s}}`, dummyUUID, string(res))
 }
 
 func prepareStorageSnapshotScheduleHTTPGet() string {
@@ -141,8 +141,8 @@ func prepareStorageSnapshotScheduleHTTPGet() string {
 
 func getMockStorageSnapshotScheduleHTTPCreateResponse() StorageSnapshotScheduleCreateResponse {
 	mock := StorageSnapshotScheduleCreateResponse{
-		RequestUuid: dummyRequestUUID,
-		ObjectUuid:  dummyUuid,
+		RequestUUID: dummyRequestUUID,
+		ObjectUUID:  dummyUUID,
 	}
 	return mock
 }

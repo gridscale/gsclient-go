@@ -27,9 +27,9 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 	lbRequest := LoadBalancerCreateRequest{
 		Name:                lb.Name,
 		Algorithm:           lb.Algorithm,
-		LocationUuid:        lb.LocationUuid,
-		ListenIPv6Uuid:      lb.ListenIPv6Uuid,
-		ListenIPv4Uuid:      lb.ListenIPv4Uuid,
+		LocationUUID:        lb.LocationUUID,
+		ListenIPv6UUID:      lb.ListenIPv6UUID,
+		ListenIPv4UUID:      lb.ListenIPv4UUID,
 		RedirectHTTPToHTTPS: lb.RedirectHTTPToHTTPS,
 		ForwardingRules:     lb.ForwardingRules,
 		BackendServers:      lb.BackendServers,
@@ -45,13 +45,13 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 func TestClient_GetLoadBalancer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiLoadBalancerBase, dummyUuid)
+	uri := path.Join(apiLoadBalancerBase, dummyUUID)
 	expectedObject := getMockLoadbalancer()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
 		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse())
 	})
-	loadbalancer, err := client.GetLoadBalancer(dummyUuid)
+	loadbalancer, err := client.GetLoadBalancer(dummyUUID)
 	if err != nil {
 		t.Errorf("GetLoadBalancer returned error: %v", err)
 	}
@@ -78,15 +78,15 @@ func TestClient_GetLoadBalancerList(t *testing.T) {
 func TestClient_UpdateLoadBalancer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiLoadBalancerBase, dummyUuid)
+	uri := path.Join(apiLoadBalancerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		fmt.Fprintf(w, "")
 	})
-	err := client.UpdateLoadBalancer(dummyUuid, LoadBalancerUpdateRequest{
+	err := client.UpdateLoadBalancer(dummyUUID, LoadBalancerUpdateRequest{
 		Name:                "test",
-		ListenIPv6Uuid:      dummyUuid,
-		ListenIPv4Uuid:      dummyUuid,
+		ListenIPv6UUID:      dummyUUID,
+		ListenIPv4UUID:      dummyUUID,
 		RedirectHTTPToHTTPS: false,
 		Status:              "inactive",
 	})
@@ -98,12 +98,12 @@ func TestClient_UpdateLoadBalancer(t *testing.T) {
 func TestClient_DeleteLoadBalancer(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiLoadBalancerBase, dummyUuid)
+	uri := path.Join(apiLoadBalancerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 		fmt.Fprintf(w, "")
 	})
-	err := client.DeleteLoadBalancer(dummyUuid)
+	err := client.DeleteLoadBalancer(dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteLoadBalancer returned an error %v", err)
 	}
@@ -112,13 +112,13 @@ func TestClient_DeleteLoadBalancer(t *testing.T) {
 func TestClient_GetLoadBalancerEventList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiLoadBalancerBase, dummyUuid, "events")
+	uri := path.Join(apiLoadBalancerBase, dummyUUID, "events")
 	expectedObjects := getMockLoadBalancerEvent()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
 		fmt.Fprint(w, prepareLoadBalancerEventListHTTPGet())
 	})
-	response, err := client.GetLoadBalancerEventList(dummyUuid)
+	response, err := client.GetLoadBalancerEventList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetLoadBalancerEventList returned error: %v", err)
 	}
@@ -131,12 +131,12 @@ func getMockLoadbalancer() LoadBalancer {
 	labels = append(labels, "nice")
 	lb := LoadBalancer{
 		Properties: LoadBalancerProperties{
-			ObjectUuid:          dummyUuid,
+			ObjectUUID:          dummyUUID,
 			Name:                "go-client-lb",
 			Algorithm:           "leastconn",
-			LocationUuid:        "45ed677b-3702-4b36-be2a-a2eab9827950",
-			ListenIPv6Uuid:      "880b7f98-3702-4b36-be2a-a2eab9827950",
-			ListenIPv4Uuid:      "880b7f98-3702-4b36-be2a-a2eab9827950",
+			LocationUUID:        "45ed677b-3702-4b36-be2a-a2eab9827950",
+			ListenIPv6UUID:      "880b7f98-3702-4b36-be2a-a2eab9827950",
+			ListenIPv4UUID:      "880b7f98-3702-4b36-be2a-a2eab9827950",
 			RedirectHTTPToHTTPS: false,
 			ForwardingRules: []ForwardingRule{
 				{
@@ -167,31 +167,31 @@ func prepareLoadBalancerHTTPGetResponse() string {
 func prepareLoadBalancerHTTPListResponse() string {
 	lb := getMockLoadbalancer()
 	res, _ := json.Marshal(lb.Properties)
-	return fmt.Sprintf(`{"loadbalancers": {"%s": %s}}`, dummyUuid, string(res))
+	return fmt.Sprintf(`{"loadbalancers": {"%s": %s}}`, dummyUUID, string(res))
 }
 
 func prepareLoadBalancerHTTPCreateResponse() string {
-	return fmt.Sprintf(`{"request_uuid": "%s","object_uuid": "%s"}`, dummyRequestUUID, dummyUuid)
+	return fmt.Sprintf(`{"request_uuid": "%s","object_uuid": "%s"}`, dummyRequestUUID, dummyUUID)
 }
 
 func prepareLoadBalancerObjectCreateResponse() LoadBalancerCreateResponse {
 	return LoadBalancerCreateResponse{
-		RequestUuid: dummyRequestUUID,
-		ObjectUuid:  dummyUuid,
+		RequestUUID: dummyRequestUUID,
+		ObjectUUID:  dummyUUID,
 	}
 }
 
 func getMockLoadBalancerEvent() LoadBalancerEvent {
 	mock := LoadBalancerEvent{Properties: LoadBalancerEventProperties{
 		ObjectType:    "type",
-		RequestUuid:   dummyRequestUUID,
-		ObjectUuid:    dummyUuid,
+		RequestUUID:   dummyRequestUUID,
+		ObjectUUID:    dummyUUID,
 		Activity:      "sent",
 		RequestType:   "type",
 		RequestStatus: "active",
 		Change:        "change",
 		Timestamp:     dummyTime,
-		UserUuid:      dummyUuid,
+		UserUUID:      dummyUUID,
 	}}
 	return mock
 }

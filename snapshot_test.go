@@ -12,13 +12,13 @@ import (
 func TestClient_GetStorageSnapshotList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshots")
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshots")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareStorageSnapshotListHTTPGet())
 	})
 
-	res, err := client.GetStorageSnapshotList(dummyUuid)
+	res, err := client.GetStorageSnapshotList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetStorageSnapshotList returned an error %v", err)
 	}
@@ -29,13 +29,13 @@ func TestClient_GetStorageSnapshotList(t *testing.T) {
 func TestClient_GetStorageSnapshot(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshots", dummyUuid)
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareStorageSnapshotHTTPGet())
 	})
 
-	res, err := client.GetStorageSnapshot(dummyUuid, dummyUuid)
+	res, err := client.GetStorageSnapshot(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("GetStorageSnapshot returned an error %v", err)
 	}
@@ -45,7 +45,7 @@ func TestClient_GetStorageSnapshot(t *testing.T) {
 func TestClient_CreateStorageSnapshot(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshots")
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshots")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		fmt.Fprint(w, prepareStorageSnapshotCreateResponseHTTP())
@@ -56,7 +56,7 @@ func TestClient_CreateStorageSnapshot(t *testing.T) {
 		fmt.Fprint(w, httpResponse)
 	})
 
-	response, err := client.CreateStorageSnapshot(dummyUuid, StorageSnapshotCreateRequest{
+	response, err := client.CreateStorageSnapshot(dummyUUID, StorageSnapshotCreateRequest{
 		Name:   "test",
 		Labels: []string{"label"},
 	})
@@ -69,12 +69,12 @@ func TestClient_CreateStorageSnapshot(t *testing.T) {
 func TestClient_UpdateStorageSnapshot(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshots", dummyUuid)
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		fmt.Fprint(w, "")
 	})
-	err := client.UpdateStorageSnapshot(dummyUuid, dummyUuid, StorageSnapshotUpdateRequest{
+	err := client.UpdateStorageSnapshot(dummyUUID, dummyUUID, StorageSnapshotUpdateRequest{
 		Name:   "test",
 		Labels: []string{"label"},
 	})
@@ -86,12 +86,12 @@ func TestClient_UpdateStorageSnapshot(t *testing.T) {
 func TestClient_DeleteStorageSnapshot(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshots", dummyUuid)
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 		fmt.Fprint(w, "")
 	})
-	err := client.DeleteStorageSnapshot(dummyUuid, dummyUuid)
+	err := client.DeleteStorageSnapshot(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteStorageSnapshot returned an error %v", err)
 	}
@@ -100,12 +100,12 @@ func TestClient_DeleteStorageSnapshot(t *testing.T) {
 func TestClient_RollbackStorage(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshots", dummyUuid, "rollback")
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID, "rollback")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		fmt.Fprint(w, "")
 	})
-	err := client.RollbackStorage(dummyUuid, dummyUuid, StorageRollbackRequest{Rollback: true})
+	err := client.RollbackStorage(dummyUUID, dummyUUID, StorageRollbackRequest{Rollback: true})
 	if err != nil {
 		t.Errorf("RollbackStorage returned an error %v", err)
 	}
@@ -114,12 +114,12 @@ func TestClient_RollbackStorage(t *testing.T) {
 func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUuid, "snapshots", dummyUuid, "export_to_s3")
+	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID, "export_to_s3")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		fmt.Fprint(w, "")
 	})
-	err := client.ExportStorageSnapshotToS3(dummyUuid, dummyUuid, StorageSnapshotExportToS3Request{
+	err := client.ExportStorageSnapshotToS3(dummyUUID, dummyUUID, StorageSnapshotExportToS3Request{
 		S3auth: struct {
 			Host      string `json:"host"`
 			AccessKey string `json:"access_key"`
@@ -149,12 +149,12 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 func getMockStorageSnapshot() StorageSnapshot {
 	mock := StorageSnapshot{Properties: StorageSnapshotProperties{
 		Labels:           []string{"label"},
-		ObjectUuid:       dummyUuid,
+		ObjectUUID:       dummyUUID,
 		Name:             "test",
 		Status:           "active",
 		LocationCountry:  "Germany",
 		UsageInMinutes:   60,
-		LocationUuid:     dummyUuid,
+		LocationUUID:     dummyUUID,
 		ChangeTime:       dummyTime,
 		LicenseProductNo: 20,
 		CurrentPrice:     0.5,
@@ -162,7 +162,7 @@ func getMockStorageSnapshot() StorageSnapshot {
 		Capacity:         10,
 		LocationName:     "Cologne",
 		LocationIata:     "",
-		ParentUuid:       dummyUuid,
+		ParentUUID:       dummyUUID,
 	}}
 	return mock
 }
@@ -176,13 +176,13 @@ func prepareStorageSnapshotHTTPGet() string {
 func prepareStorageSnapshotListHTTPGet() string {
 	snapshot := getMockStorageSnapshot()
 	res, _ := json.Marshal(snapshot.Properties)
-	return fmt.Sprintf(`{"snapshots" : {"%s" : %s}}`, dummyUuid, string(res))
+	return fmt.Sprintf(`{"snapshots" : {"%s" : %s}}`, dummyUUID, string(res))
 }
 
 func getMockStorageSnapshotCreateResponse() StorageSnapshotCreateResponse {
 	mock := StorageSnapshotCreateResponse{
-		RequestUuid: dummyRequestUUID,
-		ObjectUuid:  dummyUuid,
+		RequestUUID: dummyRequestUUID,
+		ObjectUUID:  dummyUUID,
 	}
 	return mock
 }

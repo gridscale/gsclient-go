@@ -28,12 +28,12 @@ func TestClient_GetLocationList(t *testing.T) {
 func TestClient_GetLocation(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiLocationBase, dummyUuid)
+	uri := path.Join(apiLocationBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareLocationHTTPGet())
 	})
-	res, err := client.GetLocation(dummyUuid)
+	res, err := client.GetLocation(dummyUUID)
 	if err != nil {
 		t.Errorf("GetLocation returned an error %v", err)
 	}
@@ -46,7 +46,7 @@ func getMockLocation() Location {
 		Status:     "active",
 		Labels:     nil,
 		Name:       "de/fra",
-		ObjectUuid: dummyUuid,
+		ObjectUUID: dummyUUID,
 		Country:    "de",
 	}}
 	return mock
@@ -61,5 +61,5 @@ func prepareLocationHTTPGet() string {
 func prepareLocationListHTTPGet() string {
 	location := getMockLocation()
 	res, _ := json.Marshal(location.Properties)
-	return fmt.Sprintf(`{"locations": {"%s": %s}}`, dummyUuid, string(res))
+	return fmt.Sprintf(`{"locations": {"%s": %s}}`, dummyUUID, string(res))
 }

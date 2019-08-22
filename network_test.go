@@ -28,12 +28,12 @@ func TestClient_GetNetworkList(t *testing.T) {
 func TestClient_GetNetwork(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiNetworkBase, dummyUuid)
+	uri := path.Join(apiNetworkBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareNetworkHTTPGet())
 	})
-	res, err := client.GetNetwork(dummyUuid)
+	res, err := client.GetNetwork(dummyUUID)
 	if err != nil {
 		t.Errorf("GetNetwork returned an error %v", err)
 	}
@@ -56,7 +56,7 @@ func TestClient_CreateNetwork(t *testing.T) {
 	response, err := client.CreateNetwork(NetworkCreateRequest{
 		Name:         "test",
 		Labels:       []string{"label"},
-		LocationUuid: dummyUuid,
+		LocationUUID: dummyUUID,
 		L2Security:   false,
 	})
 	if err != nil {
@@ -69,13 +69,13 @@ func TestClient_CreateNetwork(t *testing.T) {
 func TestClient_UpdateNetwork(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiNetworkBase, dummyUuid)
+	uri := path.Join(apiNetworkBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
 
-	err := client.UpdateNetwork(dummyUuid, NetworkUpdateRequest{
+	err := client.UpdateNetwork(dummyUUID, NetworkUpdateRequest{
 		Name:       "test",
 		L2Security: false,
 	})
@@ -87,12 +87,12 @@ func TestClient_UpdateNetwork(t *testing.T) {
 func TestClient_DeleteNetwork(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiNetworkBase, dummyUuid)
+	uri := path.Join(apiNetworkBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteNetwork(dummyUuid)
+	err := client.DeleteNetwork(dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteNetwork returned an error %v", err)
 	}
@@ -101,12 +101,12 @@ func TestClient_DeleteNetwork(t *testing.T) {
 func TestClient_GetNetworkEventList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiNetworkBase, dummyUuid, "events")
+	uri := path.Join(apiNetworkBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareNetworkEventListHTTPGet())
 	})
-	res, err := client.GetNetworkEventList(dummyUuid)
+	res, err := client.GetNetworkEventList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetNetworkEventList returned an error %v", err)
 	}
@@ -132,9 +132,9 @@ func TestClient_GetNetworkPublic(t *testing.T) {
 func getMockNetwork() Network {
 	mock := Network{Properties: NetworkProperties{
 		LocationCountry: "Germany",
-		LocationUuid:    "",
+		LocationUUID:    "",
 		PublicNet:       true,
-		ObjectUuid:      dummyUuid,
+		ObjectUUID:      dummyUUID,
 		NetworkType:     "",
 		Name:            "test",
 		Status:          "active",
@@ -149,7 +149,7 @@ func getMockNetwork() Network {
 				{
 					Vlan:       1,
 					TenantName: "test",
-					TenantUuid: dummyUuid,
+					TenantUUID: dummyUUID,
 				},
 			},
 		},
@@ -160,7 +160,7 @@ func getMockNetwork() Network {
 func prepareNetworkListHTTPGet() string {
 	network := getMockNetwork()
 	res, _ := json.Marshal(network.Properties)
-	return fmt.Sprintf(`{"networks": {"%s": %s}}`, dummyUuid, string(res))
+	return fmt.Sprintf(`{"networks": {"%s": %s}}`, dummyUUID, string(res))
 }
 
 func prepareNetworkHTTPGet() string {
@@ -171,8 +171,8 @@ func prepareNetworkHTTPGet() string {
 
 func getMockNetworkCreateResponse() NetworkCreateResponse {
 	mock := NetworkCreateResponse{
-		ObjectUuid:  dummyUuid,
-		RequestUuid: dummyRequestUUID,
+		ObjectUUID:  dummyUUID,
+		RequestUUID: dummyRequestUUID,
 	}
 	return mock
 }
@@ -186,14 +186,14 @@ func prepareNetworkCreateResponse() string {
 func getMockNetworkEvent() NetworkEvent {
 	mock := NetworkEvent{Properties: NetworkEventProperties{
 		ObjectType:    "type",
-		RequestUuid:   dummyRequestUUID,
-		ObjectUuid:    dummyUuid,
+		RequestUUID:   dummyRequestUUID,
+		ObjectUUID:    dummyUUID,
 		Activity:      "activity",
 		RequestType:   "tcp",
 		RequestStatus: "done",
 		Change:        "change note",
 		Timestamp:     dummyTime,
-		UserUuid:      dummyUuid,
+		UserUUID:      dummyUUID,
 	}}
 	return mock
 }

@@ -26,12 +26,12 @@ type StorageProperties struct {
 	LastUsedTemplate string                    `json:"last_used_template"`
 	CurrentPrice     float64                   `json:"current_price"`
 	Capacity         int                       `json:"capacity"`
-	LocationUuid     string                    `json:"location_uuid"`
+	LocationUUID     string                    `json:"location_uuid"`
 	StorageType      string                    `json:"storage_type"`
-	ParentUuid       string                    `json:"parent_uuid"`
+	ParentUUID       string                    `json:"parent_uuid"`
 	Name             string                    `json:"name"`
 	LocationName     string                    `json:"location_name"`
-	ObjectUuid       string                    `json:"object_uuid"`
+	ObjectUUID       string                    `json:"object_uuid"`
 	Snapshots        []StorageSnapshotRelation `json:"snapshots"`
 	Relations        StorageRelations          `json:"relations"`
 	Labels           []string                  `json:"labels"`
@@ -50,7 +50,7 @@ type StorageServerRelation struct {
 	Target     int    `json:"target"`
 	Controller int    `json:"controller"`
 	Bus        int    `json:"bus"`
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 	Lun        int    `json:"lun"`
 	CreateTime string `json:"create_time"`
 	ObjectName string `json:"object_name"`
@@ -59,10 +59,10 @@ type StorageServerRelation struct {
 //StorageSnapshotRelation JSON struct of a relation between a storage and a snapshot
 type StorageSnapshotRelation struct {
 	LastUsedTemplate      string `json:"last_used_template"`
-	ObjectUuid            string `json:"object_uuid"`
-	StorageUuid           string `json:"storage_uuid"`
+	ObjectUUID            string `json:"object_uuid"`
+	StorageUUID           string `json:"storage_uuid"`
 	SchedulesSnapshotName string `json:"schedules_snapshot_name"`
-	SchedulesSnapshotUuid string `json:"schedules_snapshot_uuid"`
+	SchedulesSnapshotUUID string `json:"schedules_snapshot_uuid"`
 	ObjectCapacity        int    `json:"object_capacity"`
 	CreateTime            string `json:"create_time"`
 	ObjectName            string `json:"object_name"`
@@ -74,7 +74,7 @@ type StorageAndSnapshotScheduleRelation struct {
 	KeepSnapshots int    `json:"keep_snapshots"`
 	ObjectName    string `json:"object_name"`
 	NextRuntime   string `json:"next_runtime"`
-	ObjectUuid    int    `json:"object_uuid"`
+	ObjectUUID    int    `json:"object_uuid"`
 	Name          string `json:"name"`
 	CreateTime    string `json:"create_time"`
 }
@@ -82,7 +82,7 @@ type StorageAndSnapshotScheduleRelation struct {
 //StorageTemplate JSON struct of a storage template
 type StorageTemplate struct {
 	Sshkeys      []string `json:"sshkeys,omitempty"`
-	TemplateUuid string   `json:"template_uuid"`
+	TemplateUUID string   `json:"template_uuid"`
 	Password     string   `json:"password,omitempty"`
 	PasswordType string   `json:"password_type,omitempty"`
 	Hostname     string   `json:"hostname,omitempty"`
@@ -91,7 +91,7 @@ type StorageTemplate struct {
 //StorageCreateRequest JSON struct of a request for creating a storage
 type StorageCreateRequest struct {
 	Capacity     int              `json:"capacity"`
-	LocationUuid string           `json:"location_uuid"`
+	LocationUUID string           `json:"location_uuid"`
 	Name         string           `json:"name"`
 	StorageType  string           `json:"storage_type,omitempty"`
 	Template     *StorageTemplate `json:"template,omitempty"`
@@ -118,14 +118,14 @@ type StorageEvent struct {
 //StorageEventProperties JSON struct of properties of an event of a storage
 type StorageEventProperties struct {
 	ObjectType    string `json:"object_type"`
-	RequestUuid   string `json:"request_uuid"`
-	ObjectUuid    string `json:"object_uuid"`
+	RequestUUID   string `json:"request_uuid"`
+	ObjectUUID    string `json:"object_uuid"`
 	Activity      string `json:"activity"`
 	RequestType   string `json:"request_type"`
 	RequestStatus string `json:"request_status"`
 	Change        string `json:"change"`
 	Timestamp     string `json:"timestamp"`
-	UserUuid      string `json:"user_uuid"`
+	UserUUID      string `json:"user_uuid"`
 }
 
 //GetStorage get a storage
@@ -168,7 +168,7 @@ func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 

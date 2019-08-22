@@ -47,18 +47,33 @@ servers := client.GetServerList()
 For creating and updating/patching objects in gridscale, it will be required to use the respective CreateRequest and UpdateRequest types. For creating an SSH-key that would be SshkeyCreateRequest and SshkeyUpdateRequest. Here an example:
 
 ```go
-requestBody := gsclient.IpCreateRequest {
+requestBody := gsclient.IPCreateRequest {
 	Family: 6,
-	Name:   "IpTest",
+	Name:   "IPTest",
 }
 
-client.CreateIp(requestBody)
+client.CreateIP(requestBody)
 ```
 
 What options are available for each create and update request can be found in the source code. After installing it should be located in: 
 ```
 ~/go/src/github.com/gridscale/gsclient-go
 ```
+## Examples
+Examples of how to use each resource can be found in examples folder:
+* Firewall (firewall.go)
+* IP (ip.go)
+* ISO-image (isoimage.go)
+* Loadbalancer (loadbalancer.go)
+* Network (network.go)
+* Object Storage (objectstorage.go)
+* PaaS service (paas.go)
+* Server (server.go)
+* Storage (storage.go)
+* Storage snapshot (snapshot.go)
+* Storage snapshot schedule (snapshotschedule.go)
+* SSH-key (sshkey.go)
+* Template (template.go)
 
 ## Implemented API Endpoints
 
@@ -93,8 +108,8 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Server's IP Create (CreateServerNetwork)
     * Server's IP Update (UpdateServerNetwork)
     * Server's IP Delete (DeleteServerNetwork)
-    * Link IP (LinkIp)
-    * Unlink IP (UnlinkIp)
+    * Link IP (LinkIP)
+    * Unlink IP (UnlinkIP)
     * Server's ISO-Images Get (GetServerIsoImageList)
     * Server's ISO-Image Get (GetServerIsoImage)
     * Server's ISO-Image Create (CreateServerIsoImage)
@@ -125,13 +140,13 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * LoadBalancer Delete (DeleteLoadBalancer)
     * LoadBalancerEvents Get (GetLoadBalancerEventList)
 * IPs
-    * IPs Get (GetIpList)
-    * IP Get (GetIp)
-    * IP Create (CreateIp)
-    * IP Patch (UpdateIp)
-    * IP Delete (DeleteIp)
-    * IP Events Get (GetIpEventList)
-    * IP Version Get (GetIpVersion)
+    * IPs Get (GetIPList)
+    * IP Get (GetIP)
+    * IP Create (CreateIP)
+    * IP Patch (UpdateIP)
+    * IP Delete (DeleteIP)
+    * IP Events Get (GetIPEventList)
+    * IP Version Get (GetIPVersion)
 * SSH-Keys
     * SSH-Keys Get (GetSshkeyList)
     * SSH-Key Get (GetSshkey)

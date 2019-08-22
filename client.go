@@ -4,7 +4,7 @@ const (
 	apiServerBase        = "/objects/servers"
 	apiStorageBase       = "/objects/storages"
 	apiNetworkBase       = "/objects/networks"
-	apiIpBase            = "/objects/ips"
+	apiIPBase            = "/objects/ips"
 	apiSshkeyBase        = "/objects/sshkeys"
 	apiTemplateBase      = "/objects/templates"
 	apiLoadBalancerBase  = "/objects/loadbalancers"
@@ -15,10 +15,12 @@ const (
 	apiLocationBase      = "/objects/locations"
 )
 
+//Client struct of a gridscale golang client
 type Client struct {
 	cfg *Config
 }
 
+//NewClient creates new gridscale golang client
 func NewClient(c *Config) *Client {
 	client := &Client{
 		cfg: c,

@@ -10,7 +10,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-const LocationUuid = "45ed677b-3702-4b36-be2a-a2eab9827950"
+const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -22,15 +22,15 @@ func main() {
 	log.Info("Create IPs and loadbalancer: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	// required to create IPv6 and IPv4 to create LB
-	ipv4, _ := client.CreateIp(gsclient.IpCreateRequest{
+	ipv4, _ := client.CreateIP(gsclient.IPCreateRequest{
 		Family:       4,
-		LocationUuid: LocationUuid,
+		LocationUUID: locationUUID,
 	})
 	log.Info("IPv4 has been created")
 
-	ipv6, _ := client.CreateIp(gsclient.IpCreateRequest{
+	ipv6, _ := client.CreateIP(gsclient.IPCreateRequest{
 		Family:       6,
-		LocationUuid: LocationUuid,
+		LocationUUID: locationUUID,
 	})
 	log.Info("[INFO] IPv6 has been created")
 
@@ -40,9 +40,9 @@ func main() {
 	lbRequest := gsclient.LoadBalancerCreateRequest{
 		Name:                "go-client-lb",
 		Algorithm:           "leastconn",
-		LocationUuid:        LocationUuid,
-		ListenIPv6Uuid:      ipv6.ObjectUuid,
-		ListenIPv4Uuid:      ipv4.ObjectUuid,
+		LocationUUID:        locationUUID,
+		ListenIPv6UUID:      ipv6.ObjectUUID,
+		ListenIPv4UUID:      ipv4.ObjectUUID,
 		RedirectHTTPToHTTPS: false,
 		ForwardingRules: []gsclient.ForwardingRule{
 			{
@@ -66,10 +66,10 @@ func main() {
 		log.Fatal("Create loadbalancer has failed with error", err)
 	}
 	log.WithFields(log.Fields{
-		"Loadbalancer_uuid": clb.ObjectUuid}).Info("Loadbalancer successfully created")
+		"Loadbalancer_uuid": clb.ObjectUUID}).Info("Loadbalancer successfully created")
 
 	// Get the loadbalacer to update some settings
-	glb, err := client.GetLoadBalancer(clb.ObjectUuid)
+	glb, err := client.GetLoadBalancer(clb.ObjectUUID)
 	if err != nil {
 		log.Fatal("Get loadbalancer has failed with error", err)
 	}
@@ -79,9 +79,9 @@ func main() {
 	lbUpdateRequest := gsclient.LoadBalancerUpdateRequest{
 		Name:                "go-client-lb233",
 		Algorithm:           glb.Properties.Algorithm,
-		LocationUuid:        glb.Properties.LocationUuid,
-		ListenIPv6Uuid:      glb.Properties.ListenIPv6Uuid,
-		ListenIPv4Uuid:      glb.Properties.ListenIPv4Uuid,
+		LocationUUID:        glb.Properties.LocationUUID,
+		ListenIPv6UUID:      glb.Properties.ListenIPv6UUID,
+		ListenIPv4UUID:      glb.Properties.ListenIPv4UUID,
 		RedirectHTTPToHTTPS: glb.Properties.RedirectHTTPToHTTPS,
 		ForwardingRules: []gsclient.ForwardingRule{
 			{
@@ -94,24 +94,24 @@ func main() {
 		BackendServers: glb.Properties.BackendServers,
 		Labels:         labels,
 	}
-	err = client.UpdateLoadBalancer(glb.Properties.ObjectUuid, lbUpdateRequest)
+	err = client.UpdateLoadBalancer(glb.Properties.ObjectUUID, lbUpdateRequest)
 
 	if err != nil {
 		log.Fatal("Update loadbalancer has failed with error", err)
 	}
 	log.WithFields(log.Fields{
-		"Loadbalancer_uuid": glb.Properties.ObjectUuid}).Info("Loadbalancer successfully updated")
+		"Loadbalancer_uuid": glb.Properties.ObjectUUID}).Info("Loadbalancer successfully updated")
 
 	log.Info("Retrive loadbalancer events: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get loadbalancer events
-	response, err := client.GetLoadBalancerEventList(glb.Properties.ObjectUuid)
+	response, err := client.GetLoadBalancerEventList(glb.Properties.ObjectUUID)
 	if err != nil {
 		log.Fatal("Events loadbalancer has failed with error", err)
 	}
 	log.WithFields(log.Fields{
-		"Loadbalancer_uuid": glb.Properties.ObjectUuid,
+		"Loadbalancer_uuid": glb.Properties.ObjectUUID,
 		"events":            response,
 	}).Info("Loadbalancer successfully events retrieved")
 
@@ -119,22 +119,22 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	// finallly clean up delete IPs and loadbalancer
-	err = client.DeleteLoadBalancer(glb.Properties.ObjectUuid)
+	err = client.DeleteLoadBalancer(glb.Properties.ObjectUUID)
 	if err != nil {
 		log.Fatal("Delete loadbalancer has failed with error", err)
 	}
 	log.WithFields(log.Fields{
-		"Loadbalancer_uuid": glb.Properties.ObjectUuid}).Info("Loadbalancer successfully deleted")
+		"Loadbalancer_uuid": glb.Properties.ObjectUUID}).Info("Loadbalancer successfully deleted")
 
 	time.Sleep(10 * time.Second)
 
-	err = client.DeleteIp(ipv4.ObjectUuid)
+	err = client.DeleteIP(ipv4.ObjectUUID)
 	if err != nil {
 		log.Fatal("Delete ipv4 has failed with error", err)
 	}
 	log.Info("IPv4 successfully deleted")
 
-	err = client.DeleteIp(ipv6.ObjectUuid)
+	err = client.DeleteIP(ipv6.ObjectUUID)
 	if err != nil {
 		log.Fatal("Delete ipv6 has failed with error", err)
 	}

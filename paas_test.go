@@ -29,13 +29,13 @@ func TestClient_GetPaaSServiceList(t *testing.T) {
 func TestClient_GetPaaSService(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiPaaSBase, "services", dummyUuid)
+	uri := path.Join(apiPaaSBase, "services", dummyUUID)
 	expectedObj := getMockPaaSService()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
 		fmt.Fprint(w, preparePaaSHTTPGetResponse())
 	})
-	paas, err := client.GetPaaSService(dummyUuid)
+	paas, err := client.GetPaaSService(dummyUUID)
 	if err != nil {
 		t.Errorf("GetPaaSService returned an error %v", err)
 	}
@@ -58,9 +58,9 @@ func TestClient_CreatePaaSService(t *testing.T) {
 	})
 	response, err := client.CreatePaaSService(PaaSServiceCreateRequest{
 		Name:                    "test",
-		PaaSServiceTemplateUuid: "test-template",
+		PaaSServiceTemplateUUID: "test-template",
 		Labels:                  []string{"label"},
-		PaaSSecurityZoneUuid:    "test-security-zone-id",
+		PaaSSecurityZoneUUID:    "test-security-zone-id",
 		ResourceLimits: []ResourceLimit{
 			{
 				Resource: "cpu",
@@ -78,14 +78,14 @@ func TestClient_CreatePaaSService(t *testing.T) {
 func TestClient_UpdatePaaSService(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiPaaSBase, "services", dummyUuid)
+	uri := path.Join(apiPaaSBase, "services", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodPatch)
 		fmt.Fprintf(w, "")
 	})
 	parameters := make(map[string]interface{})
 	parameters["TEST_PARAM"] = "param value"
-	err := client.UpdatePaaSService(dummyUuid, PaaSServiceUpdateRequest{
+	err := client.UpdatePaaSService(dummyUUID, PaaSServiceUpdateRequest{
 		Name:       "test",
 		Labels:     []string{"label"},
 		Parameters: parameters,
@@ -104,12 +104,12 @@ func TestClient_UpdatePaaSService(t *testing.T) {
 func TestClient_DeletePaaSService(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiPaaSBase, "services", dummyUuid)
+	uri := path.Join(apiPaaSBase, "services", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodDelete)
 		fmt.Fprintf(w, "")
 	})
-	err := client.DeletePaaSService(dummyUuid)
+	err := client.DeletePaaSService(dummyUUID)
 	if err != nil {
 		t.Errorf("DeletePaaSService returned an error %v", err)
 	}
@@ -118,12 +118,12 @@ func TestClient_DeletePaaSService(t *testing.T) {
 func TestClient_GetPaaSServiceMetrics(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiPaaSBase, "services", dummyUuid, "metrics")
+	uri := path.Join(apiPaaSBase, "services", dummyUUID, "metrics")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
 		fmt.Fprintf(writer, preparePaaSHTTPGetMetricsResponse())
 	})
-	res, err := client.GetPaaSServiceMetrics(dummyUuid)
+	res, err := client.GetPaaSServiceMetrics(dummyUUID)
 	if err != nil {
 		t.Errorf("GetPaaSServiceMetrics returned an error %v", err)
 	}
@@ -178,7 +178,7 @@ func TestClient_CreatePaaSSecurityZone(t *testing.T) {
 	})
 	res, err := client.CreatePaaSSecurityZone(PaaSSecurityZoneCreateRequest{
 		Name:         "test",
-		LocationUuid: "aa-bb-cc",
+		LocationUUID: "aa-bb-cc",
 	})
 	if err != nil {
 		t.Errorf("CreatePaaSSecurityZone returned an error %v", err)
@@ -189,12 +189,12 @@ func TestClient_CreatePaaSSecurityZone(t *testing.T) {
 func TestClient_GetPaaSSecurityZone(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiPaaSBase, "security_zones", dummyUuid)
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
 		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZone())
 	})
-	res, err := client.GetPaaSSecurityZone(dummyUuid)
+	res, err := client.GetPaaSSecurityZone(dummyUUID)
 	if err != nil {
 		t.Errorf("GetPaaSSecurityZone returned an error %v", err)
 	}
@@ -204,15 +204,15 @@ func TestClient_GetPaaSSecurityZone(t *testing.T) {
 func TestClient_UpdatePaaSSecurityZone(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiPaaSBase, "security_zones", dummyUuid)
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodPatch)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UpdatePaaSSecurityZone(dummyUuid, PaaSSecurityZoneUpdateRequest{
+	err := client.UpdatePaaSSecurityZone(dummyUUID, PaaSSecurityZoneUpdateRequest{
 		Name:                 "test",
-		LocationUuid:         "a-b-c",
-		PaaSSecurityZoneUuid: dummyUuid,
+		LocationUUID:         "a-b-c",
+		PaaSSecurityZoneUUID: dummyUUID,
 	})
 	if err != nil {
 		t.Errorf("UpdatePaaSSecurityZone returned an error %v", err)
@@ -222,12 +222,12 @@ func TestClient_UpdatePaaSSecurityZone(t *testing.T) {
 func TestClient_DeletePaaSSecurityZone(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiPaaSBase, "security_zones", dummyUuid)
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodDelete)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeletePaaSSecurityZone(dummyUuid)
+	err := client.DeletePaaSSecurityZone(dummyUUID)
 	if err != nil {
 		t.Errorf("DeletePaaSSecurityZone returned an error %v", err)
 	}
@@ -242,7 +242,7 @@ func getMockPaaSService() PaaSService {
 	parameters["TEST_PARAM"] = "param value"
 	mock := PaaSService{
 		Properties: PaaSServiceProperties{
-			ObjectUuid: dummyUuid,
+			ObjectUUID: dummyUUID,
 			Labels:     []string{"label"},
 			Credentials: []Credential{
 				{
@@ -253,8 +253,8 @@ func getMockPaaSService() PaaSService {
 			},
 			CreateTime:          "2018-04-28T09:47:41Z",
 			ListenPorts:         listenPort,
-			SecurityZoneUuid:    "d711fc50-ad96-4070-b769-6fe2bf93792c",
-			ServiceTemplateUuid: "504e2d11-7255-4712-b744-fcb093a4e613",
+			SecurityZoneUUID:    "d711fc50-ad96-4070-b769-6fe2bf93792c",
+			ServiceTemplateUUID: "504e2d11-7255-4712-b744-fcb093a4e613",
 			UsageInMinutes:      999,
 			CurrentPrice:        5.789,
 			ChangeTime:          "2018-04-29T09:47:41Z",
@@ -276,7 +276,7 @@ func getMockPaaSServiceMetric() PaaSServiceMetric {
 	mock := PaaSServiceMetric{Properties: PaaSMetricProperties{
 		BeginTime:       "2018-04-28T09:47:41Z",
 		EndTime:         "2018-04-28T09:47:41Z",
-		PaaSServiceUuid: dummyUuid,
+		PaaSServiceUUID: dummyUUID,
 		CoreUsage: PaaSMetricValue{
 			Value: 50,
 			Unit:  "percentage",
@@ -298,7 +298,7 @@ func preparePaaSHTTPGetMetricsResponse() string {
 func preparePaaSHTTPGetListResponse() string {
 	paas := getMockPaaSService()
 	res, _ := json.Marshal(paas.Properties)
-	return fmt.Sprintf(`{"paas_services": {"%s" : %s}}`, dummyUuid, string(res))
+	return fmt.Sprintf(`{"paas_services": {"%s" : %s}}`, dummyUUID, string(res))
 }
 
 func preparePaaSHTTPGetResponse() string {
@@ -322,9 +322,9 @@ func getMockPaaSServiceCreateResponse() PaaSServiceCreateResponse {
 	parameters := make(map[string]interface{})
 	parameters["TEST_PARAM"] = "param value"
 	return PaaSServiceCreateResponse{
-		RequestUuid:     dummyRequestUUID,
+		RequestUUID:     dummyRequestUUID,
 		ListenPorts:     listenPort,
-		PaaSServiceUuid: dummyUuid,
+		PaaSServiceUUID: dummyUUID,
 		Credentials: []Credential{
 			{
 				Username: "username",
@@ -332,7 +332,7 @@ func getMockPaaSServiceCreateResponse() PaaSServiceCreateResponse {
 				Type:     "type",
 			},
 		},
-		ObjectUuid: dummyUuid,
+		ObjectUUID: dummyUUID,
 		ResourceLimits: []ResourceLimit{
 			{
 				Resource: "cpu",
@@ -346,7 +346,7 @@ func getMockPaaSServiceCreateResponse() PaaSServiceCreateResponse {
 func getMockPaasTemplate() PaaSTemplate {
 	mock := PaaSTemplate{Properties: PaaSTemplateProperties{
 		Name:       "test",
-		ObjectUuid: "d711fc50-ad96-4070-b769-6fe2bf93792c",
+		ObjectUUID: "d711fc50-ad96-4070-b769-6fe2bf93792c",
 		Category:   "database",
 		ProductNo:  0,
 		Labels:     []string{"label"},
@@ -372,14 +372,14 @@ func getMockSecurityZone() PaaSSecurityZone {
 		LocationCountry: "Germany",
 		CreateTime:      "2018-04-28T09:47:41Z",
 		LocationIata:    "none",
-		ObjectUuid:      "aa-bb-cc-dd",
+		ObjectUUID:      "aa-bb-cc-dd",
 		Labels:          []string{"label"},
 		LocationName:    "Bonn",
 		Status:          "active",
-		LocationUuid:    "cc-dd-ee",
+		LocationUUID:    "cc-dd-ee",
 		ChangeTime:      "2018-04-28T09:47:41Z",
 		Name:            "test",
-		Relation:        PaaSRelationService{Services: []ServiceObject{{ObjectUuid: "ff-gg-hh"}}},
+		Relation:        PaaSRelationService{Services: []ServiceObject{{ObjectUUID: "ff-gg-hh"}}},
 	}}
 	return mock
 }
@@ -398,9 +398,9 @@ func preparePaaSHTTPGetSecurityZone() string {
 
 func getMockPaaSSecurityZoneCreateResponse() PaaSSecurityZoneCreateResponse {
 	return PaaSSecurityZoneCreateResponse{
-		RequestUuid:          dummyRequestUUID,
-		PaaSSecurityZoneUuid: dummyUuid,
-		ObjectUuid:           dummyUuid,
+		RequestUUID:          dummyRequestUUID,
+		PaaSSecurityZoneUUID: dummyUUID,
+		ObjectUUID:           dummyUUID,
 	}
 }
 

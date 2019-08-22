@@ -12,12 +12,12 @@ import (
 func TestClient_GetServerNetworkList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "networks")
+	uri := path.Join(apiServerBase, dummyUUID, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerNetworkListHTTPGet())
 	})
-	res, err := client.GetServerNetworkList(dummyUuid)
+	res, err := client.GetServerNetworkList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerNetworkList returned an error %v", err)
 	}
@@ -28,12 +28,12 @@ func TestClient_GetServerNetworkList(t *testing.T) {
 func TestClient_GetServerNetwork(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "networks", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerNetworkHTTPGet())
 	})
-	res, err := client.GetServerNetwork(dummyUuid, dummyUuid)
+	res, err := client.GetServerNetwork(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerNetwork returned an error %v", err)
 	}
@@ -43,17 +43,17 @@ func TestClient_GetServerNetwork(t *testing.T) {
 func TestClient_CreateServerNetwork(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "networks")
+	uri := path.Join(apiServerBase, dummyUUID, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerNetwork(dummyUuid, ServerNetworkRelationCreateRequest{
-		ObjectUuid:           dummyUuid,
+	err := client.CreateServerNetwork(dummyUUID, ServerNetworkRelationCreateRequest{
+		ObjectUUID:           dummyUUID,
 		Ordering:             1,
 		BootDevice:           false,
 		L3security:           nil,
-		FirewallTemplateUuid: dummyUuid,
+		FirewallTemplateUUID: dummyUUID,
 	})
 	if err != nil {
 		t.Errorf("CreateServerNetwork returned an error %v", err)
@@ -63,15 +63,15 @@ func TestClient_CreateServerNetwork(t *testing.T) {
 func TestClient_UpdateServerNetwork(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "networks", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UpdateServerNetwork(dummyUuid, dummyUuid, ServerNetworkRelationUpdateRequest{
+	err := client.UpdateServerNetwork(dummyUUID, dummyUUID, ServerNetworkRelationUpdateRequest{
 		Ordering:             0,
 		BootDevice:           true,
-		FirewallTemplateUuid: dummyUuid,
+		FirewallTemplateUUID: dummyUUID,
 	})
 	if err != nil {
 		t.Errorf("UpdateServerNetwork returned an error %v", err)
@@ -81,12 +81,12 @@ func TestClient_UpdateServerNetwork(t *testing.T) {
 func TestClient_DeleteServerNetwork(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "networks", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteServerNetwork(dummyUuid, dummyUuid)
+	err := client.DeleteServerNetwork(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteServerNetwork returned an error %v", err)
 	}
@@ -95,12 +95,12 @@ func TestClient_DeleteServerNetwork(t *testing.T) {
 func TestClient_LinkNetwork(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "networks")
+	uri := path.Join(apiServerBase, dummyUUID, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.LinkNetwork(dummyUuid, dummyUuid, dummyUuid, true, 0, nil, FirewallRules{})
+	err := client.LinkNetwork(dummyUUID, dummyUUID, dummyUUID, true, 0, nil, FirewallRules{})
 	if err != nil {
 		t.Errorf("LinkNetwork returned an error %v", err)
 	}
@@ -109,12 +109,12 @@ func TestClient_LinkNetwork(t *testing.T) {
 func TestClient_UnlinkNetwork(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUuid, "networks", dummyUuid)
+	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UnlinkNetwork(dummyUuid, dummyUuid)
+	err := client.UnlinkNetwork(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("UnlinkNetwork returned an error %v", err)
 	}
@@ -123,19 +123,19 @@ func TestClient_UnlinkNetwork(t *testing.T) {
 func getMockServerNetwork() ServerNetworkRelationProperties {
 	mock := ServerNetworkRelationProperties{
 		L2security:           true,
-		ServerUuid:           dummyUuid,
+		ServerUUID:           dummyUUID,
 		CreateTime:           dummyTime,
 		PublicNet:            false,
-		FirewallTemplateUuid: dummyUuid,
+		FirewallTemplateUUID: dummyUUID,
 		ObjectName:           "test",
 		Mac:                  "",
 		BootDevice:           true,
-		PartnerUuid:          dummyUuid,
+		PartnerUUID:          dummyUUID,
 		Ordering:             0,
 		Firewall:             "",
 		NetworkType:          "",
-		NetworkUuid:          dummyUuid,
-		ObjectUuid:           dummyUuid,
+		NetworkUUID:          dummyUUID,
+		ObjectUUID:           dummyUUID,
 		L3security:           nil,
 	}
 	return mock

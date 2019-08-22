@@ -17,14 +17,14 @@ type ISOImage struct {
 
 //ISOImageProperties is JSON struct of properties of an ISO image
 type ISOImageProperties struct {
-	ObjectUuid      string           `json:"object_uuid"`
+	ObjectUUID      string           `json:"object_uuid"`
 	Relations       ISOImageRelation `json:"relations"`
 	Description     string           `json:"description"`
 	LocationName    string           `json:"location_name"`
-	SourceUrl       string           `json:"source_url"`
+	SourceURL       string           `json:"source_url"`
 	Labels          []string         `json:"labels"`
 	LocationIata    string           `json:"location_iata"`
-	LocationUuid    string           `json:"location_uuid"`
+	LocationUUID    string           `json:"location_uuid"`
 	Status          string           `json:"status"`
 	CreateTime      string           `json:"create_time"`
 	Name            string           `json:"name"`
@@ -47,21 +47,21 @@ type ServerinISOImage struct {
 	Bootdevice bool   `json:"bootdevice"`
 	CreateTime string `json:"create_time"`
 	ObjectName string `json:"object_name"`
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 }
 
 //ISOImageCreateRequest is JSON struct of a request for creating an ISO-Image
 type ISOImageCreateRequest struct {
 	Name         string   `json:"name"`
-	SourceUrl    string   `json:"source_url"`
+	SourceURL    string   `json:"source_url"`
 	Labels       []string `json:"labels,omitempty"`
-	LocationUuid string   `json:"location_uuid"`
+	LocationUUID string   `json:"location_uuid"`
 }
 
 //ISOImageCreateResponse is JSON struct of a response for creating an ISO-Image
 type ISOImageCreateResponse struct {
-	RequestUuid string `json:"request_uuid"`
-	ObjectUuid  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
 }
 
 //ISOImageUpdateRequest is JSON struct of a request for updating an ISO-Image
@@ -83,14 +83,14 @@ type ISOImageEvent struct {
 //ISOImageEventProperties is JSON struct of an ISO-Image event
 type ISOImageEventProperties struct {
 	ObjectType    string `json:"object_type"`
-	RequestUuid   string `json:"request_uuid"`
-	ObjectUuid    string `json:"object_uuid"`
+	RequestUUID   string `json:"request_uuid"`
+	ObjectUUID    string `json:"object_uuid"`
 	Activity      string `json:"activity"`
 	RequestType   string `json:"request_type"`
 	RequestStatus string `json:"request_status"`
 	Change        string `json:"change"`
 	Timestamp     string `json:"timestamp"`
-	UserUuid      string `json:"user_uuid"`
+	UserUUID      string `json:"user_uuid"`
 }
 
 //GetISOImageList returns a list of available ISO images
@@ -131,7 +131,7 @@ func (c *Client) CreateISOImage(body ISOImageCreateRequest) (ISOImageCreateRespo
 	if err != nil {
 		return ISOImageCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 
@@ -154,7 +154,7 @@ func (c *Client) DeleteISOImage(id string) error {
 	return r.execute(*c, nil)
 }
 
-//GetISOImageEvents returns a list of events of an ISO image
+//GetISOImageEventList returns a list of events of an ISO image
 func (c *Client) GetISOImageEventList(id string) ([]ISOImageEvent, error) {
 	r := Request{
 		uri:    path.Join(apiISOBase, id, "events"),
