@@ -88,9 +88,9 @@ func (c *Client) GetStorageSnapshotList(id string) ([]StorageSnapshot, error) {
 }
 
 //GetStorageSnapshot gets a specific storage's snapshot based on given storage id and snapshot id.
-func (c *Client) GetStorageSnapshot(storageId, snapshotId string) (StorageSnapshot, error) {
+func (c *Client) GetStorageSnapshot(storageID, snapshotID string) (StorageSnapshot, error) {
 	r := Request{
-		uri:    path.Join(apiStorageBase, storageId, "snapshots", snapshotId),
+		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodGet,
 	}
 	var response StorageSnapshot
@@ -115,9 +115,9 @@ func (c *Client) CreateStorageSnapshot(id string, body StorageSnapshotCreateRequ
 }
 
 //UpdateStorageSnapshot updates a specific storage's snapshot
-func (c *Client) UpdateStorageSnapshot(storageId, snapshotId string, body StorageSnapshotUpdateRequest) error {
+func (c *Client) UpdateStorageSnapshot(storageID, snapshotID string, body StorageSnapshotUpdateRequest) error {
 	r := Request{
-		uri:    path.Join(apiStorageBase, storageId, "snapshots", snapshotId),
+		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodPatch,
 		body:   body,
 	}
@@ -125,18 +125,18 @@ func (c *Client) UpdateStorageSnapshot(storageId, snapshotId string, body Storag
 }
 
 //DeleteStorageSnapshot deletes a specific storage's snapshot
-func (c *Client) DeleteStorageSnapshot(storageId, snapshotId string) error {
+func (c *Client) DeleteStorageSnapshot(storageID, snapshotID string) error {
 	r := Request{
-		uri:    path.Join(apiStorageBase, storageId, "snapshots", snapshotId),
+		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)
 }
 
 //RollbackStorage rollbacks a storage
-func (c *Client) RollbackStorage(storageId, snapshotId string, body StorageRollbackRequest) error {
+func (c *Client) RollbackStorage(storageID, snapshotID string, body StorageRollbackRequest) error {
 	r := Request{
-		uri:    path.Join(apiStorageBase, storageId, "snapshots", snapshotId, "rollback"),
+		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID, "rollback"),
 		method: http.MethodPatch,
 		body:   body,
 	}
@@ -144,9 +144,9 @@ func (c *Client) RollbackStorage(storageId, snapshotId string, body StorageRollb
 }
 
 //ExportStorageSnapshotToS3 export a storage's snapshot to S3
-func (c *Client) ExportStorageSnapshotToS3(storageId, snapshotId string, body StorageSnapshotExportToS3Request) error {
+func (c *Client) ExportStorageSnapshotToS3(storageID, snapshotID string, body StorageSnapshotExportToS3Request) error {
 	r := Request{
-		uri:    path.Join(apiStorageBase, storageId, "snapshots", snapshotId, "export_to_s3"),
+		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID, "export_to_s3"),
 		method: http.MethodPatch,
 		body:   body,
 	}

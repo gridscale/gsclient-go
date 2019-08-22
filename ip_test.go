@@ -58,7 +58,7 @@ func TestClient_CreateIP(t *testing.T) {
 		Family:       1,
 		LocationUUID: dummyUUID,
 		Failover:     false,
-		ReverseDns:   "8.8.8.8",
+		ReverseDNS:   "8.8.8.8",
 	})
 	if err != nil {
 		t.Errorf("CreateIP returned an error %v", err)
@@ -79,7 +79,7 @@ func TestClient_UpdateIP(t *testing.T) {
 	err := client.UpdateIP(dummyUUID, IPUpdateRequest{
 		Name:       "test",
 		Failover:   false,
-		ReverseDns: "8.8.4.4",
+		ReverseDNS: "8.8.4.4",
 	})
 	if err != nil {
 		t.Errorf("UpdateIP returned an error %v", err)
@@ -138,7 +138,7 @@ func getMockIP() IP {
 		LocationCountry: "Germany",
 		LocationUUID:    dummyUUID,
 		ObjectUUID:      dummyUUID,
-		ReverseDns:      "8.8.8.8",
+		ReverseDNS:      "8.8.8.8",
 		Family:          1,
 		Status:          "active",
 		CreateTime:      dummyTime,

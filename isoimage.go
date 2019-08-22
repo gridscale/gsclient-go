@@ -21,7 +21,7 @@ type ISOImageProperties struct {
 	Relations       ISOImageRelation `json:"relations"`
 	Description     string           `json:"description"`
 	LocationName    string           `json:"location_name"`
-	SourceUrl       string           `json:"source_url"`
+	SourceURL       string           `json:"source_url"`
 	Labels          []string         `json:"labels"`
 	LocationIata    string           `json:"location_iata"`
 	LocationUUID    string           `json:"location_uuid"`
@@ -53,7 +53,7 @@ type ServerinISOImage struct {
 //ISOImageCreateRequest is JSON struct of a request for creating an ISO-Image
 type ISOImageCreateRequest struct {
 	Name         string   `json:"name"`
-	SourceUrl    string   `json:"source_url"`
+	SourceURL    string   `json:"source_url"`
 	Labels       []string `json:"labels,omitempty"`
 	LocationUUID string   `json:"location_uuid"`
 }

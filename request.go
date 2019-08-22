@@ -68,7 +68,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	if err != nil {
 		return err
 	}
-	request.Header.Add("X-Auth-UserId", c.cfg.UserUUID)
+	request.Header.Add("X-Auth-UserID", c.cfg.UserUUID)
 	request.Header.Add("X-Auth-Token", c.cfg.APIToken)
 	request.Header.Add("Content-Type", "application/json")
 	c.cfg.logger.Debugf("Request body: %v", request.Body)

@@ -47,9 +47,9 @@ func (c *Client) GetServerIsoImageList(id string) ([]ServerIsoImageRelationPrope
 }
 
 //GetServerIsoImage gets an ISO image of a specific server
-func (c *Client) GetServerIsoImage(serverId, isoImageId string) (ServerIsoImageRelationProperties, error) {
+func (c *Client) GetServerIsoImage(serverID, isoImageID string) (ServerIsoImageRelationProperties, error) {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "isoimages", isoImageId),
+		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodGet,
 	}
 	var response ServerIsoImageRelation
@@ -58,9 +58,9 @@ func (c *Client) GetServerIsoImage(serverId, isoImageId string) (ServerIsoImageR
 }
 
 //UpdateServerIsoImage updates a link between a storage and an ISO image
-func (c *Client) UpdateServerIsoImage(serverId, isoImageId string, body ServerIsoImageRelationUpdateRequest) error {
+func (c *Client) UpdateServerIsoImage(serverID, isoImageID string, body ServerIsoImageRelationUpdateRequest) error {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "isoimages", isoImageId),
+		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodPatch,
 		body:   body,
 	}
@@ -78,23 +78,23 @@ func (c *Client) CreateServerIsoImage(id string, body ServerIsoImageRelationCrea
 }
 
 //DeleteServerIsoImage deletes a link between an ISO image and a server
-func (c *Client) DeleteServerIsoImage(serverId, isoImageId string) error {
+func (c *Client) DeleteServerIsoImage(serverID, isoImageID string) error {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "isoimages", isoImageId),
+		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)
 }
 
 //LinkIsoImage attaches an ISO image to a server
-func (c *Client) LinkIsoImage(serverId string, isoimageId string) error {
+func (c *Client) LinkIsoImage(serverID string, isoimageID string) error {
 	body := ServerIsoImageRelationCreateRequest{
-		ObjectUUID: isoimageId,
+		ObjectUUID: isoimageID,
 	}
-	return c.CreateServerIsoImage(serverId, body)
+	return c.CreateServerIsoImage(serverID, body)
 }
 
 //UnlinkIsoImage removes the link between an ISO image and a server
-func (c *Client) UnlinkIsoImage(serverId string, isoimageId string) error {
-	return c.DeleteServerIsoImage(serverId, isoimageId)
+func (c *Client) UnlinkIsoImage(serverID string, isoimageID string) error {
+	return c.DeleteServerIsoImage(serverID, isoimageID)
 }

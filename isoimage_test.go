@@ -55,7 +55,7 @@ func TestClient_CreateISOImage(t *testing.T) {
 
 	response, err := client.CreateISOImage(ISOImageCreateRequest{
 		Name:         "Test",
-		SourceUrl:    "http://example.org",
+		SourceURL:    "http://example.org",
 		Labels:       []string{"label"},
 		LocationUUID: "aa-bb-cc",
 	})
@@ -130,7 +130,7 @@ func getMockISOImage() ISOImage {
 		},
 		Description:     "description",
 		LocationName:    "locationName",
-		SourceUrl:       "url",
+		SourceURL:       "url",
 		Labels:          []string{"label"},
 		LocationIata:    "iata",
 		LocationUUID:    "locUUID",

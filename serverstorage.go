@@ -57,9 +57,9 @@ func (c *Client) GetServerStorageList(id string) ([]ServerStorageRelationPropert
 }
 
 //GetServerStorage gets a storage of a specific server
-func (c *Client) GetServerStorage(serverId, storageId string) (ServerStorageRelationProperties, error) {
+func (c *Client) GetServerStorage(serverID, storageID string) (ServerStorageRelationProperties, error) {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "storages", storageId),
+		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodGet,
 	}
 	var response ServerStorageRelationSingle
@@ -68,9 +68,9 @@ func (c *Client) GetServerStorage(serverId, storageId string) (ServerStorageRela
 }
 
 //UpdateServerStorage updates a link between a storage and a server
-func (c *Client) UpdateServerStorage(serverId, storageId string, body ServerStorageRelationUpdateRequest) error {
+func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStorageRelationUpdateRequest) error {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "storages", storageId),
+		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodPatch,
 		body:   body,
 	}
@@ -88,24 +88,24 @@ func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreate
 }
 
 //DeleteServerStorage delete a link between a storage and a server
-func (c *Client) DeleteServerStorage(serverId, storageId string) error {
+func (c *Client) DeleteServerStorage(serverID, storageID string) error {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "storages", storageId),
+		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)
 }
 
 //LinkStorage attaches a storage to a server
-func (c *Client) LinkStorage(serverId string, storageId string, bootdevice bool) error {
+func (c *Client) LinkStorage(serverID string, storageID string, bootdevice bool) error {
 	body := ServerStorageRelationCreateRequest{
-		ObjectUUID: storageId,
+		ObjectUUID: storageID,
 		BootDevice: bootdevice,
 	}
-	return c.CreateServerStorage(serverId, body)
+	return c.CreateServerStorage(serverID, body)
 }
 
 //UnlinkStorage remove a storage from a server
-func (c *Client) UnlinkStorage(serverId string, storageId string) error {
-	return c.DeleteServerStorage(serverId, storageId)
+func (c *Client) UnlinkStorage(serverID string, storageID string) error {
+	return c.DeleteServerStorage(serverID, storageID)
 }

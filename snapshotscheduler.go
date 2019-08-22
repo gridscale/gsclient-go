@@ -82,9 +82,9 @@ func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSch
 }
 
 //GetStorageSnapshotSchedule gets a specific storage snapshot scheduler based on a given storage's id and scheduler's id
-func (c *Client) GetStorageSnapshotSchedule(storageId, scheduleId string) (StorageSnapshotSchedule, error) {
+func (c *Client) GetStorageSnapshotSchedule(storageID, scheduleID string) (StorageSnapshotSchedule, error) {
 	r := Request{
-		uri:    path.Join(apiStorageBase, storageId, "snapshot_schedules", scheduleId),
+		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodGet,
 	}
 	var response StorageSnapshotSchedule
@@ -110,10 +110,10 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 }
 
 //UpdateStorageSnapshotSchedule updates specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
-func (c *Client) UpdateStorageSnapshotSchedule(storageId, scheduleId string,
+func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 	body StorageSnapshotScheduleUpdateRequest) error {
 	r := Request{
-		uri:    path.Join(apiStorageBase, storageId, "snapshot_schedules", scheduleId),
+		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodPatch,
 		body:   body,
 	}
@@ -121,9 +121,9 @@ func (c *Client) UpdateStorageSnapshotSchedule(storageId, scheduleId string,
 }
 
 //DeleteStorageSnapshotSchedule deletes specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
-func (c *Client) DeleteStorageSnapshotSchedule(storageId, scheduleId string) error {
+func (c *Client) DeleteStorageSnapshotSchedule(storageID, scheduleID string) error {
 	r := Request{
-		uri:    path.Join(apiStorageBase, storageId, "snapshot_schedules", scheduleId),
+		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)

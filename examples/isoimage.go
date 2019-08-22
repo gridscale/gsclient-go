@@ -26,7 +26,7 @@ func main() {
 
 	isoRequest := gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
-		SourceUrl:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
+		SourceURL:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
 		LocationUUID: locationUUID,
 	}
 	cIso, err := client.CreateISOImage(isoRequest)

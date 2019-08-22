@@ -42,9 +42,9 @@ func (c *Client) GetServerIPList(id string) ([]ServerIPRelationProperties, error
 }
 
 //GetServerIP gets an IP of a specific server
-func (c *Client) GetServerIP(serverId, ipId string) (ServerIPRelationProperties, error) {
+func (c *Client) GetServerIP(serverID, ipID string) (ServerIPRelationProperties, error) {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "ips", ipId),
+		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
 		method: http.MethodGet,
 	}
 	var response ServerIPRelation
@@ -63,23 +63,23 @@ func (c *Client) CreateServerIP(id string, body ServerIPRelationCreateRequest) e
 }
 
 //DeleteServerIP delete a link between a server and an IP
-func (c *Client) DeleteServerIP(serverId, ipID string) error {
+func (c *Client) DeleteServerIP(serverID, ipID string) error {
 	r := Request{
-		uri:    path.Join(apiServerBase, serverId, "ips", ipID),
+		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
 		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)
 }
 
 //LinkIP attaches an IP to a server
-func (c *Client) LinkIP(serverId string, ipID string) error {
+func (c *Client) LinkIP(serverID string, ipID string) error {
 	body := ServerIPRelationCreateRequest{
 		ObjectUUID: ipID,
 	}
-	return c.CreateServerIP(serverId, body)
+	return c.CreateServerIP(serverID, body)
 }
 
 //UnlinkIP removes a link between an IP and a server
-func (c *Client) UnlinkIP(serverId string, ipID string) error {
-	return c.DeleteServerIP(serverId, ipID)
+func (c *Client) UnlinkIP(serverID string, ipID string) error {
+	return c.DeleteServerIP(serverID, ipID)
 }

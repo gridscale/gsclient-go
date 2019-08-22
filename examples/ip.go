@@ -57,7 +57,7 @@ func main() {
 	updateRequest := gsclient.IPUpdateRequest{
 		Name:       "Updated IP address",
 		Failover:   ip.Properties.Failover,
-		ReverseDns: ip.Properties.ReverseDns,
+		ReverseDNS: ip.Properties.ReverseDNS,
 		Labels:     ip.Properties.Labels,
 	}
 	err = client.UpdateIP(ip.Properties.ObjectUUID, updateRequest)

@@ -21,7 +21,7 @@ type IPProperties struct {
 	LocationCountry string      `json:"location_country"`
 	LocationUUID    string      `json:"location_uuid"`
 	ObjectUUID      string      `json:"object_uuid"`
-	ReverseDns      string      `json:"reverse_dns"`
+	ReverseDNS      string      `json:"reverse_dns"`
 	Family          int         `json:"family"`
 	Status          string      `json:"status"`
 	CreateTime      string      `json:"create_time"`
@@ -74,7 +74,7 @@ type IPCreateRequest struct {
 	Family       int      `json:"family"`
 	LocationUUID string   `json:"location_uuid"`
 	Failover     bool     `json:"failover,omitempty"`
-	ReverseDns   string   `json:"reverse_dns,omitempty"`
+	ReverseDNS   string   `json:"reverse_dns,omitempty"`
 	Labels       []string `json:"labels,omitempty"`
 }
 
@@ -82,7 +82,7 @@ type IPCreateRequest struct {
 type IPUpdateRequest struct {
 	Name       string   `json:"name,omitempty"`
 	Failover   bool     `json:"failover"`
-	ReverseDns string   `json:"reverse_dns,omitempty"`
+	ReverseDNS string   `json:"reverse_dns,omitempty"`
 	Labels     []string `json:"labels,omitempty"`
 }
 

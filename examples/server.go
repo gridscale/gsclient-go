@@ -154,7 +154,7 @@ func main() {
 
 	cISOimage, err := client.CreateISOImage(gsclient.ISOImageCreateRequest{
 		Name:         "go-client-iso",
-		SourceUrl:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
+		SourceURL:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
 		LocationUUID: locationUUID,
 	})
 	if err != nil {
@@ -260,31 +260,31 @@ func (c *enhancedClient) deleteService(serviceType serviceType, id string) {
 	}
 }
 
-func (c *enhancedClient) unlinkService(serviceType serviceType, serverId, serviceId string) {
+func (c *enhancedClient) unlinkService(serviceType serviceType, serverID, serviceID string) {
 	switch serviceType {
 	case storageType:
-		err := c.UnlinkStorage(serverId, serviceId)
+		err := c.UnlinkStorage(serverID, serviceID)
 		if err != nil {
 			log.Error("Unlink storage has failed with error", err)
 			return
 		}
 		log.Info("Storage successfully unlinked")
 	case networkType:
-		err := c.UnlinkNetwork(serverId, serviceId)
+		err := c.UnlinkNetwork(serverID, serviceID)
 		if err != nil {
 			log.Error("Unlink network has failed with error", err)
 			return
 		}
 		log.Info("Network successfully unlinked")
 	case ipType:
-		err := c.UnlinkIP(serverId, serviceId)
+		err := c.UnlinkIP(serverID, serviceID)
 		if err != nil {
 			log.Error("Unlink IP has failed with error", err)
 			return
 		}
 		log.Info("IP successfully unlinked")
 	case isoImageType:
-		err := c.UnlinkIsoImage(serverId, serviceId)
+		err := c.UnlinkIsoImage(serverID, serviceID)
 		if err != nil {
 			log.Error("Unlink ISO-image has failed with error", err)
 			return
