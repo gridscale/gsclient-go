@@ -121,13 +121,13 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 	})
 	err := client.ExportStorageSnapshotToS3(dummyUuid, dummyUuid, StorageSnapshotExportToS3Request{
 		S3auth: struct {
-			Host       string `json:"host"`
-			AccessKeys string `json:"access_keys"`
-			SecretKey  string `json:"secret_key"`
+			Host      string `json:"host"`
+			AccessKey string `json:"access_key"`
+			SecretKey string `json:"secret_key"`
 		}{
-			Host:       "example.com",
-			AccessKeys: "access_keys",
-			SecretKey:  "secret_key",
+			Host:      "example.com",
+			AccessKey: "access_key",
+			SecretKey: "secret_key",
 		},
 		S3data: struct {
 			Host     string `json:"host"`

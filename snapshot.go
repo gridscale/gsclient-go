@@ -60,9 +60,9 @@ type StorageRollbackRequest struct {
 //StorageSnapshotExportToS3Request JSON struct of a request for exporting a storage snapshot to S3
 type StorageSnapshotExportToS3Request struct {
 	S3auth struct {
-		Host       string `json:"host"`
-		AccessKeys string `json:"access_keys"`
-		SecretKey  string `json:"secret_key"`
+		Host      string `json:"host"`
+		AccessKey string `json:"access_key"`
+		SecretKey string `json:"secret_key"`
 	} `json:"s3auth"`
 	S3data struct {
 		Host     string `json:"host"`
