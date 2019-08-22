@@ -15,7 +15,7 @@ type ObjectStorageAccessKey struct {
 	Properties ObjectStorageAccessKeyProperties `json:"access_key"`
 }
 
-//NetworkEventProperties is JSON struct of properties of an object storage access key
+//ObjectStorageAccessKeyProperties is JSON struct of properties of an object storage access key
 type ObjectStorageAccessKeyProperties struct {
 	SecretKey string `json:"secret_key"`
 	AccessKey string `json:"access_key"`

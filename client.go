@@ -15,10 +15,12 @@ const (
 	apiLocationBase      = "/objects/locations"
 )
 
+//Client struct of a gridscale golang client
 type Client struct {
 	cfg *Config
 }
 
+//NewClient creates new gridscale golang client
 func NewClient(c *Config) *Client {
 	client := &Client{
 		cfg: c,

@@ -154,7 +154,7 @@ func (c *Client) DeleteISOImage(id string) error {
 	return r.execute(*c, nil)
 }
 
-//GetISOImageEvents returns a list of events of an ISO image
+//GetISOImageEventList returns a list of events of an ISO image
 func (c *Client) GetISOImageEventList(id string) ([]ISOImageEvent, error) {
 	r := Request{
 		uri:    path.Join(apiISOBase, id, "events"),

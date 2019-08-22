@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+//Request gridscale's custom request struct
 type Request struct {
 	uri    string
 	method string
@@ -91,11 +92,10 @@ func (r *Request) execute(c Client, output interface{}) error {
 		json.Unmarshal(iostream, &errorMessage)
 		c.cfg.logger.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
 		return errorMessage
-	} else {
-		json.Unmarshal(iostream, output) //Edit the given struct
-		c.cfg.logger.Debugf("Response body: %v", string(iostream))
-		return nil
 	}
+	json.Unmarshal(iostream, output) //Edit the given struct
+	c.cfg.logger.Debugf("Response body: %v", string(iostream))
+	return nil
 }
 
 //WaitForRequestCompletion allows to wait for a request to complete. Timeouts are currently hardcoded
