@@ -209,7 +209,15 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Firewall Update (UpdateFirewall)
     * Firewall Delete (DeleteFirewall)
     * Firewall Events Get (GetFirewallEventList) 
-    
+* Marketplace template
+    * Marketplace templates Get (GetMarketplaceTemplateList)
+    * Marketplace template Get (GetMarketplaceTemplate)
+    * Marketplace template Create (CreateMarketplaceTemplate)
+    * Marketplace template Import (ImportMarketplaceTemplate)
+    * Marketplace template Update (UpdateMarketplaceTemplate)
+    * Marketplace template Delete (DeleteMarketplaceTemplate)
+    * Marketplace template's events Get (GetMarketplaceTemplateEventList)
+
 Note: The functions in this list can be called with a Client type.
 
 ## Known Issues
