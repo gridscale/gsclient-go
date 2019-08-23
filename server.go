@@ -46,16 +46,16 @@ type ServerRelations struct {
 
 //ServerCreateRequest JSON struct of a request for creating a server
 type ServerCreateRequest struct {
-	Name            string                        `json:"name"`
-	Memory          int                           `json:"memory"`
-	Cores           int                           `json:"cores"`
-	LocationUUID    string                        `json:"location_uuid"`
-	HardwareProfile string                        `json:"hardware_profile,omitempty"`
-	AvailablityZone string                        `json:"availability_zone,omitempty"`
-	Labels          []string                      `json:"labels,omitempty"`
-	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
-	Status          string                        `json:"status,omitempty"`
-	AutoRecovery    bool                          `json:"auto_recovery,omitempty"`
+	Name            string   `json:"name"`
+	Memory          int      `json:"memory"`
+	Cores           int      `json:"cores"`
+	LocationUUID    string   `json:"location_uuid"`
+	HardwareProfile string   `json:"hardware_profile,omitempty"`
+	AvailablityZone string   `json:"availability_zone,omitempty"`
+	Labels          []string `json:"labels,omitempty"`
+	Status          string   `json:"status,omitempty"`
+	AutoRecovery    *bool    `json:"auto_recovery,omitempty"`
+	//Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
 }
 
 //ServerCreateResponse JSON struct of a response for creating a server
@@ -110,7 +110,7 @@ type ServerUpdateRequest struct {
 	Memory          int      `json:"memory,omitempty"`
 	Cores           int      `json:"cores,omitempty"`
 	Labels          []string `json:"labels,omitempty"`
-	AutoRecovery    bool     `json:"auto_recovery,omitempty"`
+	AutoRecovery    *bool    `json:"auto_recovery,omitempty"`
 }
 
 //ServerEventList JSON struct of a list of a server's events
