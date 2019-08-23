@@ -13,7 +13,6 @@ FEATURES:
 
 IMPROVEMENTS:
 
-* Avoid use of fmt.errorf
 * Unit Tests for all functionality
 * Logging support
 * Many examples have been added
