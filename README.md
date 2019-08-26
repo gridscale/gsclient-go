@@ -209,6 +209,8 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Firewall Update (UpdateFirewall)
     * Firewall Delete (DeleteFirewall)
     * Firewall Events Get (GetFirewallEventList) 
+* Event
+    * Events Get (GetEventList)
     
 Note: The functions in this list can be called with a Client type.
 
