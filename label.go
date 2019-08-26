@@ -53,6 +53,10 @@ func (c *Client) CreateLabel(body LabelCreateRequest) (CreateResponse, error) {
 	}
 	var response CreateResponse
 	err := r.execute(*c, &response)
+	if err != nil {
+		return CreateResponse{}, err
+	}
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 
