@@ -40,7 +40,7 @@ func getMockEvent() Event {
 }
 
 func prepareEventListHTTPGet() string {
-	event := getMockFirewallEvent()
+	event := getMockEvent()
 	res, _ := json.Marshal(event.Properties)
 	return fmt.Sprintf(`{"events": [%s]}`, string(res))
 }
