@@ -162,3 +162,18 @@ func (c *Client) GetTemplateEventList(id string) ([]TemplateEvent, error) {
 	}
 	return templateEvents, err
 }
+
+//GetTemplatesByLocation gets a list of templates by location
+func (c *Client) GetTemplatesByLocation(id string) ([]Template, error) {
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "templates"),
+		method: http.MethodGet,
+	}
+	var response TemplateList
+	var templates []Template
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		templates = append(templates, Template{Properties: properties})
+	}
+	return templates, err
+}

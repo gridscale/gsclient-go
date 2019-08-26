@@ -232,6 +232,22 @@ func TestClient_ShutdownServer(t *testing.T) {
 	}
 }
 
+func TestClient_GetServersByLocation(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiLocationBase, dummyUUID, "servers")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareServerListHTTPGet())
+	})
+	res, err := client.GetServersByLocation(dummyUUID)
+	if err != nil {
+		t.Errorf("GetServersByLocation returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockServer(true)), fmt.Sprintf("%v", res))
+}
+
 func getMockServer(power bool) Server {
 	mock := Server{Properties: ServerProperties{
 		ObjectUUID:           dummyUUID,
