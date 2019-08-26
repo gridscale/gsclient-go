@@ -209,7 +209,16 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Firewall Update (UpdateFirewall)
     * Firewall Delete (DeleteFirewall)
     * Firewall Events Get (GetFirewallEventList) 
-    
+* Location
+    * Locations Get (GetLocationList)
+    * Location Get (GetLocation)
+    * Location IPs Get (GetIPsByLocation)
+    * Location ISO Images Get (GetISOImagesByLocation)
+    * Location Networks Get (GetNetworksByLocation)
+    * Location Servers Get (GetServersByLocation)
+    * Location Snapshots Get (GetSnapshotsByLocation)
+    * Location Storages Get (GetStoragesByLocation)
+    * Location Templates Get (GetTemplatesByLocation)
 Note: The functions in this list can be called with a Client type.
 
 ## Known Issues
