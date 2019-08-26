@@ -37,7 +37,7 @@ func TestClient_CreateLabel(t *testing.T) {
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
-	res, err := client.CreateLabel(LabelCreateRequest{Label:"test"})
+	res, err := client.CreateLabel(LabelCreateRequest{Label: "test"})
 	if err != nil {
 		t.Errorf("CreateLabel returned an error %v", err)
 	}
