@@ -39,29 +39,6 @@ type TemplateProperties struct {
 	Labels           []string `json:"labels"`
 }
 
-//TemplateEventList JSON struct of a list of a template's events
-type TemplateEventList struct {
-	List []TemplateEventProperties `json:"events"`
-}
-
-//TemplateEvent JSON struct of an event of a template
-type TemplateEvent struct {
-	Properties TemplateEventProperties `json:"event"`
-}
-
-//TemplateEventProperties JSON struct of properties of an event of a template
-type TemplateEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //TemplateCreateRequest JSON struct of a request for creating a template
 type TemplateCreateRequest struct {
 	Name         string   `json:"name"`
@@ -149,16 +126,16 @@ func (c *Client) DeleteTemplate(id string) error {
 }
 
 //GetTemplateEventList gets a list of a template's events
-func (c *Client) GetTemplateEventList(id string) ([]TemplateEvent, error) {
+func (c *Client) GetTemplateEventList(id string) ([]Event, error) {
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response TemplateEventList
-	var templateEvents []TemplateEvent
+	var response EventList
+	var templateEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		templateEvents = append(templateEvents, TemplateEvent{Properties: properties})
+		templateEvents = append(templateEvents, Event{Properties: properties})
 	}
 	return templateEvents, err
 }

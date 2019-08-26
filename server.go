@@ -113,29 +113,6 @@ type ServerUpdateRequest struct {
 	AutoRecovery    bool     `json:"auto_recovery,omitempty"`
 }
 
-//ServerEventList JSON struct of a list of a server's events
-type ServerEventList struct {
-	List []ServerEventProperties `json:"events"`
-}
-
-//ServerEvent JSON struct of a single event of a server
-type ServerEvent struct {
-	Properties ServerEventProperties `json:"event"`
-}
-
-//ServerEventProperties JSON struct of properties of a server
-type ServerEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //ServerMetricList JSON struct of a list of a server's metrics
 type ServerMetricList struct {
 	List []ServerMetricProperties `json:"server_metrics"`
@@ -225,16 +202,16 @@ func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
 }
 
 //GetServerEventList gets a list of a specific server's events
-func (c *Client) GetServerEventList(id string) ([]ServerEvent, error) {
+func (c *Client) GetServerEventList(id string) ([]Event, error) {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response ServerEventList
-	var serverEvents []ServerEvent
+	var response EventList
+	var serverEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		serverEvents = append(serverEvents, ServerEvent{Properties: properties})
+		serverEvents = append(serverEvents, Event{Properties: properties})
 	}
 	return serverEvents, err
 }

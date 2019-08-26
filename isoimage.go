@@ -70,29 +70,6 @@ type ISOImageUpdateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 }
 
-//ISOImageEventList is JSON struct of a list of an ISO-Image's events
-type ISOImageEventList struct {
-	List []ISOImageEventProperties `json:"events"`
-}
-
-//ISOImageEvent is JSON struct of a single event of an ISO-Image
-type ISOImageEvent struct {
-	Properties ISOImageEventProperties `json:"event"`
-}
-
-//ISOImageEventProperties is JSON struct of an ISO-Image event
-type ISOImageEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //GetISOImageList returns a list of available ISO images
 func (c *Client) GetISOImageList() ([]ISOImage, error) {
 	r := Request{
@@ -155,16 +132,16 @@ func (c *Client) DeleteISOImage(id string) error {
 }
 
 //GetISOImageEventList returns a list of events of an ISO image
-func (c *Client) GetISOImageEventList(id string) ([]ISOImageEvent, error) {
+func (c *Client) GetISOImageEventList(id string) ([]Event, error) {
 	r := Request{
 		uri:    path.Join(apiISOBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response ISOImageEventList
-	var isoImageEvents []ISOImageEvent
+	var response EventList
+	var isoImageEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		isoImageEvents = append(isoImageEvents, ISOImageEvent{Properties: properties})
+		isoImageEvents = append(isoImageEvents, Event{Properties: properties})
 	}
 	return isoImageEvents, err
 }

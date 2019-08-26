@@ -80,29 +80,6 @@ type NetworkUpdateRequest struct {
 	L2Security bool   `json:"l2security"`
 }
 
-//NetworkEventList is JSON struct of a list of a network's events
-type NetworkEventList struct {
-	List []NetworkEventProperties `json:"events"`
-}
-
-//NetworkEvent is JSON struct of a single event of a network
-type NetworkEvent struct {
-	Properties NetworkEventProperties `json:"event"`
-}
-
-//NetworkEventProperties is JSON struct of properties of an event
-type NetworkEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //GetNetwork get a specific network based on given id
 func (c *Client) GetNetwork(id string) (Network, error) {
 	r := Request{
@@ -168,16 +145,16 @@ func (c *Client) GetNetworkList() ([]Network, error) {
 }
 
 //GetNetworkEventList gets a list of a network's events
-func (c *Client) GetNetworkEventList(id string) ([]NetworkEvent, error) {
+func (c *Client) GetNetworkEventList(id string) ([]Event, error) {
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response NetworkEventList
-	var networkEvents []NetworkEvent
+	var response EventList
+	var networkEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		networkEvents = append(networkEvents, NetworkEvent{Properties: properties})
+		networkEvents = append(networkEvents, Event{Properties: properties})
 	}
 	return networkEvents, err
 }

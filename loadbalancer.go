@@ -86,29 +86,6 @@ type LoadBalancerCreateResponse struct {
 	ObjectUUID  string `json:"object_uuid"`
 }
 
-//LoadBalancerEventList is the JSON struct for a loadbalancer's events
-type LoadBalancerEventList struct {
-	List []LoadBalancerEventProperties `json:"events"`
-}
-
-//LoadBalancerEvent is JSON struct for a load balancer
-type LoadBalancerEvent struct {
-	Properties LoadBalancerEventProperties `json:"event"`
-}
-
-//LoadBalancerEventProperties is the properties of a loadbalancer's event
-type LoadBalancerEventProperties struct {
-	ObjectUUID    string `json:"object_uuid"`
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	RequestType   string `json:"request_type"`
-	Activity      string `json:"activity"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //GetLoadBalancerList returns a list of loadbalancers
 func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
 	r := Request{
@@ -162,16 +139,16 @@ func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) e
 }
 
 //GetLoadBalancerEventList retrieves events of a given uuid
-func (c *Client) GetLoadBalancerEventList(id string) ([]LoadBalancerEvent, error) {
+func (c *Client) GetLoadBalancerEventList(id string) ([]Event, error) {
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response LoadBalancerEventList
-	var loadBalancerEvents []LoadBalancerEvent
+	var response EventList
+	var loadBalancerEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		loadBalancerEvents = append(loadBalancerEvents, LoadBalancerEvent{Properties: properties})
+		loadBalancerEvents = append(loadBalancerEvents, Event{Properties: properties})
 	}
 	return loadBalancerEvents, err
 }

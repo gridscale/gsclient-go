@@ -104,14 +104,14 @@ func TestClient_GetNetworkEventList(t *testing.T) {
 	uri := path.Join(apiNetworkBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareNetworkEventListHTTPGet())
+		fmt.Fprintf(writer, prepareEventListHTTPGet())
 	})
 	res, err := client.GetNetworkEventList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetNetworkEventList returned an error %v", err)
 	}
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetworkEvent()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_GetNetworkPublic(t *testing.T) {
@@ -181,25 +181,4 @@ func prepareNetworkCreateResponse() string {
 	createResponse := getMockNetworkCreateResponse()
 	res, _ := json.Marshal(createResponse)
 	return string(res)
-}
-
-func getMockNetworkEvent() NetworkEvent {
-	mock := NetworkEvent{Properties: NetworkEventProperties{
-		ObjectType:    "type",
-		RequestUUID:   dummyRequestUUID,
-		ObjectUUID:    dummyUUID,
-		Activity:      "activity",
-		RequestType:   "tcp",
-		RequestStatus: "done",
-		Change:        "change note",
-		Timestamp:     dummyTime,
-		UserUUID:      dummyUUID,
-	}}
-	return mock
-}
-
-func prepareNetworkEventListHTTPGet() string {
-	event := getMockNetworkEvent()
-	res, _ := json.Marshal(event.Properties)
-	return fmt.Sprintf(`{"events": [%s]}`, string(res))
 }
