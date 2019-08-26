@@ -143,6 +143,22 @@ func TestClient_GetTemplatesByLocation(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate()), fmt.Sprintf("%v", response))
 }
 
+func TestClient_GetDeletedTemplates(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiDeletedBase, "templates")
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, prepareDeletedTemplateListHTTPGet())
+	})
+	response, err := client.GetDeletedTemplates()
+	if err != nil {
+		t.Errorf("GetDeletedTemplates returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(response))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate()), fmt.Sprintf("%v", response))
+}
+
 func getMockTemplate() Template {
 	mock := Template{Properties: TemplateProperties{
 		Status:           "active",
@@ -213,4 +229,10 @@ func prepareTemplateEventListHTTPGet() string {
 	event := getMockTemplateEvent()
 	res, _ := json.Marshal(event.Properties)
 	return fmt.Sprintf(`{"events": [%s]}`, string(res))
+}
+
+func prepareDeletedTemplateListHTTPGet() string {
+	template := getMockTemplate()
+	res, _ := json.Marshal(template.Properties)
+	return fmt.Sprintf(`{"deleted_templates": {"%s": %s}}`, dummyUUID, string(res))
 }

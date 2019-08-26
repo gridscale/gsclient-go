@@ -11,6 +11,11 @@ type NetworkList struct {
 	List map[string]NetworkProperties `json:"networks"`
 }
 
+//DeletedNetworkList is JSON struct of a list of deleted networks
+type DeletedNetworkList struct {
+	List map[string]NetworkProperties `json:"deleted_networks"`
+}
+
 //Network is JSON struct of a single network
 type Network struct {
 	Properties NetworkProperties `json:"network"`
@@ -203,6 +208,21 @@ func (c *Client) GetNetworksByLocation(id string) ([]Network, error) {
 		method: http.MethodGet,
 	}
 	var response NetworkList
+	var networks []Network
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		networks = append(networks, Network{Properties: properties})
+	}
+	return networks, err
+}
+
+//GetDeletedNetworks gets a list of deleted networks
+func (c *Client) GetDeletedNetworks() ([]Network, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "networks"),
+		method: http.MethodGet,
+	}
+	var response DeletedNetworkList
 	var networks []Network
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {

@@ -145,6 +145,22 @@ func TestClient_GetNetworksByLocation(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetwork()), fmt.Sprintf("%v", res))
 }
 
+func TestClient_GetDeletedNetworks(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiDeletedBase, "networks")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareDeletedNetworkListHTTPGet())
+	})
+	res, err := client.GetDeletedNetworks()
+	if err != nil {
+		t.Errorf("GetDeletedNetworks returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetwork()), fmt.Sprintf("%v", res))
+}
+
 func getMockNetwork() Network {
 	mock := Network{Properties: NetworkProperties{
 		LocationCountry: "Germany",
@@ -218,4 +234,10 @@ func prepareNetworkEventListHTTPGet() string {
 	event := getMockNetworkEvent()
 	res, _ := json.Marshal(event.Properties)
 	return fmt.Sprintf(`{"events": [%s]}`, string(res))
+}
+
+func prepareDeletedNetworkListHTTPGet() string {
+	network := getMockNetwork()
+	res, _ := json.Marshal(network.Properties)
+	return fmt.Sprintf(`{"deleted_networks": {"%s": %s}}`, dummyUUID, string(res))
 }
