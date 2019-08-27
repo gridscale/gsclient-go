@@ -315,7 +315,7 @@ func (c *Client) ShutdownServer(id string) error {
 
 	err = r.execute(*c, nil)
 	if err != nil {
-		if requestError, ok := err.(*RequestError); ok {
+		if requestError, ok := err.(RequestError); ok {
 			if requestError.StatusCode == 500 {
 				c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
 				return c.StopServer(id)
