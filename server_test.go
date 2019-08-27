@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetServerList(t *testing.T) {
@@ -61,7 +62,6 @@ func TestClient_CreateServer(t *testing.T) {
 		HardwareProfile: "default",
 		AvailablityZone: "",
 		Labels:          []string{"label"},
-		Relations:       &ServerCreateRequestRelations{},
 	})
 	if err != nil {
 		t.Errorf("CreateServer returned an error %v", err)
