@@ -55,7 +55,6 @@ type ServerCreateRequest struct {
 	Labels          []string `json:"labels,omitempty"`
 	Status          string   `json:"status,omitempty"`
 	AutoRecovery    *bool    `json:"auto_recovery,omitempty"`
-	//Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
 }
 
 //ServerCreateResponse JSON struct of a response for creating a server
@@ -71,14 +70,6 @@ type ServerCreateResponse struct {
 //ServerPowerUpdateRequest JSON struct of a request for updating server's power state
 type ServerPowerUpdateRequest struct {
 	Power bool `json:"power"`
-}
-
-//ServerCreateRequestRelations JSOn struct of a list of a server's relations
-type ServerCreateRequestRelations struct {
-	IsoImages []ServerCreateRequestIsoimage `json:"isoimages,omitempty"`
-	Networks  []ServerCreateRequestNetwork  `json:"networks,omitempty"`
-	PublicIPs []ServerCreateRequestIP       `json:"public_ips,omitempty"`
-	Storages  []ServerCreateRequestStorage  `json:"storages,omitempty"`
 }
 
 //ServerCreateRequestStorage JSON struct of a relation between a server and a storage
