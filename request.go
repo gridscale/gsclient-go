@@ -87,7 +87,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
 
 	if result.StatusCode >= 300 {
-		errorMessage := new(RequestError) //error messages have a different structure, so they are read with a different struct
+		var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 		errorMessage.StatusCode = result.StatusCode
 		json.Unmarshal(iostream, &errorMessage)
 		c.cfg.logger.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
