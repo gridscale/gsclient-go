@@ -224,8 +224,11 @@ func TestClient_ShutdownServer(t *testing.T) {
 	mux.HandleFunc(uri+"/shutdown", func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		power = false
+		writer.WriteHeader(http.StatusInternalServerError)
+ 		writer.Write([]byte("☄ HTTP status code returned!"))
 		fmt.Fprint(writer, "")
 	})
+
 	err := client.ShutdownServer(dummyUUID)
 	if err != nil {
 		t.Errorf("ShutdownServer returned an error %v", err)

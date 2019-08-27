@@ -303,14 +303,23 @@ func (c *Client) ShutdownServer(id string) error {
 		method: http.MethodPatch,
 		body:   new(map[string]string),
 	}
+
 	err = r.execute(*c, nil)
 	if err != nil {
+		if requestError, ok := err.(RequestError); ok {
+			if requestError.StatusCode == 500 {
+				c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
+				return c.StopServer(id)
+			}
+		}
 		return err
 	}
+
 	//If we get an error, which includes a timeout, power off the server instead
 	err = c.WaitForServerPowerStatus(id, false)
 	if err != nil {
-		return c.setServerPowerState(id, false)
+		c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
+		return c.StopServer(id)
 	}
 	return nil
 }
