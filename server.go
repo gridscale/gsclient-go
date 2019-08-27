@@ -310,7 +310,7 @@ func (c *Client) ShutdownServer(id string) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "shutdown"),
 		method: http.MethodPatch,
-		body:   new(map[string]string),
+		body:   map[string]string{},
 	}
 	err = r.execute(*c, nil)
 	if err != nil {

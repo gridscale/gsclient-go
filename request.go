@@ -113,10 +113,9 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
-			response := new(RequestStatus)
+			var response RequestStatus
 			r.execute(*c, &response)
-			output := *response //Without this cast reading indexes doesn't work
-			if output[id].Status == "done" {
+			if response[id].Status == "done" {
 				c.cfg.logger.Info("Done with creating")
 				return nil
 			}
