@@ -195,3 +195,18 @@ func (c *Client) GetNetworkPublic() (Network, error) {
 	}
 	return Network{}, fmt.Errorf("Public Network not found")
 }
+
+//GetNetworksByLocation gets a list of networks by location
+func (c *Client) GetNetworksByLocation(id string) ([]Network, error) {
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "networks"),
+		method: http.MethodGet,
+	}
+	var response NetworkList
+	var networks []Network
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		networks = append(networks, Network{Properties: properties})
+	}
+	return networks, err
+}
