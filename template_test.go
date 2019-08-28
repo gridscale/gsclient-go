@@ -127,6 +127,22 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplateEvent()), fmt.Sprintf("%v", response))
 }
 
+func TestClient_GetTemplatesByLocation(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiLocationBase, dummyUUID, "templates")
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, prepareTemplateListHTTPGet())
+	})
+	response, err := client.GetTemplatesByLocation(dummyUUID)
+	if err != nil {
+		t.Errorf("GetTemplatesByLocation returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(response))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate()), fmt.Sprintf("%v", response))
+}
+
 func getMockTemplate() Template {
 	mock := Template{Properties: TemplateProperties{
 		Status:           "active",

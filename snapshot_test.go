@@ -146,6 +146,23 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 	}
 }
 
+func TestClient_GetSnapshotsByLocation(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiLocationBase, dummyUUID, "snapshots")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareStorageSnapshotListHTTPGet())
+	})
+
+	res, err := client.GetSnapshotsByLocation(dummyUUID)
+	if err != nil {
+		t.Errorf("GetSnapshotsByLocation returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshot()), fmt.Sprintf("%v", res))
+}
+
 func getMockStorageSnapshot() StorageSnapshot {
 	mock := StorageSnapshot{Properties: StorageSnapshotProperties{
 		Labels:           []string{"label"},

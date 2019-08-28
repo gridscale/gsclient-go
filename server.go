@@ -46,16 +46,15 @@ type ServerRelations struct {
 
 //ServerCreateRequest JSON struct of a request for creating a server
 type ServerCreateRequest struct {
-	Name            string                        `json:"name"`
-	Memory          int                           `json:"memory"`
-	Cores           int                           `json:"cores"`
-	LocationUUID    string                        `json:"location_uuid"`
-	HardwareProfile string                        `json:"hardware_profile,omitempty"`
-	AvailablityZone string                        `json:"availability_zone,omitempty"`
-	Labels          []string                      `json:"labels,omitempty"`
-	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
-	Status          string                        `json:"status,omitempty"`
-	AutoRecovery    bool                          `json:"auto_recovery,omitempty"`
+	Name            string   `json:"name"`
+	Memory          int      `json:"memory"`
+	Cores           int      `json:"cores"`
+	LocationUUID    string   `json:"location_uuid"`
+	HardwareProfile string   `json:"hardware_profile,omitempty"`
+	AvailablityZone string   `json:"availability_zone,omitempty"`
+	Labels          []string `json:"labels,omitempty"`
+	Status          string   `json:"status,omitempty"`
+	AutoRecovery    *bool    `json:"auto_recovery,omitempty"`
 }
 
 //ServerCreateResponse JSON struct of a response for creating a server
@@ -71,14 +70,6 @@ type ServerCreateResponse struct {
 //ServerPowerUpdateRequest JSON struct of a request for updating server's power state
 type ServerPowerUpdateRequest struct {
 	Power bool `json:"power"`
-}
-
-//ServerCreateRequestRelations JSOn struct of a list of a server's relations
-type ServerCreateRequestRelations struct {
-	IsoImages []ServerCreateRequestIsoimage `json:"isoimages,omitempty"`
-	Networks  []ServerCreateRequestNetwork  `json:"networks,omitempty"`
-	PublicIPs []ServerCreateRequestIP       `json:"public_ips,omitempty"`
-	Storages  []ServerCreateRequestStorage  `json:"storages,omitempty"`
 }
 
 //ServerCreateRequestStorage JSON struct of a relation between a server and a storage
@@ -110,7 +101,7 @@ type ServerUpdateRequest struct {
 	Memory          int      `json:"memory,omitempty"`
 	Cores           int      `json:"cores,omitempty"`
 	Labels          []string `json:"labels,omitempty"`
-	AutoRecovery    bool     `json:"auto_recovery,omitempty"`
+	AutoRecovery    *bool    `json:"auto_recovery,omitempty"`
 }
 
 //ServerEventList JSON struct of a list of a server's events
@@ -310,16 +301,40 @@ func (c *Client) ShutdownServer(id string) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "shutdown"),
 		method: http.MethodPatch,
-		body:   new(map[string]string),
+		body:   map[string]string{},
 	}
+
 	err = r.execute(*c, nil)
 	if err != nil {
+		if requestError, ok := err.(RequestError); ok {
+			if requestError.StatusCode == 500 {
+				c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
+				return c.StopServer(id)
+			}
+		}
 		return err
 	}
+
 	//If we get an error, which includes a timeout, power off the server instead
 	err = c.WaitForServerPowerStatus(id, false)
 	if err != nil {
-		return c.setServerPowerState(id, false)
+		c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
+		return c.StopServer(id)
 	}
 	return nil
+}
+
+//GetServersByLocation gets a list of servers by location
+func (c *Client) GetServersByLocation(id string) ([]Server, error) {
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "servers"),
+		method: http.MethodGet,
+	}
+	var response ServerList
+	var servers []Server
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		servers = append(servers, Server{Properties: properties})
+	}
+	return servers, err
 }

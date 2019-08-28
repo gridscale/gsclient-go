@@ -152,3 +152,18 @@ func (c *Client) ExportStorageSnapshotToS3(storageID, snapshotID string, body St
 	}
 	return r.execute(*c, nil)
 }
+
+//GetSnapshotsByLocation gets a list of storage snapshots by location
+func (c *Client) GetSnapshotsByLocation(id string) ([]StorageSnapshot, error) {
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "snapshots"),
+		method: http.MethodGet,
+	}
+	var response StorageSnapshotList
+	var snapshots []StorageSnapshot
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		snapshots = append(snapshots, StorageSnapshot{Properties: properties})
+	}
+	return snapshots, err
+}

@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetServerList(t *testing.T) {
@@ -61,7 +62,6 @@ func TestClient_CreateServer(t *testing.T) {
 		HardwareProfile: "default",
 		AvailablityZone: "",
 		Labels:          []string{"label"},
-		Relations:       &ServerCreateRequestRelations{},
 	})
 	if err != nil {
 		t.Errorf("CreateServer returned an error %v", err)
@@ -224,12 +224,31 @@ func TestClient_ShutdownServer(t *testing.T) {
 	mux.HandleFunc(uri+"/shutdown", func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		power = false
+		writer.WriteHeader(http.StatusInternalServerError)
+ 		writer.Write([]byte("☄ HTTP status code returned!"))
 		fmt.Fprint(writer, "")
 	})
+
 	err := client.ShutdownServer(dummyUUID)
 	if err != nil {
 		t.Errorf("ShutdownServer returned an error %v", err)
 	}
+}
+
+func TestClient_GetServersByLocation(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiLocationBase, dummyUUID, "servers")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareServerListHTTPGet())
+	})
+	res, err := client.GetServersByLocation(dummyUUID)
+	if err != nil {
+		t.Errorf("GetServersByLocation returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockServer(true)), fmt.Sprintf("%v", res))
 }
 
 func getMockServer(power bool) Server {

@@ -88,9 +88,11 @@ func main() {
 
 	log.Info("Update server: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
+	autoRecovery := false
 	err = client.UpdateServer(server.Properties.ObjectUUID, gsclient.ServerUpdateRequest{
-		Name:   "updated server",
-		Memory: 1,
+		Name:         "updated server",
+		Memory:       1,
+		AutoRecovery: &autoRecovery,
 	})
 	if err != nil {
 		log.Error("Update server has failed with error", err)
