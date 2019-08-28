@@ -145,3 +145,18 @@ func (c *Client) GetISOImageEventList(id string) ([]Event, error) {
 	}
 	return isoImageEvents, err
 }
+
+//GetISOImagesByLocation gets a list of ISO images by location
+func (c *Client) GetISOImagesByLocation(id string) ([]ISOImage, error) {
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "isoimages"),
+		method: http.MethodGet,
+	}
+	var response ISOImageList
+	var isoImages []ISOImage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		isoImages = append(isoImages, ISOImage{Properties: properties})
+	}
+	return isoImages, err
+}

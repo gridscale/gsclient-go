@@ -182,3 +182,18 @@ func (c *Client) GetStorageEventList(id string) ([]Event, error) {
 	}
 	return storageEvents, err
 }
+
+//GetStoragesByLocation gets a list of storages by location
+func (c *Client) GetStoragesByLocation(id string) ([]Storage, error) {
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "storages"),
+		method: http.MethodGet,
+	}
+	var response StorageList
+	var storages []Storage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		storages = append(storages, Storage{Properties: properties})
+	}
+	return storages, err
+}

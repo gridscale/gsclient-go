@@ -132,6 +132,22 @@ func TestClient_GetIPVersion(t *testing.T) {
 
 }
 
+func TestClient_GetIPsByLocation(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiLocationBase, dummyUUID, "ips")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareIPListHTTPGet())
+	})
+	res, err := client.GetIPsByLocation(dummyUUID)
+	if err != nil {
+		t.Errorf("GetIPsByLocation returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockIP()), fmt.Sprintf("%v", res))
+}
+
 func getMockIP() IP {
 	mock := IP{Properties: IPProperties{
 		Name:            "test",

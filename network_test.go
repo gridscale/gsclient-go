@@ -129,6 +129,22 @@ func TestClient_GetNetworkPublic(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%v", getMockNetwork()), fmt.Sprintf("%v", res))
 }
 
+func TestClient_GetNetworksByLocation(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiLocationBase, dummyUUID, "networks")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareNetworkListHTTPGet())
+	})
+	res, err := client.GetNetworksByLocation(dummyUUID)
+	if err != nil {
+		t.Errorf("GetNetworksByLocation returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetwork()), fmt.Sprintf("%v", res))
+}
+
 func getMockNetwork() Network {
 	mock := Network{Properties: NetworkProperties{
 		LocationCountry: "Germany",

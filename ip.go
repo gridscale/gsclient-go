@@ -179,3 +179,18 @@ func (c *Client) GetIPVersion(id string) int {
 	}
 	return ip.Properties.Family
 }
+
+//GetIPsByLocation gets a list of IPs by location
+func (c *Client) GetIPsByLocation(id string) ([]IP, error) {
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "ips"),
+		method: http.MethodGet,
+	}
+	var response IPList
+	var IPs []IP
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPs = append(IPs, IP{Properties: properties})
+	}
+	return IPs, err
+}

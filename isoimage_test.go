@@ -115,6 +115,22 @@ func TestClient_GetISOImageEventList(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", res))
 }
 
+func TestClient_GetISOImagesByLocation(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiLocationBase, dummyUUID, "isoimages")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareISOImageHTTPGetList())
+	})
+	res, err := client.GetISOImagesByLocation(dummyUUID)
+	if err != nil {
+		t.Errorf("GetISOImagesByLocation returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockISOImage()), fmt.Sprintf("%v", res))
+}
+
 func getMockISOImage() ISOImage {
 	mock := ISOImage{Properties: ISOImageProperties{
 		ObjectUUID: dummyUUID,
