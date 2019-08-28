@@ -217,6 +217,16 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Marketplace template Update (UpdateMarketplaceTemplate)
     * Marketplace template Delete (DeleteMarketplaceTemplate)
     * Marketplace template's events Get (GetMarketplaceTemplateEventList)
+* Location
+    * Locations Get (GetLocationList)
+    * Location Get (GetLocation)
+    * Location IPs Get (GetIPsByLocation)
+    * Location ISO Images Get (GetISOImagesByLocation)
+    * Location Networks Get (GetNetworksByLocation)
+    * Location Servers Get (GetServersByLocation)
+    * Location Snapshots Get (GetSnapshotsByLocation)
+    * Location Storages Get (GetStoragesByLocation)
+    * Location Templates Get (GetTemplatesByLocation)
 
 Note: The functions in this list can be called with a Client type.
 
@@ -224,4 +234,3 @@ Note: The functions in this list can be called with a Client type.
 The following issues are known to us:
 
 * L3security isn't read in the network relation of a server.
-* The autorecovery attribute of a server can't be changed with this client.
