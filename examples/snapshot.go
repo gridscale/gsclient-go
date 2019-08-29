@@ -63,6 +63,17 @@ func main() {
 			return
 		}
 		log.Info("Storage snapshot successfully deleted")
+
+		log.Info("Get deleted snapshots: Press 'Enter' to continue...")
+		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		snapshots, err := client.GetDeletedSnapshots()
+		if err != nil {
+			log.Error("Get deleted snapshots has failed with error", err)
+			return
+		}
+		log.WithFields(log.Fields{
+			"snapshots": snapshots,
+		}).Info("Retrieved deleted snapshots successfully")
 	}()
 
 	//Get a snapshot to update
