@@ -55,6 +55,15 @@ type ServerCreateRequest struct {
 	Labels          []string `json:"labels,omitempty"`
 	Status          string   `json:"status,omitempty"`
 	AutoRecovery    *bool    `json:"auto_recovery,omitempty"`
+	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
+}
+
+//ServerCreateRequestRelations JSOn struct of a list of a server's relations
+type ServerCreateRequestRelations struct {
+	IsoImages []ServerCreateRequestIsoimage `json:"isoimages"`
+	Networks  []ServerCreateRequestNetwork  `json:"networks"`
+	PublicIPs []ServerCreateRequestIP       `json:"public_ips"`
+	Storages  []ServerCreateRequestStorage  `json:"storages"`
 }
 
 //ServerCreateResponse JSON struct of a response for creating a server
@@ -182,6 +191,21 @@ func (c *Client) GetServerList() ([]Server, error) {
 
 //CreateServer create a server
 func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, error) {
+	//check if these slices are nil
+	//make them be empty slice instead of nil
+	//so that JSON structure will be valid
+	if body.Relations.PublicIPs == nil {
+		body.Relations.PublicIPs = make([]ServerCreateRequestIP, 0)
+	}
+	if body.Relations.Networks == nil {
+		body.Relations.Networks = make([]ServerCreateRequestNetwork, 0)
+	}
+	if body.Relations.IsoImages == nil {
+		body.Relations.IsoImages = make([]ServerCreateRequestIsoimage, 0)
+	}
+	if body.Relations.Storages == nil {
+		body.Relations.Storages = make([]ServerCreateRequestStorage, 0)
+	}
 	r := Request{
 		uri:    apiServerBase,
 		method: http.MethodPost,
