@@ -251,6 +251,22 @@ func TestClient_GetServersByLocation(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockServer(true)), fmt.Sprintf("%v", res))
 }
 
+func TestClient_GetDeletedServers(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiDeletedBase, "servers")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareDeletedServerListHTTPGet())
+	})
+	res, err := client.GetDeletedServers()
+	if err != nil {
+		t.Errorf("GetDeletedServers returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockServer(true)), fmt.Sprintf("%v", res))
+}
+
 func getMockServer(power bool) Server {
 	mock := Server{Properties: ServerProperties{
 		ObjectUUID:           dummyUUID,
@@ -361,4 +377,10 @@ func prepareServerMetricListHTTPGet() string {
 	metric := getMockServerMetric()
 	res, _ := json.Marshal(metric.Properties)
 	return fmt.Sprintf(`{"server_metrics": [%s]}`, string(res))
+}
+
+func prepareDeletedServerListHTTPGet() string {
+	server := getMockServer(true)
+	res, _ := json.Marshal(server.Properties)
+	return fmt.Sprintf(`{"deleted_servers": {"%s": %s}}`, dummyUUID, string(res))
 }

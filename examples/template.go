@@ -84,6 +84,17 @@ func main() {
 			return
 		}
 		log.Info("Template successfully deleted")
+
+		log.Info("Get deleted templates: Press 'Enter' to continue...")
+		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		templates, err := client.GetDeletedTemplates()
+		if err != nil {
+			log.Error("Get deleted templates has failed with error", err)
+			return
+		}
+		log.WithFields(log.Fields{
+			"templates": templates,
+		}).Info("Retrieved deleted templates successfully")
 	}()
 
 	//get a template to update

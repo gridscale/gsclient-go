@@ -163,6 +163,23 @@ func TestClient_GetSnapshotsByLocation(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshot()), fmt.Sprintf("%v", res))
 }
 
+func TestClient_GetDeletedSnapshots(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiDeletedBase, "snapshots")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareDeletedStorageSnapshotListHTTPGet())
+	})
+
+	res, err := client.GetDeletedSnapshots()
+	if err != nil {
+		t.Errorf("GetSnapshotsByLocation returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshot()), fmt.Sprintf("%v", res))
+}
+
 func getMockStorageSnapshot() StorageSnapshot {
 	mock := StorageSnapshot{Properties: StorageSnapshotProperties{
 		Labels:           []string{"label"},
@@ -208,4 +225,10 @@ func prepareStorageSnapshotCreateResponseHTTP() string {
 	createRes := getMockStorageSnapshotCreateResponse()
 	res, _ := json.Marshal(createRes)
 	return string(res)
+}
+
+func prepareDeletedStorageSnapshotListHTTPGet() string {
+	snapshot := getMockStorageSnapshot()
+	res, _ := json.Marshal(snapshot.Properties)
+	return fmt.Sprintf(`{"deleted_snapshots" : {"%s" : %s}}`, dummyUUID, string(res))
 }

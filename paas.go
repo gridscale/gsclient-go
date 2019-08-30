@@ -10,6 +10,11 @@ type PaaSServices struct {
 	List map[string]PaaSServiceProperties `json:"paas_services"`
 }
 
+//DeletedPaaSServices is the JSON struct of a list of deleted PaaS services
+type DeletedPaaSServices struct {
+	List map[string]PaaSServiceProperties `json:"deleted_paas_services"`
+}
+
 //PaaSService is the JSON struct of a single PaaS service
 type PaaSService struct {
 	Properties PaaSServiceProperties `json:"paas_service"`
@@ -357,4 +362,21 @@ func (c *Client) DeletePaaSSecurityZone(id string) error {
 		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)
+}
+
+//GetDeletedPaaSServices returns a list of deleted PaaS Services
+func (c *Client) GetDeletedPaaSServices() ([]PaaSService, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "paas_services"),
+		method: http.MethodGet,
+	}
+	var response DeletedPaaSServices
+	var paasServices []PaaSService
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		paasServices = append(paasServices, PaaSService{
+			Properties: properties,
+		})
+	}
+	return paasServices, err
 }

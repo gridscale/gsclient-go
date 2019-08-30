@@ -11,6 +11,11 @@ type TemplateList struct {
 	List map[string]TemplateProperties `json:"templates"`
 }
 
+//DeletedTemplateList JSON struct of a list of deleted templates
+type DeletedTemplateList struct {
+	List map[string]TemplateProperties `json:"deleted_templates"`
+}
+
 //Template JSON struct of a single template
 type Template struct {
 	Properties TemplateProperties `json:"template"`
@@ -170,6 +175,21 @@ func (c *Client) GetTemplatesByLocation(id string) ([]Template, error) {
 		method: http.MethodGet,
 	}
 	var response TemplateList
+	var templates []Template
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		templates = append(templates, Template{Properties: properties})
+	}
+	return templates, err
+}
+
+//GetDeletedTemplates gets a list of deleted templates
+func (c *Client) GetDeletedTemplates() ([]Template, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "templates"),
+		method: http.MethodGet,
+	}
+	var response DeletedTemplateList
 	var templates []Template
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
