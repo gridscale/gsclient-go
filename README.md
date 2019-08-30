@@ -217,6 +217,8 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Marketplace template Update (UpdateMarketplaceTemplate)
     * Marketplace template Delete (DeleteMarketplaceTemplate)
     * Marketplace template's events Get (GetMarketplaceTemplateEventList)
+* Event
+    * Events Get (GetEventList)
 * Label
     * Labels Get (GetLabelList)
     * Label Create (CreateLabel)

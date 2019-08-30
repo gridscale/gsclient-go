@@ -113,10 +113,10 @@ func TestClient_GetLoadBalancerEventList(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiLoadBalancerBase, dummyUUID, "events")
-	expectedObjects := getMockLoadBalancerEvent()
+	expectedObjects := getMockEvent()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		fmt.Fprint(w, prepareLoadBalancerEventListHTTPGet())
+		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	response, err := client.GetLoadBalancerEventList(dummyUUID)
 	if err != nil {
@@ -179,25 +179,4 @@ func prepareLoadBalancerObjectCreateResponse() LoadBalancerCreateResponse {
 		RequestUUID: dummyRequestUUID,
 		ObjectUUID:  dummyUUID,
 	}
-}
-
-func getMockLoadBalancerEvent() LoadBalancerEvent {
-	mock := LoadBalancerEvent{Properties: LoadBalancerEventProperties{
-		ObjectType:    "type",
-		RequestUUID:   dummyRequestUUID,
-		ObjectUUID:    dummyUUID,
-		Activity:      "sent",
-		RequestType:   "type",
-		RequestStatus: "active",
-		Change:        "change",
-		Timestamp:     dummyTime,
-		UserUUID:      dummyUUID,
-	}}
-	return mock
-}
-
-func prepareLoadBalancerEventListHTTPGet() string {
-	event := getMockLoadBalancerEvent()
-	res, _ := json.Marshal(event.Properties)
-	return fmt.Sprintf(`{"events": [%s]}`, string(res))
 }
