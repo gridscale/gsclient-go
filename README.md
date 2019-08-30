@@ -217,6 +217,10 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Marketplace template Update (UpdateMarketplaceTemplate)
     * Marketplace template Delete (DeleteMarketplaceTemplate)
     * Marketplace template's events Get (GetMarketplaceTemplateEventList)
+* Label
+    * Labels Get (GetLabelList)
+    * Label Create (CreateLabel)
+    * Label Delete (DeleteLabel)
 * Location
     * Locations Get (GetLocationList)
     * Location Get (GetLocation)
