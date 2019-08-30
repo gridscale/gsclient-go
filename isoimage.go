@@ -10,6 +10,11 @@ type ISOImageList struct {
 	List map[string]ISOImageProperties `json:"isoimages"`
 }
 
+//DeletedISOImageList is JSON struct of a list of deleted SO images
+type DeletedISOImageList struct {
+	List map[string]ISOImageProperties `json:"deleted_isoimages"`
+}
+
 //ISOImage is JSON struct of a list an ISO image
 type ISOImage struct {
 	Properties ISOImageProperties `json:"isoimage"`
@@ -176,6 +181,21 @@ func (c *Client) GetISOImagesByLocation(id string) ([]ISOImage, error) {
 		method: http.MethodGet,
 	}
 	var response ISOImageList
+	var isoImages []ISOImage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		isoImages = append(isoImages, ISOImage{Properties: properties})
+	}
+	return isoImages, err
+}
+
+//GetDeletedISOImages gets a list of deleted ISO images
+func (c *Client) GetDeletedISOImages() ([]ISOImage, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "isoimages"),
+		method: http.MethodGet,
+	}
+	var response DeletedISOImageList
 	var isoImages []ISOImage
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {

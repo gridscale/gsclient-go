@@ -13,6 +13,7 @@ const (
 	apiObjectStorageBase = "/objects/objectstorages"
 	apiFirewallBase      = "/objects/firewalls"
 	apiLocationBase      = "/objects/locations"
+	apiDeletedBase       = "/objects/deleted"
 )
 
 //Client struct of a gridscale golang client

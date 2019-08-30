@@ -46,6 +46,17 @@ func main() {
 			return
 		}
 		log.Info("Storage successfully deleted")
+
+		log.Info("Get deleted storages: Press 'Enter' to continue...")
+		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		storages, err := client.GetDeletedStorages()
+		if err != nil {
+			log.Error("Get deleted storages has failed with error", err)
+			return
+		}
+		log.WithFields(log.Fields{
+			"storages": storages,
+		}).Info("Retrieved deleted storages successfully")
 	}()
 
 	//Get storage to update

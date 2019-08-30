@@ -43,6 +43,17 @@ func main() {
 			return
 		}
 		log.Info("Delete IP address successfully")
+
+		log.Info("Get deleted IP address: Press 'Enter' to continue...")
+		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		ips, err := client.GetDeletedIPs()
+		if err != nil {
+			log.Error("Get delete IP address has failed with error", err)
+			return
+		}
+		log.WithFields(log.Fields{
+			"ips": ips,
+		}).Info("Retrieved deleted IP successfully")
 	}()
 
 	log.Info("Update IP address: Press 'Enter' to continue...")
