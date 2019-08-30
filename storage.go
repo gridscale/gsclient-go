@@ -10,6 +10,11 @@ type StorageList struct {
 	List map[string]StorageProperties `json:"storages"`
 }
 
+//DeletedStorageList JSON struct of a list of storages
+type DeletedStorageList struct {
+	List map[string]StorageProperties `json:"deleted_storages"`
+}
+
 //Storage JSON struct of a single storage
 type Storage struct {
 	Properties StorageProperties `json:"storage"`
@@ -213,6 +218,21 @@ func (c *Client) GetStoragesByLocation(id string) ([]Storage, error) {
 		method: http.MethodGet,
 	}
 	var response StorageList
+	var storages []Storage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		storages = append(storages, Storage{Properties: properties})
+	}
+	return storages, err
+}
+
+//GetDeletedStorages gets a list of deleted storages
+func (c *Client) GetDeletedStorages() ([]Storage, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "storages"),
+		method: http.MethodGet,
+	}
+	var response DeletedStorageList
 	var storages []Storage
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {

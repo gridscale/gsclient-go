@@ -148,6 +148,22 @@ func TestClient_GetIPsByLocation(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockIP()), fmt.Sprintf("%v", res))
 }
 
+func TestClient_GetDeletedIPs(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiDeletedBase, "ips")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareDeletedIPListHTTPGet())
+	})
+	res, err := client.GetDeletedIPs()
+	if err != nil {
+		t.Errorf("GetDeletedIPs returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockIP()), fmt.Sprintf("%v", res))
+}
+
 func getMockIP() IP {
 	mock := IP{Properties: IPProperties{
 		Name:            "test",
@@ -227,4 +243,10 @@ func prepareIPEventListHTTPGet() string {
 	event := getMockIPEvent()
 	res, _ := json.Marshal(event.Properties)
 	return fmt.Sprintf(`{"events": [%s]}`, string(res))
+}
+
+func prepareDeletedIPListHTTPGet() string {
+	ip := getMockIP()
+	res, _ := json.Marshal(ip.Properties)
+	return fmt.Sprintf(`{"deleted_ips": {"%s": %s}}`, dummyUUID, string(res))
 }

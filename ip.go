@@ -10,6 +10,11 @@ type IPList struct {
 	List map[string]IPProperties `json:"ips"`
 }
 
+//DeletedIPList is JSON struct of a list of deleted IPs
+type DeletedIPList struct {
+	List map[string]IPProperties `json:"deleted_ips"`
+}
+
 //IP is JSON struct if a single IP
 type IP struct {
 	Properties IPProperties `json:"ip"`
@@ -210,6 +215,21 @@ func (c *Client) GetIPsByLocation(id string) ([]IP, error) {
 		method: http.MethodGet,
 	}
 	var response IPList
+	var IPs []IP
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPs = append(IPs, IP{Properties: properties})
+	}
+	return IPs, err
+}
+
+//GetDeletedIPs gets a list of deleted IPs
+func (c *Client) GetDeletedIPs() ([]IP, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "ips"),
+		method: http.MethodGet,
+	}
+	var response DeletedIPList
 	var IPs []IP
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {

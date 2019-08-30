@@ -79,6 +79,17 @@ func main() {
 			return
 		}
 		log.Info("PaaS service successfully deleted")
+
+		log.Info("Get deleted PaaS services: Press 'Enter' to continue...")
+		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		paasServices, err := client.GetDeletedPaaSServices()
+		if err != nil {
+			log.Error("Get deleted PaaS services has failed with error", err)
+			return
+		}
+		log.WithFields(log.Fields{
+			"PaaS services": paasServices,
+		}).Info("Retrieved deleted PaaS services successfully")
 	}()
 
 	log.Info("Update PaaS and Security zone: Press 'Enter' to continue...")

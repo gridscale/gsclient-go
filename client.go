@@ -1,6 +1,7 @@
 package gsclient
 
 const (
+
 	apiServerBase              = "/objects/servers"
 	apiStorageBase             = "/objects/storages"
 	apiNetworkBase             = "/objects/networks"
@@ -14,6 +15,7 @@ const (
 	apiFirewallBase            = "/objects/firewalls"
 	apiLocationBase            = "/objects/locations"
 	apiMarketplaceTemplateBase = "/objects/marketplace/templates"
+	apiDeletedBase       = "/objects/deleted"
 )
 
 //Client struct of a gridscale golang client
