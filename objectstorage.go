@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -67,6 +68,9 @@ func (c *Client) GetObjectStorageAccessKeyList() ([]ObjectStorageAccessKey, erro
 
 //GetObjectStorageAccessKey gets a specific object storage access key based on given id
 func (c *Client) GetObjectStorageAccessKey(id string) (ObjectStorageAccessKey, error) {
+	if id == "" {
+		return ObjectStorageAccessKey{}, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodGet,
@@ -93,6 +97,9 @@ func (c *Client) CreateObjectStorageAccessKey() (ObjectStorageAccessKeyCreateRes
 
 //DeleteObjectStorageAccessKey deletes a specific object storage access key based on given id
 func (c *Client) DeleteObjectStorageAccessKey(id string) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodDelete,

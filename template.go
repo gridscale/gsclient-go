@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -59,6 +60,9 @@ type TemplateUpdateRequest struct {
 
 //GetTemplate gets a template
 func (c *Client) GetTemplate(id string) (Template, error) {
+	if id == "" {
+		return Template{}, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id),
 		method: http.MethodGet,
@@ -87,6 +91,9 @@ func (c *Client) GetTemplateList() ([]Template, error) {
 
 //GetTemplateByName gets a template by its name
 func (c *Client) GetTemplateByName(name string) (Template, error) {
+	if name == "" {
+		return Template{}, errors.New("'name' is required")
+	}
 	templates, err := c.GetTemplateList()
 	if err != nil {
 		return Template{}, err
@@ -113,6 +120,9 @@ func (c *Client) CreateTemplate(body TemplateCreateRequest) (CreateResponse, err
 
 //UpdateTemplate updates a template
 func (c *Client) UpdateTemplate(id string, body TemplateUpdateRequest) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id),
 		method: http.MethodPatch,
@@ -123,6 +133,9 @@ func (c *Client) UpdateTemplate(id string, body TemplateUpdateRequest) error {
 
 //DeleteTemplate deletes a template
 func (c *Client) DeleteTemplate(id string) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id),
 		method: http.MethodDelete,
@@ -132,6 +145,9 @@ func (c *Client) DeleteTemplate(id string) error {
 
 //GetTemplateEventList gets a list of a template's events
 func (c *Client) GetTemplateEventList(id string) ([]Event, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id, "events"),
 		method: http.MethodGet,
@@ -147,6 +163,9 @@ func (c *Client) GetTemplateEventList(id string) ([]Event, error) {
 
 //GetTemplatesByLocation gets a list of templates by location
 func (c *Client) GetTemplatesByLocation(id string) ([]Template, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "templates"),
 		method: http.MethodGet,

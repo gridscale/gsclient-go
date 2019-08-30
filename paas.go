@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -238,6 +239,9 @@ func (c *Client) CreatePaaSService(body PaaSServiceCreateRequest) (PaaSServiceCr
 
 //GetPaaSService returns a specific PaaS Service based on given id
 func (c *Client) GetPaaSService(id string) (PaaSService, error) {
+	if id == "" {
+		return PaaSService{}, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodGet,
@@ -249,6 +253,9 @@ func (c *Client) GetPaaSService(id string) (PaaSService, error) {
 
 //UpdatePaaSService updates a specific PaaS Service based on a given id
 func (c *Client) UpdatePaaSService(id string, body PaaSServiceUpdateRequest) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodPatch,
@@ -259,6 +266,9 @@ func (c *Client) UpdatePaaSService(id string, body PaaSServiceUpdateRequest) err
 
 //DeletePaaSService deletes a PaaS service
 func (c *Client) DeletePaaSService(id string) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodDelete,
@@ -268,6 +278,9 @@ func (c *Client) DeletePaaSService(id string) error {
 
 //GetPaaSServiceMetrics get a specific PaaS Service's metrics based on a given id
 func (c *Client) GetPaaSServiceMetrics(id string) ([]PaaSServiceMetric, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id, "metrics"),
 		method: http.MethodGet,
@@ -336,6 +349,9 @@ func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (Paa
 
 //GetPaaSSecurityZone get a specific PaaS Security Zone based on given id
 func (c *Client) GetPaaSSecurityZone(id string) (PaaSSecurityZone, error) {
+	if id == "" {
+		return PaaSSecurityZone{}, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodGet,
@@ -347,6 +363,9 @@ func (c *Client) GetPaaSSecurityZone(id string) (PaaSSecurityZone, error) {
 
 //UpdatePaaSSecurityZone update a specific PaaS security zone based on given id
 func (c *Client) UpdatePaaSSecurityZone(id string, body PaaSSecurityZoneUpdateRequest) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodPatch,
@@ -357,6 +376,9 @@ func (c *Client) UpdatePaaSSecurityZone(id string, body PaaSSecurityZoneUpdateRe
 
 //DeletePaaSSecurityZone delete a specific PaaS Security Zone based on given id
 func (c *Client) DeletePaaSSecurityZone(id string) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodDelete,

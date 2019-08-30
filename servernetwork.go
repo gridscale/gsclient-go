@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -58,6 +59,9 @@ type ServerNetworkRelationUpdateRequest struct {
 
 //GetServerNetworkList gets a list of a specific server's networks
 func (c *Client) GetServerNetworkList(id string) ([]ServerNetworkRelationProperties, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "networks"),
 		method: http.MethodGet,
@@ -69,6 +73,9 @@ func (c *Client) GetServerNetworkList(id string) ([]ServerNetworkRelationPropert
 
 //GetServerNetwork gets a network of a specific server
 func (c *Client) GetServerNetwork(serverID, networkID string) (ServerNetworkRelationProperties, error) {
+	if serverID == "" || networkID == "" {
+		return ServerNetworkRelationProperties{}, errors.New("'serverID' and 'networksID' are required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodGet,
@@ -80,6 +87,9 @@ func (c *Client) GetServerNetwork(serverID, networkID string) (ServerNetworkRela
 
 //UpdateServerNetwork updates a link between a network and a server
 func (c *Client) UpdateServerNetwork(serverID, networkID string, body ServerNetworkRelationUpdateRequest) error {
+	if serverID == "" || networkID == "" {
+		return errors.New("'serverID' and 'networksID' are required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodPatch,
@@ -90,6 +100,9 @@ func (c *Client) UpdateServerNetwork(serverID, networkID string, body ServerNetw
 
 //CreateServerNetwork creates a link between a network and a storage
 func (c *Client) CreateServerNetwork(id string, body ServerNetworkRelationCreateRequest) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "networks"),
 		method: http.MethodPost,
@@ -100,6 +113,9 @@ func (c *Client) CreateServerNetwork(id string, body ServerNetworkRelationCreate
 
 //DeleteServerNetwork deletes a link between a network and a server
 func (c *Client) DeleteServerNetwork(serverID, networkID string) error {
+	if serverID == "" || networkID == "" {
+		return errors.New("'serverID' and 'networksID' are required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodDelete,

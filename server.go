@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -145,6 +146,9 @@ type ServerMetricProperties struct {
 
 //GetServer gets a specific server based on given list
 func (c *Client) GetServer(id string) (Server, error) {
+	if id == "" {
+		return Server{}, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodGet,
@@ -204,6 +208,9 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 
 //DeleteServer deletes a specific server
 func (c *Client) DeleteServer(id string) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodDelete,
@@ -213,6 +220,9 @@ func (c *Client) DeleteServer(id string) error {
 
 //UpdateServer updates a specific server
 func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodPatch,
@@ -223,6 +233,9 @@ func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
 
 //GetServerEventList gets a list of a specific server's events
 func (c *Client) GetServerEventList(id string) ([]Event, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "events"),
 		method: http.MethodGet,
@@ -238,6 +251,9 @@ func (c *Client) GetServerEventList(id string) ([]Event, error) {
 
 //GetServerMetricList gets a list of a specific server's metrics
 func (c *Client) GetServerMetricList(id string) ([]ServerMetric, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "metrics"),
 		method: http.MethodGet,
@@ -332,6 +348,9 @@ func (c *Client) ShutdownServer(id string) error {
 
 //GetServersByLocation gets a list of servers by location
 func (c *Client) GetServersByLocation(id string) ([]Server, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "servers"),
 		method: http.MethodGet,

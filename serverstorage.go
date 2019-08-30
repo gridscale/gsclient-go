@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -47,6 +48,9 @@ type ServerStorageRelationUpdateRequest struct {
 
 //GetServerStorageList gets a list of a specific server's storages
 func (c *Client) GetServerStorageList(id string) ([]ServerStorageRelationProperties, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "storages"),
 		method: http.MethodGet,
@@ -58,6 +62,9 @@ func (c *Client) GetServerStorageList(id string) ([]ServerStorageRelationPropert
 
 //GetServerStorage gets a storage of a specific server
 func (c *Client) GetServerStorage(serverID, storageID string) (ServerStorageRelationProperties, error) {
+	if serverID == "" || storageID == "" {
+		return ServerStorageRelationProperties{}, errors.New("'serverID' and 'storageID' are required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodGet,
@@ -69,6 +76,9 @@ func (c *Client) GetServerStorage(serverID, storageID string) (ServerStorageRela
 
 //UpdateServerStorage updates a link between a storage and a server
 func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStorageRelationUpdateRequest) error {
+	if serverID == "" || storageID == "" {
+		return errors.New("'serverID' and 'storageID' are required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodPatch,
@@ -79,6 +89,9 @@ func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStor
 
 //CreateServerStorage create a link between a server and a storage
 func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreateRequest) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "storages"),
 		method: http.MethodPost,
@@ -89,6 +102,9 @@ func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreate
 
 //DeleteServerStorage delete a link between a storage and a server
 func (c *Client) DeleteServerStorage(serverID, storageID string) error {
+	if serverID == "" || storageID == "" {
+		return errors.New("'serverID' and 'storageID' are required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodDelete,

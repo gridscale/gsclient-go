@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -87,6 +88,9 @@ type NetworkUpdateRequest struct {
 
 //GetNetwork get a specific network based on given id
 func (c *Client) GetNetwork(id string) (Network, error) {
+	if id == "" {
+		return Network{}, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodGet,
@@ -114,6 +118,9 @@ func (c *Client) CreateNetwork(body NetworkCreateRequest) (NetworkCreateResponse
 
 //DeleteNetwork deletes a specific network based on given id
 func (c *Client) DeleteNetwork(id string) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
@@ -123,6 +130,9 @@ func (c *Client) DeleteNetwork(id string) error {
 
 //UpdateNetwork updates a specific network based on given id
 func (c *Client) UpdateNetwork(id string, body NetworkUpdateRequest) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodPatch,
@@ -151,6 +161,9 @@ func (c *Client) GetNetworkList() ([]Network, error) {
 
 //GetNetworkEventList gets a list of a network's events
 func (c *Client) GetNetworkEventList(id string) ([]Event, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id, "events"),
 		method: http.MethodGet,
@@ -180,6 +193,9 @@ func (c *Client) GetNetworkPublic() (Network, error) {
 
 //GetNetworksByLocation gets a list of networks by location
 func (c *Client) GetNetworksByLocation(id string) ([]Network, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "networks"),
 		method: http.MethodGet,

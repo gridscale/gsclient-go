@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -92,6 +93,9 @@ func (c *Client) GetISOImageList() ([]ISOImage, error) {
 
 //GetISOImage returns a specific ISO image based on given id
 func (c *Client) GetISOImage(id string) (ISOImage, error) {
+	if id == "" {
+		return ISOImage{}, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodGet,
@@ -119,6 +123,9 @@ func (c *Client) CreateISOImage(body ISOImageCreateRequest) (ISOImageCreateRespo
 
 //UpdateISOImage updates a specific ISO Image
 func (c *Client) UpdateISOImage(id string, body ISOImageUpdateRequest) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodPatch,
@@ -129,6 +136,9 @@ func (c *Client) UpdateISOImage(id string, body ISOImageUpdateRequest) error {
 
 //DeleteISOImage deletes a specific ISO image
 func (c *Client) DeleteISOImage(id string) error {
+	if id == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodDelete,
@@ -138,6 +148,9 @@ func (c *Client) DeleteISOImage(id string) error {
 
 //GetISOImageEventList returns a list of events of an ISO image
 func (c *Client) GetISOImageEventList(id string) ([]Event, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id, "events"),
 		method: http.MethodGet,
@@ -153,6 +166,9 @@ func (c *Client) GetISOImageEventList(id string) ([]Event, error) {
 
 //GetISOImagesByLocation gets a list of ISO images by location
 func (c *Client) GetISOImagesByLocation(id string) ([]ISOImage, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "isoimages"),
 		method: http.MethodGet,
