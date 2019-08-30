@@ -203,6 +203,13 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 		return ServerCreateResponse{}, err
 	}
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+	//this fixed the endpoint's bug temporarily when creating server with/without
+	//'relations' field
+	if response.ServerUUID == "" && response.ObjectUUID != "" {
+		response.ServerUUID = response.ObjectUUID
+	} else if response.ObjectUUID == "" && response.ServerUUID != "" {
+		response.ObjectUUID = response.ServerUUID
+	}
 	return response, err
 }
 
