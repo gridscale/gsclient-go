@@ -303,7 +303,7 @@ func getMockServerCreateResponse() ServerCreateResponse {
 	mock := ServerCreateResponse{
 		ObjectUUID:   dummyUUID,
 		RequestUUID:  dummyRequestUUID,
-		SeverUUID:    dummyUUID,
+		ServerUUID:   dummyUUID,
 		NetworkUUIDs: nil,
 		StorageUUIDs: nil,
 		IPaddrUUIDs:  nil,
