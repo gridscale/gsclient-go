@@ -228,6 +228,17 @@ func (c *enhancedClient) deleteService(serviceType serviceType, id string) {
 			return
 		}
 		log.Info("Server successfully deleted")
+
+		log.Info("Get deleted servers: Press 'Enter' to continue...")
+		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		servers, err := c.GetDeletedServers()
+		if err != nil {
+			log.Error("Get deleted servers has failed with error", err)
+			return
+		}
+		log.WithFields(log.Fields{
+			"servers": servers,
+		}).Info("Retrieved deleted servers successfully")
 	case storageType:
 		err := c.DeleteStorage(id)
 		if err != nil {

@@ -43,6 +43,17 @@ func main() {
 			return
 		}
 		logrus.Info("ISO-image successfully deleted")
+
+		logrus.Info("Get deleted ISO-images: Press 'Enter' to continue...")
+		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		isoImages, err := client.GetDeletedISOImages()
+		if err != nil {
+			logrus.Error("Get deleted ISO-images has failed with error", err)
+			return
+		}
+		logrus.WithFields(logrus.Fields{
+			"ISO-images": isoImages,
+		}).Info("Retrieved deleted ISO-images successfully")
 	}()
 
 	logrus.Info("Update ISO image: Press 'Enter' to continue...")

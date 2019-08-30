@@ -233,6 +233,23 @@ func TestClient_DeletePaaSSecurityZone(t *testing.T) {
 	}
 }
 
+func TestClient_GetDeletedPaaSServices(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiDeletedBase, "paas_services")
+	expectedObj := getMockPaaSService()
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, r.Method, http.MethodGet)
+		fmt.Fprint(w, prepareDeletedPaaSHTTPGetListResponse())
+	})
+	paasList, err := client.GetDeletedPaaSServices()
+	if err != nil {
+		t.Errorf("GetDeletedPaaSServices returned an error %v", err)
+	}
+	assert.Equal(t, 1, len(paasList))
+	assert.Equal(t, fmt.Sprintf("[%v]", expectedObj), fmt.Sprintf("%v", paasList))
+}
+
 func getMockPaaSService() PaaSService {
 	listenPort := make(map[string]map[string]int)
 	portmap := make(map[string]int)
@@ -407,4 +424,10 @@ func getMockPaaSSecurityZoneCreateResponse() PaaSSecurityZoneCreateResponse {
 func preparePaaSHTTPCreateSecurityZone() string {
 	res, _ := json.Marshal(getMockPaaSSecurityZoneCreateResponse())
 	return string(res)
+}
+
+func prepareDeletedPaaSHTTPGetListResponse() string {
+	paas := getMockPaaSService()
+	res, _ := json.Marshal(paas.Properties)
+	return fmt.Sprintf(`{"deleted_paas_services": {"%s" : %s}}`, dummyUUID, string(res))
 }

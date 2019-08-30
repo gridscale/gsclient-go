@@ -10,6 +10,11 @@ type ServerList struct {
 	List map[string]ServerProperties `json:"servers"`
 }
 
+//DeletedServerList JSON struct of a list of deleted servers
+type DeletedServerList struct {
+	List map[string]ServerProperties `json:"deleted_servers"`
+}
+
 //Server JSON struct of a single server
 type Server struct {
 	Properties ServerProperties `json:"server"`
@@ -308,6 +313,21 @@ func (c *Client) GetServersByLocation(id string) ([]Server, error) {
 		method: http.MethodGet,
 	}
 	var response ServerList
+	var servers []Server
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		servers = append(servers, Server{Properties: properties})
+	}
+	return servers, err
+}
+
+//GetDeletedServers gets a list of deleted servers
+func (c *Client) GetDeletedServers() ([]Server, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "servers"),
+		method: http.MethodGet,
+	}
+	var response DeletedServerList
 	var servers []Server
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {

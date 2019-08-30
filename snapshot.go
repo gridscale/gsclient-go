@@ -10,6 +10,11 @@ type StorageSnapshotList struct {
 	List map[string]StorageSnapshotProperties `json:"snapshots"`
 }
 
+//DeletedStorageSnapshotList is JSON structure of a list of deleted storage snapshots
+type DeletedStorageSnapshotList struct {
+	List map[string]StorageSnapshotProperties `json:"deleted_snapshots"`
+}
+
 //StorageSnapshot is JSON structure of a single storage snapshot
 type StorageSnapshot struct {
 	Properties StorageSnapshotProperties `json:"snapshot"`
@@ -160,6 +165,21 @@ func (c *Client) GetSnapshotsByLocation(id string) ([]StorageSnapshot, error) {
 		method: http.MethodGet,
 	}
 	var response StorageSnapshotList
+	var snapshots []StorageSnapshot
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		snapshots = append(snapshots, StorageSnapshot{Properties: properties})
+	}
+	return snapshots, err
+}
+
+//GetDeletedSnapshots gets a list of deleted storage snapshots
+func (c *Client) GetDeletedSnapshots() ([]StorageSnapshot, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "snapshots"),
+		method: http.MethodGet,
+	}
+	var response DeletedStorageSnapshotList
 	var snapshots []StorageSnapshot
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
