@@ -51,15 +51,24 @@ type ServerRelations struct {
 
 //ServerCreateRequest JSON struct of a request for creating a server
 type ServerCreateRequest struct {
-	Name            string   `json:"name"`
-	Memory          int      `json:"memory"`
-	Cores           int      `json:"cores"`
-	LocationUUID    string   `json:"location_uuid"`
-	HardwareProfile string   `json:"hardware_profile,omitempty"`
-	AvailablityZone string   `json:"availability_zone,omitempty"`
-	Labels          []string `json:"labels,omitempty"`
-	Status          string   `json:"status,omitempty"`
-	AutoRecovery    *bool    `json:"auto_recovery,omitempty"`
+	Name            string                       `json:"name"`
+	Memory          int                          `json:"memory"`
+	Cores           int                          `json:"cores"`
+	LocationUUID    string                       `json:"location_uuid"`
+	HardwareProfile string                       `json:"hardware_profile,omitempty"`
+	AvailablityZone string                       `json:"availability_zone,omitempty"`
+	Labels          []string                     `json:"labels,omitempty"`
+	Status          string                       `json:"status,omitempty"`
+	AutoRecovery    *bool                        `json:"auto_recovery,omitempty"`
+	Relations       ServerCreateRequestRelations `json:"relations"`
+}
+
+//ServerCreateRequestRelations JSOn struct of a list of a server's relations
+type ServerCreateRequestRelations struct {
+	IsoImages []ServerCreateRequestIsoimage `json:"isoimages"`
+	Networks  []ServerCreateRequestNetwork  `json:"networks"`
+	PublicIPs []ServerCreateRequestIP       `json:"public_ips"`
+	Storages  []ServerCreateRequestStorage  `json:"storages"`
 }
 
 //ServerCreateResponse JSON struct of a response for creating a server
@@ -79,24 +88,24 @@ type ServerPowerUpdateRequest struct {
 
 //ServerCreateRequestStorage JSON struct of a relation between a server and a storage
 type ServerCreateRequestStorage struct {
-	StorageUUID string `json:"storage_uuid,omitempty"`
+	StorageUUID string `json:"storage_uuid"`
 	BootDevice  bool   `json:"bootdevice,omitempty"`
 }
 
 //ServerCreateRequestNetwork JSON struct of a relation between a server and a network
 type ServerCreateRequestNetwork struct {
-	NetworkUUID string `json:"network_uuid,omitempty"`
+	NetworkUUID string `json:"network_uuid"`
 	BootDevice  bool   `json:"bootdevice,omitempty"`
 }
 
 //ServerCreateRequestIP JSON struct of a relation between a server and an IP address
 type ServerCreateRequestIP struct {
-	IPaddrUUID string `json:"ipaddr_uuid,omitempty"`
+	IPaddrUUID string `json:"ipaddr_uuid"`
 }
 
 //ServerCreateRequestIsoimage JSON struct of a relation between a server and an ISO-Image
 type ServerCreateRequestIsoimage struct {
-	IsoimageUUID string `json:"isoimage_uuid,omitempty"`
+	IsoimageUUID string `json:"isoimage_uuid"`
 }
 
 //ServerUpdateRequest JSON of a request for updating a server
@@ -164,6 +173,21 @@ func (c *Client) GetServerList() ([]Server, error) {
 
 //CreateServer create a server
 func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, error) {
+	//check if these slices are nil
+	//make them be empty slice instead of nil
+	//so that JSON structure will be valid
+	if body.Relations.PublicIPs == nil {
+		body.Relations.PublicIPs = make([]ServerCreateRequestIP, 0)
+	}
+	if body.Relations.Networks == nil {
+		body.Relations.Networks = make([]ServerCreateRequestNetwork, 0)
+	}
+	if body.Relations.IsoImages == nil {
+		body.Relations.IsoImages = make([]ServerCreateRequestIsoimage, 0)
+	}
+	if body.Relations.Storages == nil {
+		body.Relations.Storages = make([]ServerCreateRequestStorage, 0)
+	}
 	r := Request{
 		uri:    apiServerBase,
 		method: http.MethodPost,

@@ -225,7 +225,7 @@ func TestClient_ShutdownServer(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		power = false
 		writer.WriteHeader(http.StatusInternalServerError)
- 		writer.Write([]byte("☄ HTTP status code returned!"))
+		writer.Write([]byte("☄ HTTP status code returned!"))
 		fmt.Fprint(writer, "")
 	})
 

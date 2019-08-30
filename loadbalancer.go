@@ -114,6 +114,9 @@ func (c *Client) GetLoadBalancer(id string) (LoadBalancer, error) {
 
 //CreateLoadBalancer creates a new loadbalancer
 func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error) {
+	if body.Labels == nil {
+		body.Labels = make([]string, 0)
+	}
 	r := Request{
 		uri:    apiLoadBalancerBase,
 		method: http.MethodPost,
