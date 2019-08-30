@@ -13,6 +13,7 @@ const (
 	apiObjectStorageBase = "/objects/objectstorages"
 	apiFirewallBase      = "/objects/firewalls"
 	apiLocationBase      = "/objects/locations"
+	apiEventBase         = "/objects/events"
 	apiLabelBase         = "/objects/labels"
 	apiDeletedBase       = "/objects/deleted"
 )

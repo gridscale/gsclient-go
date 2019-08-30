@@ -111,14 +111,14 @@ func TestClient_GetServerEventList(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareServerEventListHTTPGet())
+		fmt.Fprintf(writer, prepareEventListHTTPGet())
 	})
 	res, err := client.GetServerEventList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerEventList returned an error %v", err)
 	}
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerEvent()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_GetServerMetricList(t *testing.T) {
@@ -311,21 +311,6 @@ func getMockServerCreateResponse() ServerCreateResponse {
 	return mock
 }
 
-func getMockServerEvent() ServerEvent {
-	mock := ServerEvent{Properties: ServerEventProperties{
-		ObjectType:    "type",
-		RequestUUID:   dummyRequestUUID,
-		ObjectUUID:    dummyUUID,
-		Activity:      "activity",
-		RequestType:   "turn on",
-		RequestStatus: "done",
-		Change:        "change note",
-		Timestamp:     dummyTime,
-		UserUUID:      dummyUUID,
-	}}
-	return mock
-}
-
 func getMockServerMetric() ServerMetric {
 	mock := ServerMetric{Properties: ServerMetricProperties{
 		BeginTime:       dummyTime,
@@ -365,12 +350,6 @@ func prepareServerCreateResponse() string {
 	server := getMockServerCreateResponse()
 	res, _ := json.Marshal(server)
 	return string(res)
-}
-
-func prepareServerEventListHTTPGet() string {
-	event := getMockServerEvent()
-	res, _ := json.Marshal(event.Properties)
-	return fmt.Sprintf(`{"events": [%s]}`, string(res))
 }
 
 func prepareServerMetricListHTTPGet() string {

@@ -209,6 +209,8 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Firewall Update (UpdateFirewall)
     * Firewall Delete (DeleteFirewall)
     * Firewall Events Get (GetFirewallEventList) 
+* Event
+    * Events Get (GetEventList)
 * Label
     * Labels Get (GetLabelList)
     * Label Create (CreateLabel)

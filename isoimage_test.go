@@ -104,7 +104,7 @@ func TestClient_GetISOImageEventList(t *testing.T) {
 	uri := path.Join(apiISOBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprint(writer, prepareISOImageHTTPGetEventList())
+		fmt.Fprint(writer, prepareEventListHTTPGet())
 	})
 
 	res, err := client.GetISOImageEventList(dummyUUID)
@@ -112,7 +112,7 @@ func TestClient_GetISOImageEventList(t *testing.T) {
 		t.Errorf("GetISOImageEventList returned an error %v", err)
 	}
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockISOImageEvent()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_GetISOImagesByLocation(t *testing.T) {
@@ -203,26 +203,6 @@ func getMockISOImageCreateResponse() ISOImageCreateResponse {
 func prepareISOImageHTTPCreateResponse() string {
 	res, _ := json.Marshal(getMockISOImageCreateResponse())
 	return string(res)
-}
-
-func getMockISOImageEvent() ISOImageEvent {
-	mock := ISOImageEvent{Properties: ISOImageEventProperties{
-		ObjectType:    "type",
-		RequestUUID:   dummyRequestUUID,
-		ObjectUUID:    dummyUUID,
-		Activity:      "activity",
-		RequestType:   "request type",
-		RequestStatus: "active",
-		Change:        "change description",
-		Timestamp:     dummyTime,
-		UserUUID:      "user-id",
-	}}
-	return mock
-}
-
-func prepareISOImageHTTPGetEventList() string {
-	res, _ := json.Marshal(getMockISOImageEvent().Properties)
-	return fmt.Sprintf(`{"events": [%s]}`, string(res))
 }
 
 func prepareDeletedISOImageHTTPGetList() string {

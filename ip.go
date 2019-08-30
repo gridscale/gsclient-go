@@ -91,29 +91,6 @@ type IPUpdateRequest struct {
 	Labels     []string `json:"labels,omitempty"`
 }
 
-//IPEventList is JSON struct of a list of an IP's events
-type IPEventList struct {
-	List []IPEventProperties `json:"events"`
-}
-
-//IPEvent is JSON struct of a single IP
-type IPEvent struct {
-	Properties IPEventProperties `json:"event"`
-}
-
-//IPEventProperties is JSON struct of an IP's properties
-type IPEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //GetIP get a specific IP based on given id
 func (c *Client) GetIP(id string) (IP, error) {
 	r := Request{
@@ -185,16 +162,16 @@ func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
 }
 
 //GetIPEventList gets a list of an IP's events
-func (c *Client) GetIPEventList(id string) ([]IPEvent, error) {
+func (c *Client) GetIPEventList(id string) ([]Event, error) {
 	r := Request{
 		uri:    path.Join(apiIPBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response IPEventList
-	var IPEvents []IPEvent
+	var response EventList
+	var IPEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		IPEvents = append(IPEvents, IPEvent{Properties: properties})
+		IPEvents = append(IPEvents, Event{Properties: properties})
 	}
 	return IPEvents, err
 }

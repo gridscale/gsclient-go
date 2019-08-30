@@ -111,14 +111,14 @@ func TestClient_GetStorageEventList(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, prepareStorageEventListHTTPGet())
+		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	response, err := client.GetStorageEventList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetStorageEventList returned an error %v", err)
 	}
 	assert.Equal(t, 1, len(response))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageEvent()), fmt.Sprintf("%v", response))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", response))
 }
 
 func TestClient_GetStoragesByLocation(t *testing.T) {
@@ -197,21 +197,6 @@ func getMockStorageCreateResponse() CreateResponse {
 	return mock
 }
 
-func getMockStorageEvent() StorageEvent {
-	mock := StorageEvent{Properties: StorageEventProperties{
-		ObjectType:    "type",
-		RequestUUID:   dummyRequestUUID,
-		ObjectUUID:    dummyUUID,
-		Activity:      "sent",
-		RequestType:   "type",
-		RequestStatus: "active",
-		Change:        "change",
-		Timestamp:     dummyTime,
-		UserUUID:      dummyUUID,
-	}}
-	return mock
-}
-
 func prepareStorageListHTTPGet() string {
 	storage := getMockStorage()
 	res, _ := json.Marshal(storage.Properties)
@@ -228,12 +213,6 @@ func prepareStorageCreateResponse() string {
 	response := getMockStorageCreateResponse()
 	res, _ := json.Marshal(response)
 	return string(res)
-}
-
-func prepareStorageEventListHTTPGet() string {
-	event := getMockStorageEvent()
-	res, _ := json.Marshal(event.Properties)
-	return fmt.Sprintf(`{"events": [%s]}`, string(res))
 }
 
 func prepareDeletedStorageListHTTPGet() string {

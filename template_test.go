@@ -117,14 +117,14 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 	uri := path.Join(apiTemplateBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, prepareTemplateEventListHTTPGet())
+		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	response, err := client.GetTemplateEventList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetTemplateEventList returned an error %v", err)
 	}
 	assert.Equal(t, 1, len(response))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplateEvent()), fmt.Sprintf("%v", response))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", response))
 }
 
 func TestClient_GetTemplatesByLocation(t *testing.T) {
@@ -192,21 +192,6 @@ func getMockTemplateCreateResponse() CreateResponse {
 	return mock
 }
 
-func getMockTemplateEvent() TemplateEvent {
-	mock := TemplateEvent{Properties: TemplateEventProperties{
-		ObjectType:    "type",
-		RequestUUID:   dummyRequestUUID,
-		ObjectUUID:    dummyUUID,
-		Activity:      "sent",
-		RequestType:   "type",
-		RequestStatus: "active",
-		Change:        "change",
-		Timestamp:     dummyTime,
-		UserUUID:      dummyUUID,
-	}}
-	return mock
-}
-
 func prepareTemplateListHTTPGet() string {
 	template := getMockTemplate()
 	res, _ := json.Marshal(template.Properties)
@@ -223,12 +208,6 @@ func prepareTemplateCreateResponse() string {
 	response := getMockTemplateCreateResponse()
 	res, _ := json.Marshal(response)
 	return string(res)
-}
-
-func prepareTemplateEventListHTTPGet() string {
-	event := getMockTemplateEvent()
-	res, _ := json.Marshal(event.Properties)
-	return fmt.Sprintf(`{"events": [%s]}`, string(res))
 }
 
 func prepareDeletedTemplateListHTTPGet() string {
