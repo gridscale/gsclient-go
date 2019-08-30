@@ -140,6 +140,9 @@ func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) e
 	if id == "" {
 		return errors.New("'id' is required")
 	}
+	if body.Labels == nil {
+		body.Labels = make([]string, 0)
+	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodPatch,
