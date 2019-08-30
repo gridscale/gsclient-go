@@ -209,6 +209,10 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Firewall Update (UpdateFirewall)
     * Firewall Delete (DeleteFirewall)
     * Firewall Events Get (GetFirewallEventList) 
+* Label
+    * Labels Get (GetLabelList)
+    * Label Create (CreateLabel)
+    * Label Delete (DeleteLabel)
 * Location
     * Locations Get (GetLocationList)
     * Location Get (GetLocation)
@@ -228,6 +232,7 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Deleted Storages Get (GetDeletedStorages)
     * Deleted Templates Get (GetDeletedTemplates)
     * Deleted PaaS Services Get (GetDeletedPaaSServices)
+
 Note: The functions in this list can be called with a Client type.
 
 ## Known Issues
