@@ -76,7 +76,7 @@ type ServerCreateRequestRelations struct {
 type ServerCreateResponse struct {
 	ObjectUUID   string   `json:"object_uuid"`
 	RequestUUID  string   `json:"request_uuid"`
-	SeverUUID    string   `json:"sever_uuid"`
+	ServerUUID   string   `json:"server_uuid"`
 	NetworkUUIDs []string `json:"network_uuids"`
 	StorageUUIDs []string `json:"storage_uuids"`
 	IPaddrUUIDs  []string `json:"ipaddr_uuids"`
