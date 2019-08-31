@@ -52,16 +52,16 @@ type ServerRelations struct {
 
 //ServerCreateRequest JSON struct of a request for creating a server
 type ServerCreateRequest struct {
-	Name            string                       `json:"name"`
-	Memory          int                          `json:"memory"`
-	Cores           int                          `json:"cores"`
-	LocationUUID    string                       `json:"location_uuid"`
-	HardwareProfile string                       `json:"hardware_profile,omitempty"`
-	AvailablityZone string                       `json:"availability_zone,omitempty"`
-	Labels          []string                     `json:"labels,omitempty"`
-	Status          string                       `json:"status,omitempty"`
-	AutoRecovery    *bool                        `json:"auto_recovery,omitempty"`
-	Relations       ServerCreateRequestRelations `json:"relations"`
+	Name            string                        `json:"name"`
+	Memory          int                           `json:"memory"`
+	Cores           int                           `json:"cores"`
+	LocationUUID    string                        `json:"location_uuid"`
+	HardwareProfile string                        `json:"hardware_profile,omitempty"`
+	AvailablityZone string                        `json:"availability_zone,omitempty"`
+	Labels          []string                      `json:"labels,omitempty"`
+	Status          string                        `json:"status,omitempty"`
+	AutoRecovery    *bool                         `json:"auto_recovery,omitempty"`
+	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
 }
 
 //ServerCreateRequestRelations JSOn struct of a list of a server's relations
@@ -180,16 +180,16 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 	//check if these slices are nil
 	//make them be empty slice instead of nil
 	//so that JSON structure will be valid
-	if body.Relations.PublicIPs == nil {
+	if body.Relations != nil && body.Relations.PublicIPs == nil {
 		body.Relations.PublicIPs = make([]ServerCreateRequestIP, 0)
 	}
-	if body.Relations.Networks == nil {
+	if body.Relations != nil && body.Relations.Networks == nil {
 		body.Relations.Networks = make([]ServerCreateRequestNetwork, 0)
 	}
-	if body.Relations.IsoImages == nil {
+	if body.Relations != nil && body.Relations.IsoImages == nil {
 		body.Relations.IsoImages = make([]ServerCreateRequestIsoimage, 0)
 	}
-	if body.Relations.Storages == nil {
+	if body.Relations != nil && body.Relations.Storages == nil {
 		body.Relations.Storages = make([]ServerCreateRequestStorage, 0)
 	}
 	r := Request{
