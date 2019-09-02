@@ -36,9 +36,7 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 		Labels:              lb.Labels,
 	}
 	response, err := client.CreateLoadBalancer(lbRequest)
-	if err != nil {
-		t.Errorf("CreateLoadBalancer returned error: %v", err)
-	}
+	assert.Nil(t, err, "CreateLoadBalancer returned error: %v", err)
 	assert.Equal(t, fmt.Sprintf("%s", prepareLoadBalancerObjectCreateResponse()), fmt.Sprintf("%s", response))
 }
 
@@ -52,9 +50,7 @@ func TestClient_GetLoadBalancer(t *testing.T) {
 		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse())
 	})
 	loadbalancer, err := client.GetLoadBalancer(dummyUUID)
-	if err != nil {
-		t.Errorf("GetLoadBalancer returned error: %v", err)
-	}
+	assert.Nil(t, err, "GetLoadBalancer returned error: %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", expectedObject.Properties), fmt.Sprintf("%v", loadbalancer.Properties))
 }
 
@@ -68,9 +64,7 @@ func TestClient_GetLoadBalancerList(t *testing.T) {
 		fmt.Fprint(w, prepareLoadBalancerHTTPListResponse())
 	})
 	loadbalancers, err := client.GetLoadBalancerList()
-	if err != nil {
-		t.Errorf("GetLoadBalancerList returned error: %v", err)
-	}
+	assert.Nil(t, err, "GetLoadBalancerList returned error: %v", err)
 	assert.Equal(t, 1, len(loadbalancers))
 	assert.Equal(t, fmt.Sprintf("[%v]", expectedObjects), fmt.Sprintf("%v", loadbalancers))
 }
@@ -90,9 +84,7 @@ func TestClient_UpdateLoadBalancer(t *testing.T) {
 		RedirectHTTPToHTTPS: false,
 		Status:              "inactive",
 	})
-	if err != nil {
-		t.Errorf("UpdateLoadBalancer returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateLoadBalancer returned an error %v", err)
 }
 
 func TestClient_DeleteLoadBalancer(t *testing.T) {
@@ -104,9 +96,7 @@ func TestClient_DeleteLoadBalancer(t *testing.T) {
 		fmt.Fprintf(w, "")
 	})
 	err := client.DeleteLoadBalancer(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteLoadBalancer returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteLoadBalancer returned an error %v", err)
 }
 
 func TestClient_GetLoadBalancerEventList(t *testing.T) {
@@ -119,9 +109,7 @@ func TestClient_GetLoadBalancerEventList(t *testing.T) {
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	response, err := client.GetLoadBalancerEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetLoadBalancerEventList returned error: %v", err)
-	}
+	assert.Nil(t, err, "GetLoadBalancerEventList returned error: %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", expectedObjects), fmt.Sprintf("%v", response))
 }

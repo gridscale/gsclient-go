@@ -19,9 +19,7 @@ func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
 	})
 
 	res, err := client.GetStorageSnapshotScheduleList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetStorageSnapshotScheduleList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetStorageSnapshotScheduleList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshotSchedule()), fmt.Sprintf("%v", res))
 }
@@ -36,9 +34,7 @@ func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
 	})
 
 	res, err := client.GetStorageSnapshotSchedule(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("GetStorageSnapshotSchedule returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetStorageSnapshotSchedule returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotSchedule()), fmt.Sprintf("%v", res))
 }
 
@@ -62,10 +58,7 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 		KeepSnapshots: 1,
 		NextRuntime:   dummyTime,
 	})
-	if err != nil {
-		t.Errorf("CreateStorageSnapshotSchedule returned an error %v", err)
-	}
-
+	assert.Nil(t, err, "CreateStorageSnapshotSchedule returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotScheduleHTTPCreateResponse()), fmt.Sprintf("%s", response))
 }
 
@@ -85,9 +78,7 @@ func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 		KeepSnapshots: 1,
 		NextRuntime:   dummyTime,
 	})
-	if err != nil {
-		t.Errorf("UpdateStorageSnapshotSchedule returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateStorageSnapshotSchedule returned an error %v", err)
 }
 
 func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
@@ -99,9 +90,7 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.DeleteStorageSnapshotSchedule(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteStorageSnapshotSchedule returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteStorageSnapshotSchedule returned an error %v", err)
 }
 
 func getMockStorageSnapshotSchedule() StorageSnapshotSchedule {

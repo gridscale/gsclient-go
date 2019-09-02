@@ -18,9 +18,7 @@ func TestClient_GetStorageList(t *testing.T) {
 		fmt.Fprint(w, prepareStorageListHTTPGet())
 	})
 	response, err := client.GetStorageList()
-	if err != nil {
-		t.Errorf("GetStorageList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetStorageList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorage()), fmt.Sprintf("%v", response))
 }
@@ -34,9 +32,7 @@ func TestClient_GetStorage(t *testing.T) {
 		fmt.Fprint(w, prepareStorageHTTPGet())
 	})
 	response, err := client.GetStorage(dummyUUID)
-	if err != nil {
-		t.Errorf("GetStorage returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetStorage returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockStorage()), fmt.Sprintf("%v", response))
 }
 
@@ -67,9 +63,7 @@ func TestClient_CreateStorage(t *testing.T) {
 		},
 		Labels: []string{"label"},
 	})
-	if err != nil {
-		t.Errorf("CreateStorage returned an error %v", err)
-	}
+	assert.Nil(t, err, "CreateStorage returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockStorageCreateResponse()), fmt.Sprintf("%v", res))
 }
 
@@ -86,9 +80,7 @@ func TestClient_UpdateStorage(t *testing.T) {
 		Labels:   []string{"label"},
 		Capacity: 20,
 	})
-	if err != nil {
-		t.Errorf("UpdateStorage returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateStorage returned an error %v", err)
 }
 
 func TestClient_DeleteStorage(t *testing.T) {
@@ -100,9 +92,7 @@ func TestClient_DeleteStorage(t *testing.T) {
 		fmt.Fprintf(w, "")
 	})
 	err := client.DeleteStorage(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteStorage returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteStorage returned an error %v", err)
 }
 
 func TestClient_GetStorageEventList(t *testing.T) {
@@ -114,9 +104,7 @@ func TestClient_GetStorageEventList(t *testing.T) {
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	response, err := client.GetStorageEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetStorageEventList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetStorageEventList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", response))
 }
@@ -130,9 +118,7 @@ func TestClient_GetStoragesByLocation(t *testing.T) {
 		fmt.Fprint(w, prepareStorageListHTTPGet())
 	})
 	response, err := client.GetStoragesByLocation(dummyUUID)
-	if err != nil {
-		t.Errorf("GetStoragesByLocation returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetStoragesByLocation returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorage()), fmt.Sprintf("%v", response))
 }
@@ -146,9 +132,7 @@ func TestClient_GetDeletedStorages(t *testing.T) {
 		fmt.Fprint(w, prepareDeletedStorageListHTTPGet())
 	})
 	response, err := client.GetDeletedStorages()
-	if err != nil {
-		t.Errorf("GetDeletedStorages returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetDeletedStorages returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorage()), fmt.Sprintf("%v", response))
 }

@@ -19,9 +19,7 @@ func TestClient_GetPaaSServiceList(t *testing.T) {
 		fmt.Fprint(w, preparePaaSHTTPGetListResponse())
 	})
 	paasList, err := client.GetPaaSServiceList()
-	if err != nil {
-		t.Errorf("GetPaaSServiceList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetPaaSServiceList returned an error %v", err)
 	assert.Equal(t, 1, len(paasList))
 	assert.Equal(t, fmt.Sprintf("[%v]", expectedObj), fmt.Sprintf("%v", paasList))
 }
@@ -36,9 +34,7 @@ func TestClient_GetPaaSService(t *testing.T) {
 		fmt.Fprint(w, preparePaaSHTTPGetResponse())
 	})
 	paas, err := client.GetPaaSService(dummyUUID)
-	if err != nil {
-		t.Errorf("GetPaaSService returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetPaaSService returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", expectedObj.Properties), fmt.Sprintf("%v", paas.Properties))
 }
 
@@ -69,9 +65,7 @@ func TestClient_CreatePaaSService(t *testing.T) {
 		},
 		Parameters: nil,
 	})
-	if err != nil {
-		t.Errorf("CreatePaaSService returned error %v", err)
-	}
+	assert.Nil(t, err, "CreatePaaSService returned error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", expectedRespObj), fmt.Sprintf("%v", response))
 }
 
@@ -96,9 +90,7 @@ func TestClient_UpdatePaaSService(t *testing.T) {
 			},
 		},
 	})
-	if err != nil {
-		t.Errorf("UpdatePaaSService returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdatePaaSService returned an error %v", err)
 }
 
 func TestClient_DeletePaaSService(t *testing.T) {
@@ -110,9 +102,7 @@ func TestClient_DeletePaaSService(t *testing.T) {
 		fmt.Fprintf(w, "")
 	})
 	err := client.DeletePaaSService(dummyUUID)
-	if err != nil {
-		t.Errorf("DeletePaaSService returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeletePaaSService returned an error %v", err)
 }
 
 func TestClient_GetPaaSServiceMetrics(t *testing.T) {
@@ -124,9 +114,7 @@ func TestClient_GetPaaSServiceMetrics(t *testing.T) {
 		fmt.Fprintf(writer, preparePaaSHTTPGetMetricsResponse())
 	})
 	res, err := client.GetPaaSServiceMetrics(dummyUUID)
-	if err != nil {
-		t.Errorf("GetPaaSServiceMetrics returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetPaaSServiceMetrics returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockPaaSServiceMetric()), fmt.Sprintf("%v", res))
 }
@@ -140,9 +128,7 @@ func TestClient_GetPaaSTemplateList(t *testing.T) {
 		fmt.Fprintf(writer, preparePaaSHTTPGetTemplatesResponse())
 	})
 	res, err := client.GetPaaSTemplateList()
-	if err != nil {
-		t.Errorf("GetPaaSTemplateList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetPaaSTemplateList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockPaasTemplate()), fmt.Sprintf("%v", res))
 }
@@ -156,10 +142,7 @@ func TestClient_GetSecurityZoneList(t *testing.T) {
 		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZoneList())
 	})
 	res, err := client.GetPaaSSecurityZoneList()
-
-	if err != nil {
-		t.Errorf("GetPaaSSecurityZone returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetPaaSSecurityZone returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockSecurityZone()), fmt.Sprintf("%v", res))
 }
@@ -180,9 +163,7 @@ func TestClient_CreatePaaSSecurityZone(t *testing.T) {
 		Name:         "test",
 		LocationUUID: "aa-bb-cc",
 	})
-	if err != nil {
-		t.Errorf("CreatePaaSSecurityZone returned an error %v", err)
-	}
+	assert.Nil(t, err, "CreatePaaSSecurityZone returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockPaaSSecurityZoneCreateResponse()), fmt.Sprintf("%v", res))
 }
 
@@ -195,9 +176,7 @@ func TestClient_GetPaaSSecurityZone(t *testing.T) {
 		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZone())
 	})
 	res, err := client.GetPaaSSecurityZone(dummyUUID)
-	if err != nil {
-		t.Errorf("GetPaaSSecurityZone returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetPaaSSecurityZone returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockSecurityZone()), fmt.Sprintf("%s", res))
 }
 
@@ -214,9 +193,7 @@ func TestClient_UpdatePaaSSecurityZone(t *testing.T) {
 		LocationUUID:         "a-b-c",
 		PaaSSecurityZoneUUID: dummyUUID,
 	})
-	if err != nil {
-		t.Errorf("UpdatePaaSSecurityZone returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdatePaaSSecurityZone returned an error %v", err)
 }
 
 func TestClient_DeletePaaSSecurityZone(t *testing.T) {
@@ -228,9 +205,7 @@ func TestClient_DeletePaaSSecurityZone(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.DeletePaaSSecurityZone(dummyUUID)
-	if err != nil {
-		t.Errorf("DeletePaaSSecurityZone returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeletePaaSSecurityZone returned an error %v", err)
 }
 
 func TestClient_GetDeletedPaaSServices(t *testing.T) {
@@ -243,9 +218,7 @@ func TestClient_GetDeletedPaaSServices(t *testing.T) {
 		fmt.Fprint(w, prepareDeletedPaaSHTTPGetListResponse())
 	})
 	paasList, err := client.GetDeletedPaaSServices()
-	if err != nil {
-		t.Errorf("GetDeletedPaaSServices returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetDeletedPaaSServices returned an error %v", err)
 	assert.Equal(t, 1, len(paasList))
 	assert.Equal(t, fmt.Sprintf("[%v]", expectedObj), fmt.Sprintf("%v", paasList))
 }

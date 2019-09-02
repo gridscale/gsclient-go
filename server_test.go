@@ -19,9 +19,7 @@ func TestClient_GetServerList(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerListHTTPGet())
 	})
 	res, err := client.GetServerList()
-	if err != nil {
-		t.Errorf("GetServerList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServerList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockServer(true)), fmt.Sprintf("%v", res))
 }
@@ -35,9 +33,7 @@ func TestClient_GetServer(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerHTTPGet(true))
 	})
 	res, err := client.GetServer(dummyUUID)
-	if err != nil {
-		t.Errorf("GetServer returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServer returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockServer(true)), fmt.Sprintf("%v", res))
 }
 
@@ -63,10 +59,7 @@ func TestClient_CreateServer(t *testing.T) {
 		AvailablityZone: "",
 		Labels:          []string{"label"},
 	})
-	if err != nil {
-		t.Errorf("CreateServer returned an error %v", err)
-	}
-
+	assert.Nil(t, err, "CreateServer returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockServerCreateResponse()), fmt.Sprintf("%s", response))
 }
 
@@ -86,9 +79,7 @@ func TestClient_UpdateServer(t *testing.T) {
 		Cores:           2,
 		Labels:          nil,
 	})
-	if err != nil {
-		t.Errorf("UpdateServer returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateServer returned an error %v", err)
 }
 
 func TestClient_DeleteServer(t *testing.T) {
@@ -100,9 +91,7 @@ func TestClient_DeleteServer(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.DeleteServer(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteServer returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteServer returned an error %v", err)
 }
 
 func TestClient_GetServerEventList(t *testing.T) {
@@ -114,9 +103,7 @@ func TestClient_GetServerEventList(t *testing.T) {
 		fmt.Fprintf(writer, prepareEventListHTTPGet())
 	})
 	res, err := client.GetServerEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerEventList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServerEventList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", res))
 }
@@ -130,9 +117,7 @@ func TestClient_GetServerMetricList(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerMetricListHTTPGet())
 	})
 	res, err := client.GetServerMetricList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerMetricList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServerMetricList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerMetric()), fmt.Sprintf("%v", res))
 }
@@ -146,9 +131,7 @@ func TestClient_IsServerOn(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerHTTPGet(true))
 	})
 	isOn, err := client.IsServerOn(dummyUUID)
-	if err != nil {
-		t.Errorf("IsServerOn returned an error %v", err)
-	}
+	assert.Nil(t, err, "IsServerOn returned an error %v", err)
 	assert.Equal(t, true, isOn)
 }
 
@@ -167,9 +150,7 @@ func TestClient_setServerPowerState(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.setServerPowerState(dummyUUID, false)
-	if err != nil {
-		t.Errorf("turnOnOffServer returned an error %v", err)
-	}
+	assert.Nil(t, err, "turnOnOffServer returned an error %v", err)
 }
 
 func TestClient_StartServer(t *testing.T) {
@@ -187,9 +168,7 @@ func TestClient_StartServer(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.StartServer(dummyUUID)
-	if err != nil {
-		t.Errorf("StartServer returned an error %v", err)
-	}
+	assert.Nil(t, err, "StartServer returned an error %v", err)
 }
 
 func TestClient_StopServer(t *testing.T) {
@@ -207,9 +186,7 @@ func TestClient_StopServer(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.StopServer(dummyUUID)
-	if err != nil {
-		t.Errorf("StopServer returned an error %v", err)
-	}
+	assert.Nil(t, err, "StopServer returned an error %v", err)
 }
 
 func TestClient_ShutdownServer(t *testing.T) {
@@ -230,9 +207,7 @@ func TestClient_ShutdownServer(t *testing.T) {
 	})
 
 	err := client.ShutdownServer(dummyUUID)
-	if err != nil {
-		t.Errorf("ShutdownServer returned an error %v", err)
-	}
+	assert.Nil(t, err, "ShutdownServer returned an error %v", err)
 }
 
 func TestClient_GetServersByLocation(t *testing.T) {
@@ -244,9 +219,7 @@ func TestClient_GetServersByLocation(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerListHTTPGet())
 	})
 	res, err := client.GetServersByLocation(dummyUUID)
-	if err != nil {
-		t.Errorf("GetServersByLocation returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServersByLocation returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockServer(true)), fmt.Sprintf("%v", res))
 }
@@ -260,9 +233,7 @@ func TestClient_GetDeletedServers(t *testing.T) {
 		fmt.Fprintf(writer, prepareDeletedServerListHTTPGet())
 	})
 	res, err := client.GetDeletedServers()
-	if err != nil {
-		t.Errorf("GetDeletedServers returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetDeletedServers returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockServer(true)), fmt.Sprintf("%v", res))
 }

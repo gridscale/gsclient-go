@@ -18,9 +18,7 @@ func TestClient_GetLabelList(t *testing.T) {
 		fmt.Fprintf(writer, prepareLabelListHTTPGet())
 	})
 	res, err := client.GetLabelList()
-	if err != nil {
-		t.Errorf("GetLabelList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetLabelList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockLabel()), fmt.Sprintf("%v", res))
 }
@@ -38,9 +36,7 @@ func TestClient_CreateLabel(t *testing.T) {
 		fmt.Fprint(w, httpResponse)
 	})
 	res, err := client.CreateLabel(LabelCreateRequest{Label: "test"})
-	if err != nil {
-		t.Errorf("CreateLabel returned an error %v", err)
-	}
+	assert.Nil(t, err, "CreateLabel returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockLabelCreateResponse()), fmt.Sprintf("%v", res))
 }
 
@@ -53,9 +49,7 @@ func TestClient_DeleteLabel(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.DeleteLabel("test")
-	if err != nil {
-		t.Errorf("DeleteLabel returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteLabel returned an error %v", err)
 }
 
 func getMockLabel() Label {

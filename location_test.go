@@ -18,9 +18,7 @@ func TestClient_GetLocationList(t *testing.T) {
 		fmt.Fprintf(writer, prepareLocationListHTTPGet())
 	})
 	res, err := client.GetLocationList()
-	if err != nil {
-		t.Errorf("GetLocationList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetLocationList returned an aerror %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockLocation()), fmt.Sprintf("%v", res))
 }
@@ -34,9 +32,7 @@ func TestClient_GetLocation(t *testing.T) {
 		fmt.Fprintf(writer, prepareLocationHTTPGet())
 	})
 	res, err := client.GetLocation(dummyUUID)
-	if err != nil {
-		t.Errorf("GetLocation returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetLocation returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockLocation()), fmt.Sprintf("%v", res))
 }
 

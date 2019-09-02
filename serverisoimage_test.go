@@ -18,9 +18,7 @@ func TestClient_GetServerIsoImageList(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerIsoImageListHTTPGet())
 	})
 	res, err := client.GetServerIsoImageList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerIsoImageList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServerIsoImageList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerIsoImage()), fmt.Sprintf("%v", res))
 }
@@ -34,9 +32,7 @@ func TestClient_GetServerIsoImage(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerIsoImageHTTPget())
 	})
 	res, err := client.GetServerIsoImage(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerIsoImage returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServerIsoImage returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockServerIsoImage()), fmt.Sprintf("%v", res))
 }
 
@@ -51,9 +47,7 @@ func TestClient_CreateServerIsoImage(t *testing.T) {
 	err := client.CreateServerIsoImage(dummyUUID, ServerIsoImageRelationCreateRequest{
 		ObjectUUID: dummyUUID,
 	})
-	if err != nil {
-		t.Errorf("CreateServerIsoImage returned an error %v", err)
-	}
+	assert.Nil(t, err, "CreateServerIsoImage returned an error %v", err)
 }
 
 func TestClient_UpdateServerIsoImage(t *testing.T) {
@@ -68,9 +62,7 @@ func TestClient_UpdateServerIsoImage(t *testing.T) {
 		BootDevice: true,
 		Name:       "test",
 	})
-	if err != nil {
-		t.Errorf("UpdateServerIsoImage returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateServerIsoImage returned an error %v", err)
 }
 
 func TestClient_DeleteServerIsoImage(t *testing.T) {
@@ -82,9 +74,7 @@ func TestClient_DeleteServerIsoImage(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.DeleteServerIsoImage(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteServerIsoImage returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteServerIsoImage returned an error %v", err)
 }
 
 func TestClient_LinkIsoImage(t *testing.T) {
@@ -96,9 +86,7 @@ func TestClient_LinkIsoImage(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.LinkIsoImage(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("LinkIsoImage returned an error %v", err)
-	}
+	assert.Nil(t, err, "LinkIsoImage returned an error %v", err)
 }
 
 func TestClient_UnlinkIsoImage(t *testing.T) {
@@ -110,9 +98,7 @@ func TestClient_UnlinkIsoImage(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.UnlinkIsoImage(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("UnlinkIsoImage returned an error %v", err)
-	}
+	assert.Nil(t, err, "UnlinkIsoImage returned an error %v", err)
 }
 
 func getMockServerIsoImage() ServerIsoImageRelationProperties {

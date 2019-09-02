@@ -18,9 +18,7 @@ func TestClient_GetNetworkList(t *testing.T) {
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet())
 	})
 	res, err := client.GetNetworkList()
-	if err != nil {
-		t.Errorf("GetNetworkList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetNetworkList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetwork()), fmt.Sprintf("%v", res))
 }
@@ -34,9 +32,7 @@ func TestClient_GetNetwork(t *testing.T) {
 		fmt.Fprintf(writer, prepareNetworkHTTPGet())
 	})
 	res, err := client.GetNetwork(dummyUUID)
-	if err != nil {
-		t.Errorf("GetNetwork returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetNetwork returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockNetwork()), fmt.Sprintf("%v", res))
 }
 
@@ -59,10 +55,7 @@ func TestClient_CreateNetwork(t *testing.T) {
 		LocationUUID: dummyUUID,
 		L2Security:   false,
 	})
-	if err != nil {
-		t.Errorf("CreateNetwork returned an error %v", err)
-	}
-
+	assert.Nil(t, err, "CreateNetwork returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockNetworkCreateResponse()), fmt.Sprintf("%s", response))
 }
 
@@ -79,9 +72,7 @@ func TestClient_UpdateNetwork(t *testing.T) {
 		Name:       "test",
 		L2Security: false,
 	})
-	if err != nil {
-		t.Errorf("UpdateNetwork returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateNetwork returned an error %v", err)
 }
 
 func TestClient_DeleteNetwork(t *testing.T) {
@@ -93,9 +84,7 @@ func TestClient_DeleteNetwork(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.DeleteNetwork(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteNetwork returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteNetwork returned an error %v", err)
 }
 
 func TestClient_GetNetworkEventList(t *testing.T) {
@@ -107,9 +96,7 @@ func TestClient_GetNetworkEventList(t *testing.T) {
 		fmt.Fprintf(writer, prepareEventListHTTPGet())
 	})
 	res, err := client.GetNetworkEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetNetworkEventList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetNetworkEventList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", res))
 }
@@ -123,9 +110,7 @@ func TestClient_GetNetworkPublic(t *testing.T) {
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet())
 	})
 	res, err := client.GetNetworkPublic()
-	if err != nil {
-		t.Errorf("GetNetworkPublic returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetNetworkPublic returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockNetwork()), fmt.Sprintf("%v", res))
 }
 
@@ -138,9 +123,7 @@ func TestClient_GetNetworksByLocation(t *testing.T) {
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet())
 	})
 	res, err := client.GetNetworksByLocation(dummyUUID)
-	if err != nil {
-		t.Errorf("GetNetworksByLocation returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetNetworksByLocation returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetwork()), fmt.Sprintf("%v", res))
 }
@@ -154,9 +137,7 @@ func TestClient_GetDeletedNetworks(t *testing.T) {
 		fmt.Fprintf(writer, prepareDeletedNetworkListHTTPGet())
 	})
 	res, err := client.GetDeletedNetworks()
-	if err != nil {
-		t.Errorf("GetDeletedNetworks returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetDeletedNetworks returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetwork()), fmt.Sprintf("%v", res))
 }

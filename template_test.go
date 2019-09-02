@@ -18,9 +18,7 @@ func TestClient_GetTemplateList(t *testing.T) {
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	response, err := client.GetTemplateList()
-	if err != nil {
-		t.Errorf("GetTemplateList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetTemplateList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate()), fmt.Sprintf("%v", response))
 }
@@ -34,9 +32,7 @@ func TestClient_GetTemplate(t *testing.T) {
 		fmt.Fprint(w, prepareTemplateHTTPGet())
 	})
 	response, err := client.GetTemplate(dummyUUID)
-	if err != nil {
-		t.Errorf("GetTemplate returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetTemplate returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockTemplate()), fmt.Sprintf("%v", response))
 }
 
@@ -49,9 +45,7 @@ func TestClient_GetTemplateByName(t *testing.T) {
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	response, err := client.GetTemplateByName("test")
-	if err != nil {
-		t.Errorf("GetTemplateByName returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetTemplateByName returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockTemplate()), fmt.Sprintf("%v", response))
 }
 
@@ -74,9 +68,7 @@ func TestClient_CreateTemplate(t *testing.T) {
 		SnapshotUUID: dummyUUID,
 		Labels:       []string{"label"},
 	})
-	if err != nil {
-		t.Errorf("CreateTemplate returned an error %v", err)
-	}
+	assert.Nil(t, err, "CreateTemplate returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockTemplateCreateResponse()), fmt.Sprintf("%v", res))
 }
 
@@ -92,9 +84,7 @@ func TestClient_UpdateTemplate(t *testing.T) {
 		Name:   "test",
 		Labels: []string{"labels"},
 	})
-	if err != nil {
-		t.Errorf("UpdateTemplate returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateTemplate returned an error %v", err)
 }
 
 func TestClient_DeleteTemplate(t *testing.T) {
@@ -106,9 +96,7 @@ func TestClient_DeleteTemplate(t *testing.T) {
 		fmt.Fprintf(w, "")
 	})
 	err := client.DeleteTemplate(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteTemplate returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteTemplate returned an error %v", err)
 }
 
 func TestClient_GetTemplateEventList(t *testing.T) {
@@ -120,9 +108,7 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	response, err := client.GetTemplateEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetTemplateEventList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetTemplateEventList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", response))
 }
@@ -136,9 +122,7 @@ func TestClient_GetTemplatesByLocation(t *testing.T) {
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	response, err := client.GetTemplatesByLocation(dummyUUID)
-	if err != nil {
-		t.Errorf("GetTemplatesByLocation returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetTemplatesByLocation returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate()), fmt.Sprintf("%v", response))
 }
@@ -152,9 +136,7 @@ func TestClient_GetDeletedTemplates(t *testing.T) {
 		fmt.Fprint(w, prepareDeletedTemplateListHTTPGet())
 	})
 	response, err := client.GetDeletedTemplates()
-	if err != nil {
-		t.Errorf("GetDeletedTemplates returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetDeletedTemplates returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate()), fmt.Sprintf("%v", response))
 }

@@ -18,9 +18,7 @@ func TestClient_GetSshkeyList(t *testing.T) {
 		fmt.Fprintf(writer, prepareSshkeyListHTTPGet())
 	})
 	res, err := client.GetSshkeyList()
-	if err != nil {
-		t.Errorf("GetSshkeyList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetSshkeyList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockSshkey()), fmt.Sprintf("%v", res))
 }
@@ -34,9 +32,7 @@ func TestClient_GetSshkey(t *testing.T) {
 		fmt.Fprintf(writer, prepareSshkeyHTTPGet())
 	})
 	res, err := client.GetSshkey(dummyUUID)
-	if err != nil {
-		t.Errorf("GetSshkey returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetSshkey returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockSshkey()), fmt.Sprintf("%v", res))
 }
 
@@ -58,10 +54,7 @@ func TestClient_CreateSshkey(t *testing.T) {
 		Sshkey: "example",
 		Labels: []string{"label"},
 	})
-	if err != nil {
-		t.Errorf("CreateSshkey returned an error %v", err)
-	}
-
+	assert.Nil(t, err, "CreateSshkey returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockSshkeyCreateResponse()), fmt.Sprintf("%s", response))
 }
 
@@ -78,9 +71,7 @@ func TestClient_UpdateSshkey(t *testing.T) {
 		Name:   "test",
 		Sshkey: "example",
 	})
-	if err != nil {
-		t.Errorf("UpdateSshkey returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateSshkey returned an error %v", err)
 }
 
 func TestClient_DeleteSshkey(t *testing.T) {
@@ -92,9 +83,7 @@ func TestClient_DeleteSshkey(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.DeleteSshkey(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteSshkey returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteSshkey returned an error %v", err)
 }
 
 func TestClient_GetSshkeyEventList(t *testing.T) {
@@ -107,9 +96,7 @@ func TestClient_GetSshkeyEventList(t *testing.T) {
 	})
 
 	res, err := client.GetSshkeyEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetSshkeyEventList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetSshkeyEventList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", res))
 }

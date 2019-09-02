@@ -18,9 +18,7 @@ func TestClient_GetServerIPList(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerIPListHTTPGet())
 	})
 	res, err := client.GetServerIPList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerIPList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServerIPList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerIP()), fmt.Sprintf("%v", res))
 }
@@ -34,9 +32,7 @@ func TestClient_GetServerIP(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerIPHTTPGet())
 	})
 	res, err := client.GetServerIP(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerIP returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServerIP returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockServerIP()), fmt.Sprintf("%v", res))
 }
 
@@ -51,9 +47,7 @@ func TestClient_CreateServerIP(t *testing.T) {
 	err := client.CreateServerIP(dummyUUID, ServerIPRelationCreateRequest{
 		ObjectUUID: dummyUUID,
 	})
-	if err != nil {
-		t.Errorf("CreateServerIP returned an error %v", err)
-	}
+	assert.Nil(t, err, "CreateServerIP returned an error %v", err)
 }
 
 func TestClient_DeleteServerIP(t *testing.T) {
@@ -65,9 +59,7 @@ func TestClient_DeleteServerIP(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.DeleteServerIP(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteServerIP returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteServerIP returned an error %v", err)
 }
 
 func TestClient_LinkIP(t *testing.T) {
@@ -79,9 +71,7 @@ func TestClient_LinkIP(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.LinkIP(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("LinkIP returned an error %v", err)
-	}
+	assert.Nil(t, err, "LinkIP returned an error %v", err)
 }
 
 func TestClient_UnlinkIP(t *testing.T) {
@@ -93,9 +83,7 @@ func TestClient_UnlinkIP(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.UnlinkIP(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("UnlinkIP returned an error %v", err)
-	}
+	assert.Nil(t, err, "UnlinkIP returned an error %v", err)
 }
 
 func getMockServerIP() ServerIPRelationProperties {

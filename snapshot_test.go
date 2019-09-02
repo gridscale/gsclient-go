@@ -19,9 +19,7 @@ func TestClient_GetStorageSnapshotList(t *testing.T) {
 	})
 
 	res, err := client.GetStorageSnapshotList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetStorageSnapshotList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetStorageSnapshotList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshot()), fmt.Sprintf("%v", res))
 }
@@ -36,9 +34,7 @@ func TestClient_GetStorageSnapshot(t *testing.T) {
 	})
 
 	res, err := client.GetStorageSnapshot(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("GetStorageSnapshot returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetStorageSnapshot returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshot()), fmt.Sprintf("%v", res))
 }
 
@@ -60,9 +56,7 @@ func TestClient_CreateStorageSnapshot(t *testing.T) {
 		Name:   "test",
 		Labels: []string{"label"},
 	})
-	if err != nil {
-		t.Errorf("CreateStorageSnapshot returned an error: %v", err)
-	}
+	assert.Nil(t, err, "CreateStorageSnapshot returned an error: %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotCreateResponse()), fmt.Sprintf("%v", response))
 }
 
@@ -78,9 +72,8 @@ func TestClient_UpdateStorageSnapshot(t *testing.T) {
 		Name:   "test",
 		Labels: []string{"label"},
 	})
-	if err != nil {
-		t.Errorf("UpdateStorageSnapshot returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateStorageSnapshot returned an error %v", err)
+
 }
 
 func TestClient_DeleteStorageSnapshot(t *testing.T) {
@@ -92,9 +85,7 @@ func TestClient_DeleteStorageSnapshot(t *testing.T) {
 		fmt.Fprint(w, "")
 	})
 	err := client.DeleteStorageSnapshot(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteStorageSnapshot returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteStorageSnapshot returned an error %v", err)
 }
 
 func TestClient_RollbackStorage(t *testing.T) {
@@ -106,9 +97,7 @@ func TestClient_RollbackStorage(t *testing.T) {
 		fmt.Fprint(w, "")
 	})
 	err := client.RollbackStorage(dummyUUID, dummyUUID, StorageRollbackRequest{Rollback: true})
-	if err != nil {
-		t.Errorf("RollbackStorage returned an error %v", err)
-	}
+	assert.Nil(t, err, "RollbackStorage returned an error %v", err)
 }
 
 func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
@@ -141,9 +130,7 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 			Private:  true,
 		},
 	})
-	if err != nil {
-		t.Errorf("ExportStorageSnapshotToS3 returned an error %v", err)
-	}
+	assert.Nil(t, err, "ExportStorageSnapshotToS3 returned an error %v", err)
 }
 
 func TestClient_GetSnapshotsByLocation(t *testing.T) {
@@ -156,9 +143,7 @@ func TestClient_GetSnapshotsByLocation(t *testing.T) {
 	})
 
 	res, err := client.GetSnapshotsByLocation(dummyUUID)
-	if err != nil {
-		t.Errorf("GetSnapshotsByLocation returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetSnapshotsByLocation returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshot()), fmt.Sprintf("%v", res))
 }
@@ -173,9 +158,7 @@ func TestClient_GetDeletedSnapshots(t *testing.T) {
 	})
 
 	res, err := client.GetDeletedSnapshots()
-	if err != nil {
-		t.Errorf("GetSnapshotsByLocation returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetSnapshotsByLocation returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshot()), fmt.Sprintf("%v", res))
 }

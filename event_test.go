@@ -17,9 +17,7 @@ func TestClient_GetEventList(t *testing.T) {
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	response, err := client.GetEventList()
-	if err != nil {
-		t.Errorf("GetEventList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetEventList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", response))
 }

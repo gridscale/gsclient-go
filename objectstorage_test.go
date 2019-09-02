@@ -19,9 +19,7 @@ func TestClient_GetObjectStorageAccessKeyList(t *testing.T) {
 	})
 
 	res, err := client.GetObjectStorageAccessKeyList()
-	if err != nil {
-		t.Errorf("GetObjectStorageAccessKeyList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetObjectStorageAccessKeyList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockObjectStorageAccessKey()), fmt.Sprintf("%v", res))
 }
@@ -36,9 +34,7 @@ func TestClient_GetObjectStorageAccessKey(t *testing.T) {
 	})
 
 	res, err := client.GetObjectStorageAccessKey(dummyUUID)
-	if err != nil {
-		t.Errorf("GetObjectStorageAccessKey returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetObjectStorageAccessKey returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockObjectStorageAccessKey()), fmt.Sprintf("%v", res))
 
 }
@@ -56,9 +52,7 @@ func TestClient_CreateObjectStorageAccessKey(t *testing.T) {
 		fmt.Fprint(w, httpResponse)
 	})
 	res, err := client.CreateObjectStorageAccessKey()
-	if err != nil {
-		t.Errorf("DeleteObjectStorageAccessKey returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteObjectStorageAccessKey returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockObjectStorageAccessKeyCreateResponse()), fmt.Sprintf("%v", res))
 }
 
@@ -72,9 +66,7 @@ func TestClient_DeleteObjectStorageAccessKey(t *testing.T) {
 	})
 
 	err := client.DeleteObjectStorageAccessKey(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteObjectStorageAccessKey returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteObjectStorageAccessKey returned an error %v", err)
 }
 
 func TestClient_GetObjectStorageBucketList(t *testing.T) {
@@ -87,9 +79,7 @@ func TestClient_GetObjectStorageBucketList(t *testing.T) {
 	})
 
 	res, err := client.GetObjectStorageBucketList()
-	if err != nil {
-		t.Errorf("GetObjectStorageBucketList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetObjectStorageBucketList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockObjectStorageBucket()), fmt.Sprintf("%v", res))
 }

@@ -18,9 +18,7 @@ func TestClient_GetServerNetworkList(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerNetworkListHTTPGet())
 	})
 	res, err := client.GetServerNetworkList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerNetworkList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServerNetworkList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerNetwork()), fmt.Sprintf("%v", res))
 }
@@ -34,9 +32,7 @@ func TestClient_GetServerNetwork(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerNetworkHTTPGet())
 	})
 	res, err := client.GetServerNetwork(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerNetwork returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetServerNetwork returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockServerNetwork()), fmt.Sprintf("%v", res))
 }
 
@@ -55,9 +51,7 @@ func TestClient_CreateServerNetwork(t *testing.T) {
 		L3security:           nil,
 		FirewallTemplateUUID: dummyUUID,
 	})
-	if err != nil {
-		t.Errorf("CreateServerNetwork returned an error %v", err)
-	}
+	assert.Nil(t, err, "CreateServerNetwork returned an error %v", err)
 }
 
 func TestClient_UpdateServerNetwork(t *testing.T) {
@@ -73,9 +67,7 @@ func TestClient_UpdateServerNetwork(t *testing.T) {
 		BootDevice:           true,
 		FirewallTemplateUUID: dummyUUID,
 	})
-	if err != nil {
-		t.Errorf("UpdateServerNetwork returned an error %v", err)
-	}
+	assert.Nil(t, err, "UpdateServerNetwork returned an error %v", err)
 }
 
 func TestClient_DeleteServerNetwork(t *testing.T) {
@@ -87,9 +79,7 @@ func TestClient_DeleteServerNetwork(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.DeleteServerNetwork(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteServerNetwork returned an error %v", err)
-	}
+	assert.Nil(t, err, "DeleteServerNetwork returned an error %v", err)
 }
 
 func TestClient_LinkNetwork(t *testing.T) {
@@ -101,9 +91,7 @@ func TestClient_LinkNetwork(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.LinkNetwork(dummyUUID, dummyUUID, dummyUUID, true, 0, nil, FirewallRules{})
-	if err != nil {
-		t.Errorf("LinkNetwork returned an error %v", err)
-	}
+	assert.Nil(t, err, "LinkNetwork returned an error %v", err)
 }
 
 func TestClient_UnlinkNetwork(t *testing.T) {
@@ -115,9 +103,7 @@ func TestClient_UnlinkNetwork(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.UnlinkNetwork(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("UnlinkNetwork returned an error %v", err)
-	}
+	assert.Nil(t, err, "UnlinkNetwork returned an error %v", err)
 }
 
 func getMockServerNetwork() ServerNetworkRelationProperties {
