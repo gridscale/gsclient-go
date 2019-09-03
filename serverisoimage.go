@@ -79,8 +79,8 @@ func (c *Client) UpdateServerIsoImage(serverID, isoImageID string, body ServerIs
 
 //CreateServerIsoImage creates a link between a server and an ISO image
 func (c *Client) CreateServerIsoImage(id string, body ServerIsoImageRelationCreateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if id == "" || body.ObjectUUID == "" {
+		return errors.New("'server_id' and 'isoimage_id' are required")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),

@@ -17,11 +17,16 @@ func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleListHTTPGet())
 	})
-
-	res, err := client.GetStorageSnapshotScheduleList(dummyUUID)
-	assert.Nil(t, err, "GetStorageSnapshotScheduleList returned an error %v", err)
-	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshotSchedule()), fmt.Sprintf("%v", res))
+	for _, test := range uuidCommonTestCases {
+		res, err := client.GetStorageSnapshotScheduleList(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetStorageSnapshotScheduleList returned an error %v", err)
+			assert.Equal(t, 1, len(res))
+			assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshotSchedule()), fmt.Sprintf("%v", res))
+		}
+	}
 }
 
 func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
@@ -32,10 +37,17 @@ func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleHTTPGet())
 	})
-
-	res, err := client.GetStorageSnapshotSchedule(dummyUUID, dummyUUID)
-	assert.Nil(t, err, "GetStorageSnapshotSchedule returned an error %v", err)
-	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotSchedule()), fmt.Sprintf("%v", res))
+	for _, testStorageID := range uuidCommonTestCases {
+		for _, testScheduleID := range uuidCommonTestCases {
+			res, err := client.GetStorageSnapshotSchedule(testStorageID.testUUID, testScheduleID.testUUID)
+			if testStorageID.isFailed || testScheduleID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "GetStorageSnapshotSchedule returned an error %v", err)
+				assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotSchedule()), fmt.Sprintf("%v", res))
+			}
+		}
+	}
 }
 
 func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
@@ -50,16 +62,21 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
-
-	response, err := client.CreateStorageSnapshotSchedule(dummyUUID, StorageSnapshotScheduleCreateRequest{
-		Name:          "test",
-		Labels:        []string{"test"},
-		RunInterval:   60,
-		KeepSnapshots: 1,
-		NextRuntime:   dummyTime,
-	})
-	assert.Nil(t, err, "CreateStorageSnapshotSchedule returned an error %v", err)
-	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotScheduleHTTPCreateResponse()), fmt.Sprintf("%s", response))
+	for _, test := range uuidCommonTestCases {
+		response, err := client.CreateStorageSnapshotSchedule(test.testUUID, StorageSnapshotScheduleCreateRequest{
+			Name:          "test",
+			Labels:        []string{"test"},
+			RunInterval:   60,
+			KeepSnapshots: 1,
+			NextRuntime:   dummyTime,
+		})
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreateStorageSnapshotSchedule returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotScheduleHTTPCreateResponse()), fmt.Sprintf("%s", response))
+		}
+	}
 }
 
 func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
@@ -70,15 +87,22 @@ func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
-
-	err := client.UpdateStorageSnapshotSchedule(dummyUUID, dummyUUID, StorageSnapshotScheduleUpdateRequest{
-		Name:          "test",
-		Labels:        []string{"label"},
-		RunInterval:   60,
-		KeepSnapshots: 1,
-		NextRuntime:   dummyTime,
-	})
-	assert.Nil(t, err, "UpdateStorageSnapshotSchedule returned an error %v", err)
+	for _, testStorageID := range uuidCommonTestCases {
+		for _, testScheduleID := range uuidCommonTestCases {
+			err := client.UpdateStorageSnapshotSchedule(testStorageID.testUUID, testScheduleID.testUUID, StorageSnapshotScheduleUpdateRequest{
+				Name:          "test",
+				Labels:        []string{"label"},
+				RunInterval:   60,
+				KeepSnapshots: 1,
+				NextRuntime:   dummyTime,
+			})
+			if testStorageID.isFailed || testScheduleID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "UpdateStorageSnapshotSchedule returned an error %v", err)
+			}
+		}
+	}
 }
 
 func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
@@ -89,8 +113,16 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteStorageSnapshotSchedule(dummyUUID, dummyUUID)
-	assert.Nil(t, err, "DeleteStorageSnapshotSchedule returned an error %v", err)
+	for _, testStorageID := range uuidCommonTestCases {
+		for _, testScheduleID := range uuidCommonTestCases {
+			err := client.DeleteStorageSnapshotSchedule(testStorageID.testUUID, testScheduleID.testUUID)
+			if testStorageID.isFailed || testScheduleID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "DeleteStorageSnapshotSchedule returned an error %v", err)
+			}
+		}
+	}
 }
 
 func getMockStorageSnapshotSchedule() StorageSnapshotSchedule {

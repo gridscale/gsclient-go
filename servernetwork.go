@@ -100,8 +100,8 @@ func (c *Client) UpdateServerNetwork(serverID, networkID string, body ServerNetw
 
 //CreateServerNetwork creates a link between a network and a storage
 func (c *Client) CreateServerNetwork(id string, body ServerNetworkRelationCreateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if id == "" || body.ObjectUUID == "" {
+		return errors.New("'server_id' and 'network_id' are required")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "networks"),

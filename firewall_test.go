@@ -46,32 +46,43 @@ func TestClient_CreateFirewall(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiFirewallBase)
+	var isFailed bool
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		fmt.Fprintf(w, prepareFirewallCreateResponse())
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			fmt.Fprintf(w, prepareFirewallCreateResponse())
+		}
 	})
 
 	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
-
-	res, err := client.CreateFirewall(FirewallCreateRequest{
-		Name:   "test",
-		Labels: []string{"label"},
-		Rules: FirewallRules{
-			RulesV6In: []FirewallRuleProperties{
-				{
-					Protocol: "tcp",
-					DstPort:  "1080",
-					SrcPort:  "80",
-					Order:    0,
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		res, err := client.CreateFirewall(FirewallCreateRequest{
+			Name:   "test",
+			Labels: []string{"label"},
+			Rules: FirewallRules{
+				RulesV6In: []FirewallRuleProperties{
+					{
+						Protocol: "tcp",
+						DstPort:  "1080",
+						SrcPort:  "80",
+						Order:    0,
+					},
 				},
 			},
-		},
-	})
-	assert.Nil(t, err, "CreateFirewall returned an error %v", err)
-	assert.Equal(t, fmt.Sprintf("%v", getMockFirewallCreateResponse()), fmt.Sprintf("%v", res))
+		})
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreateFirewall returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockFirewallCreateResponse()), fmt.Sprintf("%v", res))
+		}
+	}
 }
 
 func TestClient_UpdateFirewall(t *testing.T) {

@@ -89,8 +89,8 @@ func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStor
 
 //CreateServerStorage create a link between a server and a storage
 func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if id == "" || body.ObjectUUID == "" {
+		return errors.New("'server_id' and 'storage_id' are required")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "storages"),

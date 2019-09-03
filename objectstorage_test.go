@@ -32,28 +32,44 @@ func TestClient_GetObjectStorageAccessKey(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareObjectStorageAccessKeyHTTPGet())
 	})
-
-	res, err := client.GetObjectStorageAccessKey(dummyUUID)
-	assert.Nil(t, err, "GetObjectStorageAccessKey returned an error %v", err)
-	assert.Equal(t, fmt.Sprintf("%v", getMockObjectStorageAccessKey()), fmt.Sprintf("%v", res))
-
+	for _, test := range uuidCommonTestCases {
+		res, err := client.GetObjectStorageAccessKey(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetObjectStorageAccessKey returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockObjectStorageAccessKey()), fmt.Sprintf("%v", res))
+		}
+	}
 }
 
 func TestClient_CreateObjectStorageAccessKey(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
+	var isFailed bool
 	uri := path.Join(apiObjectStorageBase, "access_keys")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprint(writer, prepareObjectStorageAccessKeyHTTPCreateResponse())
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			fmt.Fprint(writer, prepareObjectStorageAccessKeyHTTPCreateResponse())
+		}
 	})
 	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
-	res, err := client.CreateObjectStorageAccessKey()
-	assert.Nil(t, err, "DeleteObjectStorageAccessKey returned an error %v", err)
-	assert.Equal(t, fmt.Sprintf("%v", getMockObjectStorageAccessKeyCreateResponse()), fmt.Sprintf("%v", res))
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		res, err := client.CreateObjectStorageAccessKey()
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "DeleteObjectStorageAccessKey returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockObjectStorageAccessKeyCreateResponse()), fmt.Sprintf("%v", res))
+		}
+	}
 }
 
 func TestClient_DeleteObjectStorageAccessKey(t *testing.T) {
@@ -64,9 +80,14 @@ func TestClient_DeleteObjectStorageAccessKey(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-
-	err := client.DeleteObjectStorageAccessKey(dummyUUID)
-	assert.Nil(t, err, "DeleteObjectStorageAccessKey returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		err := client.DeleteObjectStorageAccessKey(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "DeleteObjectStorageAccessKey returned an error %v", err)
+		}
+	}
 }
 
 func TestClient_GetObjectStorageBucketList(t *testing.T) {

@@ -44,26 +44,37 @@ func TestClient_GetIP(t *testing.T) {
 
 func TestClient_CreateIP(t *testing.T) {
 	server, client, mux := setupTestClient()
+	var isFailed bool
 	defer server.Close()
 	uri := apiIPBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprintf(writer, prepareIPCreateResponse())
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			fmt.Fprintf(writer, prepareIPCreateResponse())
+		}
 	})
 	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
-
-	response, err := client.CreateIP(IPCreateRequest{
-		Name:         "test",
-		Family:       1,
-		LocationUUID: dummyUUID,
-		Failover:     false,
-		ReverseDNS:   "8.8.8.8",
-	})
-	assert.Nil(t, err, "CreateIP returned an error %v", err)
-	assert.Equal(t, fmt.Sprintf("%v", getMockIPCreateResponse()), fmt.Sprintf("%s", response))
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		response, err := client.CreateIP(IPCreateRequest{
+			Name:         "test",
+			Family:       1,
+			LocationUUID: dummyUUID,
+			Failover:     false,
+			ReverseDNS:   "8.8.8.8",
+		})
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreateIP returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockIPCreateResponse()), fmt.Sprintf("%s", response))
+		}
+	}
 }
 
 func TestClient_UpdateIP(t *testing.T) {
@@ -130,17 +141,25 @@ func TestClient_GetIPEventList(t *testing.T) {
 func TestClient_GetIPVersion(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
+	var isFailed bool
 	uri := path.Join(apiIPBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareIPHTTPGet())
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			fmt.Fprintf(writer, prepareIPHTTPGet())
+		}
 	})
-	res := client.GetIPVersion(dummyUUID)
-	if res == 0 {
-		t.Error("GetIPVersion has an error")
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		res := client.GetIPVersion(dummyUUID)
+		if test.isFailed {
+			assert.Equal(t, 0, res)
+		} else {
+			assert.Equal(t, 1, res)
+		}
 	}
-	assert.Equal(t, 1, res)
-
 }
 
 func TestClient_GetIPsByLocation(t *testing.T) {

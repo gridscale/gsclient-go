@@ -16,6 +16,19 @@ type uuidTestCase struct {
 	testUUID string
 }
 
+type successFailTestCase struct {
+	isFailed bool
+}
+
+var commonSuccessFailTestCases []successFailTestCase = []successFailTestCase{
+	{
+		isFailed: true,
+	},
+	{
+		isFailed: false,
+	},
+}
+
 var uuidCommonTestCases []uuidTestCase = []uuidTestCase{
 	{
 		testUUID: dummyUUID,

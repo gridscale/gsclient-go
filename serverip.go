@@ -61,8 +61,8 @@ func (c *Client) GetServerIP(serverID, ipID string) (ServerIPRelationProperties,
 
 //CreateServerIP create a link between a server and an IP
 func (c *Client) CreateServerIP(id string, body ServerIPRelationCreateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if id == "" || body.ObjectUUID == "" {
+		return errors.New("'server_id' and 'ip_id' are required")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "ips"),
