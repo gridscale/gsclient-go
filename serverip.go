@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -32,6 +33,9 @@ type ServerIPRelationCreateRequest struct {
 
 //GetServerIPList gets a list of a specific server's IPs
 func (c *Client) GetServerIPList(id string) ([]ServerIPRelationProperties, error) {
+	if id == "" {
+		return nil, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "ips"),
 		method: http.MethodGet,
@@ -43,6 +47,9 @@ func (c *Client) GetServerIPList(id string) ([]ServerIPRelationProperties, error
 
 //GetServerIP gets an IP of a specific server
 func (c *Client) GetServerIP(serverID, ipID string) (ServerIPRelationProperties, error) {
+	if serverID == "" || ipID == "" {
+		return ServerIPRelationProperties{}, errors.New("'serverID' and 'ipID' are required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
 		method: http.MethodGet,
@@ -54,6 +61,9 @@ func (c *Client) GetServerIP(serverID, ipID string) (ServerIPRelationProperties,
 
 //CreateServerIP create a link between a server and an IP
 func (c *Client) CreateServerIP(id string, body ServerIPRelationCreateRequest) error {
+	if id == "" || body.ObjectUUID == "" {
+		return errors.New("'server_id' and 'ip_id' are required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "ips"),
 		method: http.MethodPost,
@@ -64,6 +74,9 @@ func (c *Client) CreateServerIP(id string, body ServerIPRelationCreateRequest) e
 
 //DeleteServerIP delete a link between a server and an IP
 func (c *Client) DeleteServerIP(serverID, ipID string) error {
+	if serverID == "" || ipID == "" {
+		return errors.New("'serverID' and 'ipID' are required")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
 		method: http.MethodDelete,

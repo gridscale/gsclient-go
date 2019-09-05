@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -42,6 +43,9 @@ func (c *Client) GetLocationList() ([]Location, error) {
 
 //GetLocation gets a specific location
 func (c *Client) GetLocation(id string) (Location, error) {
+	if !isValidUUID(id) {
+		return Location{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id),
 		method: http.MethodGet,

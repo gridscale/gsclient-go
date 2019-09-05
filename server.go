@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -51,16 +52,16 @@ type ServerRelations struct {
 
 //ServerCreateRequest JSON struct of a request for creating a server
 type ServerCreateRequest struct {
-	Name            string                       `json:"name"`
-	Memory          int                          `json:"memory"`
-	Cores           int                          `json:"cores"`
-	LocationUUID    string                       `json:"location_uuid"`
-	HardwareProfile string                       `json:"hardware_profile,omitempty"`
-	AvailablityZone string                       `json:"availability_zone,omitempty"`
-	Labels          []string                     `json:"labels,omitempty"`
-	Status          string                       `json:"status,omitempty"`
-	AutoRecovery    *bool                        `json:"auto_recovery,omitempty"`
-	Relations       ServerCreateRequestRelations `json:"relations"`
+	Name            string                        `json:"name"`
+	Memory          int                           `json:"memory"`
+	Cores           int                           `json:"cores"`
+	LocationUUID    string                        `json:"location_uuid"`
+	HardwareProfile string                        `json:"hardware_profile,omitempty"`
+	AvailablityZone string                        `json:"availability_zone,omitempty"`
+	Labels          []string                      `json:"labels,omitempty"`
+	Status          string                        `json:"status,omitempty"`
+	AutoRecovery    *bool                         `json:"auto_recovery,omitempty"`
+	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
 }
 
 //ServerCreateRequestRelations JSOn struct of a list of a server's relations
@@ -75,7 +76,7 @@ type ServerCreateRequestRelations struct {
 type ServerCreateResponse struct {
 	ObjectUUID   string   `json:"object_uuid"`
 	RequestUUID  string   `json:"request_uuid"`
-	SeverUUID    string   `json:"sever_uuid"`
+	ServerUUID   string   `json:"server_uuid"`
 	NetworkUUIDs []string `json:"network_uuids"`
 	StorageUUIDs []string `json:"storage_uuids"`
 	IPaddrUUIDs  []string `json:"ipaddr_uuids"`
@@ -145,6 +146,9 @@ type ServerMetricProperties struct {
 
 //GetServer gets a specific server based on given list
 func (c *Client) GetServer(id string) (Server, error) {
+	if !isValidUUID(id) {
+		return Server{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodGet,
@@ -176,16 +180,16 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 	//check if these slices are nil
 	//make them be empty slice instead of nil
 	//so that JSON structure will be valid
-	if body.Relations.PublicIPs == nil {
+	if body.Relations != nil && body.Relations.PublicIPs == nil {
 		body.Relations.PublicIPs = make([]ServerCreateRequestIP, 0)
 	}
-	if body.Relations.Networks == nil {
+	if body.Relations != nil && body.Relations.Networks == nil {
 		body.Relations.Networks = make([]ServerCreateRequestNetwork, 0)
 	}
-	if body.Relations.IsoImages == nil {
+	if body.Relations != nil && body.Relations.IsoImages == nil {
 		body.Relations.IsoImages = make([]ServerCreateRequestIsoimage, 0)
 	}
-	if body.Relations.Storages == nil {
+	if body.Relations != nil && body.Relations.Storages == nil {
 		body.Relations.Storages = make([]ServerCreateRequestStorage, 0)
 	}
 	r := Request{
@@ -199,11 +203,21 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 		return ServerCreateResponse{}, err
 	}
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+	//this fixed the endpoint's bug temporarily when creating server with/without
+	//'relations' field
+	if response.ServerUUID == "" && response.ObjectUUID != "" {
+		response.ServerUUID = response.ObjectUUID
+	} else if response.ObjectUUID == "" && response.ServerUUID != "" {
+		response.ObjectUUID = response.ServerUUID
+	}
 	return response, err
 }
 
 //DeleteServer deletes a specific server
 func (c *Client) DeleteServer(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodDelete,
@@ -213,6 +227,9 @@ func (c *Client) DeleteServer(id string) error {
 
 //UpdateServer updates a specific server
 func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodPatch,
@@ -223,6 +240,9 @@ func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
 
 //GetServerEventList gets a list of a specific server's events
 func (c *Client) GetServerEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "events"),
 		method: http.MethodGet,
@@ -238,6 +258,9 @@ func (c *Client) GetServerEventList(id string) ([]Event, error) {
 
 //GetServerMetricList gets a list of a specific server's metrics
 func (c *Client) GetServerMetricList(id string) ([]ServerMetric, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "metrics"),
 		method: http.MethodGet,
@@ -332,6 +355,9 @@ func (c *Client) ShutdownServer(id string) error {
 
 //GetServersByLocation gets a list of servers by location
 func (c *Client) GetServersByLocation(id string) ([]Server, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "servers"),
 		method: http.MethodGet,

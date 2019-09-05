@@ -18,9 +18,7 @@ func TestClient_GetLabelList(t *testing.T) {
 		fmt.Fprintf(writer, prepareLabelListHTTPGet())
 	})
 	res, err := client.GetLabelList()
-	if err != nil {
-		t.Errorf("GetLabelList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetLabelList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockLabel()), fmt.Sprintf("%v", res))
 }
@@ -28,33 +26,57 @@ func TestClient_GetLabelList(t *testing.T) {
 func TestClient_CreateLabel(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
+	var isFailed bool
 	uri := apiLabelBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprint(writer, prepareLabelCreateResponse())
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			fmt.Fprint(writer, prepareLabelCreateResponse())
+		}
 	})
 	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
-	res, err := client.CreateLabel(LabelCreateRequest{Label: "test"})
-	if err != nil {
-		t.Errorf("CreateLabel returned an error %v", err)
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		res, err := client.CreateLabel(LabelCreateRequest{Label: "test"})
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreateLabel returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockLabelCreateResponse()), fmt.Sprintf("%v", res))
+		}
 	}
-	assert.Equal(t, fmt.Sprintf("%v", getMockLabelCreateResponse()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_DeleteLabel(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
+	testCases := []uuidTestCase{
+		{
+			testUUID: "test",
+			isFailed: false,
+		},
+		{
+			testUUID: "",
+			isFailed: true,
+		},
+	}
 	uri := path.Join(apiLabelBase, "test")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteLabel("test")
-	if err != nil {
-		t.Errorf("DeleteLabel returned an error %v", err)
+	for _, test := range testCases {
+		err := client.DeleteLabel(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "DeleteLabel returned an error %v", err)
+		}
 	}
 }
 

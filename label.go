@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -62,6 +63,9 @@ func (c *Client) CreateLabel(body LabelCreateRequest) (CreateResponse, error) {
 
 //DeleteLabel deletes a label
 func (c *Client) DeleteLabel(label string) error {
+	if label == "" {
+		return errors.New("'label' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiLabelBase, label),
 		method: http.MethodDelete,

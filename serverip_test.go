@@ -17,12 +17,16 @@ func TestClient_GetServerIPList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerIPListHTTPGet())
 	})
-	res, err := client.GetServerIPList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerIPList returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		res, err := client.GetServerIPList(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetServerIPList returned an error %v", err)
+			assert.Equal(t, 1, len(res))
+			assert.Equal(t, fmt.Sprintf("[%v]", getMockServerIP()), fmt.Sprintf("%v", res))
+		}
 	}
-	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerIP()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_GetServerIP(t *testing.T) {
@@ -33,11 +37,17 @@ func TestClient_GetServerIP(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerIPHTTPGet())
 	})
-	res, err := client.GetServerIP(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerIP returned an error %v", err)
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testIPID := range uuidCommonTestCases {
+			res, err := client.GetServerIP(testServerID.testUUID, testIPID.testUUID)
+			if testServerID.isFailed || testIPID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "GetServerIP returned an error %v", err)
+				assert.Equal(t, fmt.Sprintf("%v", getMockServerIP()), fmt.Sprintf("%v", res))
+			}
+		}
 	}
-	assert.Equal(t, fmt.Sprintf("%v", getMockServerIP()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateServerIP(t *testing.T) {
@@ -48,11 +58,17 @@ func TestClient_CreateServerIP(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerIP(dummyUUID, ServerIPRelationCreateRequest{
-		ObjectUUID: dummyUUID,
-	})
-	if err != nil {
-		t.Errorf("CreateServerIP returned an error %v", err)
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testIPID := range uuidCommonTestCases {
+			err := client.CreateServerIP(testServerID.testUUID, ServerIPRelationCreateRequest{
+				ObjectUUID: testIPID.testUUID,
+			})
+			if testServerID.isFailed || testIPID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "CreateServerIP returned an error %v", err)
+			}
+		}
 	}
 }
 
@@ -64,9 +80,15 @@ func TestClient_DeleteServerIP(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteServerIP(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteServerIP returned an error %v", err)
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testIPID := range uuidCommonTestCases {
+			err := client.DeleteServerIP(testServerID.testUUID, testIPID.testUUID)
+			if testServerID.isFailed || testIPID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "DeleteServerIP returned an error %v", err)
+			}
+		}
 	}
 }
 
@@ -79,9 +101,7 @@ func TestClient_LinkIP(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.LinkIP(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("LinkIP returned an error %v", err)
-	}
+	assert.Nil(t, err, "LinkIP returned an error %v", err)
 }
 
 func TestClient_UnlinkIP(t *testing.T) {
@@ -93,9 +113,7 @@ func TestClient_UnlinkIP(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.UnlinkIP(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("UnlinkIP returned an error %v", err)
-	}
+	assert.Nil(t, err, "UnlinkIP returned an error %v", err)
 }
 
 func getMockServerIP() ServerIPRelationProperties {
