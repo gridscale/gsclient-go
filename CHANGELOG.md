@@ -1,6 +1,21 @@
 # Changelog
 
-## 0.2.0 (Unreleased)
+## 1.0.0 (September 05, 2019)
+
+FEATURES:
+* Add support for Locations
+* Add support for Events
+* Add support for Labels
+* Add support for Deletes
+
+IMPROVEMENTS:
+* Heavily code refactoring to improve code quality
+* Achieve 95% test coverage
+* Achieve 100% compliant golang code conventions based on goreportcard
+* Power-off server if graceful shutdown fails
+* Backward compatibility for server creation API
+
+## 0.2.0 (August 23, 2019)
 
 FEATURES:
 
