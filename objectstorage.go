@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"strings"
 )
 
 //ObjectStorageAccessKeyList is JSON structure of a list of Object Storage Access Keys
@@ -68,7 +69,7 @@ func (c *Client) GetObjectStorageAccessKeyList() ([]ObjectStorageAccessKey, erro
 
 //GetObjectStorageAccessKey gets a specific object storage access key based on given id
 func (c *Client) GetObjectStorageAccessKey(id string) (ObjectStorageAccessKey, error) {
-	if id == "" {
+	if strings.TrimSpace(id) == "" {
 		return ObjectStorageAccessKey{}, errors.New("'id' is required")
 	}
 	r := Request{
@@ -97,7 +98,7 @@ func (c *Client) CreateObjectStorageAccessKey() (ObjectStorageAccessKeyCreateRes
 
 //DeleteObjectStorageAccessKey deletes a specific object storage access key based on given id
 func (c *Client) DeleteObjectStorageAccessKey(id string) error {
-	if id == "" {
+	if strings.TrimSpace(id) == "" {
 		return errors.New("'id' is required")
 	}
 	r := Request{
