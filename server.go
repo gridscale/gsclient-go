@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -8,6 +9,11 @@ import (
 //ServerList JSON struct of a list of servers
 type ServerList struct {
 	List map[string]ServerProperties `json:"servers"`
+}
+
+//DeletedServerList JSON struct of a list of deleted servers
+type DeletedServerList struct {
+	List map[string]ServerProperties `json:"deleted_servers"`
 }
 
 //Server JSON struct of a single server
@@ -53,16 +59,24 @@ type ServerCreateRequest struct {
 	HardwareProfile string                        `json:"hardware_profile,omitempty"`
 	AvailablityZone string                        `json:"availability_zone,omitempty"`
 	Labels          []string                      `json:"labels,omitempty"`
-	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
 	Status          string                        `json:"status,omitempty"`
-	AutoRecovery    bool                          `json:"auto_recovery,omitempty"`
+	AutoRecovery    *bool                         `json:"auto_recovery,omitempty"`
+	Relations       *ServerCreateRequestRelations `json:"relations,omitempty"`
+}
+
+//ServerCreateRequestRelations JSOn struct of a list of a server's relations
+type ServerCreateRequestRelations struct {
+	IsoImages []ServerCreateRequestIsoimage `json:"isoimages"`
+	Networks  []ServerCreateRequestNetwork  `json:"networks"`
+	PublicIPs []ServerCreateRequestIP       `json:"public_ips"`
+	Storages  []ServerCreateRequestStorage  `json:"storages"`
 }
 
 //ServerCreateResponse JSON struct of a response for creating a server
 type ServerCreateResponse struct {
 	ObjectUUID   string   `json:"object_uuid"`
 	RequestUUID  string   `json:"request_uuid"`
-	SeverUUID    string   `json:"sever_uuid"`
+	ServerUUID   string   `json:"server_uuid"`
 	NetworkUUIDs []string `json:"network_uuids"`
 	StorageUUIDs []string `json:"storage_uuids"`
 	IPaddrUUIDs  []string `json:"ipaddr_uuids"`
@@ -73,34 +87,26 @@ type ServerPowerUpdateRequest struct {
 	Power bool `json:"power"`
 }
 
-//ServerCreateRequestRelations JSOn struct of a list of a server's relations
-type ServerCreateRequestRelations struct {
-	IsoImages []ServerCreateRequestIsoimage `json:"isoimages,omitempty"`
-	Networks  []ServerCreateRequestNetwork  `json:"networks,omitempty"`
-	PublicIPs []ServerCreateRequestIP       `json:"public_ips,omitempty"`
-	Storages  []ServerCreateRequestStorage  `json:"storages,omitempty"`
-}
-
 //ServerCreateRequestStorage JSON struct of a relation between a server and a storage
 type ServerCreateRequestStorage struct {
-	StorageUUID string `json:"storage_uuid,omitempty"`
+	StorageUUID string `json:"storage_uuid"`
 	BootDevice  bool   `json:"bootdevice,omitempty"`
 }
 
 //ServerCreateRequestNetwork JSON struct of a relation between a server and a network
 type ServerCreateRequestNetwork struct {
-	NetworkUUID string `json:"network_uuid,omitempty"`
+	NetworkUUID string `json:"network_uuid"`
 	BootDevice  bool   `json:"bootdevice,omitempty"`
 }
 
 //ServerCreateRequestIP JSON struct of a relation between a server and an IP address
 type ServerCreateRequestIP struct {
-	IPaddrUUID string `json:"ipaddr_uuid,omitempty"`
+	IPaddrUUID string `json:"ipaddr_uuid"`
 }
 
 //ServerCreateRequestIsoimage JSON struct of a relation between a server and an ISO-Image
 type ServerCreateRequestIsoimage struct {
-	IsoimageUUID string `json:"isoimage_uuid,omitempty"`
+	IsoimageUUID string `json:"isoimage_uuid"`
 }
 
 //ServerUpdateRequest JSON of a request for updating a server
@@ -110,30 +116,7 @@ type ServerUpdateRequest struct {
 	Memory          int      `json:"memory,omitempty"`
 	Cores           int      `json:"cores,omitempty"`
 	Labels          []string `json:"labels,omitempty"`
-	AutoRecovery    bool     `json:"auto_recovery,omitempty"`
-}
-
-//ServerEventList JSON struct of a list of a server's events
-type ServerEventList struct {
-	List []ServerEventProperties `json:"events"`
-}
-
-//ServerEvent JSON struct of a single event of a server
-type ServerEvent struct {
-	Properties ServerEventProperties `json:"event"`
-}
-
-//ServerEventProperties JSON struct of properties of a server
-type ServerEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
+	AutoRecovery    *bool    `json:"auto_recovery,omitempty"`
 }
 
 //ServerMetricList JSON struct of a list of a server's metrics
@@ -163,6 +146,9 @@ type ServerMetricProperties struct {
 
 //GetServer gets a specific server based on given list
 func (c *Client) GetServer(id string) (Server, error) {
+	if !isValidUUID(id) {
+		return Server{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodGet,
@@ -191,6 +177,21 @@ func (c *Client) GetServerList() ([]Server, error) {
 
 //CreateServer create a server
 func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, error) {
+	//check if these slices are nil
+	//make them be empty slice instead of nil
+	//so that JSON structure will be valid
+	if body.Relations != nil && body.Relations.PublicIPs == nil {
+		body.Relations.PublicIPs = make([]ServerCreateRequestIP, 0)
+	}
+	if body.Relations != nil && body.Relations.Networks == nil {
+		body.Relations.Networks = make([]ServerCreateRequestNetwork, 0)
+	}
+	if body.Relations != nil && body.Relations.IsoImages == nil {
+		body.Relations.IsoImages = make([]ServerCreateRequestIsoimage, 0)
+	}
+	if body.Relations != nil && body.Relations.Storages == nil {
+		body.Relations.Storages = make([]ServerCreateRequestStorage, 0)
+	}
 	r := Request{
 		uri:    apiServerBase,
 		method: http.MethodPost,
@@ -202,11 +203,21 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 		return ServerCreateResponse{}, err
 	}
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+	//this fixed the endpoint's bug temporarily when creating server with/without
+	//'relations' field
+	if response.ServerUUID == "" && response.ObjectUUID != "" {
+		response.ServerUUID = response.ObjectUUID
+	} else if response.ObjectUUID == "" && response.ServerUUID != "" {
+		response.ObjectUUID = response.ServerUUID
+	}
 	return response, err
 }
 
 //DeleteServer deletes a specific server
 func (c *Client) DeleteServer(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodDelete,
@@ -216,6 +227,9 @@ func (c *Client) DeleteServer(id string) error {
 
 //UpdateServer updates a specific server
 func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodPatch,
@@ -225,22 +239,28 @@ func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
 }
 
 //GetServerEventList gets a list of a specific server's events
-func (c *Client) GetServerEventList(id string) ([]ServerEvent, error) {
+func (c *Client) GetServerEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response ServerEventList
-	var serverEvents []ServerEvent
+	var response EventList
+	var serverEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		serverEvents = append(serverEvents, ServerEvent{Properties: properties})
+		serverEvents = append(serverEvents, Event{Properties: properties})
 	}
 	return serverEvents, err
 }
 
 //GetServerMetricList gets a list of a specific server's metrics
 func (c *Client) GetServerMetricList(id string) ([]ServerMetric, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "metrics"),
 		method: http.MethodGet,
@@ -310,16 +330,58 @@ func (c *Client) ShutdownServer(id string) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "shutdown"),
 		method: http.MethodPatch,
-		body:   new(map[string]string),
+		body:   map[string]string{},
 	}
+
 	err = r.execute(*c, nil)
 	if err != nil {
+		if requestError, ok := err.(RequestError); ok {
+			if requestError.StatusCode == 500 {
+				c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
+				return c.StopServer(id)
+			}
+		}
 		return err
 	}
+
 	//If we get an error, which includes a timeout, power off the server instead
 	err = c.WaitForServerPowerStatus(id, false)
 	if err != nil {
-		return c.setServerPowerState(id, false)
+		c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
+		return c.StopServer(id)
 	}
 	return nil
+}
+
+//GetServersByLocation gets a list of servers by location
+func (c *Client) GetServersByLocation(id string) ([]Server, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "servers"),
+		method: http.MethodGet,
+	}
+	var response ServerList
+	var servers []Server
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		servers = append(servers, Server{Properties: properties})
+	}
+	return servers, err
+}
+
+//GetDeletedServers gets a list of deleted servers
+func (c *Client) GetDeletedServers() ([]Server, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "servers"),
+		method: http.MethodGet,
+	}
+	var response DeletedServerList
+	var servers []Server
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		servers = append(servers, Server{Properties: properties})
+	}
+	return servers, err
 }

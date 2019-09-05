@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -68,6 +69,9 @@ type StorageSnapshotScheduleUpdateRequest struct {
 
 //GetStorageSnapshotScheduleList gets a list of available storage snapshot schedules based on a given storage's id
 func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSchedule, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "snapshot_schedules"),
 		method: http.MethodGet,
@@ -83,6 +87,9 @@ func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSch
 
 //GetStorageSnapshotSchedule gets a specific storage snapshot scheduler based on a given storage's id and scheduler's id
 func (c *Client) GetStorageSnapshotSchedule(storageID, scheduleID string) (StorageSnapshotSchedule, error) {
+	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
+		return StorageSnapshotSchedule{}, errors.New("'storageID' or 'scheduleID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodGet,
@@ -95,6 +102,9 @@ func (c *Client) GetStorageSnapshotSchedule(storageID, scheduleID string) (Stora
 //CreateStorageSnapshotSchedule create a storage's snapshot scheduler
 func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotScheduleCreateRequest) (
 	StorageSnapshotScheduleCreateResponse, error) {
+	if !isValidUUID(id) {
+		return StorageSnapshotScheduleCreateResponse{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "snapshot_schedules"),
 		method: http.MethodPost,
@@ -112,6 +122,9 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 //UpdateStorageSnapshotSchedule updates specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
 func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 	body StorageSnapshotScheduleUpdateRequest) error {
+	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
+		return errors.New("'storageID' or 'scheduleID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodPatch,
@@ -122,6 +135,9 @@ func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 
 //DeleteStorageSnapshotSchedule deletes specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
 func (c *Client) DeleteStorageSnapshotSchedule(storageID, scheduleID string) error {
+	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
+		return errors.New("'storageID' or 'scheduleID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodDelete,

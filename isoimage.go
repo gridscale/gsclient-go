@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -8,6 +9,11 @@ import (
 //ISOImageList is JSON struct of a list of ISO images
 type ISOImageList struct {
 	List map[string]ISOImageProperties `json:"isoimages"`
+}
+
+//DeletedISOImageList is JSON struct of a list of deleted SO images
+type DeletedISOImageList struct {
+	List map[string]ISOImageProperties `json:"deleted_isoimages"`
 }
 
 //ISOImage is JSON struct of a list an ISO image
@@ -70,29 +76,6 @@ type ISOImageUpdateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 }
 
-//ISOImageEventList is JSON struct of a list of an ISO-Image's events
-type ISOImageEventList struct {
-	List []ISOImageEventProperties `json:"events"`
-}
-
-//ISOImageEvent is JSON struct of a single event of an ISO-Image
-type ISOImageEvent struct {
-	Properties ISOImageEventProperties `json:"event"`
-}
-
-//ISOImageEventProperties is JSON struct of an ISO-Image event
-type ISOImageEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //GetISOImageList returns a list of available ISO images
 func (c *Client) GetISOImageList() ([]ISOImage, error) {
 	r := Request{
@@ -110,6 +93,9 @@ func (c *Client) GetISOImageList() ([]ISOImage, error) {
 
 //GetISOImage returns a specific ISO image based on given id
 func (c *Client) GetISOImage(id string) (ISOImage, error) {
+	if !isValidUUID(id) {
+		return ISOImage{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodGet,
@@ -137,6 +123,9 @@ func (c *Client) CreateISOImage(body ISOImageCreateRequest) (ISOImageCreateRespo
 
 //UpdateISOImage updates a specific ISO Image
 func (c *Client) UpdateISOImage(id string, body ISOImageUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodPatch,
@@ -147,6 +136,9 @@ func (c *Client) UpdateISOImage(id string, body ISOImageUpdateRequest) error {
 
 //DeleteISOImage deletes a specific ISO image
 func (c *Client) DeleteISOImage(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodDelete,
@@ -155,16 +147,52 @@ func (c *Client) DeleteISOImage(id string) error {
 }
 
 //GetISOImageEventList returns a list of events of an ISO image
-func (c *Client) GetISOImageEventList(id string) ([]ISOImageEvent, error) {
+func (c *Client) GetISOImageEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response ISOImageEventList
-	var isoImageEvents []ISOImageEvent
+	var response EventList
+	var isoImageEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		isoImageEvents = append(isoImageEvents, ISOImageEvent{Properties: properties})
+		isoImageEvents = append(isoImageEvents, Event{Properties: properties})
 	}
 	return isoImageEvents, err
+}
+
+//GetISOImagesByLocation gets a list of ISO images by location
+func (c *Client) GetISOImagesByLocation(id string) ([]ISOImage, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "isoimages"),
+		method: http.MethodGet,
+	}
+	var response ISOImageList
+	var isoImages []ISOImage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		isoImages = append(isoImages, ISOImage{Properties: properties})
+	}
+	return isoImages, err
+}
+
+//GetDeletedISOImages gets a list of deleted ISO images
+func (c *Client) GetDeletedISOImages() ([]ISOImage, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "isoimages"),
+		method: http.MethodGet,
+	}
+	var response DeletedISOImageList
+	var isoImages []ISOImage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		isoImages = append(isoImages, ISOImage{Properties: properties})
+	}
+	return isoImages, err
 }

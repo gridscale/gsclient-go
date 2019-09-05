@@ -45,6 +45,17 @@ func main() {
 			return
 		}
 		log.Info("Network successfully deleted")
+
+		log.Info("Get deleted networks: Press 'Enter' to continue...")
+		bufio.NewReader(os.Stdin).ReadBytes('\n')
+		networks, err := client.GetDeletedNetworks()
+		if err != nil {
+			log.Error("Get deleted networks has failed with error", err)
+			return
+		}
+		log.WithFields(log.Fields{
+			"networks": networks,
+		}).Info("Retrieved deleted networks successfully")
 	}()
 
 	//Get network to update

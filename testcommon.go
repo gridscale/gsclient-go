@@ -11,6 +11,35 @@ const (
 	dummyRequestUUID = "x123xx1x-123x-1x12-123x-123xxx123x1x"
 )
 
+type uuidTestCase struct {
+	isFailed bool
+	testUUID string
+}
+
+type successFailTestCase struct {
+	isFailed bool
+}
+
+var commonSuccessFailTestCases []successFailTestCase = []successFailTestCase{
+	{
+		isFailed: true,
+	},
+	{
+		isFailed: false,
+	},
+}
+
+var uuidCommonTestCases []uuidTestCase = []uuidTestCase{
+	{
+		testUUID: dummyUUID,
+		isFailed: false,
+	},
+	{
+		testUUID: "",
+		isFailed: true,
+	},
+}
+
 func setupTestClient() (*httptest.Server, *Client, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)

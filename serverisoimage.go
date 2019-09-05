@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -37,6 +38,9 @@ type ServerIsoImageRelationUpdateRequest struct {
 
 //GetServerIsoImageList gets a list of a specific server's ISO images
 func (c *Client) GetServerIsoImageList(id string) ([]ServerIsoImageRelationProperties, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),
 		method: http.MethodGet,
@@ -48,6 +52,9 @@ func (c *Client) GetServerIsoImageList(id string) ([]ServerIsoImageRelationPrope
 
 //GetServerIsoImage gets an ISO image of a specific server
 func (c *Client) GetServerIsoImage(serverID, isoImageID string) (ServerIsoImageRelationProperties, error) {
+	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
+		return ServerIsoImageRelationProperties{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodGet,
@@ -59,6 +66,9 @@ func (c *Client) GetServerIsoImage(serverID, isoImageID string) (ServerIsoImageR
 
 //UpdateServerIsoImage updates a link between a storage and an ISO image
 func (c *Client) UpdateServerIsoImage(serverID, isoImageID string, body ServerIsoImageRelationUpdateRequest) error {
+	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
+		return errors.New("'serverID' or 'isoImageID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodPatch,
@@ -69,6 +79,9 @@ func (c *Client) UpdateServerIsoImage(serverID, isoImageID string, body ServerIs
 
 //CreateServerIsoImage creates a link between a server and an ISO image
 func (c *Client) CreateServerIsoImage(id string, body ServerIsoImageRelationCreateRequest) error {
+	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
+		return errors.New("'serverID' or 'isoImageID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),
 		method: http.MethodPost,
@@ -79,6 +92,9 @@ func (c *Client) CreateServerIsoImage(id string, body ServerIsoImageRelationCrea
 
 //DeleteServerIsoImage deletes a link between an ISO image and a server
 func (c *Client) DeleteServerIsoImage(serverID, isoImageID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
+		return errors.New("'serverID' or 'isoImageID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,

@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -9,6 +10,11 @@ import (
 //NetworkList is JSON struct of a list of networks
 type NetworkList struct {
 	List map[string]NetworkProperties `json:"networks"`
+}
+
+//DeletedNetworkList is JSON struct of a list of deleted networks
+type DeletedNetworkList struct {
+	List map[string]NetworkProperties `json:"deleted_networks"`
 }
 
 //Network is JSON struct of a single network
@@ -80,31 +86,11 @@ type NetworkUpdateRequest struct {
 	L2Security bool   `json:"l2security"`
 }
 
-//NetworkEventList is JSON struct of a list of a network's events
-type NetworkEventList struct {
-	List []NetworkEventProperties `json:"events"`
-}
-
-//NetworkEvent is JSON struct of a single event of a network
-type NetworkEvent struct {
-	Properties NetworkEventProperties `json:"event"`
-}
-
-//NetworkEventProperties is JSON struct of properties of an event
-type NetworkEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //GetNetwork get a specific network based on given id
 func (c *Client) GetNetwork(id string) (Network, error) {
+	if !isValidUUID(id) {
+		return Network{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodGet,
@@ -132,6 +118,9 @@ func (c *Client) CreateNetwork(body NetworkCreateRequest) (NetworkCreateResponse
 
 //DeleteNetwork deletes a specific network based on given id
 func (c *Client) DeleteNetwork(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
@@ -141,6 +130,9 @@ func (c *Client) DeleteNetwork(id string) error {
 
 //UpdateNetwork updates a specific network based on given id
 func (c *Client) UpdateNetwork(id string, body NetworkUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodPatch,
@@ -168,16 +160,19 @@ func (c *Client) GetNetworkList() ([]Network, error) {
 }
 
 //GetNetworkEventList gets a list of a network's events
-func (c *Client) GetNetworkEventList(id string) ([]NetworkEvent, error) {
+func (c *Client) GetNetworkEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response NetworkEventList
-	var networkEvents []NetworkEvent
+	var response EventList
+	var networkEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		networkEvents = append(networkEvents, NetworkEvent{Properties: properties})
+		networkEvents = append(networkEvents, Event{Properties: properties})
 	}
 	return networkEvents, err
 }
@@ -194,4 +189,37 @@ func (c *Client) GetNetworkPublic() (Network, error) {
 		}
 	}
 	return Network{}, fmt.Errorf("Public Network not found")
+}
+
+//GetNetworksByLocation gets a list of networks by location
+func (c *Client) GetNetworksByLocation(id string) ([]Network, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "networks"),
+		method: http.MethodGet,
+	}
+	var response NetworkList
+	var networks []Network
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		networks = append(networks, Network{Properties: properties})
+	}
+	return networks, err
+}
+
+//GetDeletedNetworks gets a list of deleted networks
+func (c *Client) GetDeletedNetworks() ([]Network, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "networks"),
+		method: http.MethodGet,
+	}
+	var response DeletedNetworkList
+	var networks []Network
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		networks = append(networks, Network{Properties: properties})
+	}
+	return networks, err
 }

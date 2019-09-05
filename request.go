@@ -87,7 +87,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
 
 	if result.StatusCode >= 300 {
-		errorMessage := new(RequestError) //error messages have a different structure, so they are read with a different struct
+		var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 		errorMessage.StatusCode = result.StatusCode
 		json.Unmarshal(iostream, &errorMessage)
 		c.cfg.logger.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
@@ -113,10 +113,9 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
-			response := new(RequestStatus)
+			var response RequestStatus
 			r.execute(*c, &response)
-			output := *response //Without this cast reading indexes doesn't work
-			if output[id].Status == "done" {
+			if response[id].Status == "done" {
 				c.cfg.logger.Info("Done with creating")
 				return nil
 			}

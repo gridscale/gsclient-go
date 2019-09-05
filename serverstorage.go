@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -47,6 +48,9 @@ type ServerStorageRelationUpdateRequest struct {
 
 //GetServerStorageList gets a list of a specific server's storages
 func (c *Client) GetServerStorageList(id string) ([]ServerStorageRelationProperties, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "storages"),
 		method: http.MethodGet,
@@ -58,6 +62,9 @@ func (c *Client) GetServerStorageList(id string) ([]ServerStorageRelationPropert
 
 //GetServerStorage gets a storage of a specific server
 func (c *Client) GetServerStorage(serverID, storageID string) (ServerStorageRelationProperties, error) {
+	if !isValidUUID(serverID) || !isValidUUID(storageID) {
+		return ServerStorageRelationProperties{}, errors.New("'serverID' or 'storageID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodGet,
@@ -69,6 +76,9 @@ func (c *Client) GetServerStorage(serverID, storageID string) (ServerStorageRela
 
 //UpdateServerStorage updates a link between a storage and a server
 func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStorageRelationUpdateRequest) error {
+	if !isValidUUID(serverID) || !isValidUUID(storageID) {
+		return errors.New("'serverID' or 'storageID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodPatch,
@@ -79,6 +89,9 @@ func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStor
 
 //CreateServerStorage create a link between a server and a storage
 func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreateRequest) error {
+	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
+		return errors.New("'server_id' or 'storage_id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "storages"),
 		method: http.MethodPost,
@@ -89,6 +102,9 @@ func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreate
 
 //DeleteServerStorage delete a link between a storage and a server
 func (c *Client) DeleteServerStorage(serverID, storageID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(storageID) {
+		return errors.New("'serverID' or 'storageID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodDelete,

@@ -18,9 +18,7 @@ func TestClient_GetSshkeyList(t *testing.T) {
 		fmt.Fprintf(writer, prepareSshkeyListHTTPGet())
 	})
 	res, err := client.GetSshkeyList()
-	if err != nil {
-		t.Errorf("GetSshkeyList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetSshkeyList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockSshkey()), fmt.Sprintf("%v", res))
 }
@@ -33,11 +31,15 @@ func TestClient_GetSshkey(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareSshkeyHTTPGet())
 	})
-	res, err := client.GetSshkey(dummyUUID)
-	if err != nil {
-		t.Errorf("GetSshkey returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		res, err := client.GetSshkey(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetSshkey returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockSshkey()), fmt.Sprintf("%v", res))
+		}
 	}
-	assert.Equal(t, fmt.Sprintf("%v", getMockSshkey()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateSshkey(t *testing.T) {
@@ -58,10 +60,7 @@ func TestClient_CreateSshkey(t *testing.T) {
 		Sshkey: "example",
 		Labels: []string{"label"},
 	})
-	if err != nil {
-		t.Errorf("CreateSshkey returned an error %v", err)
-	}
-
+	assert.Nil(t, err, "CreateSshkey returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockSshkeyCreateResponse()), fmt.Sprintf("%s", response))
 }
 
@@ -73,13 +72,16 @@ func TestClient_UpdateSshkey(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
-
-	err := client.UpdateSshkey(dummyUUID, SshkeyUpdateRequest{
-		Name:   "test",
-		Sshkey: "example",
-	})
-	if err != nil {
-		t.Errorf("UpdateSshkey returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		err := client.UpdateSshkey(test.testUUID, SshkeyUpdateRequest{
+			Name:   "test",
+			Sshkey: "example",
+		})
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "UpdateSshkey returned an error %v", err)
+		}
 	}
 }
 
@@ -91,9 +93,13 @@ func TestClient_DeleteSshkey(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteSshkey(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteSshkey returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		err := client.DeleteSshkey(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "DeleteSshkey returned an error %v", err)
+		}
 	}
 }
 
@@ -103,15 +109,18 @@ func TestClient_GetSshkeyEventList(t *testing.T) {
 	uri := path.Join(apiSshkeyBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprint(writer, prepareSshkeyEventListHTTPGet())
+		fmt.Fprint(writer, prepareEventListHTTPGet())
 	})
-
-	res, err := client.GetSshkeyEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetSshkeyEventList returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		res, err := client.GetSshkeyEventList(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetSshkeyEventList returned an error %v", err)
+			assert.Equal(t, 1, len(res))
+			assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", res))
+		}
 	}
-	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockSshkeyEvent()), fmt.Sprintf("%v", res))
 }
 
 func getMockSshkey() Sshkey {
@@ -136,21 +145,6 @@ func getMockSshkeyCreateResponse() CreateResponse {
 	return mock
 }
 
-func getMockSshkeyEvent() SshkeyEvent {
-	mock := SshkeyEvent{Properties: SshkeyEventProperties{
-		ObjectType:    "type",
-		RequestUUID:   dummyRequestUUID,
-		ObjectUUID:    dummyUUID,
-		Activity:      "login",
-		RequestType:   "type",
-		RequestStatus: "done",
-		Change:        "note",
-		Timestamp:     dummyTime,
-		UserUUID:      dummyUUID,
-	}}
-	return mock
-}
-
 func prepareSshkeyListHTTPGet() string {
 	key := getMockSshkey()
 	res, _ := json.Marshal(key.Properties)
@@ -167,10 +161,4 @@ func prepareSshkeyCreateResponse() string {
 	response := getMockSshkeyCreateResponse()
 	res, _ := json.Marshal(response)
 	return string(res)
-}
-
-func prepareSshkeyEventListHTTPGet() string {
-	event := getMockSshkeyEvent()
-	res, _ := json.Marshal(event.Properties)
-	return fmt.Sprintf(`{"events": [%s]}`, string(res))
 }

@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -84,29 +85,6 @@ type FirewallUpdateRequest struct {
 	Rules  FirewallRules `json:"rules,omitempty"`
 }
 
-//FirewallEventList is JSON struct of a list of firewall's events
-type FirewallEventList struct {
-	List []FirewallEventProperties `json:"events"`
-}
-
-//FirewallEvent is JSOn struct of a single firewall's event
-type FirewallEvent struct {
-	Properties FirewallEventProperties `json:"event"`
-}
-
-//FirewallEventProperties is JSON struct of a firewall's properties
-type FirewallEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //GetFirewallList gets a list of available firewalls
 func (c *Client) GetFirewallList() ([]Firewall, error) {
 	r := Request{
@@ -124,6 +102,9 @@ func (c *Client) GetFirewallList() ([]Firewall, error) {
 
 //GetFirewall gets a specific firewall based on given id
 func (c *Client) GetFirewall(id string) (Firewall, error) {
+	if !isValidUUID(id) {
+		return Firewall{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodGet,
@@ -151,6 +132,9 @@ func (c *Client) CreateFirewall(body FirewallCreateRequest) (FirewallCreateRespo
 
 //UpdateFirewall update a specific firewall
 func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodPatch,
@@ -161,6 +145,9 @@ func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
 
 //DeleteFirewall delete a specific firewall
 func (c *Client) DeleteFirewall(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodDelete,
@@ -169,16 +156,19 @@ func (c *Client) DeleteFirewall(id string) error {
 }
 
 //GetFirewallEventList get list of a firewall's events
-func (c *Client) GetFirewallEventList(id string) ([]FirewallEvent, error) {
+func (c *Client) GetFirewallEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiFirewallBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response FirewallEventList
-	var firewallEvents []FirewallEvent
+	var response EventList
+	var firewallEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		firewallEvents = append(firewallEvents, FirewallEvent{Properties: properties})
+		firewallEvents = append(firewallEvents, Event{Properties: properties})
 	}
 	return firewallEvents, err
 }

@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -8,6 +9,11 @@ import (
 //IPList is JSON struct of a list of IPs
 type IPList struct {
 	List map[string]IPProperties `json:"ips"`
+}
+
+//DeletedIPList is JSON struct of a list of deleted IPs
+type DeletedIPList struct {
+	List map[string]IPProperties `json:"deleted_ips"`
 }
 
 //IP is JSON struct if a single IP
@@ -86,31 +92,11 @@ type IPUpdateRequest struct {
 	Labels     []string `json:"labels,omitempty"`
 }
 
-//IPEventList is JSON struct of a list of an IP's events
-type IPEventList struct {
-	List []IPEventProperties `json:"events"`
-}
-
-//IPEvent is JSON struct of a single IP
-type IPEvent struct {
-	Properties IPEventProperties `json:"event"`
-}
-
-//IPEventProperties is JSON struct of an IP's properties
-type IPEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //GetIP get a specific IP based on given id
 func (c *Client) GetIP(id string) (IP, error) {
+	if !isValidUUID(id) {
+		return IP{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodGet,
@@ -160,6 +146,9 @@ func (c *Client) CreateIP(body IPCreateRequest) (IPCreateResponse, error) {
 
 //DeleteIP deletes a specific IP based on given id
 func (c *Client) DeleteIP(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodDelete,
@@ -170,6 +159,9 @@ func (c *Client) DeleteIP(id string) error {
 
 //UpdateIP updates a specific IP based on given id
 func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodPatch,
@@ -180,16 +172,19 @@ func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
 }
 
 //GetIPEventList gets a list of an IP's events
-func (c *Client) GetIPEventList(id string) ([]IPEvent, error) {
+func (c *Client) GetIPEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiIPBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response IPEventList
-	var IPEvents []IPEvent
+	var response EventList
+	var IPEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		IPEvents = append(IPEvents, IPEvent{Properties: properties})
+		IPEvents = append(IPEvents, Event{Properties: properties})
 	}
 	return IPEvents, err
 }
@@ -201,4 +196,37 @@ func (c *Client) GetIPVersion(id string) int {
 		return 0
 	}
 	return ip.Properties.Family
+}
+
+//GetIPsByLocation gets a list of IPs by location
+func (c *Client) GetIPsByLocation(id string) ([]IP, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "ips"),
+		method: http.MethodGet,
+	}
+	var response IPList
+	var IPs []IP
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPs = append(IPs, IP{Properties: properties})
+	}
+	return IPs, err
+}
+
+//GetDeletedIPs gets a list of deleted IPs
+func (c *Client) GetDeletedIPs() ([]IP, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "ips"),
+		method: http.MethodGet,
+	}
+	var response DeletedIPList
+	var IPs []IP
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPs = append(IPs, IP{Properties: properties})
+	}
+	return IPs, err
 }

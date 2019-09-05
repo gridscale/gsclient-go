@@ -18,9 +18,7 @@ func TestClient_GetTemplateList(t *testing.T) {
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	response, err := client.GetTemplateList()
-	if err != nil {
-		t.Errorf("GetTemplateList returned an error %v", err)
-	}
+	assert.Nil(t, err, "GetTemplateList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate()), fmt.Sprintf("%v", response))
 }
@@ -33,26 +31,45 @@ func TestClient_GetTemplate(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareTemplateHTTPGet())
 	})
-	response, err := client.GetTemplate(dummyUUID)
-	if err != nil {
-		t.Errorf("GetTemplate returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		response, err := client.GetTemplate(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetTemplate returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockTemplate()), fmt.Sprintf("%v", response))
+		}
+
 	}
-	assert.Equal(t, fmt.Sprintf("%v", getMockTemplate()), fmt.Sprintf("%v", response))
 }
 
 func TestClient_GetTemplateByName(t *testing.T) {
 	server, client, mux := setupTestClient()
 	defer server.Close()
+	testCases := []uuidTestCase{
+		{
+			testUUID: "test",
+			isFailed: false,
+		},
+		{
+			testUUID: "",
+			isFailed: true,
+		},
+	}
 	uri := apiTemplateBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
-	response, err := client.GetTemplateByName("test")
-	if err != nil {
-		t.Errorf("GetTemplateByName returned an error %v", err)
+	for _, test := range testCases {
+		response, err := client.GetTemplateByName(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetTemplateByName returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockTemplate()), fmt.Sprintf("%v", response))
+		}
 	}
-	assert.Equal(t, fmt.Sprintf("%v", getMockTemplate()), fmt.Sprintf("%v", response))
 }
 
 func TestClient_CreateTemplate(t *testing.T) {
@@ -74,9 +91,7 @@ func TestClient_CreateTemplate(t *testing.T) {
 		SnapshotUUID: dummyUUID,
 		Labels:       []string{"label"},
 	})
-	if err != nil {
-		t.Errorf("CreateTemplate returned an error %v", err)
-	}
+	assert.Nil(t, err, "CreateTemplate returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockTemplateCreateResponse()), fmt.Sprintf("%v", res))
 }
 
@@ -88,12 +103,16 @@ func TestClient_UpdateTemplate(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		fmt.Fprintf(w, "")
 	})
-	err := client.UpdateTemplate(dummyUUID, TemplateUpdateRequest{
-		Name:   "test",
-		Labels: []string{"labels"},
-	})
-	if err != nil {
-		t.Errorf("UpdateTemplate returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		err := client.UpdateTemplate(test.testUUID, TemplateUpdateRequest{
+			Name:   "test",
+			Labels: []string{"labels"},
+		})
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "UpdateTemplate returned an error %v", err)
+		}
 	}
 }
 
@@ -105,9 +124,13 @@ func TestClient_DeleteTemplate(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 		fmt.Fprintf(w, "")
 	})
-	err := client.DeleteTemplate(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteTemplate returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		err := client.DeleteTemplate(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "DeleteTemplate returned an error %v", err)
+		}
 	}
 }
 
@@ -117,14 +140,52 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 	uri := path.Join(apiTemplateBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, prepareTemplateEventListHTTPGet())
+		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
-	response, err := client.GetTemplateEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetTemplateEventList returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		response, err := client.GetTemplateEventList(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetTemplateEventList returned an error %v", err)
+			assert.Equal(t, 1, len(response))
+			assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", response))
+		}
 	}
+}
+
+func TestClient_GetTemplatesByLocation(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiLocationBase, dummyUUID, "templates")
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, prepareTemplateListHTTPGet())
+	})
+	for _, test := range uuidCommonTestCases {
+		response, err := client.GetTemplatesByLocation(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetTemplatesByLocation returned an error %v", err)
+			assert.Equal(t, 1, len(response))
+			assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate()), fmt.Sprintf("%v", response))
+		}
+	}
+}
+
+func TestClient_GetDeletedTemplates(t *testing.T) {
+	server, client, mux := setupTestClient()
+	defer server.Close()
+	uri := path.Join(apiDeletedBase, "templates")
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, prepareDeletedTemplateListHTTPGet())
+	})
+	response, err := client.GetDeletedTemplates()
+	assert.Nil(t, err, "GetDeletedTemplates returned an error %v", err)
 	assert.Equal(t, 1, len(response))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplateEvent()), fmt.Sprintf("%v", response))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate()), fmt.Sprintf("%v", response))
 }
 
 func getMockTemplate() Template {
@@ -160,21 +221,6 @@ func getMockTemplateCreateResponse() CreateResponse {
 	return mock
 }
 
-func getMockTemplateEvent() TemplateEvent {
-	mock := TemplateEvent{Properties: TemplateEventProperties{
-		ObjectType:    "type",
-		RequestUUID:   dummyRequestUUID,
-		ObjectUUID:    dummyUUID,
-		Activity:      "sent",
-		RequestType:   "type",
-		RequestStatus: "active",
-		Change:        "change",
-		Timestamp:     dummyTime,
-		UserUUID:      dummyUUID,
-	}}
-	return mock
-}
-
 func prepareTemplateListHTTPGet() string {
 	template := getMockTemplate()
 	res, _ := json.Marshal(template.Properties)
@@ -193,8 +239,8 @@ func prepareTemplateCreateResponse() string {
 	return string(res)
 }
 
-func prepareTemplateEventListHTTPGet() string {
-	event := getMockTemplateEvent()
-	res, _ := json.Marshal(event.Properties)
-	return fmt.Sprintf(`{"events": [%s]}`, string(res))
+func prepareDeletedTemplateListHTTPGet() string {
+	template := getMockTemplate()
+	res, _ := json.Marshal(template.Properties)
+	return fmt.Sprintf(`{"deleted_templates": {"%s": %s}}`, dummyUUID, string(res))
 }

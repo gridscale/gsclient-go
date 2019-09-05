@@ -17,12 +17,16 @@ func TestClient_GetServerStorageList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerStorageListHTTPGet())
 	})
-	res, err := client.GetServerStorageList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerStorageList returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		res, err := client.GetServerStorageList(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetServerStorageList returned an error %v", err)
+			assert.Equal(t, 1, len(res))
+			assert.Equal(t, fmt.Sprintf("[%v]", getMockServerStorage()), fmt.Sprintf("%v", res))
+		}
 	}
-	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerStorage()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_GetServerStorage(t *testing.T) {
@@ -33,11 +37,17 @@ func TestClient_GetServerStorage(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerStorageHTTPGet())
 	})
-	res, err := client.GetServerStorage(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("GetServerStorage returned an error %v", err)
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testStorageID := range uuidCommonTestCases {
+			res, err := client.GetServerStorage(testServerID.testUUID, testStorageID.testUUID)
+			if testServerID.isFailed || testStorageID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "GetServerStorage returned an error %v", err)
+				assert.Equal(t, fmt.Sprintf("%v", getMockServerStorage()), fmt.Sprintf("%v", res))
+			}
+		}
 	}
-	assert.Equal(t, fmt.Sprintf("%v", getMockServerStorage()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateServerStorage(t *testing.T) {
@@ -48,12 +58,18 @@ func TestClient_CreateServerStorage(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.CreateServerStorage(dummyUUID, ServerStorageRelationCreateRequest{
-		ObjectUUID: dummyUUID,
-		BootDevice: true,
-	})
-	if err != nil {
-		t.Errorf("CreateServerStorage returned an error %v", err)
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testStorageID := range uuidCommonTestCases {
+			err := client.CreateServerStorage(testServerID.testUUID, ServerStorageRelationCreateRequest{
+				ObjectUUID: testStorageID.testUUID,
+				BootDevice: true,
+			})
+			if testServerID.isFailed || testStorageID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "CreateServerStorage returned an error %v", err)
+			}
+		}
 	}
 }
 
@@ -65,12 +81,18 @@ func TestClient_UpdateServerStorage(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UpdateServerStorage(dummyUUID, dummyUUID, ServerStorageRelationUpdateRequest{
-		Ordering:   1,
-		BootDevice: true,
-	})
-	if err != nil {
-		t.Errorf("UpdateServerStorage returned an error %v", err)
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testStorageID := range uuidCommonTestCases {
+			err := client.UpdateServerStorage(testServerID.testUUID, testStorageID.testUUID, ServerStorageRelationUpdateRequest{
+				Ordering:   1,
+				BootDevice: true,
+			})
+			if testServerID.isFailed || testStorageID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "UpdateServerStorage returned an error %v", err)
+			}
+		}
 	}
 }
 
@@ -82,9 +104,15 @@ func TestClient_DeleteServerStorage(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.DeleteServerStorage(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteServerStorage returned an error %v", err)
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testStorageID := range uuidCommonTestCases {
+			err := client.DeleteServerStorage(testServerID.testUUID, testStorageID.testUUID)
+			if testServerID.isFailed || testStorageID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "DeleteServerStorage returned an error %v", err)
+			}
+		}
 	}
 }
 
@@ -97,9 +125,7 @@ func TestClient_LinkStorage(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.LinkStorage(dummyUUID, dummyUUID, true)
-	if err != nil {
-		t.Errorf("LinkStorage returned an error %v", err)
-	}
+	assert.Nil(t, err, "LinkStorage returned an error %v", err)
 }
 
 func TestClient_UnlinkStorage(t *testing.T) {
@@ -111,9 +137,7 @@ func TestClient_UnlinkStorage(t *testing.T) {
 		fmt.Fprint(writer, "")
 	})
 	err := client.UnlinkStorage(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("UnlinkStorage returned an error %v", err)
-	}
+	assert.Nil(t, err, "UnlinkStorage returned an error %v", err)
 }
 
 func getMockServerStorage() ServerStorageRelationProperties {

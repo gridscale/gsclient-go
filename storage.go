@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"net/http"
 	"path"
 )
@@ -8,6 +9,11 @@ import (
 //StorageList JSON struct of a list of storages
 type StorageList struct {
 	List map[string]StorageProperties `json:"storages"`
+}
+
+//DeletedStorageList JSON struct of a list of storages
+type DeletedStorageList struct {
+	List map[string]StorageProperties `json:"deleted_storages"`
 }
 
 //Storage JSON struct of a single storage
@@ -105,31 +111,11 @@ type StorageUpdateRequest struct {
 	Capacity int      `json:"capacity,omitempty"`
 }
 
-//StorageEventList JSON struct of a list of a storage's events
-type StorageEventList struct {
-	List []StorageEventProperties `json:"events"`
-}
-
-//StorageEvent JSON struct of an event of a storage
-type StorageEvent struct {
-	Properties StorageEventProperties `json:"event"`
-}
-
-//StorageEventProperties JSON struct of properties of an event of a storage
-type StorageEventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
-}
-
 //GetStorage get a storage
 func (c *Client) GetStorage(id string) (Storage, error) {
+	if !isValidUUID(id) {
+		return Storage{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodGet,
@@ -174,6 +160,9 @@ func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error
 
 //DeleteStorage delete a storage
 func (c *Client) DeleteStorage(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodDelete,
@@ -183,6 +172,9 @@ func (c *Client) DeleteStorage(id string) error {
 
 //UpdateStorage update a storage
 func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodPatch,
@@ -192,16 +184,52 @@ func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
 }
 
 //GetStorageEventList get list of a storage's events
-func (c *Client) GetStorageEventList(id string) ([]StorageEvent, error) {
+func (c *Client) GetStorageEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response StorageEventList
-	var storageEvents []StorageEvent
+	var response EventList
+	var storageEvents []Event
 	err := r.execute(*c, &response)
 	for _, properties := range response.List {
-		storageEvents = append(storageEvents, StorageEvent{Properties: properties})
+		storageEvents = append(storageEvents, Event{Properties: properties})
 	}
 	return storageEvents, err
+}
+
+//GetStoragesByLocation gets a list of storages by location
+func (c *Client) GetStoragesByLocation(id string) ([]Storage, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "storages"),
+		method: http.MethodGet,
+	}
+	var response StorageList
+	var storages []Storage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		storages = append(storages, Storage{Properties: properties})
+	}
+	return storages, err
+}
+
+//GetDeletedStorages gets a list of deleted storages
+func (c *Client) GetDeletedStorages() ([]Storage, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "storages"),
+		method: http.MethodGet,
+	}
+	var response DeletedStorageList
+	var storages []Storage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		storages = append(storages, Storage{Properties: properties})
+	}
+	return storages, err
 }
