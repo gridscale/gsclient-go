@@ -80,8 +80,8 @@ type StorageSnapshotExportToS3Request struct {
 
 //GetStorageSnapshotList gets a list of storage snapshots
 func (c *Client) GetStorageSnapshotList(id string) ([]StorageSnapshot, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id){
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "snapshots"),
@@ -98,8 +98,8 @@ func (c *Client) GetStorageSnapshotList(id string) ([]StorageSnapshot, error) {
 
 //GetStorageSnapshot gets a specific storage's snapshot based on given storage id and snapshot id.
 func (c *Client) GetStorageSnapshot(storageID, snapshotID string) (StorageSnapshot, error) {
-	if storageID == "" || snapshotID == "" {
-		return StorageSnapshot{}, errors.New("'storageID' and 'snapshotID' are required")
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return StorageSnapshot{}, errors.New("'storageID' or 'snapshotID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
@@ -112,8 +112,8 @@ func (c *Client) GetStorageSnapshot(storageID, snapshotID string) (StorageSnapsh
 
 //CreateStorageSnapshot creates a new storage's snapshot
 func (c *Client) CreateStorageSnapshot(id string, body StorageSnapshotCreateRequest) (StorageSnapshotCreateResponse, error) {
-	if id == "" {
-		return StorageSnapshotCreateResponse{}, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return StorageSnapshotCreateResponse{}, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "snapshots"),
@@ -131,8 +131,8 @@ func (c *Client) CreateStorageSnapshot(id string, body StorageSnapshotCreateRequ
 
 //UpdateStorageSnapshot updates a specific storage's snapshot
 func (c *Client) UpdateStorageSnapshot(storageID, snapshotID string, body StorageSnapshotUpdateRequest) error {
-	if storageID == "" || snapshotID == "" {
-		return errors.New("'storageID' and 'snapshotID' are required")
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' or 'snapshotID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
@@ -144,8 +144,8 @@ func (c *Client) UpdateStorageSnapshot(storageID, snapshotID string, body Storag
 
 //DeleteStorageSnapshot deletes a specific storage's snapshot
 func (c *Client) DeleteStorageSnapshot(storageID, snapshotID string) error {
-	if storageID == "" || snapshotID == "" {
-		return errors.New("'storageID' and 'snapshotID' are required")
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' or 'snapshotID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
@@ -156,8 +156,8 @@ func (c *Client) DeleteStorageSnapshot(storageID, snapshotID string) error {
 
 //RollbackStorage rollbacks a storage
 func (c *Client) RollbackStorage(storageID, snapshotID string, body StorageRollbackRequest) error {
-	if storageID == "" || snapshotID == "" {
-		return errors.New("'storageID' and 'snapshotID' are required")
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' or 'snapshotID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID, "rollback"),
@@ -182,8 +182,8 @@ func (c *Client) ExportStorageSnapshotToS3(storageID, snapshotID string, body St
 
 //GetSnapshotsByLocation gets a list of storage snapshots by location
 func (c *Client) GetSnapshotsByLocation(id string) ([]StorageSnapshot, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "snapshots"),

@@ -94,8 +94,8 @@ type IPUpdateRequest struct {
 
 //GetIP get a specific IP based on given id
 func (c *Client) GetIP(id string) (IP, error) {
-	if id == "" {
-		return IP{}, errors.New("'id' is required")
+	if !isValidUUID(id){
+		return IP{}, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiIPBase, id),
@@ -146,8 +146,8 @@ func (c *Client) CreateIP(body IPCreateRequest) (IPCreateResponse, error) {
 
 //DeleteIP deletes a specific IP based on given id
 func (c *Client) DeleteIP(id string) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id){
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiIPBase, id),
@@ -159,8 +159,8 @@ func (c *Client) DeleteIP(id string) error {
 
 //UpdateIP updates a specific IP based on given id
 func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id){
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiIPBase, id),
@@ -173,8 +173,8 @@ func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
 
 //GetIPEventList gets a list of an IP's events
 func (c *Client) GetIPEventList(id string) ([]Event, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id){
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiIPBase, id, "events"),
@@ -200,8 +200,8 @@ func (c *Client) GetIPVersion(id string) int {
 
 //GetIPsByLocation gets a list of IPs by location
 func (c *Client) GetIPsByLocation(id string) ([]IP, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id){
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "ips"),

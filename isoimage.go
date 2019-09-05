@@ -93,8 +93,8 @@ func (c *Client) GetISOImageList() ([]ISOImage, error) {
 
 //GetISOImage returns a specific ISO image based on given id
 func (c *Client) GetISOImage(id string) (ISOImage, error) {
-	if id == "" {
-		return ISOImage{}, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return ISOImage{}, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
@@ -123,8 +123,8 @@ func (c *Client) CreateISOImage(body ISOImageCreateRequest) (ISOImageCreateRespo
 
 //UpdateISOImage updates a specific ISO Image
 func (c *Client) UpdateISOImage(id string, body ISOImageUpdateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
@@ -136,8 +136,8 @@ func (c *Client) UpdateISOImage(id string, body ISOImageUpdateRequest) error {
 
 //DeleteISOImage deletes a specific ISO image
 func (c *Client) DeleteISOImage(id string) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
@@ -148,8 +148,8 @@ func (c *Client) DeleteISOImage(id string) error {
 
 //GetISOImageEventList returns a list of events of an ISO image
 func (c *Client) GetISOImageEventList(id string) ([]Event, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id, "events"),
@@ -166,8 +166,8 @@ func (c *Client) GetISOImageEventList(id string) ([]Event, error) {
 
 //GetISOImagesByLocation gets a list of ISO images by location
 func (c *Client) GetISOImagesByLocation(id string) ([]ISOImage, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "isoimages"),

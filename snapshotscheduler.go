@@ -69,8 +69,8 @@ type StorageSnapshotScheduleUpdateRequest struct {
 
 //GetStorageSnapshotScheduleList gets a list of available storage snapshot schedules based on a given storage's id
 func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSchedule, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "snapshot_schedules"),
@@ -87,8 +87,8 @@ func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSch
 
 //GetStorageSnapshotSchedule gets a specific storage snapshot scheduler based on a given storage's id and scheduler's id
 func (c *Client) GetStorageSnapshotSchedule(storageID, scheduleID string) (StorageSnapshotSchedule, error) {
-	if storageID == "" || scheduleID == "" {
-		return StorageSnapshotSchedule{}, errors.New("'storageID' and 'scheduleID' are required")
+	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
+		return StorageSnapshotSchedule{}, errors.New("'storageID' or 'scheduleID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
@@ -102,8 +102,8 @@ func (c *Client) GetStorageSnapshotSchedule(storageID, scheduleID string) (Stora
 //CreateStorageSnapshotSchedule create a storage's snapshot scheduler
 func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotScheduleCreateRequest) (
 	StorageSnapshotScheduleCreateResponse, error) {
-	if id == "" {
-		return StorageSnapshotScheduleCreateResponse{}, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return StorageSnapshotScheduleCreateResponse{}, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "snapshot_schedules"),
@@ -122,8 +122,8 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 //UpdateStorageSnapshotSchedule updates specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
 func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 	body StorageSnapshotScheduleUpdateRequest) error {
-	if storageID == "" || scheduleID == "" {
-		return errors.New("'storageID' and 'scheduleID' are required")
+	if !isValidUUID(storageID) || !isValidUUID(scheduleID){
+		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
@@ -135,8 +135,8 @@ func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 
 //DeleteStorageSnapshotSchedule deletes specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
 func (c *Client) DeleteStorageSnapshotSchedule(storageID, scheduleID string) error {
-	if storageID == "" || scheduleID == "" {
-		return errors.New("'storageID' and 'scheduleID' are required")
+	if !isValidUUID(storageID) || !isValidUUID(scheduleID){
+		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),

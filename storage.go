@@ -113,8 +113,8 @@ type StorageUpdateRequest struct {
 
 //GetStorage get a storage
 func (c *Client) GetStorage(id string) (Storage, error) {
-	if id == "" {
-		return Storage{}, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return Storage{}, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
@@ -160,8 +160,8 @@ func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error
 
 //DeleteStorage delete a storage
 func (c *Client) DeleteStorage(id string) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
@@ -172,8 +172,8 @@ func (c *Client) DeleteStorage(id string) error {
 
 //UpdateStorage update a storage
 func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
@@ -185,8 +185,8 @@ func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
 
 //GetStorageEventList get list of a storage's events
 func (c *Client) GetStorageEventList(id string) ([]Event, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "events"),
@@ -203,8 +203,8 @@ func (c *Client) GetStorageEventList(id string) ([]Event, error) {
 
 //GetStoragesByLocation gets a list of storages by location
 func (c *Client) GetStoragesByLocation(id string) ([]Storage, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "storages"),

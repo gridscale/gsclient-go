@@ -104,8 +104,8 @@ func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
 
 //GetLoadBalancer returns a loadbalancer of a given uuid
 func (c *Client) GetLoadBalancer(id string) (LoadBalancer, error) {
-	if id == "" {
-		return LoadBalancer{}, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return LoadBalancer{}, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
@@ -137,8 +137,8 @@ func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalance
 
 //UpdateLoadBalancer update configuration of a loadbalancer
 func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	if body.Labels == nil {
 		body.Labels = make([]string, 0)
@@ -153,8 +153,8 @@ func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) e
 
 //GetLoadBalancerEventList retrieves events of a given uuid
 func (c *Client) GetLoadBalancerEventList(id string) ([]Event, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id, "events"),
@@ -171,8 +171,8 @@ func (c *Client) GetLoadBalancerEventList(id string) ([]Event, error) {
 
 //DeleteLoadBalancer deletes a loadbalancer
 func (c *Client) DeleteLoadBalancer(id string) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),

@@ -59,8 +59,8 @@ type ServerNetworkRelationUpdateRequest struct {
 
 //GetServerNetworkList gets a list of a specific server's networks
 func (c *Client) GetServerNetworkList(id string) ([]ServerNetworkRelationProperties, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "networks"),
@@ -73,8 +73,8 @@ func (c *Client) GetServerNetworkList(id string) ([]ServerNetworkRelationPropert
 
 //GetServerNetwork gets a network of a specific server
 func (c *Client) GetServerNetwork(serverID, networkID string) (ServerNetworkRelationProperties, error) {
-	if serverID == "" || networkID == "" {
-		return ServerNetworkRelationProperties{}, errors.New("'serverID' and 'networksID' are required")
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return ServerNetworkRelationProperties{}, errors.New("'serverID' or 'networksID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
@@ -87,8 +87,8 @@ func (c *Client) GetServerNetwork(serverID, networkID string) (ServerNetworkRela
 
 //UpdateServerNetwork updates a link between a network and a server
 func (c *Client) UpdateServerNetwork(serverID, networkID string, body ServerNetworkRelationUpdateRequest) error {
-	if serverID == "" || networkID == "" {
-		return errors.New("'serverID' and 'networksID' are required")
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return errors.New("'serverID' or 'networksID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
@@ -100,8 +100,8 @@ func (c *Client) UpdateServerNetwork(serverID, networkID string, body ServerNetw
 
 //CreateServerNetwork creates a link between a network and a storage
 func (c *Client) CreateServerNetwork(id string, body ServerNetworkRelationCreateRequest) error {
-	if id == "" || body.ObjectUUID == "" {
-		return errors.New("'server_id' and 'network_id' are required")
+	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
+		return errors.New("'serverID' or 'network_id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "networks"),
@@ -113,8 +113,8 @@ func (c *Client) CreateServerNetwork(id string, body ServerNetworkRelationCreate
 
 //DeleteServerNetwork deletes a link between a network and a server
 func (c *Client) DeleteServerNetwork(serverID, networkID string) error {
-	if serverID == "" || networkID == "" {
-		return errors.New("'serverID' and 'networksID' are required")
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return errors.New("'serverID' or 'networkID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),

@@ -44,8 +44,8 @@ type SshkeyUpdateRequest struct {
 
 //GetSshkey gets a ssh key
 func (c *Client) GetSshkey(id string) (Sshkey, error) {
-	if id == "" {
-		return Sshkey{}, errors.New("'id' is required")
+	if !isValidUUID(id){
+		return Sshkey{}, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
@@ -90,8 +90,8 @@ func (c *Client) CreateSshkey(body SshkeyCreateRequest) (CreateResponse, error) 
 
 //DeleteSshkey deletes a ssh key
 func (c *Client) DeleteSshkey(id string) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id){
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
@@ -102,8 +102,8 @@ func (c *Client) DeleteSshkey(id string) error {
 
 //UpdateSshkey updates a ssh key
 func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id){
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
@@ -115,8 +115,8 @@ func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
 
 //GetSshkeyEventList gets a ssh key's events
 func (c *Client) GetSshkeyEventList(id string) ([]Event, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id){
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id, "events"),

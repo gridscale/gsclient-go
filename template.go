@@ -60,8 +60,8 @@ type TemplateUpdateRequest struct {
 
 //GetTemplate gets a template
 func (c *Client) GetTemplate(id string) (Template, error) {
-	if id == "" {
-		return Template{}, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return Template{}, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id),
@@ -120,8 +120,8 @@ func (c *Client) CreateTemplate(body TemplateCreateRequest) (CreateResponse, err
 
 //UpdateTemplate updates a template
 func (c *Client) UpdateTemplate(id string, body TemplateUpdateRequest) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id),
@@ -133,8 +133,8 @@ func (c *Client) UpdateTemplate(id string, body TemplateUpdateRequest) error {
 
 //DeleteTemplate deletes a template
 func (c *Client) DeleteTemplate(id string) error {
-	if id == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id),
@@ -145,8 +145,8 @@ func (c *Client) DeleteTemplate(id string) error {
 
 //GetTemplateEventList gets a list of a template's events
 func (c *Client) GetTemplateEventList(id string) ([]Event, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id, "events"),
@@ -163,8 +163,8 @@ func (c *Client) GetTemplateEventList(id string) ([]Event, error) {
 
 //GetTemplatesByLocation gets a list of templates by location
 func (c *Client) GetTemplatesByLocation(id string) ([]Template, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id, "templates"),

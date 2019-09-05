@@ -38,8 +38,8 @@ type ServerIsoImageRelationUpdateRequest struct {
 
 //GetServerIsoImageList gets a list of a specific server's ISO images
 func (c *Client) GetServerIsoImageList(id string) ([]ServerIsoImageRelationProperties, error) {
-	if id == "" {
-		return nil, errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),
@@ -52,8 +52,8 @@ func (c *Client) GetServerIsoImageList(id string) ([]ServerIsoImageRelationPrope
 
 //GetServerIsoImage gets an ISO image of a specific server
 func (c *Client) GetServerIsoImage(serverID, isoImageID string) (ServerIsoImageRelationProperties, error) {
-	if serverID == "" || isoImageID == "" {
-		return ServerIsoImageRelationProperties{}, errors.New("'serverID' and 'isoImageID' are required")
+	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
+		return ServerIsoImageRelationProperties{}, errors.New("'id' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
@@ -66,8 +66,8 @@ func (c *Client) GetServerIsoImage(serverID, isoImageID string) (ServerIsoImageR
 
 //UpdateServerIsoImage updates a link between a storage and an ISO image
 func (c *Client) UpdateServerIsoImage(serverID, isoImageID string, body ServerIsoImageRelationUpdateRequest) error {
-	if serverID == "" || isoImageID == "" {
-		return errors.New("'serverID' and 'isoImageID' are required")
+	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
+		return errors.New("'serverID' or 'isoImageID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
@@ -79,8 +79,8 @@ func (c *Client) UpdateServerIsoImage(serverID, isoImageID string, body ServerIs
 
 //CreateServerIsoImage creates a link between a server and an ISO image
 func (c *Client) CreateServerIsoImage(id string, body ServerIsoImageRelationCreateRequest) error {
-	if id == "" || body.ObjectUUID == "" {
-		return errors.New("'server_id' and 'isoimage_id' are required")
+	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
+		return errors.New("'serverID' or 'isoImageID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),
@@ -92,8 +92,8 @@ func (c *Client) CreateServerIsoImage(id string, body ServerIsoImageRelationCrea
 
 //DeleteServerIsoImage deletes a link between an ISO image and a server
 func (c *Client) DeleteServerIsoImage(serverID, isoImageID string) error {
-	if serverID == "" || isoImageID == "" {
-		return errors.New("'serverID' and 'isoImageID' are required")
+	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
+		return errors.New("'serverID' or 'isoImageID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
