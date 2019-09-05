@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.0 (Unreleased)
+FEATURES:
+* Add support for Locations
+* Add support for Events
+* Add support for Lables
+* Add support for Deletes
+
+IMPROVEMENTS:
+* Heavily code refactoring to improve code quality
+* Achieve 95% test coverage
+* Achieve 100% compliant golang code conventions based on goreportcard
+* Power-off server if graceful shutdown fails
+* Backward compatibility for server creation API
+
 ## 0.2.0 (Unreleased)
 
 FEATURES:
