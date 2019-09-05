@@ -146,7 +146,7 @@ type ServerMetricProperties struct {
 
 //GetServer gets a specific server based on given list
 func (c *Client) GetServer(id string) (Server, error) {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return Server{}, errors.New("'id' is invalid")
 	}
 	r := Request{

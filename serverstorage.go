@@ -89,7 +89,7 @@ func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStor
 
 //CreateServerStorage create a link between a server and a storage
 func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreateRequest) error {
-	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID){
+	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
 		return errors.New("'server_id' or 'storage_id' is invalid")
 	}
 	r := Request{
@@ -102,7 +102,7 @@ func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreate
 
 //DeleteServerStorage delete a link between a storage and a server
 func (c *Client) DeleteServerStorage(serverID, storageID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(storageID){
+	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' or 'storageID' is invalid")
 	}
 	r := Request{

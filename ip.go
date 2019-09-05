@@ -94,7 +94,7 @@ type IPUpdateRequest struct {
 
 //GetIP get a specific IP based on given id
 func (c *Client) GetIP(id string) (IP, error) {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return IP{}, errors.New("'id' is invalid")
 	}
 	r := Request{
@@ -146,7 +146,7 @@ func (c *Client) CreateIP(body IPCreateRequest) (IPCreateResponse, error) {
 
 //DeleteIP deletes a specific IP based on given id
 func (c *Client) DeleteIP(id string) error {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	r := Request{
@@ -159,7 +159,7 @@ func (c *Client) DeleteIP(id string) error {
 
 //UpdateIP updates a specific IP based on given id
 func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	r := Request{
@@ -173,7 +173,7 @@ func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
 
 //GetIPEventList gets a list of an IP's events
 func (c *Client) GetIPEventList(id string) ([]Event, error) {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{
@@ -200,7 +200,7 @@ func (c *Client) GetIPVersion(id string) int {
 
 //GetIPsByLocation gets a list of IPs by location
 func (c *Client) GetIPsByLocation(id string) ([]IP, error) {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{

@@ -80,7 +80,7 @@ type StorageSnapshotExportToS3Request struct {
 
 //GetStorageSnapshotList gets a list of storage snapshots
 func (c *Client) GetStorageSnapshotList(id string) ([]StorageSnapshot, error) {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
 	r := Request{

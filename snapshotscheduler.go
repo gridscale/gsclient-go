@@ -122,7 +122,7 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 //UpdateStorageSnapshotSchedule updates specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
 func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 	body StorageSnapshotScheduleUpdateRequest) error {
-	if !isValidUUID(storageID) || !isValidUUID(scheduleID){
+	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
 	r := Request{
@@ -135,7 +135,7 @@ func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 
 //DeleteStorageSnapshotSchedule deletes specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
 func (c *Client) DeleteStorageSnapshotSchedule(storageID, scheduleID string) error {
-	if !isValidUUID(storageID) || !isValidUUID(scheduleID){
+	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
 	r := Request{

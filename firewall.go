@@ -102,7 +102,7 @@ func (c *Client) GetFirewallList() ([]Firewall, error) {
 
 //GetFirewall gets a specific firewall based on given id
 func (c *Client) GetFirewall(id string) (Firewall, error) {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return Firewall{}, errors.New("'id' is invalid")
 	}
 	r := Request{
@@ -132,7 +132,7 @@ func (c *Client) CreateFirewall(body FirewallCreateRequest) (FirewallCreateRespo
 
 //UpdateFirewall update a specific firewall
 func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	r := Request{
@@ -145,7 +145,7 @@ func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
 
 //DeleteFirewall delete a specific firewall
 func (c *Client) DeleteFirewall(id string) error {
-	if !isValidUUID(id){
+	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	r := Request{
