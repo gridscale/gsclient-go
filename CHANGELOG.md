@@ -1,6 +1,7 @@
 # Changelog
 
-## 1.0.0 (Unreleased)
+## 1.0.0 (September 05, 2019)
+
 FEATURES:
 * Add support for Locations
 * Add support for Events
@@ -14,7 +15,7 @@ IMPROVEMENTS:
 * Power-off server if graceful shutdown fails
 * Backward compatibility for server creation API
 
-## 0.2.0 (Unreleased)
+## 0.2.0 (August 23, 2019)
 
 FEATURES:
 
