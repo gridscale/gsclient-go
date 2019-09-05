@@ -67,12 +67,12 @@ func (c *Client) GetObjectStorageAccessKeyList() ([]ObjectStorageAccessKey, erro
 }
 
 //GetObjectStorageAccessKey gets a specific object storage access key based on given id
-func (c *Client) GetObjectStorageAccessKey(id string) (ObjectStorageAccessKey, error) {
-	if id == "" {
-		return ObjectStorageAccessKey{}, errors.New("'id' is required")
+func (c *Client) GetObjectStorageAccessKey(accessKey string) (ObjectStorageAccessKey, error) {
+	if accessKey == "" {
+		return ObjectStorageAccessKey{}, errors.New("'accessKey' is required")
 	}
 	r := Request{
-		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
+		uri:    path.Join(apiObjectStorageBase, "access_keys", accessKey),
 		method: http.MethodGet,
 	}
 	var response ObjectStorageAccessKey
@@ -96,12 +96,12 @@ func (c *Client) CreateObjectStorageAccessKey() (ObjectStorageAccessKeyCreateRes
 }
 
 //DeleteObjectStorageAccessKey deletes a specific object storage access key based on given id
-func (c *Client) DeleteObjectStorageAccessKey(id string) error {
-	if id == "" {
-		return errors.New("'id' is required")
+func (c *Client) DeleteObjectStorageAccessKey(accessKey string) error {
+	if accessKey == "" {
+		return errors.New("'accessKey' is required")
 	}
 	r := Request{
-		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
+		uri:    path.Join(apiObjectStorageBase, "access_keys", accessKey),
 		method: http.MethodDelete,
 	}
 	return r.execute(*c, nil)
