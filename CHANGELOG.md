@@ -5,7 +5,7 @@
 FEATURES:
 * Add support for Locations
 * Add support for Events
-* Add support for Lables
+* Add support for Labels
 * Add support for Deletes
 
 IMPROVEMENTS:
