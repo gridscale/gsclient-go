@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"github.com/nvthongswansea/gsclient-go"
+	"github.com/gridscale/gsclient-go"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
