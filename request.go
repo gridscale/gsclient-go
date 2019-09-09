@@ -68,7 +68,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	if err != nil {
 		return err
 	}
-	request.Header.Set("User-Agent", "gsclient-go version: "+version)
+	request.Header.Set("User-Agent", c.cfg.UserAgent)
 	request.Header.Add("X-Auth-UserID", c.cfg.UserUUID)
 	request.Header.Add("X-Auth-Token", c.cfg.APIToken)
 	request.Header.Add("Content-Type", "application/json")

@@ -3,6 +3,7 @@ package gsclient
 import (
 	"net/http"
 	"os"
+	"runtime"
 
 	"github.com/sirupsen/logrus"
 )
@@ -12,6 +13,7 @@ type Config struct {
 	APIUrl     string
 	UserUUID   string
 	APIToken   string
+	UserAgent  string
 	HTTPClient *http.Client
 	logger     logrus.Logger
 }
@@ -36,6 +38,7 @@ func NewConfiguration(apiURL string, uuid string, token string, debugMode bool) 
 		APIUrl:     apiURL,
 		UserUUID:   uuid,
 		APIToken:   token,
+		UserAgent:  "gsclient-go/" + version + " (" + runtime.GOOS + ")",
 		HTTPClient: http.DefaultClient,
 		logger:     logger,
 	}
