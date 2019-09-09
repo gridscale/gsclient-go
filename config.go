@@ -8,6 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const version = "1.0.0"
+
 //Config config for client
 type Config struct {
 	APIUrl     string
