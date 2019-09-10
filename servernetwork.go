@@ -33,9 +33,6 @@ type ServerNetworkRelationProperties struct {
 	NetworkUUID          string   `json:"network_uuid"`
 	ObjectUUID           string   `json:"object_uuid"`
 	L3security           []string `json:"l3security"`
-	//Vlan                 int          `json:"vlan,omitempty"`
-	//Vxlan                int          `json:"vxlan,omitempty"`
-	//Mcast                string       `json:"mcast, omitempty"`
 }
 
 //ServerNetworkRelationCreateRequest JSON struct of a request for creating a relation between a server and a network
