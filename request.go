@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+const (
+	requestCheckTimeout = 2 * time.Minute
+)
+
 //Request gridscale's custom request struct
 type Request struct {
 	uri    string
@@ -105,8 +109,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 		uri:    path.Join("/requests/", id),
 		method: "GET",
 	}
-	timer := time.After(time.Minute)
-
+	timer := time.After(requestCheckTimeout)
 	for {
 		select {
 		case <-timer:
@@ -126,7 +129,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 
 //WaitForServerPowerStatus  allows to wait for a server changing its power status. Timeouts are currently hardcoded
 func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
-	timer := time.After(2 * time.Minute)
+	timer := time.After(requestCheckTimeout)
 	for {
 		select {
 		case <-timer:
