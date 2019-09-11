@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"strings"
 	"time"
 )
 
 const (
-	requestCheckTimeout = 2 * time.Minute
+	requestCheckTimeout            = 2 * time.Minute
+	requestServerErrorRetryTimeout = 1 * time.Minute
 )
 
 //Request gridscale's custom request struct
@@ -78,29 +80,54 @@ func (r *Request) execute(c Client, output interface{}) error {
 	request.Header.Add("Content-Type", "application/json")
 	c.cfg.logger.Debugf("Request body: %v", request.Body)
 
-	//execute the request
-	result, err := c.cfg.HTTPClient.Do(request)
-	if err != nil {
-		return err
-	}
+	timer := time.After(requestServerErrorRetryTimeout)
+	var latestRetryErr error
+RETRY:
+	for {
+		select {
+		case <-timer:
+			c.cfg.logger.Errorf("Timeout reached when retrying, last error: %v", latestRetryErr)
+			return latestRetryErr
+		default:
+			//execute the request
+			result, err := c.cfg.HTTPClient.Do(request)
+			if err != nil {
+				c.cfg.logger.Errorf("Error while executing the request: %v", err)
+				return err
+			}
 
-	iostream, err := ioutil.ReadAll(result.Body)
-	if err != nil {
-		return err
-	}
+			iostream, err := ioutil.ReadAll(result.Body)
+			if err != nil {
+				c.cfg.logger.Errorf("Error while reading the response's body: %v", err)
+				return err
+			}
 
-	c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
+			c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
 
-	if result.StatusCode >= 300 {
-		var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
-		errorMessage.StatusCode = result.StatusCode
-		json.Unmarshal(iostream, &errorMessage)
-		c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
-		return errorMessage
+			if result.StatusCode >= 300 {
+				var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
+				errorMessage.StatusCode = result.StatusCode
+				json.Unmarshal(iostream, &errorMessage)
+				if result.StatusCode >= 500 {
+					latestRetryErr = errorMessage
+					c.cfg.logger.Errorf("RETRY! Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
+					time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
+					continue RETRY                     //continue the RETRY loop
+				}
+				c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
+				return errorMessage
+			}
+			if strings.TrimSpace(string(iostream)) != "" {
+				err = json.Unmarshal(iostream, output) //Edit the given struct
+				if err != nil {
+					c.cfg.logger.Errorf("Error while marshaling JSON: %v", err)
+					return err
+				}
+			}
+			c.cfg.logger.Debugf("Response body: %v", string(iostream))
+			return nil
+		}
 	}
-	json.Unmarshal(iostream, output) //Edit the given struct
-	c.cfg.logger.Debugf("Response body: %v", string(iostream))
-	return nil
 }
 
 //WaitForRequestCompletion allows to wait for a request to complete. Timeouts are currently hardcoded
