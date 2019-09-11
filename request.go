@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
-	"strings"
 	"time"
 )
 
@@ -118,7 +117,8 @@ RETRY:
 				return errorMessage
 			}
 			c.cfg.logger.Debugf("Response body: %v", string(iostream))
-			if strings.TrimSpace(string(iostream)) != "" {
+			//if output is set
+			if output != nil {
 				err = json.Unmarshal(iostream, output) //Edit the given struct
 				if err != nil {
 					c.cfg.logger.Errorf("Error while marshaling JSON: %v", err)
