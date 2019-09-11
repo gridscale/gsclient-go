@@ -6,6 +6,12 @@ import (
 	"path"
 )
 
+const (
+	StorageTypeStandard = "standard"
+	StorageTypeHigh     = "high"
+	StorageTypeInsane   = "instane"
+)
+
 //StorageList JSON struct of a list of storages
 type StorageList struct {
 	List map[string]StorageProperties `json:"storages"`
