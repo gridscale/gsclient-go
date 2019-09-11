@@ -212,7 +212,7 @@ func getMockIP() IP {
 		LocationName:    "Cologne",
 		Prefix:          "",
 		IP:              "192.168.0.1",
-		DeleteBlock:     "",
+		DeleteBlock:     false,
 		UsagesInMinutes: 10,
 		CurrentPrice:    0.9,
 		Labels:          []string{"label"},
