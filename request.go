@@ -117,6 +117,7 @@ RETRY:
 				c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
 				return errorMessage
 			}
+			c.cfg.logger.Debugf("Response body: %v", string(iostream))
 			if strings.TrimSpace(string(iostream)) != "" {
 				err = json.Unmarshal(iostream, output) //Edit the given struct
 				if err != nil {
@@ -124,7 +125,6 @@ RETRY:
 					return err
 				}
 			}
-			c.cfg.logger.Debugf("Response body: %v", string(iostream))
 			return nil
 		}
 	}

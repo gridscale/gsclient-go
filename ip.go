@@ -37,7 +37,7 @@ type IPProperties struct {
 	LocationName    string      `json:"location_name"`
 	Prefix          string      `json:"prefix"`
 	IP              string      `json:"ip"`
-	DeleteBlock     string      `json:"delete_block"`
+	DeleteBlock     bool        `json:"delete_block"`
 	UsagesInMinutes float64     `json:"usage_in_minutes"`
 	CurrentPrice    float64     `json:"current_price"`
 	Labels          []string    `json:"labels"`
