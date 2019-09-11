@@ -17,6 +17,8 @@ func main() {
 		uuid,
 		token,
 		true,
+		0,
+		0,
 	)
 	client := gsclient.NewClient(config)
 	logrus.Info("gridscale client configured")

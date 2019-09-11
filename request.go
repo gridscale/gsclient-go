@@ -10,11 +10,6 @@ import (
 	"time"
 )
 
-const (
-	requestCheckTimeout            = 2 * time.Minute
-	requestServerErrorRetryTimeout = 1 * time.Minute
-)
-
 //Request gridscale's custom request struct
 type Request struct {
 	uri    string
@@ -79,7 +74,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	request.Header.Add("Content-Type", "application/json")
 	c.cfg.logger.Debugf("Request body: %v", request.Body)
 
-	timer := time.After(requestServerErrorRetryTimeout)
+	timer := time.After(c.cfg.ServerErrorRetryTimeoutSecs)
 	var latestRetryErr error
 RETRY:
 	for {
@@ -136,7 +131,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 		uri:    path.Join("/requests/", id),
 		method: "GET",
 	}
-	timer := time.After(requestCheckTimeout)
+	timer := time.After(c.cfg.RequestCheckTimeoutSecs)
 	for {
 		select {
 		case <-timer:
@@ -156,7 +151,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 
 //WaitForServerPowerStatus  allows to wait for a server changing its power status. Timeouts are currently hardcoded
 func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
-	timer := time.After(requestCheckTimeout)
+	timer := time.After(c.cfg.RequestCheckTimeoutSecs)
 	for {
 		select {
 		case <-timer:

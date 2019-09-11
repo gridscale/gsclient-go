@@ -35,6 +35,8 @@ func main() {
 		uuid,
 		token,
 		true,
+		0,
+		0,
 	)
 	client := enhancedClient{
 		gsclient.NewClient(config),

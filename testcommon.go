@@ -43,6 +43,6 @@ var uuidCommonTestCases []uuidTestCase = []uuidTestCase{
 func setupTestClient() (*httptest.Server, *Client, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
-	config := NewConfiguration(server.URL, "uuid", "token", true)
+	config := NewConfiguration(server.URL, "uuid", "token", true, 5, 10)
 	return server, NewClient(config), mux
 }
