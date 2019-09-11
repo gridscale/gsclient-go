@@ -35,14 +35,14 @@ type RequestStatusProperties struct {
 
 //RequestError error of a request
 type RequestError struct {
-	StatusMessage string `json:"status"`
-	ErrorMessage  string `json:"message"`
-	StatusCode    int
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	StatusCode  int
 }
 
 //Error just returns error as string
 func (r RequestError) Error() string {
-	message := r.ErrorMessage
+	message := r.Description
 	if message == "" {
 		message = "no error message received from server"
 	}
@@ -90,7 +90,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 		var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 		errorMessage.StatusCode = result.StatusCode
 		json.Unmarshal(iostream, &errorMessage)
-		c.cfg.logger.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
+		c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
 		return errorMessage
 	}
 	json.Unmarshal(iostream, output) //Edit the given struct
