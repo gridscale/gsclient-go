@@ -51,7 +51,7 @@ func (r RequestError) Error() string {
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *Request) execute(c Client, output interface{}) error {
-	url := c.cfg.APIUrl + r.uri
+	url := c.cfg.apiURL + r.uri
 	c.cfg.logger.Debugf("%v request sent to URL: %v", r.method, url)
 
 	//Convert the body of the request to json
@@ -68,61 +68,59 @@ func (r *Request) execute(c Client, output interface{}) error {
 	if err != nil {
 		return err
 	}
-	request.Header.Set("User-Agent", c.cfg.UserAgent)
-	request.Header.Add("X-Auth-UserID", c.cfg.UserUUID)
-	request.Header.Add("X-Auth-Token", c.cfg.APIToken)
+	request.Header.Set("User-Agent", c.cfg.userAgent)
+	request.Header.Add("X-Auth-UserID", c.cfg.userUUID)
+	request.Header.Add("X-Auth-Token", c.cfg.apiToken)
 	request.Header.Add("Content-Type", "application/json")
 	c.cfg.logger.Debugf("Request body: %v", request.Body)
 
-	timer := time.After(c.cfg.ServerErrorRetryTimeoutSecs)
+	retryNo := 0
+	maxNumOfRetries := c.cfg.maxNumberOfRetries
+	delayInterval := c.cfg.delayInterval
 	var latestRetryErr error
 RETRY:
-	for {
-		select {
-		case <-timer:
-			c.cfg.logger.Errorf("Timeout reached when retrying, last error: %v", latestRetryErr)
-			return latestRetryErr
-		default:
-			//execute the request
-			result, err := c.cfg.HTTPClient.Do(request)
-			if err != nil {
-				c.cfg.logger.Errorf("Error while executing the request: %v", err)
-				return err
-			}
-
-			iostream, err := ioutil.ReadAll(result.Body)
-			if err != nil {
-				c.cfg.logger.Errorf("Error while reading the response's body: %v", err)
-				return err
-			}
-
-			c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
-
-			if result.StatusCode >= 300 {
-				var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
-				errorMessage.StatusCode = result.StatusCode
-				json.Unmarshal(iostream, &errorMessage)
-				if result.StatusCode >= 500 {
-					latestRetryErr = errorMessage
-					c.cfg.logger.Errorf("RETRY! Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
-					time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
-					continue RETRY                     //continue the RETRY loop
-				}
-				c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
-				return errorMessage
-			}
-			c.cfg.logger.Debugf("Response body: %v", string(iostream))
-			//if output is set
-			if output != nil {
-				err = json.Unmarshal(iostream, output) //Edit the given struct
-				if err != nil {
-					c.cfg.logger.Errorf("Error while marshaling JSON: %v", err)
-					return err
-				}
-			}
-			return nil
+	for retryNo <= maxNumOfRetries {
+		//execute the request
+		result, err := c.cfg.httpClient.Do(request)
+		if err != nil {
+			c.cfg.logger.Errorf("Error while executing the request: %v", err)
+			return err
 		}
+
+		iostream, err := ioutil.ReadAll(result.Body)
+		if err != nil {
+			c.cfg.logger.Errorf("Error while reading the response's body: %v", err)
+			return err
+		}
+
+		c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
+
+		if result.StatusCode >= 300 {
+			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
+			errorMessage.StatusCode = result.StatusCode
+			json.Unmarshal(iostream, &errorMessage)
+			if result.StatusCode >= 500 {
+				latestRetryErr = errorMessage
+				c.cfg.logger.Errorf("RETRY! Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
+				time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+				retryNo++
+				continue RETRY                     //continue the RETRY loop
+			}
+			c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
+			return errorMessage
+		}
+		c.cfg.logger.Debugf("Response body: %v", string(iostream))
+		//if output is set
+		if output != nil {
+			err = json.Unmarshal(iostream, output) //Edit the given struct
+			if err != nil {
+				c.cfg.logger.Errorf("Error while marshaling JSON: %v", err)
+				return err
+			}
+		}
+		return nil
 	}
+	return latestRetryErr
 }
 
 //WaitForRequestCompletion allows to wait for a request to complete. Timeouts are currently hardcoded
@@ -131,7 +129,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 		uri:    path.Join("/requests/", id),
 		method: "GET",
 	}
-	timer := time.After(c.cfg.RequestCheckTimeoutSecs)
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
 	for {
 		select {
 		case <-timer:
@@ -151,7 +149,7 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 
 //WaitForServerPowerStatus  allows to wait for a server changing its power status. Timeouts are currently hardcoded
 func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
-	timer := time.After(c.cfg.RequestCheckTimeoutSecs)
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
 	for {
 		select {
 		case <-timer:
