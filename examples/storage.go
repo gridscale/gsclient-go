@@ -31,6 +31,7 @@ func main() {
 		Capacity:     1,
 		LocationUUID: locationUUID,
 		Name:         "go-client-storage",
+		StorageType:  gsclient.StorageTypeHigh,
 	})
 	if err != nil {
 		log.Error("Create storage has failed with error", err)
