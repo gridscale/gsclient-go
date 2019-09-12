@@ -37,6 +37,7 @@ func main() {
 		true,
 		0,
 		0,
+		0,
 	)
 	client := enhancedClient{
 		gsclient.NewClient(config),
