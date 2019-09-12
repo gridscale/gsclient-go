@@ -8,11 +8,10 @@ import (
 	"time"
 )
 
-const version = "1.0.0"
-
 const (
 	defaultCheckRequestTimeoutSecs     = 120
 	defaultServerErrorRetryTimeoutSecs = 60
+	version                            = "1.0.0"
 )
 
 //Config config for client
