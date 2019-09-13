@@ -66,13 +66,13 @@ type ResourceLimit struct {
 
 //PaaSServiceCreateResponse is JSON struct of a response for creating a PaaS service
 type PaaSServiceCreateResponse struct {
-	RequestUUID     string                       `json:"request_uuid"`
-	ListenPorts     map[string]map[string]string `json:"listen_ports"`
-	PaaSServiceUUID string                       `json:"paas_service_uuid"`
-	Credentials     []Credential                 `json:"credentials"`
-	ObjectUUID      string                       `json:"object_uuid"`
-	ResourceLimits  []ResourceLimit              `json:"resource_limits"`
-	Parameters      map[string]interface{}       `json:"parameters"`
+	RequestUUID     string                    `json:"request_uuid"`
+	ListenPorts     map[string]map[string]int `json:"listen_ports"`
+	PaaSServiceUUID string                    `json:"paas_service_uuid"`
+	Credentials     []Credential              `json:"credentials"`
+	ObjectUUID      string                    `json:"object_uuid"`
+	ResourceLimits  []ResourceLimit           `json:"resource_limits"`
+	Parameters      map[string]interface{}    `json:"parameters"`
 }
 
 //PaaSTemplates is JSON struct of a list of PaaS Templates
@@ -87,14 +87,14 @@ type PaaSTemplate struct {
 
 //PaaSTemplateProperties is JSOn struct of properties of a PaaS template
 type PaaSTemplateProperties struct {
-	Name             string               `json:"name"`
-	ObjectUUID       string               `json:"object_uuid"`
-	Category         string               `json:"category"`
-	ProductNo        int                  `json:"product_no"`
-	Labels           []string             `json:"labels"`
-	Resources        []Resource           `json:"resources"`
-	Status           string               `json:"status"`
-	ParametersSchema map[string]Parameter `json:"parameters_schema"`
+	Name             string                 `json:"name"`
+	ObjectUUID       string                 `json:"object_uuid"`
+	Category         string                 `json:"category"`
+	ProductNo        int                    `json:"product_no"`
+	Labels           []string               `json:"labels"`
+	Resources        map[string]interface{} `json:"resources"`
+	Status           string                 `json:"status"`
+	ParametersSchema map[string]Parameter   `json:"parameters_schema"`
 }
 
 //Parameter JSON of a parameter

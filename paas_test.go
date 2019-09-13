@@ -370,10 +370,10 @@ func preparePaaSHTTPCreateResponse() string {
 }
 
 func getMockPaaSServiceCreateResponse() PaaSServiceCreateResponse {
-	listenPort := make(map[string]map[string]string)
-	portmap := make(map[string]string)
-	portmap["mysql"] = "3306"
-	portmap["http"] = "80"
+	listenPort := make(map[string]map[string]int)
+	portmap := make(map[string]int)
+	portmap["mysql"] = 3306
+	portmap["http"] = 80
 	listenPort["fcfc::1:aaaa:bbbb:cccc:dddd"] = portmap
 	parameters := make(map[string]interface{})
 	parameters["TEST_PARAM"] = "param value"
@@ -406,11 +406,9 @@ func getMockPaasTemplate() PaaSTemplate {
 		Category:   "database",
 		ProductNo:  0,
 		Labels:     []string{"label"},
-		Resources: []Resource{
-			{
-				Memory:      10,
-				Connections: 10,
-			},
+		Resources: map[string]interface{}{
+			"Memory":      10,
+			"Connections": 10,
 		},
 		Status: "active",
 	}}
