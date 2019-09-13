@@ -104,7 +104,7 @@ RETRY:
 				c.cfg.logger.Errorf("RETRY! Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
 				time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
 				retryNo++
-				continue RETRY                     //continue the RETRY loop
+				continue RETRY //continue the RETRY loop
 			}
 			c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
 			return errorMessage
@@ -130,13 +130,14 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 		method: "GET",
 	}
 	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
 	for {
 		select {
 		case <-timer:
 			c.cfg.logger.Errorf("Timeout reached when waiting for request %v to complete", id)
 			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
 		default:
-			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
 			var response RequestStatus
 			r.execute(*c, &response)
 			if response[id].Status == "done" {
@@ -150,13 +151,14 @@ func (c *Client) WaitForRequestCompletion(id string) error {
 //WaitForServerPowerStatus  allows to wait for a server changing its power status. Timeouts are currently hardcoded
 func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
 	for {
 		select {
 		case <-timer:
 			c.cfg.logger.Errorf("Timeout reached when trying to shut down system with id %v", id)
 			return fmt.Errorf("Timeout reached when trying to shut down system with id %v", id)
 		default:
-			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
 			server, err := c.GetServer(id)
 			if err != nil {
 				return err
