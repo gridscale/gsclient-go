@@ -32,7 +32,7 @@ type ServerProperties struct {
 	LocationUUID         string          `json:"location_uuid"`
 	Power                bool            `json:"power"`
 	CurrentPrice         float64         `json:"current_price"`
-	AvailablityZone      string          `json:"availability_zone"`
+	AvailabilityZone     string          `json:"availability_zone"`
 	AutoRecovery         bool            `json:"auto_recovery"`
 	Legacy               bool            `json:"legacy"`
 	ConsoleToken         string          `json:"console_token"`
@@ -41,6 +41,18 @@ type ServerProperties struct {
 	Labels               []string        `json:"labels"`
 	Relations            ServerRelations `json:"relations"`
 }
+
+//All available server's hardware types
+var (
+	DefaultServerHardware   = serverHardwareProfile{"default"}
+	NestedServerHardware    = serverHardwareProfile{"nested"}
+	LegacyServerHardware    = serverHardwareProfile{"legacy"}
+	CiscoCSRServerHardware  = serverHardwareProfile{"cisco_csr"}
+	SophosUTMServerHardware = serverHardwareProfile{"sophos_utm"}
+	F5BigipServerHardware   = serverHardwareProfile{"f5_bigip"}
+	Q35ServerHardware       = serverHardwareProfile{"q35"}
+	Q35NestedServerHardware = serverHardwareProfile{"q35_nested"}
+)
 
 //ServerRelations JSON struct of a list of server relations
 type ServerRelations struct {
@@ -56,7 +68,7 @@ type ServerCreateRequest struct {
 	Memory          int                           `json:"memory"`
 	Cores           int                           `json:"cores"`
 	LocationUUID    string                        `json:"location_uuid"`
-	HardwareProfile string                        `json:"hardware_profile,omitempty"`
+	HardwareProfile serverHardwareProfile         `json:"hardware_profile,omitempty"`
 	AvailablityZone string                        `json:"availability_zone,omitempty"`
 	Labels          []string                      `json:"labels,omitempty"`
 	Status          string                        `json:"status,omitempty"`

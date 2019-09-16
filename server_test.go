@@ -61,10 +61,11 @@ func TestClient_CreateServer(t *testing.T) {
 		Memory:          10,
 		Cores:           4,
 		LocationUUID:    dummyUUID,
-		HardwareProfile: "default",
+		HardwareProfile: DefaultServerHardware,
 		AvailablityZone: "",
 		Labels:          []string{"label"},
 	})
+
 	assert.Nil(t, err, "CreateServer returned an error %v", err)
 	assert.Equal(t, fmt.Sprintf("%v", getMockServerCreateResponse()), fmt.Sprintf("%s", response))
 }
@@ -321,7 +322,7 @@ func getMockServer(power bool) Server {
 		LocationUUID:         dummyUUID,
 		Power:                power,
 		CurrentPrice:         9.5,
-		AvailablityZone:      "",
+		AvailabilityZone:     "",
 		AutoRecovery:         true,
 		Legacy:               false,
 		ConsoleToken:         "",

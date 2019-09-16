@@ -52,6 +52,7 @@ func main() {
 		Memory:       1,
 		Cores:        1,
 		LocationUUID: locationUUID,
+		HardwareProfile: gsclient.DefaultServerHardware,
 	}
 	cServer, err := client.CreateServer(serverCreateRequest)
 	if err != nil {
