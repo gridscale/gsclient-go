@@ -101,9 +101,9 @@ RETRY:
 			json.Unmarshal(iostream, &errorMessage)
 			if result.StatusCode >= 500 {
 				latestRetryErr = errorMessage
-				c.cfg.logger.Errorf("RETRY! Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
 				time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
 				retryNo++
+				c.cfg.logger.Errorf("RETRY no %d ! Error message: %v. Title: %v. Code: %v.", retryNo, errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
 				continue RETRY //continue the RETRY loop
 			}
 			c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
