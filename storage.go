@@ -99,7 +99,7 @@ type StorageCreateRequest struct {
 	Capacity     int              `json:"capacity"`
 	LocationUUID string           `json:"location_uuid"`
 	Name         string           `json:"name"`
-	StorageType  string           `json:"storage_type,omitempty"`
+	StorageType  storageType      `json:"storage_type,omitempty"`
 	Template     *StorageTemplate `json:"template,omitempty"`
 	Labels       []string         `json:"labels,omitempty"`
 }
@@ -110,6 +110,12 @@ type StorageUpdateRequest struct {
 	Labels   []string `json:"labels,omitempty"`
 	Capacity int      `json:"capacity,omitempty"`
 }
+
+var (
+	DefaultStorageType = storageType{"storage"}
+	HighStorageType    = storageType{"storage_high"}
+	InsaneStorageType  = storageType{"storage_insane"}
+)
 
 //GetStorage get a storage
 func (c *Client) GetStorage(id string) (Storage, error) {

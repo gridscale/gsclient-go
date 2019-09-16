@@ -10,3 +10,12 @@ type serverHardwareProfile struct {
 func (s serverHardwareProfile) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.string)
 }
+
+type storageType struct {
+	string
+}
+
+//MarshalJSON custom marshal for storageType
+func (s storageType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.string)
+}
