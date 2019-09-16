@@ -42,18 +42,6 @@ type ServerProperties struct {
 	Relations            ServerRelations `json:"relations"`
 }
 
-//All available server's hardware types
-var (
-	DefaultServerHardware   = serverHardwareProfile{"default"}
-	NestedServerHardware    = serverHardwareProfile{"nested"}
-	LegacyServerHardware    = serverHardwareProfile{"legacy"}
-	CiscoCSRServerHardware  = serverHardwareProfile{"cisco_csr"}
-	SophosUTMServerHardware = serverHardwareProfile{"sophos_utm"}
-	F5BigipServerHardware   = serverHardwareProfile{"f5_bigip"}
-	Q35ServerHardware       = serverHardwareProfile{"q35"}
-	Q35NestedServerHardware = serverHardwareProfile{"q35_nested"}
-)
-
 //ServerRelations JSON struct of a list of server relations
 type ServerRelations struct {
 	IsoImages []ServerIsoImageRelationProperties `json:"isoimages"`
@@ -155,6 +143,18 @@ type ServerMetricProperties struct {
 		Unit  string  `json:"unit"`
 	} `json:"storage_size"`
 }
+
+//All available server's hardware types
+var (
+	DefaultServerHardware   = serverHardwareProfile{"default"}
+	NestedServerHardware    = serverHardwareProfile{"nested"}
+	LegacyServerHardware    = serverHardwareProfile{"legacy"}
+	CiscoCSRServerHardware  = serverHardwareProfile{"cisco_csr"}
+	SophosUTMServerHardware = serverHardwareProfile{"sophos_utm"}
+	F5BigipServerHardware   = serverHardwareProfile{"f5_bigip"}
+	Q35ServerHardware       = serverHardwareProfile{"q35"}
+	Q35NestedServerHardware = serverHardwareProfile{"q35_nested"}
+)
 
 //GetServer gets a specific server based on given list
 func (c *Client) GetServer(id string) (Server, error) {
