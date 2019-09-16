@@ -28,3 +28,12 @@ type ipAddressType struct {
 func (i ipAddressType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(i.int)
 }
+
+type loadbalancerAlgorithm struct {
+	string
+}
+
+//MarshalJSON custom marshal for loadbalancerAlgorithm
+func (l loadbalancerAlgorithm) MarshalJSON() ([]byte, error) {
+	return json.Marshal(l.string)
+}
