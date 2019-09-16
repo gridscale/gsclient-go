@@ -63,7 +63,7 @@ func TestClient_CreateIP(t *testing.T) {
 		isFailed = test.isFailed
 		response, err := client.CreateIP(IPCreateRequest{
 			Name:         "test",
-			Family:       1,
+			Family:       IPv4Type,
 			LocationUUID: dummyUUID,
 			Failover:     false,
 			ReverseDNS:   "8.8.8.8",

@@ -146,7 +146,7 @@ func main() {
 
 	cIP, err := client.CreateIP(gsclient.IPCreateRequest{
 		Name:         "go-client-ip",
-		Family:       4,
+		Family:       gsclient.IPv4Type,
 		LocationUUID: locationUUID,
 	})
 	if err != nil {

@@ -76,12 +76,12 @@ type IPCreateResponse struct {
 
 //IPCreateRequest is JSON struct of a request for creating an IP
 type IPCreateRequest struct {
-	Name         string   `json:"name,omitempty"`
-	Family       int      `json:"family"`
-	LocationUUID string   `json:"location_uuid"`
-	Failover     bool     `json:"failover,omitempty"`
-	ReverseDNS   string   `json:"reverse_dns,omitempty"`
-	Labels       []string `json:"labels,omitempty"`
+	Name         string        `json:"name,omitempty"`
+	Family       ipAddressType `json:"family"`
+	LocationUUID string        `json:"location_uuid"`
+	Failover     bool          `json:"failover,omitempty"`
+	ReverseDNS   string        `json:"reverse_dns,omitempty"`
+	Labels       []string      `json:"labels,omitempty"`
 }
 
 //IPUpdateRequest is JSON struct of a request for updating an IP
@@ -91,6 +91,12 @@ type IPUpdateRequest struct {
 	ReverseDNS string   `json:"reverse_dns,omitempty"`
 	Labels     []string `json:"labels,omitempty"`
 }
+
+//All available IP address versions
+var (
+	IPv4Type = ipAddressType{4}
+	IPv6Type = ipAddressType{6}
+)
 
 //GetIP get a specific IP based on given id
 func (c *Client) GetIP(id string) (IP, error) {

@@ -19,3 +19,12 @@ type storageType struct {
 func (s storageType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.string)
 }
+
+type ipAddressType struct {
+	int
+}
+
+//MarshalJSON custom marshal for ipAddressType
+func (i ipAddressType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(i.int)
+}
