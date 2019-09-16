@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //NetworkList is JSON struct of a list of networks
@@ -31,9 +32,9 @@ type NetworkProperties struct {
 	NetworkType     string           `json:"network_type"`
 	Name            string           `json:"name"`
 	Status          string           `json:"status"`
-	CreateTime      string           `json:"create_time"`
+	CreateTime      time.Time        `json:"create_time"`
 	L2Security      bool             `json:"l2security"`
-	ChangeTime      string           `json:"change_time"`
+	ChangeTime      time.Time        `json:"change_time"`
 	LocationIata    string           `json:"location_iata"`
 	LocationName    string           `json:"location_name"`
 	DeleteBlock     bool             `json:"delete_block"`
@@ -56,14 +57,14 @@ type NetworkVlan struct {
 
 //NetworkServer is JSON struct of a relation between a network and a server
 type NetworkServer struct {
-	ObjectUUID  string   `json:"object_uuid"`
-	Mac         string   `json:"mac"`
-	Bootdevice  bool     `json:"bootdevice"`
-	CreateTime  string   `json:"create_time"`
-	L3security  []string `json:"l3security"`
-	ObjectName  string   `json:"object_name"`
-	NetworkUUID string   `json:"network_uuid"`
-	Ordering    int      `json:"ordering"`
+	ObjectUUID  string    `json:"object_uuid"`
+	Mac         string    `json:"mac"`
+	Bootdevice  bool      `json:"bootdevice"`
+	CreateTime  time.Time `json:"create_time"`
+	L3security  []string  `json:"l3security"`
+	ObjectName  string    `json:"object_name"`
+	NetworkUUID string    `json:"network_uuid"`
+	Ordering    int       `json:"ordering"`
 }
 
 //NetworkCreateRequest is JSON of a request for creating a network

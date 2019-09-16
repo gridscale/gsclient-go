@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //TemplateList JSON struct of a list of templates
@@ -24,25 +25,25 @@ type Template struct {
 
 //TemplateProperties JSOn struct of properties of a template
 type TemplateProperties struct {
-	Status           string   `json:"status"`
-	Ostype           string   `json:"ostype"`
-	LocationUUID     string   `json:"location_uuid"`
-	Version          string   `json:"version"`
-	LocationIata     string   `json:"location_iata"`
-	ChangeTime       string   `json:"change_time"`
-	Private          bool     `json:"private"`
-	ObjectUUID       string   `json:"object_uuid"`
-	LicenseProductNo int      `json:"license_product_no"`
-	CreateTime       string   `json:"create_time"`
-	UsageInMinutes   int      `json:"usage_in_minutes"`
-	Capacity         int      `json:"capacity"`
-	LocationName     string   `json:"location_name"`
-	Distro           string   `json:"distro"`
-	Description      string   `json:"description"`
-	CurrentPrice     float64  `json:"current_price"`
-	LocationCountry  string   `json:"location_country"`
-	Name             string   `json:"name"`
-	Labels           []string `json:"labels"`
+	Status           string    `json:"status"`
+	Ostype           string    `json:"ostype"`
+	LocationUUID     string    `json:"location_uuid"`
+	Version          string    `json:"version"`
+	LocationIata     string    `json:"location_iata"`
+	ChangeTime       time.Time `json:"change_time"`
+	Private          bool      `json:"private"`
+	ObjectUUID       string    `json:"object_uuid"`
+	LicenseProductNo int       `json:"license_product_no"`
+	CreateTime       time.Time `json:"create_time"`
+	UsageInMinutes   int       `json:"usage_in_minutes"`
+	Capacity         int       `json:"capacity"`
+	LocationName     string    `json:"location_name"`
+	Distro           string    `json:"distro"`
+	Description      string    `json:"description"`
+	CurrentPrice     float64   `json:"current_price"`
+	LocationCountry  string    `json:"location_country"`
+	Name             string    `json:"name"`
+	Labels           []string  `json:"labels"`
 }
 
 //TemplateCreateRequest JSON struct of a request for creating a template

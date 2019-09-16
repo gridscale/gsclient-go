@@ -1,6 +1,9 @@
 package gsclient
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 //EventList is JSON struct of a list of events
 type EventList struct {
@@ -14,15 +17,15 @@ type Event struct {
 
 //EventProperties is JSON struct of an event properties
 type EventProperties struct {
-	ObjectType    string `json:"object_type"`
-	RequestUUID   string `json:"request_uuid"`
-	ObjectUUID    string `json:"object_uuid"`
-	Activity      string `json:"activity"`
-	RequestType   string `json:"request_type"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUUID      string `json:"user_uuid"`
+	ObjectType    string    `json:"object_type"`
+	RequestUUID   string    `json:"request_uuid"`
+	ObjectUUID    string    `json:"object_uuid"`
+	Activity      string    `json:"activity"`
+	RequestType   string    `json:"request_type"`
+	RequestStatus string    `json:"request_status"`
+	Change        string    `json:"change"`
+	Timestamp     time.Time `json:"timestamp"`
+	UserUUID      string    `json:"user_uuid"`
 }
 
 //GetEventList gets a list of events

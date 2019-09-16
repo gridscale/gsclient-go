@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //ServerIsoImageRelationList JSON struct of a list of relations between a server and ISO-Images
@@ -18,11 +19,11 @@ type ServerIsoImageRelation struct {
 
 //ServerIsoImageRelationProperties JSON struct of properties of a relation between a server and an ISO-Image
 type ServerIsoImageRelationProperties struct {
-	ObjectUUID string `json:"object_uuid"`
-	ObjectName string `json:"object_name"`
-	Private    bool   `json:"private"`
-	CreateTime string `json:"create_time"`
-	Bootdevice bool   `json:"bootdevice"`
+	ObjectUUID string    `json:"object_uuid"`
+	ObjectName string    `json:"object_name"`
+	Private    bool      `json:"private"`
+	CreateTime time.Time `json:"create_time"`
+	Bootdevice bool      `json:"bootdevice"`
 }
 
 //ServerIsoImageRelationCreateRequest JSON struct of a request for creating a relation between a server and an ISO-Image

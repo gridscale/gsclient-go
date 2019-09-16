@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //LabelList JSON struct of a list of labels
@@ -19,8 +20,8 @@ type Label struct {
 //LabelProperties JSON struct of properties of a label
 type LabelProperties struct {
 	Label      string        `json:"label"`
-	CreateTime string        `json:"create_time"`
-	ChangeTime string        `json:"change_time"`
+	CreateTime time.Time     `json:"create_time"`
+	ChangeTime time.Time     `json:"change_time"`
 	Relations  []interface{} `json:"relations"`
 	Status     string        `json:"status"`
 }

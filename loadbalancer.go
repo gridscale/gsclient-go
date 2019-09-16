@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //LoadBalancers is the JSON struct of a list of loadbalancers
@@ -25,7 +26,7 @@ type LoadBalancerProperties struct {
 	LocationIata        string           `json:"location_iata"`
 	LocationUUID        string           `json:"location_uuid"`
 	BackendServers      []BackendServer  `json:"backend_servers"`
-	ChangeTime          string           `json:"change_time"`
+	ChangeTime          time.Time        `json:"change_time"`
 	Status              string           `json:"status"`
 	CurrentPrice        float64          `json:"current_price"`
 	LocationCountry     string           `json:"location_country"`
@@ -34,7 +35,7 @@ type LoadBalancerProperties struct {
 	LocationName        string           `json:"location_name"`
 	UsageInMinutes      int              `json:"usage_in_minutes"`
 	Algorithm           string           `json:"algorithm"`
-	CreateTime          string           `json:"create_time"`
+	CreateTime          time.Time        `json:"create_time"`
 	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
 	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
 }

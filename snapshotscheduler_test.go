@@ -68,7 +68,7 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 			Labels:        []string{"test"},
 			RunInterval:   60,
 			KeepSnapshots: 1,
-			NextRuntime:   dummyTime,
+			NextRuntime:   dummyTime.Format(gsTimeLayout),
 		})
 		if test.isFailed {
 			assert.NotNil(t, err)
@@ -94,7 +94,7 @@ func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 				Labels:        []string{"label"},
 				RunInterval:   60,
 				KeepSnapshots: 1,
-				NextRuntime:   dummyTime,
+				NextRuntime:   dummyTime.Format(gsTimeLayout),
 			})
 			if testStorageID.isFailed || testScheduleID.isFailed {
 				assert.NotNil(t, err)
@@ -132,7 +132,7 @@ func getMockStorageSnapshotSchedule() StorageSnapshotSchedule {
 		KeepSnapshots: 1,
 		Labels:        []string{"label"},
 		Name:          "test",
-		NextRuntime:   dummyTime,
+		NextRuntime:   dummyTime.Format(gsTimeLayout),
 		ObjectUUID:    dummyUUID,
 		Relations: StorageSnapshotScheduleRelations{Snapshots: []StorageSnapshotScheduleRelation{
 			{

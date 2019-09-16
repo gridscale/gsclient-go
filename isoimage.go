@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //ISOImageList is JSON struct of a list of ISO images
@@ -32,13 +33,13 @@ type ISOImageProperties struct {
 	LocationIata    string           `json:"location_iata"`
 	LocationUUID    string           `json:"location_uuid"`
 	Status          string           `json:"status"`
-	CreateTime      string           `json:"create_time"`
+	CreateTime      time.Time        `json:"create_time"`
 	Name            string           `json:"name"`
 	Version         string           `json:"version"`
 	LocationCountry string           `json:"location_country"`
 	UsageInMinutes  int              `json:"usage_in_minutes"`
 	Private         bool             `json:"private"`
-	ChangeTime      string           `json:"change_time"`
+	ChangeTime      time.Time        `json:"change_time"`
 	Capacity        int              `json:"capacity"`
 	CurrentPrice    float64          `json:"current_price"`
 }
@@ -50,10 +51,10 @@ type ISOImageRelation struct {
 
 //ServerinISOImage is JSON struct of a relation between an ISO-Image and a Server
 type ServerinISOImage struct {
-	Bootdevice bool   `json:"bootdevice"`
-	CreateTime string `json:"create_time"`
-	ObjectName string `json:"object_name"`
-	ObjectUUID string `json:"object_uuid"`
+	Bootdevice bool      `json:"bootdevice"`
+	CreateTime time.Time `json:"create_time"`
+	ObjectName string    `json:"object_name"`
+	ObjectUUID string    `json:"object_uuid"`
 }
 
 //ISOImageCreateRequest is JSON struct of a request for creating an ISO-Image

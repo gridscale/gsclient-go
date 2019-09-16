@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //IPList is JSON struct of a list of IPs
@@ -30,9 +31,9 @@ type IPProperties struct {
 	ReverseDNS      string      `json:"reverse_dns"`
 	Family          int         `json:"family"`
 	Status          string      `json:"status"`
-	CreateTime      string      `json:"create_time"`
+	CreateTime      time.Time   `json:"create_time"`
 	Failover        bool        `json:"failover"`
-	ChangeTime      string      `json:"change_time"`
+	ChangeTime      time.Time   `json:"change_time"`
 	LocationIata    string      `json:"location_iata"`
 	LocationName    string      `json:"location_name"`
 	Prefix          string      `json:"prefix"`
@@ -54,16 +55,16 @@ type IPRelations struct {
 
 //IPLoadbalancer is JSON struct of the relation between an IP and a Load Balancer
 type IPLoadbalancer struct {
-	CreateTime       string `json:"create_time"`
-	LoadbalancerName string `json:"loadbalancer_name"`
-	LoadbalancerUUID string `json:"loadbalancer_uuid"`
+	CreateTime       time.Time `json:"create_time"`
+	LoadbalancerName string    `json:"loadbalancer_name"`
+	LoadbalancerUUID string    `json:"loadbalancer_uuid"`
 }
 
 //IPServer is JSON struct of the relation between an IP and a Server
 type IPServer struct {
-	CreateTime string `json:"create_time"`
-	ServerName string `json:"server_name"`
-	ServerUUID string `json:"server_uuid"`
+	CreateTime time.Time `json:"create_time"`
+	ServerName string    `json:"server_name"`
+	ServerUUID string    `json:"server_uuid"`
 }
 
 //IPCreateResponse is JSON struct of a response for creating an IP

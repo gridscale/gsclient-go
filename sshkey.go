@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //SshkeyList JSON struct of a list of SSH-keys
@@ -18,14 +19,14 @@ type Sshkey struct {
 
 //SshkeyProperties JSON struct of properties of a single SSH-key
 type SshkeyProperties struct {
-	Name       string   `json:"name"`
-	ObjectUUID string   `json:"object_uuid"`
-	Status     string   `json:"status"`
-	CreateTime string   `json:"create_time"`
-	ChangeTime string   `json:"change_time"`
-	Sshkey     string   `json:"sshkey"`
-	Labels     []string `json:"labels"`
-	UserUUID   string   `json:"user_uuid"`
+	Name       string    `json:"name"`
+	ObjectUUID string    `json:"object_uuid"`
+	Status     string    `json:"status"`
+	CreateTime time.Time `json:"create_time"`
+	ChangeTime time.Time `json:"change_time"`
+	Sshkey     string    `json:"sshkey"`
+	Labels     []string  `json:"labels"`
+	UserUUID   string    `json:"user_uuid"`
 }
 
 //SshkeyCreateRequest JSON struct of a request for creating a SSH-key

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //StorageSnapshotScheduleList JSON of a list of storage snapshot schedule
@@ -18,8 +19,8 @@ type StorageSnapshotSchedule struct {
 
 //StorageSnapshotScheduleProperties JSON struct of properties of a single storage snapshot schedule
 type StorageSnapshotScheduleProperties struct {
-	ChangeTime    string                           `json:"change_time"`
-	CreateTime    string                           `json:"create_time"`
+	ChangeTime    time.Time                        `json:"change_time"`
+	CreateTime    time.Time                        `json:"create_time"`
 	KeepSnapshots int                              `json:"keep_snapshots"`
 	Labels        []string                         `json:"labels"`
 	Name          string                           `json:"name"`
@@ -38,9 +39,9 @@ type StorageSnapshotScheduleRelations struct {
 
 //StorageSnapshotScheduleRelation JSON struct of a relation of a storage snapshot schedule
 type StorageSnapshotScheduleRelation struct {
-	CreateTime string `json:"create_time"`
-	Name       string `json:"name"`
-	ObjectUUID string `json:"object_uuid"`
+	CreateTime time.Time `json:"create_time"`
+	Name       string    `json:"name"`
+	ObjectUUID string    `json:"object_uuid"`
 }
 
 //StorageSnapshotScheduleCreateRequest JSON struct of a request for creating a storage snapshot schedule

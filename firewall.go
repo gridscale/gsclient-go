@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //FirewallList is JSON structure of a list of firewalls
@@ -21,9 +22,9 @@ type FirewallProperties struct {
 	Status       string           `json:"status"`
 	Labels       []string         `json:"labels"`
 	ObjectUUID   string           `json:"object_uuid"`
-	ChangeTime   string           `json:"change_time"`
+	ChangeTime   time.Time        `json:"change_time"`
 	Rules        FirewallRules    `json:"rules"`
-	CreateTime   string           `json:"create_time"`
+	CreateTime   time.Time        `json:"create_time"`
 	Private      bool             `json:"private"`
 	Relations    FirewallRelation `json:"relations"`
 	Description  string           `json:"description"`
@@ -58,11 +59,11 @@ type FirewallRelation struct {
 
 //NetworkInFirewall is a JSON struct of a firewall's relation
 type NetworkInFirewall struct {
-	CreateTime  string `json:"create_time"`
-	NetworkUUID string `json:"network_uuid"`
-	NetworkName string `json:"network_name"`
-	ObjectUUID  string `json:"object_uuid"`
-	ObjectName  string `json:"object_name"`
+	CreateTime  time.Time `json:"create_time"`
+	NetworkUUID string    `json:"network_uuid"`
+	NetworkName string    `json:"network_name"`
+	ObjectUUID  string    `json:"object_uuid"`
+	ObjectName  string    `json:"object_name"`
 }
 
 //FirewallCreateRequest is JSON struct of a request for creating a firewall

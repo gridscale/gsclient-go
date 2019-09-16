@@ -1,6 +1,23 @@
 package gsclient
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
+
+const gsTimeLayout = "2006-01-02T15:04:05Z"
+
+type JSONTime time.Time
+
+func (t *JSONTime) UnmarshalJSON(b []byte) error {
+	var tstring string
+	if err := json.Unmarshal(b, &tstring); err != nil {
+		return err
+	}
+	parsedTime, err := time.Parse(gsTimeLayout, tstring)
+	*t = JSONTime(parsedTime)
+	return err
+}
 
 type serverHardwareProfile struct {
 	string

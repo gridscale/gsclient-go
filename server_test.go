@@ -339,6 +339,7 @@ func getMockServer(power bool) Server {
 				},
 			},
 		},
+		CreateTime: dummyTime,
 	}}
 	return mock
 }

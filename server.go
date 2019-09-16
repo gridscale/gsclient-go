@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //ServerList JSON struct of a list of servers
@@ -40,6 +41,8 @@ type ServerProperties struct {
 	UsageInMinutesCores  int             `json:"usage_in_minutes_cores"`
 	Labels               []string        `json:"labels"`
 	Relations            ServerRelations `json:"relations"`
+	CreateTime           time.Time       `json:"create_time"`
+	ChangeTime           time.Time       `json:"change_time"`
 }
 
 //ServerRelations JSON struct of a list of server relations
@@ -131,9 +134,9 @@ type ServerMetric struct {
 
 //ServerMetricProperties JSON stru
 type ServerMetricProperties struct {
-	BeginTime       string `json:"begin_time"`
-	EndTime         string `json:"end_time"`
-	PaaSServiceUUID string `json:"paas_service_uuid"`
+	BeginTime       time.Time `json:"begin_time"`
+	EndTime         time.Time `json:"end_time"`
+	PaaSServiceUUID string    `json:"paas_service_uuid"`
 	CoreUsage       struct {
 		Value float64 `json:"value"`
 		Unit  string  `json:"unit"`

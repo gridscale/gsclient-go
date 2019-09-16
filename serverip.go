@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"time"
 )
 
 //ServerIPRelationList JSON struct of a list of relations between a server and IP addresses
@@ -18,12 +19,12 @@ type ServerIPRelation struct {
 
 //ServerIPRelationProperties JSON struct of properties of a relation between a server and a IP address
 type ServerIPRelationProperties struct {
-	ServerUUID string `json:"server_uuid"`
-	CreateTime string `json:"create_time"`
-	Prefix     string `json:"prefix"`
-	Family     int    `json:"family"`
-	ObjectUUID string `json:"object_uuid"`
-	IP         string `json:"ip"`
+	ServerUUID string    `json:"server_uuid"`
+	CreateTime time.Time `json:"create_time"`
+	Prefix     string    `json:"prefix"`
+	Family     int       `json:"family"`
+	ObjectUUID string    `json:"object_uuid"`
+	IP         string    `json:"ip"`
 }
 
 //ServerIPRelationCreateRequest JSON struct of request for creating a relation between a server and a IP address
