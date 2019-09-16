@@ -15,6 +15,9 @@ func main() {
 		uuid,
 		token,
 		false,
+		0,
+		0,
+		0,
 	)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")

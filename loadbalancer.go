@@ -19,7 +19,7 @@ type LoadBalancer struct {
 //LoadBalancerProperties is the properties of a loadbalancer
 type LoadBalancerProperties struct {
 	ObjectUUID          string           `json:"object_uuid"`
-	LocationSite        int              `json:"location_site"`
+	LocationSite        string           `json:"location_site"`
 	Name                string           `json:"name"`
 	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
 	LocationIata        string           `json:"location_iata"`

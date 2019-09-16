@@ -18,21 +18,24 @@ type ServerNetworkRelation struct {
 
 //ServerNetworkRelationProperties JSON struct of properties of a relation between a server and a network
 type ServerNetworkRelationProperties struct {
-	L2security           bool     `json:"l2security"`
-	ServerUUID           string   `json:"server_uuid"`
-	CreateTime           string   `json:"create_time"`
-	PublicNet            bool     `json:"public_net"`
-	FirewallTemplateUUID string   `json:"firewall_template_uuid,omitempty"`
-	ObjectName           string   `json:"object_name"`
-	Mac                  string   `json:"mac"`
-	BootDevice           bool     `json:"bootdevice"`
-	PartnerUUID          string   `json:"partner_uuid"`
-	Ordering             int      `json:"ordering"`
-	Firewall             string   `json:"firewall,omitempty"`
-	NetworkType          string   `json:"network_type"`
-	NetworkUUID          string   `json:"network_uuid"`
-	ObjectUUID           string   `json:"object_uuid"`
-	L3security           []string `json:"l3security"`
+	L2security           bool        `json:"l2security"`
+	ServerUUID           string      `json:"server_uuid"`
+	CreateTime           string      `json:"create_time"`
+	PublicNet            bool        `json:"public_net"`
+	FirewallTemplateUUID string      `json:"firewall_template_uuid,omitempty"`
+	ObjectName           string      `json:"object_name"`
+	Mac                  string      `json:"mac"`
+	BootDevice           bool        `json:"bootdevice"`
+	PartnerUUID          string      `json:"partner_uuid"`
+	Ordering             int         `json:"ordering"`
+	Firewall             interface{} `json:"firewall,omitempty"`
+	NetworkType          string      `json:"network_type"`
+	NetworkUUID          string      `json:"network_uuid"`
+	ObjectUUID           string      `json:"object_uuid"`
+	L3security           []string    `json:"l3security"`
+	//Vlan                 int          `json:"vlan,omitempty"`
+	//Vxlan                int          `json:"vxlan,omitempty"`
+	//Mcast                string       `json:"mcast, omitempty"`
 }
 
 //ServerNetworkRelationCreateRequest JSON struct of a request for creating a relation between a server and a network

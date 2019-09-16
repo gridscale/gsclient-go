@@ -219,24 +219,61 @@ func TestClient_StopServer(t *testing.T) {
 }
 
 func TestClient_ShutdownServer(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUUID)
-	power := true
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareServerHTTPGet(power))
-	})
-	mux.HandleFunc(uri+"/shutdown", func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPatch, request.Method)
-		power = false
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte("☄ HTTP status code returned!"))
-		fmt.Fprint(writer, "")
-	})
+	shutdownSuccessTestCases := []bool{true, false}
+	for _, testCaseShutdownSuccess := range shutdownSuccessTestCases {
+		if testCaseShutdownSuccess {
+			server, client, mux := setupTestClient()
+			defer server.Close()
+			uri := path.Join(apiServerBase, dummyUUID)
+			power := true
+			retries := 0
+			mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+				assert.Equal(t, http.MethodGet, request.Method)
+				fmt.Fprintf(writer, prepareServerHTTPGet(power))
+			})
+			mux.HandleFunc(uri+"/shutdown", func(writer http.ResponseWriter, request *http.Request) {
+				assert.Equal(t, http.MethodPatch, request.Method)
+				if retries < 5 {
+					retries++
+					writer.WriteHeader(http.StatusInternalServerError)
+					writer.Write([]byte("☄ HTTP status code returned!"))
+					return
+				}
+				power = false
+				fmt.Fprint(writer, "")
+			})
+			mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
+				assert.Equal(t, http.MethodPatch, request.Method)
+				power = false
+				fmt.Fprint(writer, "")
+			})
+			err := client.ShutdownServer(dummyUUID)
+			assert.Nil(t, err, "ShutdownServer returned an error %v", err)
+			continue
+		} else {
+			server, client, mux := setupTestClient()
+			defer server.Close()
+			uri := path.Join(apiServerBase, dummyUUID)
+			power := true
+			mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+				assert.Equal(t, http.MethodGet, request.Method)
+				fmt.Fprintf(writer, prepareServerHTTPGet(power))
+			})
+			mux.HandleFunc(uri+"/shutdown", func(writer http.ResponseWriter, request *http.Request) {
+				assert.Equal(t, http.MethodPatch, request.Method)
+				writer.WriteHeader(http.StatusInternalServerError)
+				writer.Write([]byte("☄ HTTP status code returned!"))
+			})
+			mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
+				assert.Equal(t, http.MethodPatch, request.Method)
+				power = false
+				fmt.Fprint(writer, "")
+			})
+			err := client.ShutdownServer(dummyUUID)
+			assert.Nil(t, err, "ShutdownServer returned an error %v", err)
+		}
+	}
 
-	err := client.ShutdownServer(dummyUUID)
-	assert.Nil(t, err, "ShutdownServer returned an error %v", err)
 }
 
 func TestClient_GetServersByLocation(t *testing.T) {
