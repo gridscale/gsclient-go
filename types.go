@@ -7,16 +7,24 @@ import (
 
 const gsTimeLayout = "2006-01-02T15:04:05Z"
 
-type JSONTime time.Time
+type JSONTime struct {
+	time.Time
+}
 
+//UnmarshalJSON custom unmarshaller for JSONTime
 func (t *JSONTime) UnmarshalJSON(b []byte) error {
 	var tstring string
 	if err := json.Unmarshal(b, &tstring); err != nil {
 		return err
 	}
 	parsedTime, err := time.Parse(gsTimeLayout, tstring)
-	*t = JSONTime(parsedTime)
+	*t = JSONTime{parsedTime}
 	return err
+}
+
+//MarshalJSON custom marshaller for JSONTime
+func (t JSONTime) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Time)
 }
 
 type serverHardwareProfile struct {

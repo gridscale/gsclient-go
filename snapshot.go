@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"path"
-	"time"
 )
 
 //StorageSnapshotList is JSON structure of a list of storage snapshots
@@ -24,21 +23,21 @@ type StorageSnapshot struct {
 
 //StorageSnapshotProperties JSON struct of properties of a storage snapshot
 type StorageSnapshotProperties struct {
-	Labels           []string  `json:"labels"`
-	ObjectUUID       string    `json:"object_uuid"`
-	Name             string    `json:"name"`
-	Status           string    `json:"status"`
-	LocationCountry  string    `json:"location_country"`
-	UsageInMinutes   int       `json:"usage_in_minutes"`
-	LocationUUID     string    `json:"location_uuid"`
-	ChangeTime       time.Time `json:"change_time"`
-	LicenseProductNo int       `json:"license_product_no"`
-	CurrentPrice     float64   `json:"current_price"`
-	CreateTime       time.Time `json:"create_time"`
-	Capacity         int       `json:"capacity"`
-	LocationName     string    `json:"location_name"`
-	LocationIata     string    `json:"location_iata"`
-	ParentUUID       string    `json:"parent_uuid"`
+	Labels           []string `json:"labels"`
+	ObjectUUID       string   `json:"object_uuid"`
+	Name             string   `json:"name"`
+	Status           string   `json:"status"`
+	LocationCountry  string   `json:"location_country"`
+	UsageInMinutes   int      `json:"usage_in_minutes"`
+	LocationUUID     string   `json:"location_uuid"`
+	ChangeTime       JSONTime `json:"change_time"`
+	LicenseProductNo int      `json:"license_product_no"`
+	CurrentPrice     float64  `json:"current_price"`
+	CreateTime       JSONTime `json:"create_time"`
+	Capacity         int      `json:"capacity"`
+	LocationName     string   `json:"location_name"`
+	LocationIata     string   `json:"location_iata"`
+	ParentUUID       string   `json:"parent_uuid"`
 }
 
 //StorageSnapshotCreateRequest JSON struct of a request for creating a storage snapshot

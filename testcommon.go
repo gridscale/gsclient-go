@@ -11,7 +11,8 @@ const (
 	dummyRequestUUID = "x123xx1x-123x-1x12-123x-123xxx123x1x"
 )
 
-var dummyTime, _ = time.Parse(gsTimeLayout, "2018-04-28T09:47:41Z")
+var dummyTimeOriginal, _ = time.Parse(gsTimeLayout, "2018-04-28T09:47:41Z")
+var dummyTime = JSONTime{dummyTimeOriginal}
 
 type uuidTestCase struct {
 	isFailed bool

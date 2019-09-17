@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"path"
-	"time"
 )
 
 //PaaSServices is the JSON struct of a list of PaaS services
@@ -27,7 +26,7 @@ type PaaSServiceProperties struct {
 	ObjectUUID          string                    `json:"object_uuid"`
 	Labels              []string                  `json:"labels"`
 	Credentials         []Credential              `json:"credentials"`
-	CreateTime          time.Time                 `json:"create_time"`
+	CreateTime          JSONTime                  `json:"create_time"`
 	ListenPorts         map[string]map[string]int `json:"listen_ports"`
 	SecurityZoneUUID    string                    `json:"security_zone_uuid"`
 	ServiceTemplateUUID string                    `json:"service_template_uuid"`
@@ -35,7 +34,7 @@ type PaaSServiceProperties struct {
 	//UsageInMinutesStorage int                       `json:"usage_in_minutes_storage"`
 	//UsageInMinutesCores   int                       `json:"usage_in_minutes_cores"`
 	CurrentPrice   float64                `json:"current_price"`
-	ChangeTime     time.Time              `json:"change_time"`
+	ChangeTime     JSONTime               `json:"change_time"`
 	Status         string                 `json:"status"`
 	Name           string                 `json:"name"`
 	ResourceLimits []ResourceLimit        `json:"resource_limits"`
@@ -137,8 +136,8 @@ type PaaSServiceMetric struct {
 
 //PaaSMetricProperties JSON of properties of a PaaS metric
 type PaaSMetricProperties struct {
-	BeginTime       time.Time       `json:"begin_time"`
-	EndTime         time.Time       `json:"end_time"`
+	BeginTime       JSONTime        `json:"begin_time"`
+	EndTime         JSONTime        `json:"end_time"`
 	PaaSServiceUUID string          `json:"paas_service_uuid"`
 	CoreUsage       PaaSMetricValue `json:"core_usage"`
 	StorageSize     PaaSMetricValue `json:"storage_size"`
@@ -163,14 +162,14 @@ type PaaSSecurityZone struct {
 //PaaSSecurityZoneProperties JSOn struct of properties of a PaaS security zone
 type PaaSSecurityZoneProperties struct {
 	LocationCountry string              `json:"location_country"`
-	CreateTime      time.Time           `json:"create_time"`
+	CreateTime      JSONTime            `json:"create_time"`
 	LocationIata    string              `json:"location_iata"`
 	ObjectUUID      string              `json:"object_uuid"`
 	Labels          []string            `json:"labels"`
 	LocationName    string              `json:"location_name"`
 	Status          string              `json:"status"`
 	LocationUUID    string              `json:"location_uuid"`
-	ChangeTime      time.Time           `json:"change_time"`
+	ChangeTime      JSONTime            `json:"change_time"`
 	Name            string              `json:"name"`
 	Relation        PaaSRelationService `json:"relation"`
 }

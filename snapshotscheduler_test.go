@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"net/http"
 	"path"
 	"testing"
@@ -68,8 +69,15 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 			Labels:        []string{"test"},
 			RunInterval:   60,
 			KeepSnapshots: 1,
-			NextRuntime:   dummyTime.Format(gsTimeLayout),
+			//NextRuntime:   JSONTime(dummyTime),
 		})
+		log.Print(StorageSnapshotScheduleCreateRequest{
+			Name:          "test",
+			Labels:        []string{"test"},
+			RunInterval:   60,
+			KeepSnapshots: 1,
+			//NextRuntime:   JSONTime(dummyTime),
+		}.NextRuntime)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -94,7 +102,7 @@ func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 				Labels:        []string{"label"},
 				RunInterval:   60,
 				KeepSnapshots: 1,
-				NextRuntime:   dummyTime.Format(gsTimeLayout),
+				NextRuntime:   dummyTime,
 			})
 			if testStorageID.isFailed || testScheduleID.isFailed {
 				assert.NotNil(t, err)
@@ -132,7 +140,7 @@ func getMockStorageSnapshotSchedule() StorageSnapshotSchedule {
 		KeepSnapshots: 1,
 		Labels:        []string{"label"},
 		Name:          "test",
-		NextRuntime:   dummyTime.Format(gsTimeLayout),
+		NextRuntime:   dummyTime,
 		ObjectUUID:    dummyUUID,
 		Relations: StorageSnapshotScheduleRelations{Snapshots: []StorageSnapshotScheduleRelation{
 			{
