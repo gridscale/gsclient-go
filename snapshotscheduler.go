@@ -45,11 +45,11 @@ type StorageSnapshotScheduleRelation struct {
 
 //StorageSnapshotScheduleCreateRequest JSON struct of a request for creating a storage snapshot schedule
 type StorageSnapshotScheduleCreateRequest struct {
-	Name          string   `json:"name"`
-	Labels        []string `json:"labels,omitempty"`
-	RunInterval   int      `json:"run_interval"`
-	KeepSnapshots int      `json:"keep_snapshots"`
-	NextRuntime   JSONTime `json:"next_runtime,omitempty"`
+	Name          string    `json:"name"`
+	Labels        []string  `json:"labels,omitempty"`
+	RunInterval   int       `json:"run_interval"`
+	KeepSnapshots int       `json:"keep_snapshots"`
+	NextRuntime   *JSONTime `json:"next_runtime,omitempty"`
 }
 
 //StorageSnapshotScheduleCreateResponse JSON struct of a response for creating a storage snapshot schedule
@@ -60,11 +60,11 @@ type StorageSnapshotScheduleCreateResponse struct {
 
 //StorageSnapshotScheduleUpdateRequest JSON struct of a request for updating a storage snapshot schedule
 type StorageSnapshotScheduleUpdateRequest struct {
-	Name          string   `json:"name,omitempty"`
-	Labels        []string `json:"labels,omitempty"`
-	RunInterval   int      `json:"run_interval,omitempty"`
-	KeepSnapshots int      `json:"keep_snapshots,omitempty"`
-	NextRuntime   JSONTime `json:"next_runtime,omitempty"`
+	Name          string    `json:"name,omitempty"`
+	Labels        []string  `json:"labels,omitempty"`
+	RunInterval   int       `json:"run_interval,omitempty"`
+	KeepSnapshots int       `json:"keep_snapshots,omitempty"`
+	NextRuntime   *JSONTime `json:"next_runtime,omitempty"`
 }
 
 //GetStorageSnapshotScheduleList gets a list of available storage snapshot schedules based on a given storage's id
