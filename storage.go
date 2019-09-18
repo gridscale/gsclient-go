@@ -99,7 +99,7 @@ type StorageCreateRequest struct {
 	Capacity     int              `json:"capacity"`
 	LocationUUID string           `json:"location_uuid"`
 	Name         string           `json:"name"`
-	StorageType  storageType      `json:"storage_type,omitempty"`
+	StorageType  storageType      `json:"storage_type"`
 	Template     *StorageTemplate `json:"template,omitempty"`
 	Labels       []string         `json:"labels,omitempty"`
 }
@@ -150,6 +150,9 @@ func (c *Client) GetStorageList() ([]Storage, error) {
 
 //CreateStorage create a storage
 func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error) {
+	if (body.StorageType == storageType{}) {
+		body.StorageType = DefaultStorageType
+	}
 	r := Request{
 		uri:    apiStorageBase,
 		method: http.MethodPost,

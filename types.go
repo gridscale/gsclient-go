@@ -24,7 +24,7 @@ func (t *JSONTime) UnmarshalJSON(b []byte) error {
 
 //MarshalJSON custom marshaller for JSONTime
 func (t JSONTime) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t.Time)
+	return json.Marshal(t.Time.Format(gsTimeLayout))
 }
 
 type serverHardwareProfile struct {
