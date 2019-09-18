@@ -29,11 +29,11 @@ type TemplateProperties struct {
 	LocationUUID     string   `json:"location_uuid"`
 	Version          string   `json:"version"`
 	LocationIata     string   `json:"location_iata"`
-	ChangeTime       string   `json:"change_time"`
+	ChangeTime       JSONTime `json:"change_time"`
 	Private          bool     `json:"private"`
 	ObjectUUID       string   `json:"object_uuid"`
 	LicenseProductNo int      `json:"license_product_no"`
-	CreateTime       string   `json:"create_time"`
+	CreateTime       JSONTime `json:"create_time"`
 	UsageInMinutes   int      `json:"usage_in_minutes"`
 	Capacity         int      `json:"capacity"`
 	LocationName     string   `json:"location_name"`

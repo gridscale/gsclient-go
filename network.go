@@ -31,9 +31,9 @@ type NetworkProperties struct {
 	NetworkType     string           `json:"network_type"`
 	Name            string           `json:"name"`
 	Status          string           `json:"status"`
-	CreateTime      string           `json:"create_time"`
+	CreateTime      JSONTime         `json:"create_time"`
 	L2Security      bool             `json:"l2security"`
-	ChangeTime      string           `json:"change_time"`
+	ChangeTime      JSONTime         `json:"change_time"`
 	LocationIata    string           `json:"location_iata"`
 	LocationName    string           `json:"location_name"`
 	DeleteBlock     bool             `json:"delete_block"`
@@ -59,7 +59,7 @@ type NetworkServer struct {
 	ObjectUUID  string   `json:"object_uuid"`
 	Mac         string   `json:"mac"`
 	Bootdevice  bool     `json:"bootdevice"`
-	CreateTime  string   `json:"create_time"`
+	CreateTime  JSONTime `json:"create_time"`
 	L3security  []string `json:"l3security"`
 	ObjectName  string   `json:"object_name"`
 	NetworkUUID string   `json:"network_uuid"`

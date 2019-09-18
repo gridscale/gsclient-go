@@ -48,10 +48,11 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	serverCreateRequest := gsclient.ServerCreateRequest{
-		Name:         "go-client-server",
-		Memory:       1,
-		Cores:        1,
-		LocationUUID: locationUUID,
+		Name:            "go-client-server",
+		Memory:          1,
+		Cores:           1,
+		LocationUUID:    locationUUID,
+		HardwareProfile: gsclient.DefaultServerHardware,
 	}
 	cServer, err := client.CreateServer(serverCreateRequest)
 	if err != nil {
@@ -145,7 +146,7 @@ func main() {
 
 	cIP, err := client.CreateIP(gsclient.IPCreateRequest{
 		Name:         "go-client-ip",
-		Family:       4,
+		Family:       gsclient.IPv4Type,
 		LocationUUID: locationUUID,
 	})
 	if err != nil {

@@ -35,7 +35,7 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 		for _, testLabel := range labelSlices {
 			lbRequest := LoadBalancerCreateRequest{
 				Name:                lb.Name,
-				Algorithm:           lb.Algorithm,
+				Algorithm:           LoadbalancerLeastConnAlg,
 				LocationUUID:        lb.LocationUUID,
 				ListenIPv6UUID:      lb.ListenIPv6UUID,
 				ListenIPv4UUID:      lb.ListenIPv4UUID,

@@ -30,10 +30,10 @@ type StorageSnapshotProperties struct {
 	LocationCountry  string   `json:"location_country"`
 	UsageInMinutes   int      `json:"usage_in_minutes"`
 	LocationUUID     string   `json:"location_uuid"`
-	ChangeTime       string   `json:"change_time"`
+	ChangeTime       JSONTime `json:"change_time"`
 	LicenseProductNo int      `json:"license_product_no"`
 	CurrentPrice     float64  `json:"current_price"`
-	CreateTime       string   `json:"create_time"`
+	CreateTime       JSONTime `json:"create_time"`
 	Capacity         int      `json:"capacity"`
 	LocationName     string   `json:"location_name"`
 	LocationIata     string   `json:"location_iata"`

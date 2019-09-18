@@ -30,9 +30,9 @@ type IPProperties struct {
 	ReverseDNS      string      `json:"reverse_dns"`
 	Family          int         `json:"family"`
 	Status          string      `json:"status"`
-	CreateTime      string      `json:"create_time"`
+	CreateTime      JSONTime    `json:"create_time"`
 	Failover        bool        `json:"failover"`
-	ChangeTime      string      `json:"change_time"`
+	ChangeTime      JSONTime    `json:"change_time"`
 	LocationIata    string      `json:"location_iata"`
 	LocationName    string      `json:"location_name"`
 	Prefix          string      `json:"prefix"`
@@ -54,16 +54,16 @@ type IPRelations struct {
 
 //IPLoadbalancer is JSON struct of the relation between an IP and a Load Balancer
 type IPLoadbalancer struct {
-	CreateTime       string `json:"create_time"`
-	LoadbalancerName string `json:"loadbalancer_name"`
-	LoadbalancerUUID string `json:"loadbalancer_uuid"`
+	CreateTime       JSONTime `json:"create_time"`
+	LoadbalancerName string   `json:"loadbalancer_name"`
+	LoadbalancerUUID string   `json:"loadbalancer_uuid"`
 }
 
 //IPServer is JSON struct of the relation between an IP and a Server
 type IPServer struct {
-	CreateTime string `json:"create_time"`
-	ServerName string `json:"server_name"`
-	ServerUUID string `json:"server_uuid"`
+	CreateTime JSONTime `json:"create_time"`
+	ServerName string   `json:"server_name"`
+	ServerUUID string   `json:"server_uuid"`
 }
 
 //IPCreateResponse is JSON struct of a response for creating an IP
@@ -76,12 +76,12 @@ type IPCreateResponse struct {
 
 //IPCreateRequest is JSON struct of a request for creating an IP
 type IPCreateRequest struct {
-	Name         string   `json:"name,omitempty"`
-	Family       int      `json:"family"`
-	LocationUUID string   `json:"location_uuid"`
-	Failover     bool     `json:"failover,omitempty"`
-	ReverseDNS   string   `json:"reverse_dns,omitempty"`
-	Labels       []string `json:"labels,omitempty"`
+	Name         string        `json:"name,omitempty"`
+	Family       ipAddressType `json:"family"`
+	LocationUUID string        `json:"location_uuid"`
+	Failover     bool          `json:"failover,omitempty"`
+	ReverseDNS   string        `json:"reverse_dns,omitempty"`
+	Labels       []string      `json:"labels,omitempty"`
 }
 
 //IPUpdateRequest is JSON struct of a request for updating an IP
@@ -91,6 +91,12 @@ type IPUpdateRequest struct {
 	ReverseDNS string   `json:"reverse_dns,omitempty"`
 	Labels     []string `json:"labels,omitempty"`
 }
+
+//All available IP address versions
+var (
+	IPv4Type = ipAddressType{4}
+	IPv6Type = ipAddressType{6}
+)
 
 //GetIP get a specific IP based on given id
 func (c *Client) GetIP(id string) (IP, error) {

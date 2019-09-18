@@ -23,7 +23,7 @@ type Storage struct {
 
 //StorageProperties JSON struct of properties of a storage
 type StorageProperties struct {
-	ChangeTime       string                    `json:"change_time"`
+	ChangeTime       JSONTime                  `json:"change_time"`
 	LocationIata     string                    `json:"location_iata"`
 	Status           string                    `json:"status"`
 	LicenseProductNo int                       `json:"license_product_no"`
@@ -41,7 +41,7 @@ type StorageProperties struct {
 	Snapshots        []StorageSnapshotRelation `json:"snapshots"`
 	Relations        StorageRelations          `json:"relations"`
 	Labels           []string                  `json:"labels"`
-	CreateTime       string                    `json:"create_time"`
+	CreateTime       JSONTime                  `json:"create_time"`
 }
 
 //StorageRelations JSON struct of a list of a storage's relations
@@ -52,37 +52,37 @@ type StorageRelations struct {
 
 //StorageServerRelation JSON struct of a relation between a storage and a server
 type StorageServerRelation struct {
-	Bootdevice bool   `json:"bootdevice"`
-	Target     int    `json:"target"`
-	Controller int    `json:"controller"`
-	Bus        int    `json:"bus"`
-	ObjectUUID string `json:"object_uuid"`
-	Lun        int    `json:"lun"`
-	CreateTime string `json:"create_time"`
-	ObjectName string `json:"object_name"`
+	Bootdevice bool     `json:"bootdevice"`
+	Target     int      `json:"target"`
+	Controller int      `json:"controller"`
+	Bus        int      `json:"bus"`
+	ObjectUUID string   `json:"object_uuid"`
+	Lun        int      `json:"lun"`
+	CreateTime JSONTime `json:"create_time"`
+	ObjectName string   `json:"object_name"`
 }
 
 //StorageSnapshotRelation JSON struct of a relation between a storage and a snapshot
 type StorageSnapshotRelation struct {
-	LastUsedTemplate      string `json:"last_used_template"`
-	ObjectUUID            string `json:"object_uuid"`
-	StorageUUID           string `json:"storage_uuid"`
-	SchedulesSnapshotName string `json:"schedules_snapshot_name"`
-	SchedulesSnapshotUUID string `json:"schedules_snapshot_uuid"`
-	ObjectCapacity        int    `json:"object_capacity"`
-	CreateTime            string `json:"create_time"`
-	ObjectName            string `json:"object_name"`
+	LastUsedTemplate      string   `json:"last_used_template"`
+	ObjectUUID            string   `json:"object_uuid"`
+	StorageUUID           string   `json:"storage_uuid"`
+	SchedulesSnapshotName string   `json:"schedules_snapshot_name"`
+	SchedulesSnapshotUUID string   `json:"schedules_snapshot_uuid"`
+	ObjectCapacity        int      `json:"object_capacity"`
+	CreateTime            JSONTime `json:"create_time"`
+	ObjectName            string   `json:"object_name"`
 }
 
 //StorageAndSnapshotScheduleRelation JSON struct of a relation between a storage and a snapshot schedule
 type StorageAndSnapshotScheduleRelation struct {
-	RunInterval   int    `json:"run_interval"`
-	KeepSnapshots int    `json:"keep_snapshots"`
-	ObjectName    string `json:"object_name"`
-	NextRuntime   string `json:"next_runtime"`
-	ObjectUUID    int    `json:"object_uuid"`
-	Name          string `json:"name"`
-	CreateTime    string `json:"create_time"`
+	RunInterval   int      `json:"run_interval"`
+	KeepSnapshots int      `json:"keep_snapshots"`
+	ObjectName    string   `json:"object_name"`
+	NextRuntime   string   `json:"next_runtime"`
+	ObjectUUID    int      `json:"object_uuid"`
+	Name          string   `json:"name"`
+	CreateTime    JSONTime `json:"create_time"`
 }
 
 //StorageTemplate JSON struct of a storage template
@@ -99,7 +99,7 @@ type StorageCreateRequest struct {
 	Capacity     int              `json:"capacity"`
 	LocationUUID string           `json:"location_uuid"`
 	Name         string           `json:"name"`
-	StorageType  string           `json:"storage_type,omitempty"`
+	StorageType  storageType      `json:"storage_type,omitempty"`
 	Template     *StorageTemplate `json:"template,omitempty"`
 	Labels       []string         `json:"labels,omitempty"`
 }
@@ -110,6 +110,12 @@ type StorageUpdateRequest struct {
 	Labels   []string `json:"labels,omitempty"`
 	Capacity int      `json:"capacity,omitempty"`
 }
+
+var (
+	DefaultStorageType = storageType{"storage"}
+	HighStorageType    = storageType{"storage_high"}
+	InsaneStorageType  = storageType{"storage_insane"}
+)
 
 //GetStorage get a storage
 func (c *Client) GetStorage(id string) (Storage, error) {

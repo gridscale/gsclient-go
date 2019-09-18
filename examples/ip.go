@@ -29,7 +29,7 @@ func main() {
 
 	ipRequest := gsclient.IPCreateRequest{
 		Name:         "go-client-ip",
-		Family:       4,
+		Family:       gsclient.IPv4Type,
 		LocationUUID: locationUUID,
 	}
 	//Create new IP

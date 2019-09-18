@@ -307,13 +307,13 @@ func getMockPaaSService() PaaSService {
 					Type:     "type",
 				},
 			},
-			CreateTime:          "2018-04-28T09:47:41Z",
+			CreateTime:          dummyTime,
 			ListenPorts:         listenPort,
 			SecurityZoneUUID:    "d711fc50-ad96-4070-b769-6fe2bf93792c",
 			ServiceTemplateUUID: "504e2d11-7255-4712-b744-fcb093a4e613",
 			UsageInMinutes:      999,
 			CurrentPrice:        5.789,
-			ChangeTime:          "2018-04-29T09:47:41Z",
+			ChangeTime:          dummyTime,
 			Status:              "active",
 			Name:                "test",
 			ResourceLimits: []ResourceLimit{
@@ -330,8 +330,8 @@ func getMockPaaSService() PaaSService {
 
 func getMockPaaSServiceMetric() PaaSServiceMetric {
 	mock := PaaSServiceMetric{Properties: PaaSMetricProperties{
-		BeginTime:       "2018-04-28T09:47:41Z",
-		EndTime:         "2018-04-28T09:47:41Z",
+		BeginTime:       dummyTime,
+		EndTime:         dummyTime,
 		PaaSServiceUUID: dummyUUID,
 		CoreUsage: PaaSMetricValue{
 			Value: 50,
@@ -424,14 +424,14 @@ func preparePaaSHTTPGetTemplatesResponse() string {
 func getMockSecurityZone() PaaSSecurityZone {
 	mock := PaaSSecurityZone{Properties: PaaSSecurityZoneProperties{
 		LocationCountry: "Germany",
-		CreateTime:      "2018-04-28T09:47:41Z",
+		CreateTime:      dummyTime,
 		LocationIata:    "none",
 		ObjectUUID:      "aa-bb-cc-dd",
 		Labels:          []string{"label"},
 		LocationName:    "Bonn",
 		Status:          "active",
 		LocationUUID:    "cc-dd-ee",
-		ChangeTime:      "2018-04-28T09:47:41Z",
+		ChangeTime:      dummyTime,
 		Name:            "test",
 		Relation:        PaaSRelationService{Services: []ServiceObject{{ObjectUUID: "ff-gg-hh"}}},
 	}}

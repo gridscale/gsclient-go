@@ -32,7 +32,7 @@ type ServerProperties struct {
 	LocationUUID         string          `json:"location_uuid"`
 	Power                bool            `json:"power"`
 	CurrentPrice         float64         `json:"current_price"`
-	AvailablityZone      string          `json:"availability_zone"`
+	AvailabilityZone     string          `json:"availability_zone"`
 	AutoRecovery         bool            `json:"auto_recovery"`
 	Legacy               bool            `json:"legacy"`
 	ConsoleToken         string          `json:"console_token"`
@@ -40,6 +40,8 @@ type ServerProperties struct {
 	UsageInMinutesCores  int             `json:"usage_in_minutes_cores"`
 	Labels               []string        `json:"labels"`
 	Relations            ServerRelations `json:"relations"`
+	CreateTime           JSONTime        `json:"create_time"`
+	ChangeTime           JSONTime        `json:"change_time"`
 }
 
 //ServerRelations JSON struct of a list of server relations
@@ -56,7 +58,7 @@ type ServerCreateRequest struct {
 	Memory          int                           `json:"memory"`
 	Cores           int                           `json:"cores"`
 	LocationUUID    string                        `json:"location_uuid"`
-	HardwareProfile string                        `json:"hardware_profile,omitempty"`
+	HardwareProfile serverHardwareProfile         `json:"hardware_profile,omitempty"`
 	AvailablityZone string                        `json:"availability_zone,omitempty"`
 	Labels          []string                      `json:"labels,omitempty"`
 	Status          string                        `json:"status,omitempty"`
@@ -131,9 +133,9 @@ type ServerMetric struct {
 
 //ServerMetricProperties JSON stru
 type ServerMetricProperties struct {
-	BeginTime       string `json:"begin_time"`
-	EndTime         string `json:"end_time"`
-	PaaSServiceUUID string `json:"paas_service_uuid"`
+	BeginTime       JSONTime `json:"begin_time"`
+	EndTime         JSONTime `json:"end_time"`
+	PaaSServiceUUID string   `json:"paas_service_uuid"`
 	CoreUsage       struct {
 		Value float64 `json:"value"`
 		Unit  string  `json:"unit"`
@@ -143,6 +145,18 @@ type ServerMetricProperties struct {
 		Unit  string  `json:"unit"`
 	} `json:"storage_size"`
 }
+
+//All available server's hardware types
+var (
+	DefaultServerHardware   = serverHardwareProfile{"default"}
+	NestedServerHardware    = serverHardwareProfile{"nested"}
+	LegacyServerHardware    = serverHardwareProfile{"legacy"}
+	CiscoCSRServerHardware  = serverHardwareProfile{"cisco_csr"}
+	SophosUTMServerHardware = serverHardwareProfile{"sophos_utm"}
+	F5BigipServerHardware   = serverHardwareProfile{"f5_bigip"}
+	Q35ServerHardware       = serverHardwareProfile{"q35"}
+	Q35NestedServerHardware = serverHardwareProfile{"q35_nested"}
+)
 
 //GetServer gets a specific server based on given list
 func (c *Client) GetServer(id string) (Server, error) {

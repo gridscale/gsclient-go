@@ -25,7 +25,7 @@ type LoadBalancerProperties struct {
 	LocationIata        string           `json:"location_iata"`
 	LocationUUID        string           `json:"location_uuid"`
 	BackendServers      []BackendServer  `json:"backend_servers"`
-	ChangeTime          string           `json:"change_time"`
+	ChangeTime          JSONTime         `json:"change_time"`
 	Status              string           `json:"status"`
 	CurrentPrice        float64          `json:"current_price"`
 	LocationCountry     string           `json:"location_country"`
@@ -34,7 +34,7 @@ type LoadBalancerProperties struct {
 	LocationName        string           `json:"location_name"`
 	UsageInMinutes      int              `json:"usage_in_minutes"`
 	Algorithm           string           `json:"algorithm"`
-	CreateTime          string           `json:"create_time"`
+	CreateTime          JSONTime         `json:"create_time"`
 	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
 	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
 }
@@ -55,30 +55,30 @@ type ForwardingRule struct {
 
 //LoadBalancerCreateRequest is the JSON struct for creating a loadbalancer request
 type LoadBalancerCreateRequest struct {
-	Name                string           `json:"name"`
-	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
-	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
-	Algorithm           string           `json:"algorithm"`
-	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
-	BackendServers      []BackendServer  `json:"backend_servers"`
-	Labels              []string         `json:"labels"`
-	LocationUUID        string           `json:"location_uuid"`
-	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
-	Status              string           `json:"status,omitempty"`
+	Name                string                `json:"name"`
+	ListenIPv6UUID      string                `json:"listen_ipv6_uuid"`
+	ListenIPv4UUID      string                `json:"listen_ipv4_uuid"`
+	Algorithm           loadbalancerAlgorithm `json:"algorithm"`
+	ForwardingRules     []ForwardingRule      `json:"forwarding_rules"`
+	BackendServers      []BackendServer       `json:"backend_servers"`
+	Labels              []string              `json:"labels"`
+	LocationUUID        string                `json:"location_uuid"`
+	RedirectHTTPToHTTPS bool                  `json:"redirect_http_to_https"`
+	Status              string                `json:"status,omitempty"`
 }
 
 //LoadBalancerUpdateRequest is the JSON struct for updating a loadbalancer request
 type LoadBalancerUpdateRequest struct {
-	Name                string           `json:"name"`
-	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
-	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
-	Algorithm           string           `json:"algorithm"`
-	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
-	BackendServers      []BackendServer  `json:"backend_servers"`
-	Labels              []string         `json:"labels"`
-	LocationUUID        string           `json:"location_uuid"`
-	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
-	Status              string           `json:"status,omitempty"`
+	Name                string                `json:"name"`
+	ListenIPv6UUID      string                `json:"listen_ipv6_uuid"`
+	ListenIPv4UUID      string                `json:"listen_ipv4_uuid"`
+	Algorithm           loadbalancerAlgorithm `json:"algorithm"`
+	ForwardingRules     []ForwardingRule      `json:"forwarding_rules"`
+	BackendServers      []BackendServer       `json:"backend_servers"`
+	Labels              []string              `json:"labels"`
+	LocationUUID        string                `json:"location_uuid"`
+	RedirectHTTPToHTTPS bool                  `json:"redirect_http_to_https"`
+	Status              string                `json:"status,omitempty"`
 }
 
 //LoadBalancerCreateResponse is the JSON struct for a loadbalancer response
@@ -86,6 +86,11 @@ type LoadBalancerCreateResponse struct {
 	RequestUUID string `json:"request_uuid"`
 	ObjectUUID  string `json:"object_uuid"`
 }
+
+var (
+	LoadbalancerRoundrobinAlg = loadbalancerAlgorithm{"roundrobin"}
+	LoadbalancerLeastConnAlg  = loadbalancerAlgorithm{"leastconn"}
+)
 
 //GetLoadBalancerList returns a list of loadbalancers
 func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {

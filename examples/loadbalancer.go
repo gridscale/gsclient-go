@@ -23,13 +23,13 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	// required to create IPv6 and IPv4 to create LB
 	ipv4, _ := client.CreateIP(gsclient.IPCreateRequest{
-		Family:       4,
+		Family:       gsclient.IPv4Type,
 		LocationUUID: locationUUID,
 	})
 	log.Info("IPv4 has been created")
 
 	ipv6, _ := client.CreateIP(gsclient.IPCreateRequest{
-		Family:       6,
+		Family:       gsclient.IPv6Type,
 		LocationUUID: locationUUID,
 	})
 	log.Info("[INFO] IPv6 has been created")
@@ -39,7 +39,7 @@ func main() {
 	labels = append(labels, "lb-http")
 	lbRequest := gsclient.LoadBalancerCreateRequest{
 		Name:                "go-client-lb",
-		Algorithm:           "leastconn",
+		Algorithm:           gsclient.LoadbalancerLeastConnAlg,
 		LocationUUID:        locationUUID,
 		ListenIPv6UUID:      ipv6.ObjectUUID,
 		ListenIPv4UUID:      ipv4.ObjectUUID,
@@ -78,7 +78,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	lbUpdateRequest := gsclient.LoadBalancerUpdateRequest{
 		Name:                "go-client-lb233",
-		Algorithm:           glb.Properties.Algorithm,
+		Algorithm:           gsclient.LoadbalancerRoundrobinAlg,
 		LocationUUID:        glb.Properties.LocationUUID,
 		ListenIPv6UUID:      glb.Properties.ListenIPv6UUID,
 		ListenIPv4UUID:      glb.Properties.ListenIPv4UUID,
