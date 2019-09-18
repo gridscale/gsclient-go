@@ -80,7 +80,7 @@ type StorageAndSnapshotScheduleRelation struct {
 	KeepSnapshots int      `json:"keep_snapshots"`
 	ObjectName    string   `json:"object_name"`
 	NextRuntime   string   `json:"next_runtime"`
-	ObjectUUID    int      `json:"object_uuid"`
+	ObjectUUID    string   `json:"object_uuid"`
 	Name          string   `json:"name"`
 	CreateTime    JSONTime `json:"create_time"`
 }
