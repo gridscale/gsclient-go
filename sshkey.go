@@ -21,8 +21,8 @@ type SshkeyProperties struct {
 	Name       string   `json:"name"`
 	ObjectUUID string   `json:"object_uuid"`
 	Status     string   `json:"status"`
-	CreateTime JSONTime `json:"create_time"`
-	ChangeTime JSONTime `json:"change_time"`
+	CreateTime GSTime   `json:"create_time"`
+	ChangeTime GSTime   `json:"change_time"`
 	Sshkey     string   `json:"sshkey"`
 	Labels     []string `json:"labels"`
 	UserUUID   string   `json:"user_uuid"`

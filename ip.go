@@ -30,9 +30,9 @@ type IPProperties struct {
 	ReverseDNS      string      `json:"reverse_dns"`
 	Family          int         `json:"family"`
 	Status          string      `json:"status"`
-	CreateTime      JSONTime    `json:"create_time"`
+	CreateTime      GSTime      `json:"create_time"`
 	Failover        bool        `json:"failover"`
-	ChangeTime      JSONTime    `json:"change_time"`
+	ChangeTime      GSTime      `json:"change_time"`
 	LocationIata    string      `json:"location_iata"`
 	LocationName    string      `json:"location_name"`
 	Prefix          string      `json:"prefix"`
@@ -54,16 +54,16 @@ type IPRelations struct {
 
 //IPLoadbalancer is JSON struct of the relation between an IP and a Load Balancer
 type IPLoadbalancer struct {
-	CreateTime       JSONTime `json:"create_time"`
-	LoadbalancerName string   `json:"loadbalancer_name"`
-	LoadbalancerUUID string   `json:"loadbalancer_uuid"`
+	CreateTime       GSTime `json:"create_time"`
+	LoadbalancerName string `json:"loadbalancer_name"`
+	LoadbalancerUUID string `json:"loadbalancer_uuid"`
 }
 
 //IPServer is JSON struct of the relation between an IP and a Server
 type IPServer struct {
-	CreateTime JSONTime `json:"create_time"`
-	ServerName string   `json:"server_name"`
-	ServerUUID string   `json:"server_uuid"`
+	CreateTime GSTime `json:"create_time"`
+	ServerName string `json:"server_name"`
+	ServerUUID string `json:"server_uuid"`
 }
 
 //IPCreateResponse is JSON struct of a response for creating an IP

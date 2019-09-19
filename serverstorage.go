@@ -18,19 +18,19 @@ type ServerStorageRelationSingle struct {
 
 //ServerStorageRelationProperties JSON struct of properties of a relation between a server and a storage
 type ServerStorageRelationProperties struct {
-	ObjectUUID       string   `json:"object_uuid"`
-	ObjectName       string   `json:"object_name"`
-	Capacity         int      `json:"capacity"`
-	StorageType      string   `json:"storage_type"`
-	Target           int      `json:"target"`
-	Lun              int      `json:"lun"`
-	Controller       int      `json:"controller"`
-	CreateTime       JSONTime `json:"create_time"`
-	BootDevice       bool     `json:"bootdevice"`
-	Bus              int      `json:"bus"`
-	LastUsedTemplate string   `json:"last_used_template"`
-	LicenseProductNo int      `json:"license_product_no"`
-	ServerUUID       string   `json:"server_uuid"`
+	ObjectUUID       string `json:"object_uuid"`
+	ObjectName       string `json:"object_name"`
+	Capacity         int    `json:"capacity"`
+	StorageType      string `json:"storage_type"`
+	Target           int    `json:"target"`
+	Lun              int    `json:"lun"`
+	Controller       int    `json:"controller"`
+	CreateTime       GSTime `json:"create_time"`
+	BootDevice       bool   `json:"bootdevice"`
+	Bus              int    `json:"bus"`
+	LastUsedTemplate string `json:"last_used_template"`
+	LicenseProductNo int    `json:"license_product_no"`
+	ServerUUID       string `json:"server_uuid"`
 }
 
 //ServerStorageRelationCreateRequest JSON struct of a request for creating a relation between a server and a storage

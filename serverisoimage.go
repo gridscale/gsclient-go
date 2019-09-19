@@ -18,11 +18,11 @@ type ServerIsoImageRelation struct {
 
 //ServerIsoImageRelationProperties JSON struct of properties of a relation between a server and an ISO-Image
 type ServerIsoImageRelationProperties struct {
-	ObjectUUID string   `json:"object_uuid"`
-	ObjectName string   `json:"object_name"`
-	Private    bool     `json:"private"`
-	CreateTime JSONTime `json:"create_time"`
-	Bootdevice bool     `json:"bootdevice"`
+	ObjectUUID string `json:"object_uuid"`
+	ObjectName string `json:"object_name"`
+	Private    bool   `json:"private"`
+	CreateTime GSTime `json:"create_time"`
+	Bootdevice bool   `json:"bootdevice"`
 }
 
 //ServerIsoImageRelationCreateRequest JSON struct of a request for creating a relation between a server and an ISO-Image

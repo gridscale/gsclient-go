@@ -28,9 +28,9 @@ type RequestStatus map[string]RequestStatusProperties
 
 //RequestStatusProperties JSON struct of properties of a request's status
 type RequestStatusProperties struct {
-	Status     string   `json:"status"`
-	Message    string   `json:"message"`
-	CreateTime JSONTime `json:"create_time"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	CreateTime GSTime `json:"create_time"`
 }
 
 //RequestError error of a request

@@ -32,13 +32,13 @@ type ISOImageProperties struct {
 	LocationIata    string           `json:"location_iata"`
 	LocationUUID    string           `json:"location_uuid"`
 	Status          string           `json:"status"`
-	CreateTime      JSONTime         `json:"create_time"`
+	CreateTime      GSTime           `json:"create_time"`
 	Name            string           `json:"name"`
 	Version         string           `json:"version"`
 	LocationCountry string           `json:"location_country"`
 	UsageInMinutes  int              `json:"usage_in_minutes"`
 	Private         bool             `json:"private"`
-	ChangeTime      JSONTime         `json:"change_time"`
+	ChangeTime      GSTime           `json:"change_time"`
 	Capacity        int              `json:"capacity"`
 	CurrentPrice    float64          `json:"current_price"`
 }
@@ -50,10 +50,10 @@ type ISOImageRelation struct {
 
 //ServerinISOImage is JSON struct of a relation between an ISO-Image and a Server
 type ServerinISOImage struct {
-	Bootdevice bool     `json:"bootdevice"`
-	CreateTime JSONTime `json:"create_time"`
-	ObjectName string   `json:"object_name"`
-	ObjectUUID string   `json:"object_uuid"`
+	Bootdevice bool   `json:"bootdevice"`
+	CreateTime GSTime `json:"create_time"`
+	ObjectName string `json:"object_name"`
+	ObjectUUID string `json:"object_uuid"`
 }
 
 //ISOImageCreateRequest is JSON struct of a request for creating an ISO-Image

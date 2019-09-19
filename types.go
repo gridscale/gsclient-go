@@ -7,23 +7,24 @@ import (
 
 const gsTimeLayout = "2006-01-02T15:04:05Z"
 
-type JSONTime struct {
+//GSTime is custom time type of Gridscale
+type GSTime struct {
 	time.Time
 }
 
-//UnmarshalJSON custom unmarshaller for JSONTime
-func (t *JSONTime) UnmarshalJSON(b []byte) error {
+//UnmarshalJSON custom unmarshaller for GSTime
+func (t *GSTime) UnmarshalJSON(b []byte) error {
 	var tstring string
 	if err := json.Unmarshal(b, &tstring); err != nil {
 		return err
 	}
 	parsedTime, err := time.Parse(gsTimeLayout, tstring)
-	*t = JSONTime{parsedTime}
+	*t = GSTime{parsedTime}
 	return err
 }
 
-//MarshalJSON custom marshaller for JSONTime
-func (t JSONTime) MarshalJSON() ([]byte, error) {
+//MarshalJSON custom marshaller for GSTime
+func (t GSTime) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.Time.Format(gsTimeLayout))
 }
 
