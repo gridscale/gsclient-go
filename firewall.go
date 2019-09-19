@@ -158,6 +158,7 @@ type FirewallUpdateRequest struct {
 }
 
 //GetFirewallList gets a list of available firewalls
+//
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewalls
 func (c *Client) GetFirewallList() ([]Firewall, error) {
 	r := Request{
@@ -174,6 +175,7 @@ func (c *Client) GetFirewallList() ([]Firewall, error) {
 }
 
 //GetFirewall gets a specific firewall based on given id
+//
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewall
 func (c *Client) GetFirewall(id string) (Firewall, error) {
 	if !isValidUUID(id) {
@@ -189,6 +191,7 @@ func (c *Client) GetFirewall(id string) (Firewall, error) {
 }
 
 //CreateFirewall creates a new firewall
+//
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createFirewall
 func (c *Client) CreateFirewall(body FirewallCreateRequest) (FirewallCreateResponse, error) {
 	r := Request{
@@ -206,6 +209,7 @@ func (c *Client) CreateFirewall(body FirewallCreateRequest) (FirewallCreateRespo
 }
 
 //UpdateFirewall update a specific firewall
+//
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateFirewall
 func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
 	if !isValidUUID(id) {
@@ -220,6 +224,7 @@ func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
 }
 
 //DeleteFirewall delete a specific firewall
+//
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteFirewall
 func (c *Client) DeleteFirewall(id string) error {
 	if !isValidUUID(id) {
@@ -233,6 +238,7 @@ func (c *Client) DeleteFirewall(id string) error {
 }
 
 //GetFirewallEventList get list of a firewall's events
+//
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewallEvents
 func (c *Client) GetFirewallEventList(id string) ([]Event, error) {
 	if !isValidUUID(id) {

@@ -47,6 +47,7 @@ type EventProperties struct {
 }
 
 //GetEventList gets a list of events
+//
 //See: https://gridscale.io/en//api-documentation/index.html#operation/EventGetAll
 func (c *Client) GetEventList() ([]Event, error) {
 	r := Request{
