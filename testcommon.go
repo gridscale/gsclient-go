@@ -12,7 +12,7 @@ const (
 )
 
 var dummyTimeOriginal, _ = time.Parse(gsTimeLayout, "2018-04-28T09:47:41Z")
-var dummyTime = JSONTime{dummyTimeOriginal}
+var dummyTime = GSTime{dummyTimeOriginal}
 
 type uuidTestCase struct {
 	isFailed bool

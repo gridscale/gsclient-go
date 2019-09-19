@@ -40,8 +40,8 @@ type ServerProperties struct {
 	UsageInMinutesCores  int             `json:"usage_in_minutes_cores"`
 	Labels               []string        `json:"labels"`
 	Relations            ServerRelations `json:"relations"`
-	CreateTime           JSONTime        `json:"create_time"`
-	ChangeTime           JSONTime        `json:"change_time"`
+	CreateTime           GSTime          `json:"create_time"`
+	ChangeTime           GSTime          `json:"change_time"`
 }
 
 //ServerRelations JSON struct of a list of server relations
@@ -133,9 +133,9 @@ type ServerMetric struct {
 
 //ServerMetricProperties JSON stru
 type ServerMetricProperties struct {
-	BeginTime       JSONTime `json:"begin_time"`
-	EndTime         JSONTime `json:"end_time"`
-	PaaSServiceUUID string   `json:"paas_service_uuid"`
+	BeginTime       GSTime `json:"begin_time"`
+	EndTime         GSTime `json:"end_time"`
+	PaaSServiceUUID string `json:"paas_service_uuid"`
 	CoreUsage       struct {
 		Value float64 `json:"value"`
 		Unit  string  `json:"unit"`

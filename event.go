@@ -16,15 +16,15 @@ type Event struct {
 
 //EventProperties is JSON struct of an event properties
 type EventProperties struct {
-	ObjectType    string   `json:"object_type"`
-	RequestUUID   string   `json:"request_uuid"`
-	ObjectUUID    string   `json:"object_uuid"`
-	Activity      string   `json:"activity"`
-	RequestType   string   `json:"request_type"`
-	RequestStatus string   `json:"request_status"`
-	Change        string   `json:"change"`
-	Timestamp     JSONTime `json:"timestamp"`
-	UserUUID      string   `json:"user_uuid"`
+	ObjectType    string `json:"object_type"`
+	RequestUUID   string `json:"request_uuid"`
+	ObjectUUID    string `json:"object_uuid"`
+	Activity      string `json:"activity"`
+	RequestType   string `json:"request_type"`
+	RequestStatus string `json:"request_status"`
+	Change        string `json:"change"`
+	Timestamp     GSTime `json:"timestamp"`
+	UserUUID      string `json:"user_uuid"`
 }
 
 //GetEventList gets a list of events

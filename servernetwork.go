@@ -20,7 +20,7 @@ type ServerNetworkRelation struct {
 type ServerNetworkRelationProperties struct {
 	L2security           bool        `json:"l2security"`
 	ServerUUID           string      `json:"server_uuid"`
-	CreateTime           JSONTime    `json:"create_time"`
+	CreateTime           GSTime      `json:"create_time"`
 	PublicNet            bool        `json:"public_net"`
 	FirewallTemplateUUID string      `json:"firewall_template_uuid,omitempty"`
 	ObjectName           string      `json:"object_name"`

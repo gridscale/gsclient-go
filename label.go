@@ -19,8 +19,8 @@ type Label struct {
 //LabelProperties JSON struct of properties of a label
 type LabelProperties struct {
 	Label      string        `json:"label"`
-	CreateTime JSONTime      `json:"create_time"`
-	ChangeTime JSONTime      `json:"change_time"`
+	CreateTime GSTime        `json:"create_time"`
+	ChangeTime GSTime        `json:"change_time"`
 	Relations  []interface{} `json:"relations"`
 	Status     string        `json:"status"`
 }
