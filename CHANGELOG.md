@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.1 (September 19, 2019)
+## 2.0.0 (September 19, 2019)
 
 IMPROVEMENTS:
 * Auto retry when server returns 5xx http codes
