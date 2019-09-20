@@ -142,19 +142,19 @@ type FirewallCreateResponse struct {
 	RequestUUID string `json:"request_uuid"`
 
 	//The UUID of the firewall being created
-	ObjectUUID  string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 }
 
 //FirewallUpdateRequest is JSON struct of a request for updating a firewall
 type FirewallUpdateRequest struct {
 	//New name. Leave it if you do not want to update the name
-	Name   string        `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	//New list of labels. Leave it if you do not want to update the Labels
-	Labels []string      `json:"labels,omitempty"`
+	Labels []string `json:"labels,omitempty"`
 
 	//FirewallRules. Leave it if you do not want to update the firewall rules
-	Rules  FirewallRules `json:"rules,omitempty"`
+	Rules FirewallRules `json:"rules,omitempty"`
 }
 
 //GetFirewallList gets a list of available firewalls

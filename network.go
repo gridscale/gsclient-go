@@ -153,10 +153,10 @@ type NetworkCreateResponse struct {
 //NetworkUpdateRequest is JSON of a request for updating a network
 type NetworkUpdateRequest struct {
 	//New name. Leave it if you do not want to update the name
-	Name       string `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	//L2Security. Leave it if you do not want to update the l2 security
-	L2Security bool   `json:"l2security"`
+	L2Security bool `json:"l2security"`
 }
 
 //GetNetwork get a specific network based on given id
