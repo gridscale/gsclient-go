@@ -117,8 +117,8 @@ type ServerCreateRequest struct {
 	LocationUUID string `json:"location_uuid"`
 
 	//Specifies the hardware settings for the virtual machine.
-	//Allowed values: nil, &DefaultServerHardware, &NestedServerHardware, &LegacyServerHardware, &CiscoCSRServerHardware,
-	//&SophosUTMServerHardware, &F5BigipServerHardware, &Q35ServerHardware, &Q35NestedServerHardware.
+	//Allowed values: nil, DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
+	//SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
 	//HardwareProfile = nil => server hardware is normal type
 	HardwareProfile *serverHardwareProfile `json:"hardware_profile,omitempty"`
 
@@ -326,8 +326,8 @@ func (c *Client) GetServerList() ([]Server, error) {
 
 //CreateServer create a server
 //
-//NOTE: Allowed values of `HardwareProfile`: nil, &DefaultServerHardware, &NestedServerHardware, &LegacyServerHardware,
-//&CiscoCSRServerHardware, &SophosUTMServerHardware, &F5BigipServerHardware, &Q35ServerHardware, &Q35NestedServerHardware.
+//NOTE: Allowed values of `HardwareProfile`: nil, DefaultServerHardware, NestedServerHardware, LegacyServerHardware,
+//CiscoCSRServerHardware, SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createServer
 func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, error) {
@@ -382,9 +382,6 @@ func (c *Client) DeleteServer(id string) error {
 }
 
 //UpdateServer updates a specific server
-//
-//NOTE: Allowed values of `HardwareProfile`: DefaultServerHardware, NestedServerHardware, LegacyServerHardware,
-//CiscoCSRServerHardware, SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateServer
 func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {

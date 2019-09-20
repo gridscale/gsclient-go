@@ -187,7 +187,7 @@ type StorageTemplate struct {
 	//The password has to be either plaintext or a crypt string (modular crypt format - MCF). Optional.
 	Password string `json:"password,omitempty"`
 
-	//Password type. Allowed values: &PlainPasswordType, &CryptPasswordType. Optional.
+	//Password type. Allowed values: nil, PlainPasswordType, CryptPasswordType. Optional.
 	PasswordType *passwordType `json:"password_type,omitempty"`
 
 	//Hostname to set for the installed storage. The running server will use this as its hostname.
@@ -206,7 +206,7 @@ type StorageCreateRequest struct {
 	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//Storage type. Allowed values: nil, &DefaultStorageType, &HighStorageType, &InsaneStorageType. Optional.
+	//Storage type. Allowed values: nil, DefaultStorageType, HighStorageType, InsaneStorageType. Optional.
 	StorageType *storageType `json:"storage_type,omitempty"`
 
 	//An object holding important values such as hostnames, passwords, and SSH keys.
@@ -282,9 +282,9 @@ func (c *Client) GetStorageList() ([]Storage, error) {
 //
 //NOTE:
 //
-// - Allowed value for `StorageType`: nil, &DefaultStorageType, &HighStorageType, &InsaneStorageType.
+// - Allowed value for `StorageType`: nil, DefaultStorageType, HighStorageType, InsaneStorageType.
 //
-// - Allowed value for `PasswordType`: nil, &PlainPasswordType, &CryptPasswordType.
+// - Allowed value for `PasswordType`: nil, PlainPasswordType, CryptPasswordType.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createStorage
 func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error) {
