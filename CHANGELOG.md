@@ -9,6 +9,7 @@ IMPROVEMENTS:
 * IP address family is now limited to pre-defined values
 * Loadbalancer algorithm is now limited to pre-defined values
 * All time-related properties are now type of GSTime (a custom type of time.Time)
+* Friendly godoc.
 
 BUG FIXES:
 * Fixed bugs when unmarshalling JSON to concrete type (mismatched type)
