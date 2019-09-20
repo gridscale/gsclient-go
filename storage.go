@@ -187,8 +187,8 @@ type StorageTemplate struct {
 	//The password has to be either plaintext or a crypt string (modular crypt format - MCF). Optional.
 	Password string `json:"password,omitempty"`
 
-	//Password type. Allowed values: . Optional
-	PasswordType string `json:"password_type,omitempty"`
+	//Password type. Allowed values: PlainPasswordType, CryptPasswordType.
+	PasswordType passwordType `json:"password_type"`
 
 	//Hostname to set for the installed storage. The running server will use this as its hostname.
 	//Valid only for public Linux and Windows templates. Optional.
@@ -237,6 +237,12 @@ var (
 	InsaneStorageType  = storageType{"storage_insane"}
 )
 
+//All allowed password type's values
+var (
+	PlainPasswordType = passwordType{"plain"}
+	CryptPasswordType = passwordType{"crypt"}
+)
+
 //GetStorage get a storage
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getStorage
@@ -274,7 +280,11 @@ func (c *Client) GetStorageList() ([]Storage, error) {
 
 //CreateStorage create a storage
 //
-//NOTE: Allowed value for `StorageType`: DefaultStorageType, HighStorageType, InsaneStorageType
+//NOTE:
+//
+// - Allowed value for `StorageType`: DefaultStorageType, HighStorageType, InsaneStorageType.
+//
+// - Allowed value for `PasswordType`: PlainPasswordType, CryptPasswordType.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createStorage
 func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error) {
