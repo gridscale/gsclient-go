@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.0 (September 19, 2019)
+
+IMPROVEMENTS:
+* Auto retry when server returns 5xx http codes
+* Server type is now limited to pre-defined values
+* Storage type is now limited to pre-defined values
+* IP address family is now limited to pre-defined values
+* Loadbalancer algorithm is now limited to pre-defined values
+* All time-related properties are now type of GSTime (a custom type of time.Time)
+
+BUG FIXES:
+* Fixed bugs when unmarshalling JSON to concrete type (mismatched type)
+
 ## 1.0.0 (September 05, 2019)
 
 FEATURES:
