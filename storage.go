@@ -232,15 +232,15 @@ type StorageUpdateRequest struct {
 
 //All allowed storage type's values
 var (
-	DefaultStorageType = storageType{"storage"}
-	HighStorageType    = storageType{"storage_high"}
-	InsaneStorageType  = storageType{"storage_insane"}
+	DefaultStorageType = &storageType{"storage"}
+	HighStorageType    = &storageType{"storage_high"}
+	InsaneStorageType  = &storageType{"storage_insane"}
 )
 
 //All allowed password type's values
 var (
-	PlainPasswordType = passwordType{"plain"}
-	CryptPasswordType = passwordType{"crypt"}
+	PlainPasswordType = &passwordType{"plain"}
+	CryptPasswordType = &passwordType{"crypt"}
 )
 
 //GetStorage get a storage
