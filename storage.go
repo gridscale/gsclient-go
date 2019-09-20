@@ -187,8 +187,8 @@ type StorageTemplate struct {
 	//The password has to be either plaintext or a crypt string (modular crypt format - MCF). Optional.
 	Password string `json:"password,omitempty"`
 
-	//Password type. Allowed values: PlainPasswordType, CryptPasswordType.
-	PasswordType passwordType `json:"password_type"`
+	//Password type. Allowed values: &PlainPasswordType, &CryptPasswordType. Optional.
+	PasswordType *passwordType `json:"password_type,omitempty"`
 
 	//Hostname to set for the installed storage. The running server will use this as its hostname.
 	//Valid only for public Linux and Windows templates. Optional.
@@ -206,8 +206,8 @@ type StorageCreateRequest struct {
 	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//Storage type. Allowed values: DefaultStorageType, HighStorageType, InsaneStorageType
-	StorageType storageType `json:"storage_type"`
+	//Storage type. Allowed values: &DefaultStorageType, &HighStorageType, &InsaneStorageType. Optional.
+	StorageType *storageType `json:"storage_type,omitempty"`
 
 	//An object holding important values such as hostnames, passwords, and SSH keys.
 	//Creating a storage with a template is required either sshkey or password.
@@ -288,9 +288,6 @@ func (c *Client) GetStorageList() ([]Storage, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createStorage
 func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error) {
-	if (body.StorageType == storageType{}) {
-		body.StorageType = DefaultStorageType
-	}
 	r := Request{
 		uri:    apiStorageBase,
 		method: http.MethodPost,

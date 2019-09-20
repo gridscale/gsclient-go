@@ -60,11 +60,11 @@ func TestClient_CreateStorage(t *testing.T) {
 		Capacity:     10,
 		LocationUUID: dummyUUID,
 		Name:         "test",
-		StorageType:  DefaultStorageType,
+		StorageType:  &DefaultStorageType,
 		Template: &StorageTemplate{
 			TemplateUUID: dummyUUID,
 			Password:     "pass",
-			PasswordType: CryptPasswordType,
+			PasswordType: &CryptPasswordType,
 			Hostname:     "example.com",
 		},
 		Labels: []string{"label"},
