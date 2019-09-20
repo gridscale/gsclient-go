@@ -279,14 +279,14 @@ type ServerMetricProperties struct {
 
 //All available server's hardware types
 var (
-	DefaultServerHardware   = serverHardwareProfile{"default"}
-	NestedServerHardware    = serverHardwareProfile{"nested"}
-	LegacyServerHardware    = serverHardwareProfile{"legacy"}
-	CiscoCSRServerHardware  = serverHardwareProfile{"cisco_csr"}
-	SophosUTMServerHardware = serverHardwareProfile{"sophos_utm"}
-	F5BigipServerHardware   = serverHardwareProfile{"f5_bigip"}
-	Q35ServerHardware       = serverHardwareProfile{"q35"}
-	Q35NestedServerHardware = serverHardwareProfile{"q35_nested"}
+	DefaultServerHardware   = &serverHardwareProfile{"default"}
+	NestedServerHardware    = &serverHardwareProfile{"nested"}
+	LegacyServerHardware    = &serverHardwareProfile{"legacy"}
+	CiscoCSRServerHardware  = &serverHardwareProfile{"cisco_csr"}
+	SophosUTMServerHardware = &serverHardwareProfile{"sophos_utm"}
+	F5BigipServerHardware   = &serverHardwareProfile{"f5_bigip"}
+	Q35ServerHardware       = &serverHardwareProfile{"q35"}
+	Q35NestedServerHardware = &serverHardwareProfile{"q35_nested"}
 )
 
 //GetServer gets a specific server based on given list
