@@ -163,7 +163,7 @@ type StorageAndSnapshotScheduleRelation struct {
 	ObjectName string `json:"object_name"`
 
 	//The date and time that the snapshot schedule will be run.
-	NextRuntime string `json:"next_runtime"`
+	NextRuntime GSTime `json:"next_runtime"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
