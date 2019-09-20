@@ -8,41 +8,71 @@ import (
 
 //SshkeyList JSON struct of a list of SSH-keys
 type SshkeyList struct {
+	//Array of SSH-keys
 	List map[string]SshkeyProperties `json:"sshkeys"`
 }
 
 //Sshkey JSON struct of a single SSH-key
 type Sshkey struct {
+	//Properties of a SSH-key
 	Properties SshkeyProperties `json:"sshkey"`
 }
 
 //SshkeyProperties JSON struct of properties of a single SSH-key
 type SshkeyProperties struct {
-	Name       string   `json:"name"`
-	ObjectUUID string   `json:"object_uuid"`
-	Status     string   `json:"status"`
-	CreateTime GSTime   `json:"create_time"`
-	ChangeTime GSTime   `json:"change_time"`
-	Sshkey     string   `json:"sshkey"`
-	Labels     []string `json:"labels"`
-	UserUUID   string   `json:"user_uuid"`
+	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	Name string `json:"name"`
+
+	//The UUID of an object is always unique, and refers to a specific object.
+	ObjectUUID string `json:"object_uuid"`
+
+	//Status indicates the status of the object.
+	Status string `json:"status"`
+
+	//Defines the date and time the object was initially created.
+	CreateTime GSTime `json:"create_time"`
+
+	//Defines the date and time of the last object change.
+	ChangeTime GSTime `json:"change_time"`
+
+	//The OpenSSH public key string (all key types are supported => ed25519, ecdsa, dsa, rsa, rsa1).
+	Sshkey string `json:"sshkey"`
+
+	//List of labels.
+	Labels []string `json:"labels"`
+
+	//The User-UUID of the account which created this SSH Key.
+	UserUUID string `json:"user_uuid"`
 }
 
 //SshkeyCreateRequest JSON struct of a request for creating a SSH-key
 type SshkeyCreateRequest struct {
-	Name   string   `json:"name"`
-	Sshkey string   `json:"sshkey"`
+	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	Name string `json:"name"`
+
+	//The OpenSSH public key string (all key types are supported => ed25519, ecdsa, dsa, rsa, rsa1).
+	Sshkey string `json:"sshkey"`
+
+	//List of labels. Optional.
 	Labels []string `json:"labels,omitempty"`
 }
 
 //SshkeyUpdateRequest JSON struct of a request for updating a SSH-key
 type SshkeyUpdateRequest struct {
-	Name   string   `json:"name,omitempty"`
-	Sshkey string   `json:"sshkey,omitempty"`
+	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//Optional.
+	Name string `json:"name,omitempty"`
+
+	//The OpenSSH public key string (all key types are supported => ed25519, ecdsa, dsa, rsa, rsa1). Optional.
+	Sshkey string `json:"sshkey,omitempty"`
+
+	//List of labels. Optional.
 	Labels []string `json:"labels,omitempty"`
 }
 
 //GetSshkey gets a ssh key
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKey
 func (c *Client) GetSshkey(id string) (Sshkey, error) {
 	if !isValidUUID(id) {
 		return Sshkey{}, errors.New("'id' is invalid")
@@ -57,6 +87,8 @@ func (c *Client) GetSshkey(id string) (Sshkey, error) {
 }
 
 //GetSshkeyList gets a list of ssh keys
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeys
 func (c *Client) GetSshkeyList() ([]Sshkey, error) {
 	r := Request{
 		uri:    apiSshkeyBase,
@@ -73,6 +105,8 @@ func (c *Client) GetSshkeyList() ([]Sshkey, error) {
 }
 
 //CreateSshkey creates a ssh key
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createSshKey
 func (c *Client) CreateSshkey(body SshkeyCreateRequest) (CreateResponse, error) {
 	r := Request{
 		uri:    apiSshkeyBase,
@@ -89,6 +123,8 @@ func (c *Client) CreateSshkey(body SshkeyCreateRequest) (CreateResponse, error) 
 }
 
 //DeleteSshkey deletes a ssh key
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSshKey
 func (c *Client) DeleteSshkey(id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
@@ -101,6 +137,8 @@ func (c *Client) DeleteSshkey(id string) error {
 }
 
 //UpdateSshkey updates a ssh key
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateSshKey
 func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
@@ -114,6 +152,8 @@ func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
 }
 
 //GetSshkeyEventList gets a ssh key's events
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeyEvents
 func (c *Client) GetSshkeyEventList(id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
