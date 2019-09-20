@@ -117,7 +117,7 @@ type ServerCreateRequest struct {
 	LocationUUID string `json:"location_uuid"`
 
 	//Specifies the hardware settings for the virtual machine.
-	//Allowed values: &DefaultServerHardware, &NestedServerHardware, &LegacyServerHardware, &CiscoCSRServerHardware,
+	//Allowed values: nil, &DefaultServerHardware, &NestedServerHardware, &LegacyServerHardware, &CiscoCSRServerHardware,
 	//&SophosUTMServerHardware, &F5BigipServerHardware, &Q35ServerHardware, &Q35NestedServerHardware.
 	//HardwareProfile = nil => server hardware is normal type
 	HardwareProfile *serverHardwareProfile `json:"hardware_profile,omitempty"`
@@ -326,7 +326,7 @@ func (c *Client) GetServerList() ([]Server, error) {
 
 //CreateServer create a server
 //
-//NOTE: Allowed values of `HardwareProfile`: &DefaultServerHardware, &NestedServerHardware, &LegacyServerHardware,
+//NOTE: Allowed values of `HardwareProfile`: nil, &DefaultServerHardware, &NestedServerHardware, &LegacyServerHardware,
 //&CiscoCSRServerHardware, &SophosUTMServerHardware, &F5BigipServerHardware, &Q35ServerHardware, &Q35NestedServerHardware.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createServer
