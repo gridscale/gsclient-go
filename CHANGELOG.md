@@ -3,7 +3,7 @@
 ## 2.0.0 (September 19, 2019)
 
 IMPROVEMENTS:
-* Auto retry when server returns 5xx http codes
+* Auto retry when server returns 5xx and 424 http codes
 * Server type is now limited to pre-defined values
 * Storage type is now limited to pre-defined values
 * IP address family is now limited to pre-defined values
