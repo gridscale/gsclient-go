@@ -48,10 +48,10 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	serverCreateRequest := gsclient.ServerCreateRequest{
-		Name:            "go-client-server",
-		Memory:          1,
-		Cores:           1,
-		LocationUUID:    locationUUID,
+		Name:         "go-client-server",
+		Memory:       1,
+		Cores:        1,
+		LocationUUID: locationUUID,
 	}
 	cServer, err := client.CreateServer(serverCreateRequest)
 	if err != nil {
