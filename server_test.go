@@ -61,7 +61,7 @@ func TestClient_CreateServer(t *testing.T) {
 		Memory:          10,
 		Cores:           4,
 		LocationUUID:    dummyUUID,
-		HardwareProfile: DefaultServerHardware,
+		HardwareProfile: &DefaultServerHardware,
 		AvailablityZone: "",
 		Labels:          []string{"label"},
 	})
