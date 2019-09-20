@@ -19,7 +19,10 @@ type Request struct {
 
 //CreateResponse common struct of a response for creation
 type CreateResponse struct {
-	ObjectUUID  string `json:"object_uuid"`
+	//UUID of the object being created
+	ObjectUUID string `json:"object_uuid"`
+
+	//UUID of the request
 	RequestUUID string `json:"request_uuid"`
 }
 
