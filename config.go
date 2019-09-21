@@ -29,6 +29,15 @@ type Config struct {
 }
 
 //NewConfiguration creates a new config
+//
+//- Parameters:
+//		+ apiURL string: base URL of API.
+//		+ uuid string: UUID of user.
+//		+ token string: API token.
+//		+ debugMode bool: true => run client in debug mode.
+//		+ requestCheckTimeoutSecs int: Timeout for checking requests (for synchronous feature)
+//		+ delayIntervalMilliSecs int: delay between requests when checking request (or retry 5xx, 424 error code)
+//		+ maxNumberOfRetries int: number of retries when server returns 5xx, 424 error code.
 func NewConfiguration(apiURL string, uuid string, token string, debugMode bool, requestCheckTimeoutSecs,
 	delayIntervalMilliSecs, maxNumberOfRetries int) *Config {
 	logLevel := logrus.InfoLevel
