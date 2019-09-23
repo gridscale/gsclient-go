@@ -406,9 +406,9 @@ func getMockPaasTemplate() PaaSTemplate {
 		Category:   "database",
 		ProductNo:  0,
 		Labels:     []string{"label"},
-		Resources: map[string]interface{}{
-			"Memory":      10,
-			"Connections": 10,
+		Resources: Resource{
+			Memory:      10,
+			Connections: 10,
 		},
 		Status: "active",
 	}}
