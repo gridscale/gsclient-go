@@ -2,8 +2,10 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //StorageSnapshotScheduleList JSON of a list of storage snapshot schedules
@@ -178,7 +180,9 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 	if err != nil {
 		return StorageSnapshotScheduleCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -195,6 +199,14 @@ func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 		method: http.MethodPatch,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotScheduleActive(storageID, scheduleID)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -209,5 +221,69 @@ func (c *Client) DeleteStorageSnapshotSchedule(storageID, scheduleID string) err
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodDelete,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotScheduleDeleted(storageID, scheduleID)
+	}
 	return r.execute(*c, nil)
+}
+
+//waitForSnapshotScheduleActive allows to wait until the snapshot schedule's status is active
+func (c *Client) waitForSnapshotScheduleActive(storageID, scheduleID string) error {
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for snapshot schedule %v to be active", scheduleID)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			schedule, err := c.GetStorageSnapshotSchedule(storageID, scheduleID)
+			if err != nil {
+				return err
+			}
+			if schedule.Properties.Status == activeStatus {
+				return nil
+			}
+		}
+	}
+}
+
+//waitForSnapshotScheduleDeleted allows to wait until the snapshot schedule deleted
+func (c *Client) waitForSnapshotScheduleDeleted(storageID, scheduleID string) error {
+	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
+		return errors.New("'storageID' or 'scheduleID' is invalid")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for snapshot schedule %v to be deleted", scheduleID)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
 }
