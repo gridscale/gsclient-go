@@ -3,6 +3,7 @@
 ## 2.0.0 (September 19, 2019)
 
 IMPROVEMENTS:
+* Client now can be run in `sync` mode
 * Auto retry when server returns 5xx and 424 http codes
 * Server type is now limited to pre-defined values
 * Storage type is now limited to pre-defined values
