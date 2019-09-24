@@ -6,68 +6,127 @@ import (
 	"path"
 )
 
-//StorageSnapshotScheduleList JSON of a list of storage snapshot schedule
+//StorageSnapshotScheduleList JSON of a list of storage snapshot schedules
 type StorageSnapshotScheduleList struct {
+	//Array of storage snapshot schedules
 	List map[string]StorageSnapshotScheduleProperties `json:"snapshot_schedules"`
 }
 
-//StorageSnapshotSchedule JSON struct of a single storage snapshot schedule
+//StorageSnapshotSchedule JSON struct of a single storage snapshot scheduler
 type StorageSnapshotSchedule struct {
+	//Properties of a storage snapshot schedule
 	Properties StorageSnapshotScheduleProperties `json:"snapshot_schedule"`
 }
 
 //StorageSnapshotScheduleProperties JSON struct of properties of a single storage snapshot schedule
 type StorageSnapshotScheduleProperties struct {
-	ChangeTime    GSTime                           `json:"change_time"`
-	CreateTime    GSTime                           `json:"create_time"`
-	KeepSnapshots int                              `json:"keep_snapshots"`
-	Labels        []string                         `json:"labels"`
-	Name          string                           `json:"name"`
-	NextRuntime   GSTime                           `json:"next_runtime"`
-	ObjectUUID    string                           `json:"object_uuid"`
-	Relations     StorageSnapshotScheduleRelations `json:"relations"`
-	RunInterval   int                              `json:"run_interval"`
-	Status        string                           `json:"status"`
-	StorageUUID   string                           `json:"storage_uuid"`
+	//Defines the date and time of the last object change.
+	ChangeTime GSTime `json:"change_time"`
+
+	//Defines the date and time the object was initially created.
+	CreateTime GSTime `json:"create_time"`
+
+	//The amount of Snapshots to keep before overwriting the last created Snapshot.
+	//value >= 1
+	KeepSnapshots int `json:"keep_snapshots"`
+
+	//List of labels.
+	Labels []string `json:"labels"`
+
+	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	Name string `json:"name"`
+
+	//The date and time that the snapshot schedule will be run.
+	NextRuntime GSTime `json:"next_runtime"`
+
+	//The UUID of an object is always unique, and refers to a specific object.
+	ObjectUUID string `json:"object_uuid"`
+
+	//Related snapshots (snapshots taken by this snapshot schedule)
+	Relations StorageSnapshotScheduleRelations `json:"relations"`
+
+	//The interval at which the schedule will run (in minutes)
+	//value >= 60
+	RunInterval int `json:"run_interval"`
+
+	//Status indicates the status of the object.
+	Status string `json:"status"`
+
+	//UUID of the storage that will be used for taking snapshots
+	StorageUUID string `json:"storage_uuid"`
 }
 
 //StorageSnapshotScheduleRelations JSON struct of a list of relations of a storage snapshot schedule
 type StorageSnapshotScheduleRelations struct {
+	//Array of all related snapshots (snapshots taken by this snapshot schedule)
 	Snapshots []StorageSnapshotScheduleRelation `json:"snapshots"`
 }
 
 //StorageSnapshotScheduleRelation JSON struct of a relation of a storage snapshot schedule
 type StorageSnapshotScheduleRelation struct {
+	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
-	Name       string `json:"name"`
+
+	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	Name string `json:"name"`
+
+	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 }
 
 //StorageSnapshotScheduleCreateRequest JSON struct of a request for creating a storage snapshot schedule
 type StorageSnapshotScheduleCreateRequest struct {
-	Name          string   `json:"name"`
-	Labels        []string `json:"labels,omitempty"`
-	RunInterval   int      `json:"run_interval"`
-	KeepSnapshots int      `json:"keep_snapshots"`
-	NextRuntime   *GSTime  `json:"next_runtime,omitempty"`
+	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	Name string `json:"name"`
+
+	//List of labels. Optional.
+	Labels []string `json:"labels,omitempty"`
+
+	//The interval at which the schedule will run (in minutes)
+	//Allowed value >= 60
+	RunInterval int `json:"run_interval"`
+
+	//The amount of Snapshots to keep before overwriting the last created Snapshot.
+	//Allowed value >= 1
+	KeepSnapshots int `json:"keep_snapshots"`
+
+	//The date and time that the snapshot schedule will be run. Optional.
+	NextRuntime *GSTime `json:"next_runtime,omitempty"`
 }
 
 //StorageSnapshotScheduleCreateResponse JSON struct of a response for creating a storage snapshot schedule
 type StorageSnapshotScheduleCreateResponse struct {
+	//UUID of the request
 	RequestUUID string `json:"request_uuid"`
-	ObjectUUID  string `json:"object_uuid"`
+
+	//UUID of the snapshot schedule being created
+	ObjectUUID string `json:"object_uuid"`
 }
 
 //StorageSnapshotScheduleUpdateRequest JSON struct of a request for updating a storage snapshot schedule
 type StorageSnapshotScheduleUpdateRequest struct {
-	Name          string   `json:"name,omitempty"`
-	Labels        []string `json:"labels,omitempty"`
-	RunInterval   int      `json:"run_interval,omitempty"`
-	KeepSnapshots int      `json:"keep_snapshots,omitempty"`
-	NextRuntime   *GSTime  `json:"next_runtime,omitempty"`
+	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//Optional.
+	Name string `json:"name,omitempty"`
+
+	//List of labels. Optional.
+	Labels []string `json:"labels,omitempty"`
+
+	//The interval at which the schedule will run (in minutes). Optional.
+	//Allowed value >= 60
+	RunInterval int `json:"run_interval,omitempty"`
+
+	//The amount of Snapshots to keep before overwriting the last created Snapshot. Optional.
+	//Allowed value >= 1
+	KeepSnapshots int `json:"keep_snapshots,omitempty"`
+
+	//The date and time that the snapshot schedule will be run. Optional.
+	NextRuntime *GSTime `json:"next_runtime,omitempty"`
 }
 
 //GetStorageSnapshotScheduleList gets a list of available storage snapshot schedules based on a given storage's id
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSnapshotSchedules
 func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSchedule, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
@@ -86,6 +145,8 @@ func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSch
 }
 
 //GetStorageSnapshotSchedule gets a specific storage snapshot scheduler based on a given storage's id and scheduler's id
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSnapshotSchedule
 func (c *Client) GetStorageSnapshotSchedule(storageID, scheduleID string) (StorageSnapshotSchedule, error) {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return StorageSnapshotSchedule{}, errors.New("'storageID' or 'scheduleID' is invalid")
@@ -100,6 +161,8 @@ func (c *Client) GetStorageSnapshotSchedule(storageID, scheduleID string) (Stora
 }
 
 //CreateStorageSnapshotSchedule create a storage's snapshot scheduler
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createSnapshotSchedule
 func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotScheduleCreateRequest) (
 	StorageSnapshotScheduleCreateResponse, error) {
 	if !isValidUUID(id) {
@@ -120,6 +183,8 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 }
 
 //UpdateStorageSnapshotSchedule updates specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateSnapshotSchedule
 func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 	body StorageSnapshotScheduleUpdateRequest) error {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
@@ -134,6 +199,8 @@ func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 }
 
 //DeleteStorageSnapshotSchedule deletes specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSnapshotSchedule
 func (c *Client) DeleteStorageSnapshotSchedule(storageID, scheduleID string) error {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")

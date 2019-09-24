@@ -19,7 +19,10 @@ type Request struct {
 
 //CreateResponse common struct of a response for creation
 type CreateResponse struct {
-	ObjectUUID  string `json:"object_uuid"`
+	//UUID of the object being created
+	ObjectUUID string `json:"object_uuid"`
+
+	//UUID of the request
 	RequestUUID string `json:"request_uuid"`
 }
 
@@ -99,7 +102,8 @@ RETRY:
 			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 			errorMessage.StatusCode = result.StatusCode
 			json.Unmarshal(iostream, &errorMessage)
-			if result.StatusCode >= 500 {
+			//If internal server error or object is in status that does not allow the request, retry
+			if result.StatusCode >= 500 || result.StatusCode == 424 {
 				latestRetryErr = errorMessage
 				time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
 				retryNo++

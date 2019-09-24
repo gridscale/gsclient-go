@@ -63,3 +63,12 @@ type loadbalancerAlgorithm struct {
 func (l loadbalancerAlgorithm) MarshalJSON() ([]byte, error) {
 	return json.Marshal(l.string)
 }
+
+type passwordType struct {
+	string
+}
+
+//MarshalJSON custom marshal for passwordType
+func (p passwordType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(p.string)
+}
