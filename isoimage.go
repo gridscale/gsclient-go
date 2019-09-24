@@ -2,8 +2,10 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //ISOImageList is JSON struct of a list of ISO images
@@ -182,7 +184,9 @@ func (c *Client) CreateISOImage(body ISOImageCreateRequest) (ISOImageCreateRespo
 	if err != nil {
 		return ISOImageCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -198,6 +202,14 @@ func (c *Client) UpdateISOImage(id string, body ISOImageUpdateRequest) error {
 		method: http.MethodPatch,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForISOImageActive(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -211,6 +223,14 @@ func (c *Client) DeleteISOImage(id string) error {
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForISOImageDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -270,4 +290,60 @@ func (c *Client) GetDeletedISOImages() ([]ISOImage, error) {
 		isoImages = append(isoImages, ISOImage{Properties: properties})
 	}
 	return isoImages, err
+}
+
+//waitForISOImageActive allows to wait until the ISO-Image's status is active
+func (c *Client) waitForISOImageActive(id string) error {
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for firewall %v to be active", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			img, err := c.GetISOImage(id)
+			if err != nil {
+				return err
+			}
+			if img.Properties.Status == activeStatus {
+				return nil
+			}
+		}
+	}
+}
+
+//waitForISOImageDeleted allows to wait until the ISO-Image id deleted
+func (c *Client) waitForISOImageDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for firewall %v to be deleted", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiISOBase, id),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
 }
