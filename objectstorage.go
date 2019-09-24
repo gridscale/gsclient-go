@@ -2,9 +2,11 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 	"strings"
+	"time"
 )
 
 //ObjectStorageAccessKeyList is JSON structure of a list of Object Storage Access Keys
@@ -118,7 +120,9 @@ func (c *Client) CreateObjectStorageAccessKey() (ObjectStorageAccessKeyCreateRes
 	if err != nil {
 		return ObjectStorageAccessKeyCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -132,6 +136,14 @@ func (c *Client) DeleteObjectStorageAccessKey(id string) error {
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForObjectStorageAccessKeyDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -151,4 +163,37 @@ func (c *Client) GetObjectStorageBucketList() ([]ObjectStorageBucket, error) {
 		buckets = append(buckets, ObjectStorageBucket{Properties: properties})
 	}
 	return buckets, err
+}
+
+//waitForObjectStorageAccessKeyDeleted allows to wait until the object storage's access key is deleted
+func (c *Client) waitForObjectStorageAccessKeyDeleted(id string) error {
+	if strings.TrimSpace(id) == "" {
+		return errors.New("'id' is required")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for access key %v to be deleted", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiObjectStorageBase, "access_keys", id),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
 }
