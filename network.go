@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //NetworkList is JSON struct of a list of networks
@@ -189,7 +190,9 @@ func (c *Client) CreateNetwork(body NetworkCreateRequest) (NetworkCreateResponse
 	if err != nil {
 		return NetworkCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -203,6 +206,14 @@ func (c *Client) DeleteNetwork(id string) error {
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForNetworkDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -219,7 +230,14 @@ func (c *Client) UpdateNetwork(id string, body NetworkUpdateRequest) error {
 		method: http.MethodPatch,
 		body:   body,
 	}
-
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForNetworkActive(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -311,4 +329,60 @@ func (c *Client) GetDeletedNetworks() ([]Network, error) {
 		networks = append(networks, Network{Properties: properties})
 	}
 	return networks, err
+}
+
+//waitForNetworkActive allows to wait until the network's status is active
+func (c *Client) waitForNetworkActive(id string) error {
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for network %v to be active", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			net, err := c.GetNetwork(id)
+			if err != nil {
+				return err
+			}
+			if net.Properties.Status == activeStatus {
+				return nil
+			}
+		}
+	}
+}
+
+//waitForNetworkDeleted allows to wait until the network is deleted
+func (c *Client) waitForNetworkDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for network %v to be deleted", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiNetworkBase, id),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
 }
