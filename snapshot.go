@@ -2,8 +2,10 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //StorageSnapshotList is JSON structure of a list of storage snapshots
@@ -188,7 +190,9 @@ func (c *Client) CreateStorageSnapshot(id string, body StorageSnapshotCreateRequ
 	if err != nil {
 		return StorageSnapshotCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -204,6 +208,14 @@ func (c *Client) UpdateStorageSnapshot(storageID, snapshotID string, body Storag
 		method: http.MethodPatch,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotActive(storageID, snapshotID)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -217,6 +229,14 @@ func (c *Client) DeleteStorageSnapshot(storageID, snapshotID string) error {
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotDeleted(storageID, snapshotID)
 	}
 	return r.execute(*c, nil)
 }
@@ -233,6 +253,14 @@ func (c *Client) RollbackStorage(storageID, snapshotID string, body StorageRollb
 		method: http.MethodPatch,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotActive(storageID, snapshotID)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -240,13 +268,21 @@ func (c *Client) RollbackStorage(storageID, snapshotID string, body StorageRollb
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/SnapshotExportToS3
 func (c *Client) ExportStorageSnapshotToS3(storageID, snapshotID string, body StorageSnapshotExportToS3Request) error {
-	if storageID == "" || snapshotID == "" {
-		return errors.New("'storageID' and 'snapshotID' are required")
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' and 'snapshotID' is invalid")
 	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID, "export_to_s3"),
 		method: http.MethodPatch,
 		body:   body,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotActive(storageID, snapshotID)
 	}
 	return r.execute(*c, nil)
 }
@@ -286,4 +322,60 @@ func (c *Client) GetDeletedSnapshots() ([]StorageSnapshot, error) {
 		snapshots = append(snapshots, StorageSnapshot{Properties: properties})
 	}
 	return snapshots, err
+}
+
+//waitForSnapshotActive allows to wait until the snapshot's status is active
+func (c *Client) waitForSnapshotActive(storageID, snapshotID string) error {
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for snapshot %v to be active", snapshotID)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			snapshot, err := c.GetStorageSnapshot(storageID, snapshotID)
+			if err != nil {
+				return err
+			}
+			if snapshot.Properties.Status == activeStatus {
+				return nil
+			}
+		}
+	}
+}
+
+//waitForSnapshotDeleted allows to wait until the snapshot is deleted
+func (c *Client) waitForSnapshotDeleted(storageID, snapshotID string) error {
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' or 'snapshotID' is invalid")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for snapshot %v to be deleted", snapshotID)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
 }
