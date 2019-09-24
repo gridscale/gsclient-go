@@ -9,23 +9,33 @@ import (
 	"testing"
 )
 
+var labelTestCases = []uuidTestCase{
+	{
+		testUUID: "test",
+		isFailed: false,
+	},
+	{
+		testUUID: "",
+		isFailed: true,
+	},
+}
+
 func TestClient_GetLabelList(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := apiLabelBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareLabelListHTTPGet())
+		fmt.Fprintf(writer, prepareLabelListHTTPGet("test"))
 	})
 	res, err := client.GetLabelList()
 	assert.Nil(t, err, "GetLabelList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockLabel()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockLabel("test")), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateLabel(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
+	server, client, mux := setupTestClient(true)
 	var isFailed bool
 	uri := apiLabelBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
@@ -50,39 +60,80 @@ func TestClient_CreateLabel(t *testing.T) {
 			assert.Equal(t, fmt.Sprintf("%v", getMockLabelCreateResponse()), fmt.Sprintf("%v", res))
 		}
 	}
+	server.Close()
 }
 
-func TestClient_DeleteLabel(t *testing.T) {
-	server, client, mux := setupTestClient()
+func TestClient_waitForLabelDeleted(t *testing.T) {
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	testCases := []uuidTestCase{
-		{
-			testUUID: "test",
-			isFailed: false,
-		},
-		{
-			testUUID: "",
-			isFailed: true,
-		},
-	}
-	uri := path.Join(apiLabelBase, "test")
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodDelete, request.Method)
-		fmt.Fprint(writer, "")
-	})
-	for _, test := range testCases {
-		err := client.DeleteLabel(test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
+	var isFailed bool
+	var isTimeout bool
+	uri := apiLabelBase
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		if isFailed {
+			w.WriteHeader(400)
 		} else {
-			assert.Nil(t, err, "DeleteLabel returned an error %v", err)
+			if isTimeout {
+				fmt.Fprint(w, prepareLabelListHTTPGet("test"))
+			} else {
+				fmt.Fprint(w, prepareLabelListHTTPGet("not-test"))
+			}
+		}
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, isTimeoutTest := range timeoutTestCases {
+			isTimeout = isTimeoutTest
+			for _, test := range labelTestCases {
+				err := client.waitForLabelDeleted(test.testUUID)
+				if test.isFailed || isFailed || isTimeout {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "waitForFirewallDeleted returned an error %v", err)
+				}
+			}
 		}
 	}
 }
 
-func getMockLabel() Label {
+func TestClient_DeleteLabel(t *testing.T) {
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiLabelBase, "test")
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			assert.Equal(t, http.MethodDelete, request.Method)
+			if isFailed {
+				writer.WriteHeader(400)
+			} else {
+				fmt.Fprint(writer, "")
+			}
+		})
+		if clientTest {
+			mux.HandleFunc(apiLabelBase, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, http.MethodGet, r.Method)
+				fmt.Fprint(w, prepareLabelListHTTPGet("not-test"))
+			})
+		}
+		for _, serverTest := range commonSuccessFailTestCases {
+			isFailed = serverTest.isFailed
+			for _, test := range labelTestCases {
+				err := client.DeleteLabel(test.testUUID)
+				if test.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "DeleteLabel returned an error %v", err)
+				}
+			}
+		}
+		server.Close()
+	}
+}
+
+func getMockLabel(label string) Label {
 	mock := Label{Properties: LabelProperties{
-		Label:      "test",
+		Label:      label,
 		CreateTime: dummyTime,
 		ChangeTime: dummyTime,
 		Relations:  nil,
@@ -98,8 +149,8 @@ func getMockLabelCreateResponse() CreateResponse {
 	return mock
 }
 
-func prepareLabelListHTTPGet() string {
-	label := getMockLabel()
+func prepareLabelListHTTPGet(labelName string) string {
+	label := getMockLabel(labelName)
 	res, _ := json.Marshal(label.Properties)
 	return fmt.Sprintf(`{"labels": {"%s": %s}}`, dummyUUID, string(res))
 }

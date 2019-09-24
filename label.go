@@ -2,8 +2,10 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //LabelList JSON struct of a list of labels
@@ -73,7 +75,9 @@ func (c *Client) CreateLabel(body LabelCreateRequest) (CreateResponse, error) {
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -88,5 +92,48 @@ func (c *Client) DeleteLabel(label string) error {
 		uri:    path.Join(apiLabelBase, label),
 		method: http.MethodDelete,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForLabelDeleted(label)
+	}
 	return r.execute(*c, nil)
+}
+
+//waitForLabelDeleted allows to wait until the label is deleted
+func (c *Client) waitForLabelDeleted(label string) error {
+	if label == "" {
+		return errors.New("'label' is required")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for label %v to be deleted", label)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			labels, err := c.GetLabelList()
+			if err != nil {
+				return err
+			}
+			if !isLabelInSlice(label, labels) {
+				return nil
+			}
+		}
+	}
+}
+
+//isLabelInSlice check if a label in a lice of labels
+func isLabelInSlice(a string, list []Label) bool {
+	for _, b := range list {
+		if b.Properties.Label == a {
+			return true
+		}
+	}
+	return false
 }
