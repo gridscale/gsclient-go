@@ -1,5 +1,11 @@
 package gsclient
 
+import (
+	"fmt"
+	"path"
+	"time"
+)
+
 const (
 	apiServerBase        = "/objects/servers"
 	apiStorageBase       = "/objects/storages"
@@ -18,6 +24,8 @@ const (
 	apiDeletedBase       = "/objects/deleted"
 )
 
+const activeStatus = "active"
+
 //Client struct of a gridscale golang client
 type Client struct {
 	cfg *Config
@@ -29,4 +37,29 @@ func NewClient(c *Config) *Client {
 		cfg: c,
 	}
 	return client
+}
+
+//waitForRequestCompleted allows to wait for a request to complete. Timeouts are currently hardcoded
+func (c *Client) waitForRequestCompleted(id string) error {
+	r := Request{
+		uri:    path.Join("/requests/", id),
+		method: "GET",
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			c.cfg.logger.Errorf("Timeout reached when waiting for request %v to complete", id)
+			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			var response RequestStatus
+			r.execute(*c, &response)
+			if response[id].Status == "done" {
+				c.cfg.logger.Info("Done with creating")
+				return nil
+			}
+		}
+	}
 }
