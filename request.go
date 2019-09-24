@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"path"
 	"time"
 )
 
 //Request gridscale's custom request struct
 type Request struct {
-	uri    string
-	method string
-	body   interface{}
+	uri          string
+	method       string
+	skipPrint404 bool
+	body         interface{}
 }
 
 //CreateResponse common struct of a response for creation
@@ -110,6 +110,10 @@ RETRY:
 				c.cfg.logger.Errorf("RETRY no %d ! Error message: %v. Title: %v. Code: %v.", retryNo, errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
 				continue RETRY //continue the RETRY loop
 			}
+			if r.skipPrint404 && result.StatusCode == 404 {
+				c.cfg.logger.Debug("Skip 404 error code.")
+				return errorMessage
+			}
 			c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
 			return errorMessage
 		}
@@ -125,52 +129,4 @@ RETRY:
 		return nil
 	}
 	return latestRetryErr
-}
-
-//WaitForRequestCompletion allows to wait for a request to complete. Timeouts are currently hardcoded
-func (c *Client) WaitForRequestCompletion(id string) error {
-	r := Request{
-		uri:    path.Join("/requests/", id),
-		method: "GET",
-	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			c.cfg.logger.Errorf("Timeout reached when waiting for request %v to complete", id)
-			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			var response RequestStatus
-			r.execute(*c, &response)
-			if response[id].Status == "done" {
-				c.cfg.logger.Info("Done with creating")
-				return nil
-			}
-		}
-	}
-}
-
-//WaitForServerPowerStatus  allows to wait for a server changing its power status. Timeouts are currently hardcoded
-func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			c.cfg.logger.Errorf("Timeout reached when trying to shut down system with id %v", id)
-			return fmt.Errorf("Timeout reached when trying to shut down system with id %v", id)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			server, err := c.GetServer(id)
-			if err != nil {
-				return err
-			}
-			if server.Properties.Power == status {
-				c.cfg.logger.Infof("The power status of the server with id %v has changed to %t", id, status)
-				return nil
-			}
-		}
-	}
 }
