@@ -2,8 +2,10 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //SshkeyList JSON struct of a list of SSH-keys
@@ -118,7 +120,9 @@ func (c *Client) CreateSshkey(body SshkeyCreateRequest) (CreateResponse, error) 
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -132,6 +136,14 @@ func (c *Client) DeleteSshkey(id string) error {
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSSHKeyDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -147,6 +159,14 @@ func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodPatch,
 		body:   body,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSSHKeyActive(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -169,4 +189,60 @@ func (c *Client) GetSshkeyEventList(id string) ([]Event, error) {
 		sshEvents = append(sshEvents, Event{Properties: properties})
 	}
 	return sshEvents, err
+}
+
+//waitForSSHKeyActive allows to wait until the SSH-Key's status is active
+func (c *Client) waitForSSHKeyActive(id string) error {
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for SSH-key %v to be active", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			key, err := c.GetSshkey(id)
+			if err != nil {
+				return err
+			}
+			if key.Properties.Status == activeStatus {
+				return nil
+			}
+		}
+	}
+}
+
+//waitForSSHKeyDeleted allows to wait until the SSH-Key is deleted
+func (c *Client) waitForSSHKeyDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for SSH-key %v to be deleted", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiSshkeyBase, id),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
 }
