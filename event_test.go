@@ -9,7 +9,7 @@ import (
 )
 
 func TestClient_GetEventList(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := apiEventBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
