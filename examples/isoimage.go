@@ -17,6 +17,7 @@ func main() {
 		uuid,
 		token,
 		true,
+		true,
 		0,
 		0,
 		0,

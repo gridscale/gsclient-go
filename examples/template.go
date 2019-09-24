@@ -2,10 +2,8 @@ package main
 
 import (
 	"bufio"
-	"os"
-	"time"
-
 	log "github.com/sirupsen/logrus"
+	"os"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -19,6 +17,7 @@ func main() {
 		"https://api.gridscale.io",
 		uuid,
 		token,
+		true,
 		true,
 		0,
 		0,
@@ -41,7 +40,6 @@ func main() {
 		return
 	}
 	defer func() {
-		time.Sleep(30 * time.Second)
 		err := client.DeleteStorage(cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)
@@ -59,7 +57,6 @@ func main() {
 		return
 	}
 	defer func() {
-		time.Sleep(40 * time.Second)
 		err := client.DeleteStorageSnapshot(cStorage.ObjectUUID, cSnapshot.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage snapshot has failed with error", err)

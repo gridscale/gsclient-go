@@ -2,11 +2,9 @@ package main
 
 import (
 	"bufio"
-	"os"
-	"time"
-
 	"github.com/gridscale/gsclient-go"
 	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
@@ -18,6 +16,7 @@ func main() {
 		"https://api.gridscale.io",
 		uuid,
 		token,
+		true,
 		true,
 		0,
 		0,
@@ -50,9 +49,6 @@ func main() {
 		"securityzone_uuid": cSCZ.ObjectUUID,
 	}).Info("Security zone successfully created")
 	defer func() {
-		//Wait until paas deleted successfully
-		//it takes around a minute
-		time.Sleep(60 * time.Second)
 		err := client.DeletePaaSSecurityZone(cSCZ.ObjectUUID)
 		if err != nil {
 			log.Error("Delete security zone has failed with error", err)

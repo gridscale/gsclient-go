@@ -2,10 +2,8 @@ package main
 
 import (
 	"bufio"
-	"os"
-	"time"
-
 	log "github.com/sirupsen/logrus"
+	"os"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -15,7 +13,16 @@ const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration("https://api.gridscale.io", uuid, token, true, 0, 0, 0)
+	config := gsclient.NewConfiguration(
+		"https://api.gridscale.io",
+		uuid,
+		token,
+		true,
+		true,
+		0,
+		0,
+		0,
+	)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
@@ -35,8 +42,6 @@ func main() {
 		"storage_uuid": cStorage.ObjectUUID,
 	}).Info("Storage successfully created")
 	defer func() {
-		//we have to wait for the snapshot getting deleted firstly
-		time.Sleep(1 * time.Minute)
 		err := client.DeleteStorage(cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)

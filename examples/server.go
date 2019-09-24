@@ -35,6 +35,7 @@ func main() {
 		uuid,
 		token,
 		true,
+		true,
 		0,
 		0,
 		0,
@@ -187,7 +188,7 @@ func main() {
 		false,
 		1,
 		nil,
-		gsclient.FirewallRules{},
+		&gsclient.FirewallRules{},
 	)
 	if err != nil {
 		log.Error("Link network has failed with error", err)

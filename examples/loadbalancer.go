@@ -2,12 +2,9 @@ package main
 
 import (
 	"bufio"
-	"os"
-	"time"
-
-	log "github.com/sirupsen/logrus"
-
 	"github.com/gridscale/gsclient-go"
+	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
@@ -15,7 +12,16 @@ const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration("https://api.gridscale.io", uuid, token, false, 0, 0, 0)
+	config := gsclient.NewConfiguration(
+		"https://api.gridscale.io",
+		uuid,
+		token,
+		true,
+		true,
+		0,
+		0,
+		0,
+	)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
@@ -125,8 +131,6 @@ func main() {
 	}
 	log.WithFields(log.Fields{
 		"Loadbalancer_uuid": glb.Properties.ObjectUUID}).Info("Loadbalancer successfully deleted")
-
-	time.Sleep(10 * time.Second)
 
 	err = client.DeleteIP(ipv4.ObjectUUID)
 	if err != nil {
