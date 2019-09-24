@@ -10,7 +10,7 @@ import (
 )
 
 func TestClient_GetLocationList(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := apiLocationBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
@@ -24,7 +24,7 @@ func TestClient_GetLocationList(t *testing.T) {
 }
 
 func TestClient_GetLocation(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiLocationBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
