@@ -2,8 +2,10 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //ServerList JSON struct of a list of servers
@@ -356,7 +358,9 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 	if err != nil {
 		return ServerCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	//this fixed the endpoint's bug temporarily when creating server with/without
 	//'relations' field
 	if response.ServerUUID == "" && response.ObjectUUID != "" {
@@ -378,6 +382,14 @@ func (c *Client) DeleteServer(id string) error {
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodDelete,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForServerDeleted(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -392,6 +404,14 @@ func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodPatch,
 		body:   body,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForServerActive(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -466,7 +486,10 @@ func (c *Client) setServerPowerState(id string, powerState bool) error {
 	if err != nil {
 		return err
 	}
-	return c.WaitForServerPowerStatus(id, powerState)
+	if c.cfg.sync {
+		return c.waitForServerPowerStatus(id, powerState)
+	}
+	return nil
 }
 
 //StartServer starts a server
@@ -506,11 +529,13 @@ func (c *Client) ShutdownServer(id string) error {
 		return err
 	}
 
-	//If we get an error, which includes a timeout, power off the server instead
-	err = c.WaitForServerPowerStatus(id, false)
-	if err != nil {
-		c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
-		return c.StopServer(id)
+	if c.cfg.sync {
+		//If we get an error, which includes a timeout, power off the server instead
+		err = c.waitForServerPowerStatus(id, false)
+		if err != nil {
+			c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
+			return c.StopServer(id)
+		}
 	}
 	return nil
 }
@@ -550,4 +575,83 @@ func (c *Client) GetDeletedServers() ([]Server, error) {
 		servers = append(servers, Server{Properties: properties})
 	}
 	return servers, err
+}
+
+//waitForServerPowerStatus  allows to wait for a server changing its power status.
+func (c *Client) waitForServerPowerStatus(id string, status bool) error {
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			c.cfg.logger.Errorf("Timeout reached when trying to shut down system with id %v", id)
+			return fmt.Errorf("Timeout reached when trying to shut down system with id %v", id)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			server, err := c.GetServer(id)
+			if err != nil {
+				return err
+			}
+			if server.Properties.Power == status {
+				c.cfg.logger.Infof("The power status of the server with id %v has changed to %t", id, status)
+				return nil
+			}
+		}
+	}
+}
+
+//waitForServerActive allows to wait until the server's status is active
+func (c *Client) waitForServerActive(id string) error {
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for server %v to be active", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			fw, err := c.GetServer(id)
+			if err != nil {
+				return err
+			}
+			if fw.Properties.Status == activeStatus {
+				return nil
+			}
+		}
+	}
+}
+
+//waitForServerDeleted allows to wait until the server is deleted
+func (c *Client) waitForServerDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for server %v to be deleted", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiServerBase, id),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
 }
