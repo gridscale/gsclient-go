@@ -21,6 +21,7 @@ type Config struct {
 	userUUID                string
 	apiToken                string
 	userAgent               string
+	sync                    bool
 	httpClient              *http.Client
 	requestCheckTimeoutSecs time.Duration
 	delayInterval           time.Duration
@@ -35,10 +36,12 @@ type Config struct {
 //		+ uuid string: UUID of user.
 //		+ token string: API token.
 //		+ debugMode bool: true => run client in debug mode.
-//		+ requestCheckTimeoutSecs int: Timeout for checking requests (for synchronous feature)
-//		+ delayIntervalMilliSecs int: delay between requests when checking request (or retry 5xx, 424 error code)
+//		+ sync bool: true => client is in synchronous mode. The client will block until Create/Update/Delete processes
+//		are completely finished. It is safer to set this parameter to `true`.
+//		+ requestCheckTimeoutSecs int: Timeout (in second) for checking requests (for synchronous feature)
+//		+ delayIntervalMilliSecs int: delay (in MilliSecond) between requests when checking request (or retry 5xx, 424 error code)
 //		+ maxNumberOfRetries int: number of retries when server returns 5xx, 424 error code.
-func NewConfiguration(apiURL string, uuid string, token string, debugMode bool, requestCheckTimeoutSecs,
+func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync bool, requestCheckTimeoutSecs,
 	delayIntervalMilliSecs, maxNumberOfRetries int) *Config {
 	logLevel := logrus.InfoLevel
 	if debugMode {
@@ -68,6 +71,7 @@ func NewConfiguration(apiURL string, uuid string, token string, debugMode bool, 
 		userUUID:                uuid,
 		apiToken:                token,
 		userAgent:               "gsclient-go/" + version + " (" + runtime.GOOS + ")",
+		sync:                    sync,
 		httpClient:              http.DefaultClient,
 		logger:                  logger,
 		requestCheckTimeoutSecs: time.Duration(requestCheckTimeoutSecs) * time.Second,
