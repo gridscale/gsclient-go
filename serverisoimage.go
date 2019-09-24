@@ -2,8 +2,10 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //ServerIsoImageRelationList JSON struct of a list of relations between a server and ISO-Images
@@ -108,6 +110,13 @@ func (c *Client) CreateServerIsoImage(id string, body ServerIsoImageRelationCrea
 		method: http.MethodPost,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerISOImageRelCreation(id, body.ObjectUUID)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -121,6 +130,13 @@ func (c *Client) DeleteServerIsoImage(serverID, isoImageID string) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerISOImageRelDeleted(serverID, isoImageID)
 	}
 	return r.execute(*c, nil)
 }
@@ -136,4 +152,74 @@ func (c *Client) LinkIsoImage(serverID string, isoimageID string) error {
 //UnlinkIsoImage removes the link between an ISO image and a server
 func (c *Client) UnlinkIsoImage(serverID string, isoimageID string) error {
 	return c.DeleteServerIsoImage(serverID, isoimageID)
+}
+
+//waitForServerISOImageRelCreation allows to wait until the relation between a server and an ISO-Image is created
+func (c *Client) waitForServerISOImageRelCreation(serverID, isoimageID string) error {
+	if serverID == "" || isoimageID == "" {
+		return errors.New("'serverID' and 'isoimageID' are required")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+RETRY:
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for sever(%v)-ISOImage(%v) relation to be created",
+				serverID, isoimageID)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiServerBase, serverID, "isoimages", isoimageID),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						continue RETRY
+					}
+				}
+				return err
+			}
+			return nil
+		}
+	}
+}
+
+//waitForServerISOImageRelDeleted allows to wait until the relation between a server and an ISO-Image is deleted
+func (c *Client) waitForServerISOImageRelDeleted(serverID, isoimageID string) error {
+	if serverID == "" || isoimageID == "" {
+		return errors.New("'serverID' and 'isoimageID' are required")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for sever(%v)-ISOImage(%v) relation to be deleted",
+				serverID, isoimageID)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiServerBase, serverID, "isoimages", isoimageID),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
 }

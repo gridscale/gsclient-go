@@ -10,7 +10,7 @@ import (
 )
 
 func TestClient_GetServerStorageList(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "storages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
@@ -30,7 +30,7 @@ func TestClient_GetServerStorageList(t *testing.T) {
 }
 
 func TestClient_GetServerStorage(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
@@ -51,30 +51,46 @@ func TestClient_GetServerStorage(t *testing.T) {
 }
 
 func TestClient_CreateServerStorage(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUUID, "storages")
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprint(writer, "")
-	})
-	for _, testServerID := range uuidCommonTestCases {
-		for _, testStorageID := range uuidCommonTestCases {
-			err := client.CreateServerStorage(testServerID.testUUID, ServerStorageRelationCreateRequest{
-				ObjectUUID: testStorageID.testUUID,
-				BootDevice: true,
-			})
-			if testServerID.isFailed || testStorageID.isFailed {
-				assert.NotNil(t, err)
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiServerBase, dummyUUID, "storages")
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			assert.Equal(t, http.MethodPost, request.Method)
+			if isFailed {
+				writer.WriteHeader(400)
 			} else {
-				assert.Nil(t, err, "CreateServerStorage returned an error %v", err)
+				fmt.Fprint(writer, "")
+			}
+		})
+		if clientTest {
+			mux.HandleFunc(path.Join(apiServerBase, dummyUUID, "storages", dummyUUID), func(writer http.ResponseWriter, request *http.Request) {
+				assert.Equal(t, http.MethodGet, request.Method)
+				fmt.Fprintf(writer, prepareServerStorageHTTPGet())
+			})
+		}
+		for _, test := range commonSuccessFailTestCases {
+			isFailed = test.isFailed
+			for _, testServerID := range uuidCommonTestCases {
+				for _, testStorageID := range uuidCommonTestCases {
+					err := client.CreateServerStorage(testServerID.testUUID, ServerStorageRelationCreateRequest{
+						ObjectUUID: testStorageID.testUUID,
+						BootDevice: true,
+					})
+					if testServerID.isFailed || testStorageID.isFailed || isFailed {
+						assert.NotNil(t, err)
+					} else {
+						assert.Nil(t, err, "CreateServerStorage returned an error %v", err)
+					}
+				}
 			}
 		}
+		server.Close()
 	}
 }
 
 func TestClient_UpdateServerStorage(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
@@ -97,47 +113,141 @@ func TestClient_UpdateServerStorage(t *testing.T) {
 }
 
 func TestClient_DeleteServerStorage(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodDelete, request.Method)
-		fmt.Fprint(writer, "")
-	})
-	for _, testServerID := range uuidCommonTestCases {
-		for _, testStorageID := range uuidCommonTestCases {
-			err := client.DeleteServerStorage(testServerID.testUUID, testStorageID.testUUID)
-			if testServerID.isFailed || testStorageID.isFailed {
-				assert.NotNil(t, err)
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			if isFailed {
+				writer.WriteHeader(400)
 			} else {
-				assert.Nil(t, err, "DeleteServerStorage returned an error %v", err)
+				if request.Method == http.MethodDelete {
+					fmt.Fprintf(writer, "")
+				} else if request.Method == http.MethodGet {
+					writer.WriteHeader(404)
+				}
+			}
+		})
+		for _, test := range commonSuccessFailTestCases {
+			isFailed = test.isFailed
+			for _, testServerID := range uuidCommonTestCases {
+				for _, testStorageID := range uuidCommonTestCases {
+					err := client.DeleteServerStorage(testServerID.testUUID, testStorageID.testUUID)
+					if testServerID.isFailed || testStorageID.isFailed || isFailed {
+						assert.NotNil(t, err)
+					} else {
+						assert.Nil(t, err, "DeleteServerStorage returned an error %v", err)
+					}
+				}
 			}
 		}
+		server.Close()
 	}
 }
 
 func TestClient_LinkStorage(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "storages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
+	mux.HandleFunc(path.Join(apiServerBase, dummyUUID, "storages", dummyUUID), func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareServerStorageHTTPGet())
+	})
 	err := client.LinkStorage(dummyUUID, dummyUUID, true)
-	assert.Nil(t, err, "LinkStorage returned an error %v", err)
+	assert.Nil(t, err, "CreateServerStorage returned an error %v", err)
+
 }
 
 func TestClient_UnlinkStorage(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodDelete, request.Method)
-		fmt.Fprint(writer, "")
+
+		if request.Method == http.MethodDelete {
+			fmt.Fprintf(writer, "")
+		} else if request.Method == http.MethodGet {
+			writer.WriteHeader(404)
+		}
 	})
 	err := client.UnlinkStorage(dummyUUID, dummyUUID)
 	assert.Nil(t, err, "UnlinkStorage returned an error %v", err)
+}
+
+func TestClient_waitForServerStorageRelCreation(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	var isTimeout bool
+	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			if isTimeout {
+				writer.WriteHeader(404)
+			} else {
+				fmt.Fprintf(writer, prepareServerIsoImageHTTPGet())
+			}
+		}
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, isTimeoutTest := range timeoutTestCases {
+			isTimeout = isTimeoutTest
+			for _, testServerID := range uuidCommonTestCases {
+				for _, testIPID := range uuidCommonTestCases {
+					err := client.waitForServerStorageRelCreation(testServerID.testUUID, testIPID.testUUID)
+					if testServerID.isFailed || testIPID.isFailed || isFailed || isTimeout {
+						assert.NotNil(t, err)
+					} else {
+						assert.Nil(t, err, "waitForServerStorageRelCreation returned an error %v", err)
+					}
+				}
+			}
+		}
+	}
+}
+
+func TestClient_waitForServerStorageRelDeleted(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	var isTimeout bool
+	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			if isTimeout {
+				fmt.Fprintf(writer, prepareServerStorageHTTPGet())
+			} else {
+				writer.WriteHeader(404)
+			}
+		}
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, isTimeoutTest := range timeoutTestCases {
+			isTimeout = isTimeoutTest
+			for _, testServerID := range uuidCommonTestCases {
+				for _, testIPID := range uuidCommonTestCases {
+					err := client.waitForServerStorageRelDeleted(testServerID.testUUID, testIPID.testUUID)
+					if testServerID.isFailed || testIPID.isFailed || isFailed || isTimeout {
+						assert.NotNil(t, err)
+					} else {
+						assert.Nil(t, err, "waitForServerStorageRelDeleted returned an error %v", err)
+					}
+				}
+			}
+		}
+	}
 }
 
 func getMockServerStorage() ServerStorageRelationProperties {
