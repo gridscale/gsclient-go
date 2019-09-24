@@ -2,8 +2,10 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
+	"time"
 )
 
 //PaaSServices is the JSON struct of a list of PaaS services
@@ -395,7 +397,9 @@ func (c *Client) CreatePaaSService(body PaaSServiceCreateRequest) (PaaSServiceCr
 	if err != nil {
 		return PaaSServiceCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -427,6 +431,14 @@ func (c *Client) UpdatePaaSService(id string, body PaaSServiceUpdateRequest) err
 		method: http.MethodPatch,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForPaaSServiceActive(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -440,6 +452,14 @@ func (c *Client) DeletePaaSService(id string) error {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForPaaSServiceDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -519,7 +539,9 @@ func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (Paa
 	if err != nil {
 		return PaaSSecurityZoneCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -551,6 +573,14 @@ func (c *Client) UpdatePaaSSecurityZone(id string, body PaaSSecurityZoneUpdateRe
 		method: http.MethodPatch,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSecurityZoneActive(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -564,6 +594,14 @@ func (c *Client) DeletePaaSSecurityZone(id string) error {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSecurityZoneDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -585,4 +623,116 @@ func (c *Client) GetDeletedPaaSServices() ([]PaaSService, error) {
 		})
 	}
 	return paasServices, err
+}
+
+//waitForPaaSServiceActive allows to wait until the PaaS service's status is active
+func (c *Client) waitForPaaSServiceActive(id string) error {
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for PaaS %v to be active", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			fw, err := c.GetPaaSService(id)
+			if err != nil {
+				return err
+			}
+			if fw.Properties.Status == activeStatus {
+				return nil
+			}
+		}
+	}
+}
+
+//waitForPaaSServiceDeleted allows to wait until the PaaS service is deleted
+func (c *Client) waitForPaaSServiceDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for PaaS %v to be deleted", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiPaaSBase, "services", id),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
+}
+
+//waitForSecurityZoneActive allows to wait until the security zone's status is active
+func (c *Client) waitForSecurityZoneActive(id string) error {
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for security zone %v to be active", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			fw, err := c.GetPaaSSecurityZone(id)
+			if err != nil {
+				return err
+			}
+			if fw.Properties.Status == activeStatus {
+				return nil
+			}
+		}
+	}
+}
+
+//waitForSecurityZoneDeleted allows to wait until the security zone is deleted
+func (c *Client) waitForSecurityZoneDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	timer := time.After(c.cfg.requestCheckTimeoutSecs)
+	delayInterval := c.cfg.delayInterval
+	for {
+		select {
+		case <-timer:
+			errorMessage := fmt.Sprintf("Timeout reached when waiting for security zone %v to be deleted", id)
+			c.cfg.logger.Error(errorMessage)
+			return errors.New(errorMessage)
+		default:
+			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
+			r := Request{
+				uri:          path.Join(apiPaaSBase, "security_zones", id),
+				method:       http.MethodGet,
+				skipPrint404: true,
+			}
+			err := r.execute(*c, nil)
+			if err != nil {
+				if requestError, ok := err.(RequestError); ok {
+					if requestError.StatusCode == 404 {
+						return nil
+					}
+				}
+				return err
+			}
+		}
+	}
 }
