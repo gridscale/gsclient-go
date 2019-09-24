@@ -10,26 +10,26 @@ import (
 )
 
 func TestClient_GetIPList(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := apiIPBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareIPListHTTPGet())
+		fmt.Fprintf(writer, prepareIPListHTTPGet("active"))
 	})
 	res, err := client.GetIPList()
 	assert.Nil(t, err, "GetIPList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockIP()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockIP("active")), fmt.Sprintf("%v", res))
 }
 
 func TestClient_GetIP(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiIPBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareIPHTTPGet())
+		fmt.Fprintf(writer, prepareIPHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetIP(test.testUUID)
@@ -37,88 +37,118 @@ func TestClient_GetIP(t *testing.T) {
 			assert.NotNil(t, err)
 		} else {
 			assert.Nil(t, err, "GetIP returned an error %v", err)
-			assert.Equal(t, fmt.Sprintf("%v", getMockIP()), fmt.Sprintf("%v", res))
+			assert.Equal(t, fmt.Sprintf("%v", getMockIP("active")), fmt.Sprintf("%v", res))
 		}
 	}
 }
 
 func TestClient_CreateIP(t *testing.T) {
-	server, client, mux := setupTestClient()
-	var isFailed bool
-	defer server.Close()
-	uri := apiIPBase
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			fmt.Fprintf(writer, prepareIPCreateResponse())
-		}
-	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-	for _, test := range commonSuccessFailTestCases {
-		isFailed = test.isFailed
-		response, err := client.CreateIP(IPCreateRequest{
-			Name:         "test",
-			Family:       IPv4Type,
-			LocationUUID: dummyUUID,
-			Failover:     false,
-			ReverseDNS:   "8.8.8.8",
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := apiIPBase
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			assert.Equal(t, http.MethodPost, request.Method)
+			if isFailed {
+				writer.WriteHeader(400)
+			} else {
+				fmt.Fprintf(writer, prepareIPCreateResponse())
+			}
 		})
-		if isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "CreateIP returned an error %v", err)
-			assert.Equal(t, fmt.Sprintf("%v", getMockIPCreateResponse()), fmt.Sprintf("%s", response))
+		if clientTest {
+			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
+			mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprint(w, httpResponse)
+			})
 		}
+		for _, test := range commonSuccessFailTestCases {
+			isFailed = test.isFailed
+			response, err := client.CreateIP(IPCreateRequest{
+				Name:         "test",
+				Family:       IPv4Type,
+				LocationUUID: dummyUUID,
+				Failover:     false,
+				ReverseDNS:   "8.8.8.8",
+			})
+			if isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "CreateIP returned an error %v", err)
+				assert.Equal(t, fmt.Sprintf("%v", getMockIPCreateResponse()), fmt.Sprintf("%s", response))
+			}
+		}
+		server.Close()
 	}
 }
 
 func TestClient_UpdateIP(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiIPBase, dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPatch, request.Method)
-		fmt.Fprint(writer, "")
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.UpdateIP(test.testUUID, IPUpdateRequest{
-			Name:       "test",
-			Failover:   false,
-			ReverseDNS: "8.8.4.4",
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiIPBase, dummyUUID)
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			if isFailed {
+				writer.WriteHeader(400)
+			} else {
+				if request.Method == http.MethodPatch {
+					fmt.Fprintf(writer, "")
+				} else if request.Method == http.MethodGet {
+					fmt.Fprint(writer, prepareIPHTTPGet("active"))
+				}
+			}
 		})
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "UpdateIP returned an error %v", err)
+		for _, serverTest := range commonSuccessFailTestCases {
+			isFailed = serverTest.isFailed
+			for _, test := range uuidCommonTestCases {
+				err := client.UpdateIP(test.testUUID, IPUpdateRequest{
+					Name:       "test",
+					Failover:   false,
+					ReverseDNS: "8.8.4.4",
+				})
+				if test.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "UpdateIP returned an error %v", err)
+				}
+			}
 		}
+		server.Close()
 	}
 }
 
 func TestClient_DeleteIP(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiIPBase, dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodDelete, request.Method)
-		fmt.Fprint(writer, "")
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.DeleteIP(test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "DeleteIP returned an error %v", err)
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiIPBase, dummyUUID)
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			if isFailed {
+				writer.WriteHeader(400)
+			} else {
+				if request.Method == http.MethodDelete {
+					fmt.Fprintf(writer, "")
+				} else if request.Method == http.MethodGet {
+					writer.WriteHeader(404)
+				}
+			}
+		})
+		for _, serverTest := range commonSuccessFailTestCases {
+			isFailed = serverTest.isFailed
+			for _, test := range uuidCommonTestCases {
+				err := client.DeleteIP(test.testUUID)
+				if test.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "DeleteIP returned an error %v", err)
+				}
+			}
 		}
+		server.Close()
 	}
 }
 
 func TestClient_GetIPEventList(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiIPBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
@@ -139,7 +169,7 @@ func TestClient_GetIPEventList(t *testing.T) {
 }
 
 func TestClient_GetIPVersion(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
 	uri := path.Join(apiIPBase, dummyUUID)
@@ -148,7 +178,7 @@ func TestClient_GetIPVersion(t *testing.T) {
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
-			fmt.Fprintf(writer, prepareIPHTTPGet())
+			fmt.Fprintf(writer, prepareIPHTTPGet("active"))
 		}
 	})
 	for _, test := range commonSuccessFailTestCases {
@@ -163,12 +193,12 @@ func TestClient_GetIPVersion(t *testing.T) {
 }
 
 func TestClient_GetIPsByLocation(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiLocationBase, dummyUUID, "ips")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareIPListHTTPGet())
+		fmt.Fprintf(writer, prepareIPListHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetIPsByLocation(test.testUUID)
@@ -177,26 +207,92 @@ func TestClient_GetIPsByLocation(t *testing.T) {
 		} else {
 			assert.Nil(t, err, "GetIPsByLocation returned an error %v", err)
 			assert.Equal(t, 1, len(res))
-			assert.Equal(t, fmt.Sprintf("[%v]", getMockIP()), fmt.Sprintf("%v", res))
+			assert.Equal(t, fmt.Sprintf("[%v]", getMockIP("active")), fmt.Sprintf("%v", res))
 		}
 	}
 }
 
 func TestClient_GetDeletedIPs(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiDeletedBase, "ips")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareDeletedIPListHTTPGet())
+		fmt.Fprintf(writer, prepareDeletedIPListHTTPGet("deleted"))
 	})
 	res, err := client.GetDeletedIPs()
 	assert.Nil(t, err, "GetDeletedIPs returned an error %v", err)
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockIP()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockIP("deleted")), fmt.Sprintf("%v", res))
 }
 
-func getMockIP() IP {
+func TestClient_waitForIPActive(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	var isTimeout bool
+	uri := path.Join(apiIPBase, dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			if isTimeout {
+				fmt.Fprint(w, prepareIPHTTPGet("in-provisioning"))
+			} else {
+				fmt.Fprint(w, prepareIPHTTPGet("active"))
+			}
+		}
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, isTimeoutTest := range timeoutTestCases {
+			isTimeout = isTimeoutTest
+			err := client.waitForIPActive(dummyUUID)
+			if isFailed || isTimeout {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "waitForIPActive returned an error %v", err)
+			}
+		}
+	}
+}
+
+func TestClient_waitForIPDeleted(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	var isTimeout bool
+	uri := path.Join(apiIPBase, dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			if isTimeout {
+				fmt.Fprint(w, prepareIPHTTPGet("to-be-deleted"))
+			} else {
+				w.WriteHeader(404)
+			}
+		}
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, isTimeoutTest := range timeoutTestCases {
+			isTimeout = isTimeoutTest
+			for _, test := range uuidCommonTestCases {
+				err := client.waitForIPDeleted(test.testUUID)
+				if test.isFailed || isFailed || isTimeout {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "waitForIPDeleted returned an error %v", err)
+				}
+			}
+		}
+	}
+}
+
+func getMockIP(status string) IP {
 	mock := IP{Properties: IPProperties{
 		Name:            "test",
 		LocationCountry: "Germany",
@@ -204,7 +300,7 @@ func getMockIP() IP {
 		ObjectUUID:      dummyUUID,
 		ReverseDNS:      "8.8.8.8",
 		Family:          1,
-		Status:          "active",
+		Status:          status,
 		CreateTime:      dummyTime,
 		Failover:        false,
 		ChangeTime:      dummyTime,
@@ -229,14 +325,14 @@ func getMockIP() IP {
 	return mock
 }
 
-func prepareIPListHTTPGet() string {
-	ip := getMockIP()
+func prepareIPListHTTPGet(status string) string {
+	ip := getMockIP(status)
 	res, _ := json.Marshal(ip.Properties)
 	return fmt.Sprintf(`{"ips": {"%s": %s}}`, dummyUUID, string(res))
 }
 
-func prepareIPHTTPGet() string {
-	ip := getMockIP()
+func prepareIPHTTPGet(status string) string {
+	ip := getMockIP(status)
 	res, _ := json.Marshal(ip)
 	return string(res)
 }
@@ -256,8 +352,8 @@ func prepareIPCreateResponse() string {
 	return string(res)
 }
 
-func prepareDeletedIPListHTTPGet() string {
-	ip := getMockIP()
+func prepareDeletedIPListHTTPGet(status string) string {
+	ip := getMockIP(status)
 	res, _ := json.Marshal(ip.Properties)
 	return fmt.Sprintf(`{"deleted_ips": {"%s": %s}}`, dummyUUID, string(res))
 }
