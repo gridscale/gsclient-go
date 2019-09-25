@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -46,7 +47,7 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 					BackendServers:      lb.BackendServers,
 					Labels:              testLabel,
 				}
-				response, err := client.CreateLoadBalancer(lbRequest)
+				response, err := client.CreateLoadBalancer(context.Background(), lbRequest)
 				if testSuccessFail.isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -68,7 +69,7 @@ func TestClient_GetLoadBalancer(t *testing.T) {
 		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		loadbalancer, err := client.GetLoadBalancer(test.testUUID)
+		loadbalancer, err := client.GetLoadBalancer(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -88,7 +89,7 @@ func TestClient_GetLoadBalancerList(t *testing.T) {
 		assert.Equal(t, r.Method, http.MethodGet)
 		fmt.Fprint(w, prepareLoadBalancerHTTPListResponse("active"))
 	})
-	loadbalancers, err := client.GetLoadBalancerList()
+	loadbalancers, err := client.GetLoadBalancerList(context.Background())
 	assert.Nil(t, err, "GetLoadBalancerList returned error: %v", err)
 	assert.Equal(t, 1, len(loadbalancers))
 	assert.Equal(t, fmt.Sprintf("[%v]", expectedObjects), fmt.Sprintf("%v", loadbalancers))
@@ -113,13 +114,16 @@ func TestClient_UpdateLoadBalancer(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.UpdateLoadBalancer(test.testUUID, LoadBalancerUpdateRequest{
-					Name:                "test",
-					ListenIPv6UUID:      dummyUUID,
-					ListenIPv4UUID:      dummyUUID,
-					RedirectHTTPToHTTPS: false,
-					Status:              "inactive",
-				})
+				err := client.UpdateLoadBalancer(
+					context.Background(),
+					test.testUUID,
+					LoadBalancerUpdateRequest{
+						Name:                "test",
+						ListenIPv6UUID:      dummyUUID,
+						ListenIPv4UUID:      dummyUUID,
+						RedirectHTTPToHTTPS: false,
+						Status:              "inactive",
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -150,7 +154,7 @@ func TestClient_DeleteLoadBalancer(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteLoadBalancer(test.testUUID)
+				err := client.DeleteLoadBalancer(context.Background(), test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -172,7 +176,7 @@ func TestClient_GetLoadBalancerEventList(t *testing.T) {
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetLoadBalancerEventList(test.testUUID)
+		response, err := client.GetLoadBalancerEventList(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -205,7 +209,7 @@ func TestClient_waitForLoadbalancerActive(t *testing.T) {
 		isFailed = serverTest.isFailed
 		for _, isTimeoutTest := range timeoutTestCases {
 			isTimeout = isTimeoutTest
-			err := client.waitForLoadbalancerActive(dummyUUID)
+			err := client.waitForLoadbalancerActive(context.Background(), dummyUUID)
 			if isFailed || isTimeout {
 				assert.NotNil(t, err)
 			} else {
@@ -238,7 +242,7 @@ func TestClient_waitForLoadbalancerDeleted(t *testing.T) {
 		for _, isTimeoutTest := range timeoutTestCases {
 			isTimeout = isTimeoutTest
 			for _, test := range uuidCommonTestCases {
-				err := client.waitForLoadbalancerDeleted(test.testUUID)
+				err := client.waitForLoadbalancerDeleted(context.Background(), test.testUUID)
 				if test.isFailed || isFailed || isTimeout {
 					assert.NotNil(t, err)
 				} else {

@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,7 @@ func TestClient_GetObjectStorageAccessKeyList(t *testing.T) {
 		fmt.Fprintf(writer, prepareObjectStorageAccessKeyListHTTPGet())
 	})
 
-	res, err := client.GetObjectStorageAccessKeyList()
+	res, err := client.GetObjectStorageAccessKeyList(context.Background())
 	assert.Nil(t, err, "GetObjectStorageAccessKeyList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockObjectStorageAccessKey()), fmt.Sprintf("%v", res))
@@ -33,7 +34,7 @@ func TestClient_GetObjectStorageAccessKey(t *testing.T) {
 		fmt.Fprintf(writer, prepareObjectStorageAccessKeyHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetObjectStorageAccessKey(test.testUUID)
+		res, err := client.GetObjectStorageAccessKey(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -64,7 +65,7 @@ func TestClient_CreateObjectStorageAccessKey(t *testing.T) {
 		}
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
-			res, err := client.CreateObjectStorageAccessKey()
+			res, err := client.CreateObjectStorageAccessKey(context.Background())
 			if isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -95,7 +96,7 @@ func TestClient_DeleteObjectStorageAccessKey(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteObjectStorageAccessKey(test.testUUID)
+				err := client.DeleteObjectStorageAccessKey(context.Background(), test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -116,7 +117,7 @@ func TestClient_GetObjectStorageBucketList(t *testing.T) {
 		fmt.Fprintf(writer, prepareObjectStorageBucketListHTTPGet())
 	})
 
-	res, err := client.GetObjectStorageBucketList()
+	res, err := client.GetObjectStorageBucketList(context.Background())
 	assert.Nil(t, err, "GetObjectStorageBucketList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockObjectStorageBucket()), fmt.Sprintf("%v", res))
@@ -145,7 +146,7 @@ func TestClient_waitForObjectStorageAccessKeyDeleted(t *testing.T) {
 		for _, isTimeoutTest := range timeoutTestCases {
 			isTimeout = isTimeoutTest
 			for _, test := range uuidCommonTestCases {
-				err := client.waitForObjectStorageAccessKeyDeleted(test.testUUID)
+				err := client.waitForObjectStorageAccessKeyDeleted(context.Background(), test.testUUID)
 				if test.isFailed || isFailed || isTimeout {
 					assert.NotNil(t, err)
 				} else {

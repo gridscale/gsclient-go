@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestClient_GetIPList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareIPListHTTPGet("active"))
 	})
-	res, err := client.GetIPList()
+	res, err := client.GetIPList(context.Background())
 	assert.Nil(t, err, "GetIPList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockIP("active")), fmt.Sprintf("%v", res))
@@ -32,7 +33,7 @@ func TestClient_GetIP(t *testing.T) {
 		fmt.Fprintf(writer, prepareIPHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetIP(test.testUUID)
+		res, err := client.GetIP(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -63,13 +64,15 @@ func TestClient_CreateIP(t *testing.T) {
 		}
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
-			response, err := client.CreateIP(IPCreateRequest{
-				Name:         "test",
-				Family:       IPv4Type,
-				LocationUUID: dummyUUID,
-				Failover:     false,
-				ReverseDNS:   "8.8.8.8",
-			})
+			response, err := client.CreateIP(
+				context.Background(),
+				IPCreateRequest{
+					Name:         "test",
+					Family:       IPv4Type,
+					LocationUUID: dummyUUID,
+					Failover:     false,
+					ReverseDNS:   "8.8.8.8",
+				})
 			if isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -100,11 +103,14 @@ func TestClient_UpdateIP(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.UpdateIP(test.testUUID, IPUpdateRequest{
-					Name:       "test",
-					Failover:   false,
-					ReverseDNS: "8.8.4.4",
-				})
+				err := client.UpdateIP(
+					context.Background(),
+					test.testUUID,
+					IPUpdateRequest{
+						Name:       "test",
+						Failover:   false,
+						ReverseDNS: "8.8.4.4",
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -135,7 +141,7 @@ func TestClient_DeleteIP(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteIP(test.testUUID)
+				err := client.DeleteIP(context.Background(), test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -156,7 +162,7 @@ func TestClient_GetIPEventList(t *testing.T) {
 		fmt.Fprintf(writer, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetIPEventList(test.testUUID)
+		res, err := client.GetIPEventList(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -183,7 +189,7 @@ func TestClient_GetIPVersion(t *testing.T) {
 	})
 	for _, test := range commonSuccessFailTestCases {
 		isFailed = test.isFailed
-		res := client.GetIPVersion(dummyUUID)
+		res := client.GetIPVersion(context.Background(), dummyUUID)
 		if test.isFailed {
 			assert.Equal(t, 0, res)
 		} else {
@@ -201,7 +207,7 @@ func TestClient_GetIPsByLocation(t *testing.T) {
 		fmt.Fprintf(writer, prepareIPListHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetIPsByLocation(test.testUUID)
+		res, err := client.GetIPsByLocation(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -220,7 +226,7 @@ func TestClient_GetDeletedIPs(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareDeletedIPListHTTPGet("deleted"))
 	})
-	res, err := client.GetDeletedIPs()
+	res, err := client.GetDeletedIPs(context.Background())
 	assert.Nil(t, err, "GetDeletedIPs returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockIP("deleted")), fmt.Sprintf("%v", res))
@@ -248,7 +254,7 @@ func TestClient_waitForIPActive(t *testing.T) {
 		isFailed = serverTest.isFailed
 		for _, isTimeoutTest := range timeoutTestCases {
 			isTimeout = isTimeoutTest
-			err := client.waitForIPActive(dummyUUID)
+			err := client.waitForIPActive(context.Background(), dummyUUID)
 			if isFailed || isTimeout {
 				assert.NotNil(t, err)
 			} else {
@@ -281,7 +287,7 @@ func TestClient_waitForIPDeleted(t *testing.T) {
 		for _, isTimeoutTest := range timeoutTestCases {
 			isTimeout = isTimeoutTest
 			for _, test := range uuidCommonTestCases {
-				err := client.waitForIPDeleted(test.testUUID)
+				err := client.waitForIPDeleted(context.Background(), test.testUUID)
 				if test.isFailed || isFailed || isTimeout {
 					assert.NotNil(t, err)
 				} else {

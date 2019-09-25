@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +29,7 @@ func TestClient_GetLabelList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareLabelListHTTPGet("test"))
 	})
-	res, err := client.GetLabelList()
+	res, err := client.GetLabelList(context.Background())
 	assert.Nil(t, err, "GetLabelList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockLabel("test")), fmt.Sprintf("%v", res))
@@ -52,7 +53,7 @@ func TestClient_CreateLabel(t *testing.T) {
 	})
 	for _, test := range commonSuccessFailTestCases {
 		isFailed = test.isFailed
-		res, err := client.CreateLabel(LabelCreateRequest{Label: "test"})
+		res, err := client.CreateLabel(context.Background(), LabelCreateRequest{Label: "test"})
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -86,7 +87,7 @@ func TestClient_waitForLabelDeleted(t *testing.T) {
 		for _, isTimeoutTest := range timeoutTestCases {
 			isTimeout = isTimeoutTest
 			for _, test := range labelTestCases {
-				err := client.waitForLabelDeleted(test.testUUID)
+				err := client.waitForLabelDeleted(context.Background(), test.testUUID)
 				if test.isFailed || isFailed || isTimeout {
 					assert.NotNil(t, err)
 				} else {
@@ -119,7 +120,7 @@ func TestClient_DeleteLabel(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range labelTestCases {
-				err := client.DeleteLabel(test.testUUID)
+				err := client.DeleteLabel(context.Background(), test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {

@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,7 @@ func TestClient_GetServerStorageList(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerStorageListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetServerStorageList(test.testUUID)
+		res, err := client.GetServerStorageList(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -39,7 +40,7 @@ func TestClient_GetServerStorage(t *testing.T) {
 	})
 	for _, testServerID := range uuidCommonTestCases {
 		for _, testStorageID := range uuidCommonTestCases {
-			res, err := client.GetServerStorage(testServerID.testUUID, testStorageID.testUUID)
+			res, err := client.GetServerStorage(context.Background(), testServerID.testUUID, testStorageID.testUUID)
 			if testServerID.isFailed || testStorageID.isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -73,10 +74,13 @@ func TestClient_CreateServerStorage(t *testing.T) {
 			isFailed = test.isFailed
 			for _, testServerID := range uuidCommonTestCases {
 				for _, testStorageID := range uuidCommonTestCases {
-					err := client.CreateServerStorage(testServerID.testUUID, ServerStorageRelationCreateRequest{
-						ObjectUUID: testStorageID.testUUID,
-						BootDevice: true,
-					})
+					err := client.CreateServerStorage(
+						context.Background(),
+						testServerID.testUUID,
+						ServerStorageRelationCreateRequest{
+							ObjectUUID: testStorageID.testUUID,
+							BootDevice: true,
+						})
 					if testServerID.isFailed || testStorageID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -99,10 +103,14 @@ func TestClient_UpdateServerStorage(t *testing.T) {
 	})
 	for _, testServerID := range uuidCommonTestCases {
 		for _, testStorageID := range uuidCommonTestCases {
-			err := client.UpdateServerStorage(testServerID.testUUID, testStorageID.testUUID, ServerStorageRelationUpdateRequest{
-				Ordering:   1,
-				BootDevice: true,
-			})
+			err := client.UpdateServerStorage(
+				context.Background(),
+				testServerID.testUUID,
+				testStorageID.testUUID,
+				ServerStorageRelationUpdateRequest{
+					Ordering:   1,
+					BootDevice: true,
+				})
 			if testServerID.isFailed || testStorageID.isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -132,7 +140,7 @@ func TestClient_DeleteServerStorage(t *testing.T) {
 			isFailed = test.isFailed
 			for _, testServerID := range uuidCommonTestCases {
 				for _, testStorageID := range uuidCommonTestCases {
-					err := client.DeleteServerStorage(testServerID.testUUID, testStorageID.testUUID)
+					err := client.DeleteServerStorage(context.Background(), testServerID.testUUID, testStorageID.testUUID)
 					if testServerID.isFailed || testStorageID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -157,7 +165,7 @@ func TestClient_LinkStorage(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerStorageHTTPGet())
 	})
-	err := client.LinkStorage(dummyUUID, dummyUUID, true)
+	err := client.LinkStorage(context.Background(), dummyUUID, dummyUUID, true)
 	assert.Nil(t, err, "CreateServerStorage returned an error %v", err)
 
 }
@@ -174,7 +182,7 @@ func TestClient_UnlinkStorage(t *testing.T) {
 			writer.WriteHeader(404)
 		}
 	})
-	err := client.UnlinkStorage(dummyUUID, dummyUUID)
+	err := client.UnlinkStorage(context.Background(), dummyUUID, dummyUUID)
 	assert.Nil(t, err, "UnlinkStorage returned an error %v", err)
 }
 
@@ -202,7 +210,7 @@ func TestClient_waitForServerStorageRelCreation(t *testing.T) {
 			isTimeout = isTimeoutTest
 			for _, testServerID := range uuidCommonTestCases {
 				for _, testIPID := range uuidCommonTestCases {
-					err := client.waitForServerStorageRelCreation(testServerID.testUUID, testIPID.testUUID)
+					err := client.waitForServerStorageRelCreation(context.Background(), testServerID.testUUID, testIPID.testUUID)
 					if testServerID.isFailed || testIPID.isFailed || isFailed || isTimeout {
 						assert.NotNil(t, err)
 					} else {
@@ -238,7 +246,7 @@ func TestClient_waitForServerStorageRelDeleted(t *testing.T) {
 			isTimeout = isTimeoutTest
 			for _, testServerID := range uuidCommonTestCases {
 				for _, testIPID := range uuidCommonTestCases {
-					err := client.waitForServerStorageRelDeleted(testServerID.testUUID, testIPID.testUUID)
+					err := client.waitForServerStorageRelDeleted(context.Background(), testServerID.testUUID, testIPID.testUUID)
 					if testServerID.isFailed || testIPID.isFailed || isFailed || isTimeout {
 						assert.NotNil(t, err)
 					} else {

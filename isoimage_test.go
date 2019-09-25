@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestClient_GetISOImageList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareISOImageHTTPGetList("active"))
 	})
-	res, err := client.GetISOImageList()
+	res, err := client.GetISOImageList(context.Background())
 	assert.Nil(t, err, "GetISOImageList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockISOImage("active")), fmt.Sprintf("%v", res))
@@ -32,7 +33,7 @@ func TestClient_GetISOImage(t *testing.T) {
 		fmt.Fprintf(writer, prepareISOImageHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetISOImage(test.testUUID)
+		res, err := client.GetISOImage(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -63,12 +64,14 @@ func TestClient_CreateISOImage(t *testing.T) {
 		}
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
-			response, err := client.CreateISOImage(ISOImageCreateRequest{
-				Name:         "Test",
-				SourceURL:    "http://example.org",
-				Labels:       []string{"label"},
-				LocationUUID: "aa-bb-cc",
-			})
+			response, err := client.CreateISOImage(
+				context.Background(),
+				ISOImageCreateRequest{
+					Name:         "Test",
+					SourceURL:    "http://example.org",
+					Labels:       []string{"label"},
+					LocationUUID: "aa-bb-cc",
+				})
 			if test.isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -99,10 +102,13 @@ func TestClient_UpdateISOImage(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.UpdateISOImage(test.testUUID, ISOImageUpdateRequest{
-					Name:   "test",
-					Labels: []string{},
-				})
+				err := client.UpdateISOImage(
+					context.Background(),
+					test.testUUID,
+					ISOImageUpdateRequest{
+						Name:   "test",
+						Labels: []string{},
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -133,7 +139,7 @@ func TestClient_DeleteISOImage(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteISOImage(test.testUUID)
+				err := client.DeleteISOImage(context.Background(), test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -154,7 +160,7 @@ func TestClient_GetISOImageEventList(t *testing.T) {
 		fmt.Fprint(writer, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetISOImageEventList(test.testUUID)
+		res, err := client.GetISOImageEventList(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -174,7 +180,7 @@ func TestClient_GetISOImagesByLocation(t *testing.T) {
 		fmt.Fprintf(writer, prepareISOImageHTTPGetList("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetISOImagesByLocation(test.testUUID)
+		res, err := client.GetISOImagesByLocation(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -193,7 +199,7 @@ func TestClient_GetDeletedISOImages(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareDeletedISOImageHTTPGetList("deleted"))
 	})
-	res, err := client.GetDeletedISOImages()
+	res, err := client.GetDeletedISOImages(context.Background())
 	assert.Nil(t, err, "GetDeletedISOImages returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockISOImage("deleted")), fmt.Sprintf("%v", res))
@@ -221,7 +227,7 @@ func TestClient_waitForISOImageActive(t *testing.T) {
 		isFailed = serverTest.isFailed
 		for _, isTimeoutTest := range timeoutTestCases {
 			isTimeout = isTimeoutTest
-			err := client.waitForISOImageActive(dummyUUID)
+			err := client.waitForISOImageActive(context.Background(), dummyUUID)
 			if isFailed || isTimeout {
 				assert.NotNil(t, err)
 			} else {
@@ -254,7 +260,7 @@ func TestClient_waitForISOImageDeleted(t *testing.T) {
 		for _, isTimeoutTest := range timeoutTestCases {
 			isTimeout = isTimeoutTest
 			for _, test := range uuidCommonTestCases {
-				err := client.waitForISOImageDeleted(test.testUUID)
+				err := client.waitForISOImageDeleted(context.Background(), test.testUUID)
 				if test.isFailed || isFailed || isTimeout {
 					assert.NotNil(t, err)
 				} else {

@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,7 @@ func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetStorageSnapshotScheduleList(test.testUUID)
+		res, err := client.GetStorageSnapshotScheduleList(context.Background(), test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -39,7 +40,7 @@ func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
 	})
 	for _, testStorageID := range uuidCommonTestCases {
 		for _, testScheduleID := range uuidCommonTestCases {
-			res, err := client.GetStorageSnapshotSchedule(testStorageID.testUUID, testScheduleID.testUUID)
+			res, err := client.GetStorageSnapshotSchedule(context.Background(), testStorageID.testUUID, testScheduleID.testUUID)
 			if testStorageID.isFailed || testScheduleID.isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -72,13 +73,16 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
 			for _, test := range uuidCommonTestCases {
-				response, err := client.CreateStorageSnapshotSchedule(test.testUUID, StorageSnapshotScheduleCreateRequest{
-					Name:          "test",
-					Labels:        []string{"test"},
-					RunInterval:   60,
-					KeepSnapshots: 1,
-					NextRuntime:   &dummyTime,
-				})
+				response, err := client.CreateStorageSnapshotSchedule(
+					context.Background(),
+					test.testUUID,
+					StorageSnapshotScheduleCreateRequest{
+						Name:          "test",
+						Labels:        []string{"test"},
+						RunInterval:   60,
+						KeepSnapshots: 1,
+						NextRuntime:   &dummyTime,
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -111,13 +115,17 @@ func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 			isFailed = serverTest.isFailed
 			for _, testStorageID := range uuidCommonTestCases {
 				for _, testScheduleID := range uuidCommonTestCases {
-					err := client.UpdateStorageSnapshotSchedule(testStorageID.testUUID, testScheduleID.testUUID, StorageSnapshotScheduleUpdateRequest{
-						Name:          "test",
-						Labels:        []string{"label"},
-						RunInterval:   60,
-						KeepSnapshots: 1,
-						NextRuntime:   &dummyTime,
-					})
+					err := client.UpdateStorageSnapshotSchedule(
+						context.Background(),
+						testStorageID.testUUID,
+						testScheduleID.testUUID,
+						StorageSnapshotScheduleUpdateRequest{
+							Name:          "test",
+							Labels:        []string{"label"},
+							RunInterval:   60,
+							KeepSnapshots: 1,
+							NextRuntime:   &dummyTime,
+						})
 					if testStorageID.isFailed || testScheduleID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -150,7 +158,7 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 			isFailed = serverTest.isFailed
 			for _, testStorageID := range uuidCommonTestCases {
 				for _, testScheduleID := range uuidCommonTestCases {
-					err := client.DeleteStorageSnapshotSchedule(testStorageID.testUUID, testScheduleID.testUUID)
+					err := client.DeleteStorageSnapshotSchedule(context.Background(), testStorageID.testUUID, testScheduleID.testUUID)
 					if testStorageID.isFailed || testScheduleID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -185,7 +193,7 @@ func TestClient_waitForSnapshotScheduleActive(t *testing.T) {
 		isFailed = serverTest.isFailed
 		for _, isTimeoutTest := range timeoutTestCases {
 			isTimeout = isTimeoutTest
-			err := client.waitForSnapshotScheduleActive(dummyUUID, dummyUUID)
+			err := client.waitForSnapshotScheduleActive(context.Background(), dummyUUID, dummyUUID)
 			if isFailed || isTimeout {
 				assert.NotNil(t, err)
 			} else {
@@ -219,7 +227,7 @@ func TestClient_waitForSnapshotScheduleDeleted(t *testing.T) {
 			isTimeout = isTimeoutTest
 			for _, testStorageID := range uuidCommonTestCases {
 				for _, testScheduleID := range uuidCommonTestCases {
-					err := client.waitForSnapshotScheduleDeleted(testStorageID.testUUID, testScheduleID.testUUID)
+					err := client.waitForSnapshotScheduleDeleted(context.Background(), testStorageID.testUUID, testScheduleID.testUUID)
 					if testStorageID.isFailed || testScheduleID.isFailed || isFailed || isTimeout {
 						assert.NotNil(t, err)
 					} else {
