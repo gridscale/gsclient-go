@@ -4,6 +4,7 @@
 
 IMPROVEMENTS:
 * Client now can be run in `sync` mode
+* The library now can be fully controlled through `context`
 * Auto retry when server returns 5xx and 424 http codes
 * Server type is now limited to pre-defined values
 * Storage type is now limited to pre-defined values
