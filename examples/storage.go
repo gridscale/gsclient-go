@@ -7,7 +7,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/nvthongswansea/gsclient-go"
+	"github.com/gridscale/gsclient-go"
 )
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
