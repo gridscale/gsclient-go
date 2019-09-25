@@ -2,7 +2,8 @@ package main
 
 import (
 	"bufio"
-	"github.com/gridscale/gsclient-go"
+	"context"
+	"github.com/nvthongswansea/gsclient-go"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -34,14 +35,14 @@ func main() {
 		LocationUUID: locationUUID,
 	}
 	//Create new IP
-	ipc, err := client.CreateIP(ipRequest)
+	ipc, err := client.CreateIP(context.Background(), ipRequest)
 	if err != nil {
 		log.Error("Create IP address has failed with error", err)
 		return
 	}
 	log.WithFields(log.Fields{"ip_uuid": ipc.ObjectUUID}).Info("IP address successfully created")
 	defer func() {
-		err := client.DeleteIP(ipc.ObjectUUID)
+		err := client.DeleteIP(context.Background(), ipc.ObjectUUID)
 		if err != nil {
 			log.Error("Delete IP address has failed with error", err)
 			return
@@ -50,7 +51,7 @@ func main() {
 
 		log.Info("Get deleted IP address: Press 'Enter' to continue...")
 		bufio.NewReader(os.Stdin).ReadBytes('\n')
-		ips, err := client.GetDeletedIPs()
+		ips, err := client.GetDeletedIPs(context.Background())
 		if err != nil {
 			log.Error("Get delete IP address has failed with error", err)
 			return
@@ -64,7 +65,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get IP to update
-	ip, err := client.GetIP(ipc.ObjectUUID)
+	ip, err := client.GetIP(context.Background(), ipc.ObjectUUID)
 	if err != nil {
 		log.Error("Get IP address has failed with error", err)
 		return
@@ -75,7 +76,7 @@ func main() {
 		ReverseDNS: ip.Properties.ReverseDNS,
 		Labels:     ip.Properties.Labels,
 	}
-	err = client.UpdateIP(ip.Properties.ObjectUUID, updateRequest)
+	err = client.UpdateIP(context.Background(), ip.Properties.ObjectUUID, updateRequest)
 	if err != nil {
 		log.Error("Update IP address has failed with error", err)
 		return
@@ -84,7 +85,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get IP address events
-	response, err := client.GetIPEventList(ip.Properties.ObjectUUID)
+	response, err := client.GetIPEventList(context.Background(), ip.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get IP address events has failed with error", err)
 		return

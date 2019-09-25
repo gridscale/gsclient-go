@@ -2,7 +2,8 @@ package main
 
 import (
 	"bufio"
-	"github.com/gridscale/gsclient-go"
+	"context"
+	"github.com/nvthongswansea/gsclient-go"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -30,10 +31,12 @@ func main() {
 
 	log.Info("Create SSH-key: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	cSSHkey, err := client.CreateSshkey(gsclient.SshkeyCreateRequest{
-		Name:   "go-client-ssh-key",
-		Sshkey: exampleSSHkey,
-	})
+	cSSHkey, err := client.CreateSshkey(
+		context.Background(),
+		gsclient.SshkeyCreateRequest{
+			Name:   "go-client-ssh-key",
+			Sshkey: exampleSSHkey,
+		})
 	if err != nil {
 		log.Error("Create SSH-key has failed with error", err)
 		return
@@ -42,7 +45,7 @@ func main() {
 		"sshkey_uuid": cSSHkey.ObjectUUID,
 	}).Info("SSH-key successfully created")
 	defer func() {
-		err := client.DeleteSshkey(cSSHkey.ObjectUUID)
+		err := client.DeleteSshkey(context.Background(), cSSHkey.ObjectUUID)
 		if err != nil {
 			log.Error("Delete SSH-key has failed with error", err)
 			return
@@ -51,7 +54,7 @@ func main() {
 	}()
 
 	//Get a SSH-key to update
-	sshkey, err := client.GetSshkey(cSSHkey.ObjectUUID)
+	sshkey, err := client.GetSshkey(context.Background(), cSSHkey.ObjectUUID)
 	if err != nil {
 		log.Error("Get SSH-key has failed with error", err)
 		return
@@ -59,11 +62,14 @@ func main() {
 
 	log.Info("Update SSH-key: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	err = client.UpdateSshkey(sshkey.Properties.ObjectUUID, gsclient.SshkeyUpdateRequest{
-		Name:   "updated SSH-key",
-		Sshkey: sshkey.Properties.Sshkey,
-		Labels: sshkey.Properties.Labels,
-	})
+	err = client.UpdateSshkey(
+		context.Background(),
+		sshkey.Properties.ObjectUUID,
+		gsclient.SshkeyUpdateRequest{
+			Name:   "updated SSH-key",
+			Sshkey: sshkey.Properties.Sshkey,
+			Labels: sshkey.Properties.Labels,
+		})
 	if err != nil {
 		log.Error("Update SSH-key has failed with error", err)
 		return
@@ -72,7 +78,7 @@ func main() {
 
 	log.Info("Get SSH-key's events: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	events, err := client.GetSshkeyEventList(sshkey.Properties.ObjectUUID)
+	events, err := client.GetSshkeyEventList(context.Background(), sshkey.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get SSH-key's events has failed with error", err)
 		return

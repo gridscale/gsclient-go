@@ -2,10 +2,11 @@ package main
 
 import (
 	"bufio"
+	"context"
 	log "github.com/sirupsen/logrus"
 	"os"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
@@ -29,11 +30,13 @@ func main() {
 	log.Info("Create storage and snapshot: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//Create storage
-	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
-		Capacity:     1,
-		LocationUUID: locationUUID,
-		Name:         "go-client-storage",
-	})
+	cStorage, err := client.CreateStorage(
+		context.Background(),
+		gsclient.StorageCreateRequest{
+			Capacity:     1,
+			LocationUUID: locationUUID,
+			Name:         "go-client-storage",
+		})
 	if err != nil {
 		log.Error("Create storage has failed with error", err)
 		return
@@ -42,7 +45,7 @@ func main() {
 		"storage_uuid": cStorage.ObjectUUID,
 	}).Info("Storage successfully created")
 	defer func() {
-		err := client.DeleteStorage(cStorage.ObjectUUID)
+		err := client.DeleteStorage(context.Background(), cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)
 			return
@@ -51,9 +54,12 @@ func main() {
 	}()
 
 	//Create a snapshot
-	cSnapshot, err := client.CreateStorageSnapshot(cStorage.ObjectUUID, gsclient.StorageSnapshotCreateRequest{
-		Name: "go-client-snapshot",
-	})
+	cSnapshot, err := client.CreateStorageSnapshot(
+		context.Background(),
+		cStorage.ObjectUUID,
+		gsclient.StorageSnapshotCreateRequest{
+			Name: "go-client-snapshot",
+		})
 	if err != nil {
 		log.Error("Create snapshot has failed with error", err)
 		return
@@ -62,7 +68,7 @@ func main() {
 		"snapshot_uuid": cStorage.ObjectUUID,
 	}).Info("Snapshot successfully created")
 	defer func() {
-		err := client.DeleteStorageSnapshot(cStorage.ObjectUUID, cSnapshot.ObjectUUID)
+		err := client.DeleteStorageSnapshot(context.Background(), cStorage.ObjectUUID, cSnapshot.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage snapshot has failed with error", err)
 			return
@@ -71,7 +77,7 @@ func main() {
 
 		log.Info("Get deleted snapshots: Press 'Enter' to continue...")
 		bufio.NewReader(os.Stdin).ReadBytes('\n')
-		snapshots, err := client.GetDeletedSnapshots()
+		snapshots, err := client.GetDeletedSnapshots(context.Background())
 		if err != nil {
 			log.Error("Get deleted snapshots has failed with error", err)
 			return
@@ -82,7 +88,7 @@ func main() {
 	}()
 
 	//Get a snapshot to update
-	snapshot, err := client.GetStorageSnapshot(cStorage.ObjectUUID, cSnapshot.ObjectUUID)
+	snapshot, err := client.GetStorageSnapshot(context.Background(), cStorage.ObjectUUID, cSnapshot.ObjectUUID)
 	if err != nil {
 		log.Error("Get snapshot has failed with error", err)
 		return
@@ -94,9 +100,13 @@ func main() {
 	log.Info("Update snapshot: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//Update a snapshot
-	err = client.UpdateStorageSnapshot(cStorage.ObjectUUID, snapshot.Properties.ObjectUUID, gsclient.StorageSnapshotUpdateRequest{
-		Name: "updated snapshot",
-	})
+	err = client.UpdateStorageSnapshot(
+		context.Background(),
+		cStorage.ObjectUUID,
+		snapshot.Properties.ObjectUUID,
+		gsclient.StorageSnapshotUpdateRequest{
+			Name: "updated snapshot",
+		})
 	if err != nil {
 		log.Error("Update snapshot has failed with error", err)
 		return
@@ -106,9 +116,13 @@ func main() {
 	log.Info("Rollback storage: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//Rollback
-	err = client.RollbackStorage(cStorage.ObjectUUID, snapshot.Properties.ObjectUUID, gsclient.StorageRollbackRequest{
-		Rollback: true,
-	})
+	err = client.RollbackStorage(
+		context.Background(),
+		cStorage.ObjectUUID,
+		snapshot.Properties.ObjectUUID,
+		gsclient.StorageRollbackRequest{
+			Rollback: true,
+		})
 	if err != nil {
 		log.Error("Rollback storage has failed with error", err)
 		return
