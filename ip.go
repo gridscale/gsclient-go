@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -185,7 +186,7 @@ var (
 //GetIP get a specific IP based on given id
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getIp
-func (c *Client) GetIP(id string) (IP, error) {
+func (c *Client) GetIP(ctx context.Context, id string) (IP, error) {
 	if !isValidUUID(id) {
 		return IP{}, errors.New("'id' is invalid")
 	}
@@ -195,7 +196,7 @@ func (c *Client) GetIP(id string) (IP, error) {
 	}
 
 	var response IP
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 
 	return response, err
 }
@@ -203,7 +204,7 @@ func (c *Client) GetIP(id string) (IP, error) {
 //GetIPList gets a list of available IPs
 //
 //https://gridscale.io/en//api-documentation/index.html#operation/getIps
-func (c *Client) GetIPList() ([]IP, error) {
+func (c *Client) GetIPList(ctx context.Context) ([]IP, error) {
 	r := Request{
 		uri:    apiIPBase,
 		method: http.MethodGet,
@@ -211,7 +212,7 @@ func (c *Client) GetIPList() ([]IP, error) {
 
 	var response IPList
 	var IPs []IP
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		IPs = append(IPs, IP{Properties: properties})
 	}
@@ -224,7 +225,7 @@ func (c *Client) GetIPList() ([]IP, error) {
 //Note: IP address family can only be either `IPv4Type` or `IPv6Type`
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createIp
-func (c *Client) CreateIP(body IPCreateRequest) (IPCreateResponse, error) {
+func (c *Client) CreateIP(ctx context.Context, body IPCreateRequest) (IPCreateResponse, error) {
 	r := Request{
 		uri:    apiIPBase,
 		method: http.MethodPost,
@@ -232,12 +233,12 @@ func (c *Client) CreateIP(body IPCreateRequest) (IPCreateResponse, error) {
 	}
 
 	var response IPCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return IPCreateResponse{}, err
 	}
 	if c.cfg.sync {
-		err = c.waitForRequestCompleted(response.RequestUUID)
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
 }
@@ -245,7 +246,7 @@ func (c *Client) CreateIP(body IPCreateRequest) (IPCreateResponse, error) {
 //DeleteIP deletes a specific IP based on given id
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteIp
-func (c *Client) DeleteIP(id string) error {
+func (c *Client) DeleteIP(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -254,20 +255,20 @@ func (c *Client) DeleteIP(id string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForIPDeleted(id)
+		return c.waitForIPDeleted(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //UpdateIP updates a specific IP based on given id
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateIp
-func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
+func (c *Client) UpdateIP(ctx context.Context, id string, body IPUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -277,20 +278,20 @@ func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForIPActive(id)
+		return c.waitForIPActive(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //GetIPEventList gets a list of an IP's events
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getIpEvents
-func (c *Client) GetIPEventList(id string) ([]Event, error) {
+func (c *Client) GetIPEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -300,7 +301,7 @@ func (c *Client) GetIPEventList(id string) ([]Event, error) {
 	}
 	var response EventList
 	var IPEvents []Event
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		IPEvents = append(IPEvents, Event{Properties: properties})
 	}
@@ -308,8 +309,8 @@ func (c *Client) GetIPEventList(id string) ([]Event, error) {
 }
 
 //GetIPVersion gets IP's version, returns 0 if an error was encountered
-func (c *Client) GetIPVersion(id string) int {
-	ip, err := c.GetIP(id)
+func (c *Client) GetIPVersion(ctx context.Context, id string) int {
+	ip, err := c.GetIP(ctx, id)
 	if err != nil {
 		return 0
 	}
@@ -319,7 +320,7 @@ func (c *Client) GetIPVersion(id string) int {
 //GetIPsByLocation gets a list of IPs by location
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationIps
-func (c *Client) GetIPsByLocation(id string) ([]IP, error) {
+func (c *Client) GetIPsByLocation(ctx context.Context, id string) ([]IP, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -329,7 +330,7 @@ func (c *Client) GetIPsByLocation(id string) ([]IP, error) {
 	}
 	var response IPList
 	var IPs []IP
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		IPs = append(IPs, IP{Properties: properties})
 	}
@@ -339,14 +340,14 @@ func (c *Client) GetIPsByLocation(id string) ([]IP, error) {
 //GetDeletedIPs gets a list of deleted IPs
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedIps
-func (c *Client) GetDeletedIPs() ([]IP, error) {
+func (c *Client) GetDeletedIPs(ctx context.Context) ([]IP, error) {
 	r := Request{
 		uri:    path.Join(apiDeletedBase, "ips"),
 		method: http.MethodGet,
 	}
 	var response DeletedIPList
 	var IPs []IP
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		IPs = append(IPs, IP{Properties: properties})
 	}
@@ -354,7 +355,7 @@ func (c *Client) GetDeletedIPs() ([]IP, error) {
 }
 
 //waitForIPActive allows to wait until the IP address's status is active
-func (c *Client) waitForIPActive(id string) error {
+func (c *Client) waitForIPActive(ctx context.Context, id string) error {
 	timer := time.After(c.cfg.requestCheckTimeoutSecs)
 	delayInterval := c.cfg.delayInterval
 	for {
@@ -365,7 +366,7 @@ func (c *Client) waitForIPActive(id string) error {
 			return errors.New(errorMessage)
 		default:
 			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			ip, err := c.GetIP(id)
+			ip, err := c.GetIP(ctx, id)
 			if err != nil {
 				return err
 			}
@@ -377,7 +378,7 @@ func (c *Client) waitForIPActive(id string) error {
 }
 
 //waitForIPDeleted allows to wait until the IP address is deleted
-func (c *Client) waitForIPDeleted(id string) error {
+func (c *Client) waitForIPDeleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -396,7 +397,7 @@ func (c *Client) waitForIPDeleted(id string) error {
 				method:       http.MethodGet,
 				skipPrint404: true,
 			}
-			err := r.execute(*c, nil)
+			err := r.execute(ctx, *c, nil)
 			if err != nil {
 				if requestError, ok := err.(RequestError); ok {
 					if requestError.StatusCode == 404 {

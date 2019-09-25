@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"time"
@@ -53,7 +54,7 @@ func (c *Client) waitForRequestCompleted(id string) error {
 		default:
 			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
 			var response RequestStatus
-			r.execute(*c, &response)
+			r.execute(ctx, *c, &response)
 			if response[id].Status == requestDoneStatus {
 				c.cfg.logger.Info("Done with creating")
 				return nil

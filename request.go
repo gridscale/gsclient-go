@@ -2,6 +2,7 @@ package gsclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -53,7 +54,7 @@ func (r RequestError) Error() string {
 }
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
-func (r *Request) execute(c Client, output interface{}) error {
+func (r *Request) execute(ctx context.Context, c Client, output interface{}) error {
 	url := c.cfg.apiURL + r.uri
 	c.cfg.logger.Debugf("%v request sent to URL: %v", r.method, url)
 
@@ -67,7 +68,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	}
 
 	//Add authentication headers and content type
-	request, err := http.NewRequest(r.method, url, jsonBody)
+	request, err := http.NewRequestWithContext(ctx, r.method, url, jsonBody)
 	if err != nil {
 		return err
 	}

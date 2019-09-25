@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -75,7 +76,7 @@ type SshkeyUpdateRequest struct {
 //GetSshkey gets a ssh key
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKey
-func (c *Client) GetSshkey(id string) (Sshkey, error) {
+func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
 	if !isValidUUID(id) {
 		return Sshkey{}, errors.New("'id' is invalid")
 	}
@@ -84,14 +85,14 @@ func (c *Client) GetSshkey(id string) (Sshkey, error) {
 		method: http.MethodGet,
 	}
 	var response Sshkey
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //GetSshkeyList gets a list of ssh keys
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeys
-func (c *Client) GetSshkeyList() ([]Sshkey, error) {
+func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
 	r := Request{
 		uri:    apiSshkeyBase,
 		method: http.MethodGet,
@@ -99,7 +100,7 @@ func (c *Client) GetSshkeyList() ([]Sshkey, error) {
 
 	var response SshkeyList
 	var sshKeys []Sshkey
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		sshKeys = append(sshKeys, Sshkey{Properties: properties})
 	}
@@ -109,19 +110,19 @@ func (c *Client) GetSshkeyList() ([]Sshkey, error) {
 //CreateSshkey creates a ssh key
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createSshKey
-func (c *Client) CreateSshkey(body SshkeyCreateRequest) (CreateResponse, error) {
+func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (CreateResponse, error) {
 	r := Request{
 		uri:    apiSshkeyBase,
 		method: "POST",
 		body:   body,
 	}
 	var response CreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return CreateResponse{}, err
 	}
 	if c.cfg.sync {
-		err = c.waitForRequestCompleted(response.RequestUUID)
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
 }
@@ -129,7 +130,7 @@ func (c *Client) CreateSshkey(body SshkeyCreateRequest) (CreateResponse, error) 
 //DeleteSshkey deletes a ssh key
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSshKey
-func (c *Client) DeleteSshkey(id string) error {
+func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -138,20 +139,20 @@ func (c *Client) DeleteSshkey(id string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForSSHKeyDeleted(id)
+		return c.waitForSSHKeyDeleted(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //UpdateSshkey updates a ssh key
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateSshKey
-func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
+func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -161,20 +162,20 @@ func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForSSHKeyActive(id)
+		return c.waitForSSHKeyActive(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //GetSshkeyEventList gets a ssh key's events
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeyEvents
-func (c *Client) GetSshkeyEventList(id string) ([]Event, error) {
+func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -184,7 +185,7 @@ func (c *Client) GetSshkeyEventList(id string) ([]Event, error) {
 	}
 	var response EventList
 	var sshEvents []Event
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		sshEvents = append(sshEvents, Event{Properties: properties})
 	}
@@ -192,7 +193,7 @@ func (c *Client) GetSshkeyEventList(id string) ([]Event, error) {
 }
 
 //waitForSSHKeyActive allows to wait until the SSH-Key's status is active
-func (c *Client) waitForSSHKeyActive(id string) error {
+func (c *Client) waitForSSHKeyActive(ctx context.Context, id string) error {
 	timer := time.After(c.cfg.requestCheckTimeoutSecs)
 	delayInterval := c.cfg.delayInterval
 	for {
@@ -203,7 +204,7 @@ func (c *Client) waitForSSHKeyActive(id string) error {
 			return errors.New(errorMessage)
 		default:
 			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			key, err := c.GetSshkey(id)
+			key, err := c.GetSshkey(ctx, id)
 			if err != nil {
 				return err
 			}
@@ -215,7 +216,7 @@ func (c *Client) waitForSSHKeyActive(id string) error {
 }
 
 //waitForSSHKeyDeleted allows to wait until the SSH-Key is deleted
-func (c *Client) waitForSSHKeyDeleted(id string) error {
+func (c *Client) waitForSSHKeyDeleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -234,7 +235,7 @@ func (c *Client) waitForSSHKeyDeleted(id string) error {
 				method:       http.MethodGet,
 				skipPrint404: true,
 			}
-			err := r.execute(*c, nil)
+			err := r.execute(ctx, *c, nil)
 			if err != nil {
 				if requestError, ok := err.(RequestError); ok {
 					if requestError.StatusCode == 404 {

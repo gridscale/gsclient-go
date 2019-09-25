@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -50,7 +51,7 @@ type ServerIPRelationCreateRequest struct {
 //GetServerIPList gets a list of a specific server's IPs
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedIps
-func (c *Client) GetServerIPList(id string) ([]ServerIPRelationProperties, error) {
+func (c *Client) GetServerIPList(ctx context.Context, id string) ([]ServerIPRelationProperties, error) {
 	if id == "" {
 		return nil, errors.New("'id' is required")
 	}
@@ -59,14 +60,14 @@ func (c *Client) GetServerIPList(id string) ([]ServerIPRelationProperties, error
 		method: http.MethodGet,
 	}
 	var response ServerIPRelationList
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response.List, err
 }
 
 //GetServerIP gets an IP of a specific server
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedIp
-func (c *Client) GetServerIP(serverID, ipID string) (ServerIPRelationProperties, error) {
+func (c *Client) GetServerIP(ctx context.Context, serverID, ipID string) (ServerIPRelationProperties, error) {
 	if serverID == "" || ipID == "" {
 		return ServerIPRelationProperties{}, errors.New("'serverID' and 'ipID' are required")
 	}
@@ -75,14 +76,14 @@ func (c *Client) GetServerIP(serverID, ipID string) (ServerIPRelationProperties,
 		method: http.MethodGet,
 	}
 	var response ServerIPRelation
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response.Properties, err
 }
 
 //CreateServerIP create a link between a server and an IP
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/linkIpToServer
-func (c *Client) CreateServerIP(id string, body ServerIPRelationCreateRequest) error {
+func (c *Client) CreateServerIP(ctx context.Context, id string, body ServerIPRelationCreateRequest) error {
 	if id == "" || body.ObjectUUID == "" {
 		return errors.New("'server_id' and 'ip_id' are required")
 	}
@@ -92,19 +93,19 @@ func (c *Client) CreateServerIP(id string, body ServerIPRelationCreateRequest) e
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
-		return c.waitForServerIPRelCreation(id, body.ObjectUUID)
+		return c.waitForServerIPRelCreation(ctx, id, body.ObjectUUID)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //DeleteServerIP delete a link between a server and an IP
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/unlinkIpFromServer
-func (c *Client) DeleteServerIP(serverID, ipID string) error {
+func (c *Client) DeleteServerIP(ctx context.Context, serverID, ipID string) error {
 	if serverID == "" || ipID == "" {
 		return errors.New("'serverID' and 'ipID' are required")
 	}
@@ -113,30 +114,30 @@ func (c *Client) DeleteServerIP(serverID, ipID string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
-		return c.waitForServerIPRelDeleted(serverID, ipID)
+		return c.waitForServerIPRelDeleted(ctx, serverID, ipID)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //LinkIP attaches an IP to a server
-func (c *Client) LinkIP(serverID string, ipID string) error {
+func (c *Client) LinkIP(ctx context.Context, serverID string, ipID string) error {
 	body := ServerIPRelationCreateRequest{
 		ObjectUUID: ipID,
 	}
-	return c.CreateServerIP(serverID, body)
+	return c.CreateServerIP(ctx, serverID, body)
 }
 
 //UnlinkIP removes a link between an IP and a server
-func (c *Client) UnlinkIP(serverID string, ipID string) error {
-	return c.DeleteServerIP(serverID, ipID)
+func (c *Client) UnlinkIP(ctx context.Context, serverID string, ipID string) error {
+	return c.DeleteServerIP(ctx, serverID, ipID)
 }
 
 //waitForServerIPRelCreation allows to wait until the relation between a server and an IP address is created
-func (c *Client) waitForServerIPRelCreation(serverID, ipID string) error {
+func (c *Client) waitForServerIPRelCreation(ctx context.Context, serverID, ipID string) error {
 	if serverID == "" || ipID == "" {
 		return errors.New("'serverID' and 'ipID' are required")
 	}
@@ -157,7 +158,7 @@ RETRY:
 				method:       http.MethodGet,
 				skipPrint404: true,
 			}
-			err := r.execute(*c, nil)
+			err := r.execute(ctx, *c, nil)
 			if err != nil {
 				if requestError, ok := err.(RequestError); ok {
 					if requestError.StatusCode == 404 {
@@ -172,7 +173,7 @@ RETRY:
 }
 
 //waitForServerIPRelDeleted allows to wait until the relation between a server and an IP address is deleted
-func (c *Client) waitForServerIPRelDeleted(serverID, ipID string) error {
+func (c *Client) waitForServerIPRelDeleted(ctx context.Context, serverID, ipID string) error {
 	if serverID == "" || ipID == "" {
 		return errors.New("'serverID' and 'ipID' are required")
 	}
@@ -192,7 +193,7 @@ func (c *Client) waitForServerIPRelDeleted(serverID, ipID string) error {
 				method:       http.MethodGet,
 				skipPrint404: true,
 			}
-			err := r.execute(*c, nil)
+			err := r.execute(ctx, *c, nil)
 			if err != nil {
 				if requestError, ok := err.(RequestError); ok {
 					if requestError.StatusCode == 404 {

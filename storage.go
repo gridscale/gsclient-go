@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -248,7 +249,7 @@ var (
 //GetStorage get a storage
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getStorage
-func (c *Client) GetStorage(id string) (Storage, error) {
+func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
 	if !isValidUUID(id) {
 		return Storage{}, errors.New("'id' is invalid")
 	}
@@ -257,21 +258,21 @@ func (c *Client) GetStorage(id string) (Storage, error) {
 		method: http.MethodGet,
 	}
 	var response Storage
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //GetStorageList gets a list of available storages
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getStorages
-func (c *Client) GetStorageList() ([]Storage, error) {
+func (c *Client) GetStorageList(ctx context.Context) ([]Storage, error) {
 	r := Request{
 		uri:    apiStorageBase,
 		method: http.MethodGet,
 	}
 	var response StorageList
 	var storages []Storage
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		storages = append(storages, Storage{
 			Properties: properties,
@@ -289,19 +290,19 @@ func (c *Client) GetStorageList() ([]Storage, error) {
 // - Allowed value for `PasswordType`: nil, PlainPasswordType, CryptPasswordType.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createStorage
-func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error) {
+func (c *Client) CreateStorage(ctx context.Context, body StorageCreateRequest) (CreateResponse, error) {
 	r := Request{
 		uri:    apiStorageBase,
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response CreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return CreateResponse{}, err
 	}
 	if c.cfg.sync {
-		err = c.waitForRequestCompleted(response.RequestUUID)
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
 }
@@ -309,7 +310,7 @@ func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error
 //DeleteStorage delete a storage
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteStorage
-func (c *Client) DeleteStorage(id string) error {
+func (c *Client) DeleteStorage(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -318,20 +319,20 @@ func (c *Client) DeleteStorage(id string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForStorageDeleted(id)
+		return c.waitForStorageDeleted(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //UpdateStorage update a storage
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateStorage
-func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
+func (c *Client) UpdateStorage(ctx context.Context, id string, body StorageUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -341,20 +342,20 @@ func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForStorageActive(id)
+		return c.waitForStorageActive(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //GetStorageEventList get list of a storage's event
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageEvents
-func (c *Client) GetStorageEventList(id string) ([]Event, error) {
+func (c *Client) GetStorageEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -364,7 +365,7 @@ func (c *Client) GetStorageEventList(id string) ([]Event, error) {
 	}
 	var response EventList
 	var storageEvents []Event
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		storageEvents = append(storageEvents, Event{Properties: properties})
 	}
@@ -374,7 +375,7 @@ func (c *Client) GetStorageEventList(id string) ([]Event, error) {
 //GetStoragesByLocation gets a list of storages by location
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationStorages
-func (c *Client) GetStoragesByLocation(id string) ([]Storage, error) {
+func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storage, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -384,7 +385,7 @@ func (c *Client) GetStoragesByLocation(id string) ([]Storage, error) {
 	}
 	var response StorageList
 	var storages []Storage
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		storages = append(storages, Storage{Properties: properties})
 	}
@@ -394,14 +395,14 @@ func (c *Client) GetStoragesByLocation(id string) ([]Storage, error) {
 //GetDeletedStorages gets a list of deleted storages
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedStorages
-func (c *Client) GetDeletedStorages() ([]Storage, error) {
+func (c *Client) GetDeletedStorages(ctx context.Context) ([]Storage, error) {
 	r := Request{
 		uri:    path.Join(apiDeletedBase, "storages"),
 		method: http.MethodGet,
 	}
 	var response DeletedStorageList
 	var storages []Storage
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		storages = append(storages, Storage{Properties: properties})
 	}
@@ -409,7 +410,7 @@ func (c *Client) GetDeletedStorages() ([]Storage, error) {
 }
 
 //waitForStorageActive allows to wait until the storage's status is active
-func (c *Client) waitForStorageActive(id string) error {
+func (c *Client) waitForStorageActive(ctx context.Context, id string) error {
 	timer := time.After(c.cfg.requestCheckTimeoutSecs)
 	delayInterval := c.cfg.delayInterval
 	for {
@@ -420,7 +421,7 @@ func (c *Client) waitForStorageActive(id string) error {
 			return errors.New(errorMessage)
 		default:
 			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			storage, err := c.GetStorage(id)
+			storage, err := c.GetStorage(ctx, id)
 			if err != nil {
 				return err
 			}
@@ -432,7 +433,7 @@ func (c *Client) waitForStorageActive(id string) error {
 }
 
 //waitForStorageDeleted allows to wait until the storage is deleted
-func (c *Client) waitForStorageDeleted(id string) error {
+func (c *Client) waitForStorageDeleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -451,7 +452,7 @@ func (c *Client) waitForStorageDeleted(id string) error {
 				method:       http.MethodGet,
 				skipPrint404: true,
 			}
-			err := r.execute(*c, nil)
+			err := r.execute(ctx, *c, nil)
 			if err != nil {
 				if requestError, ok := err.(RequestError); ok {
 					if requestError.StatusCode == 404 {

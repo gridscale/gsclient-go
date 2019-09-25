@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -188,14 +189,14 @@ var (
 //GetLoadBalancerList returns a list of loadbalancers
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancers
-func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
+func (c *Client) GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error) {
 	r := Request{
 		uri:    apiLoadBalancerBase,
 		method: http.MethodGet,
 	}
 	var response LoadBalancers
 	var loadBalancers []LoadBalancer
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		loadBalancers = append(loadBalancers, LoadBalancer{Properties: properties})
 	}
@@ -205,7 +206,7 @@ func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
 //GetLoadBalancer returns a loadbalancer of a given uuid
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancer
-func (c *Client) GetLoadBalancer(id string) (LoadBalancer, error) {
+func (c *Client) GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, error) {
 	if !isValidUUID(id) {
 		return LoadBalancer{}, errors.New("'id' is invalid")
 	}
@@ -214,7 +215,7 @@ func (c *Client) GetLoadBalancer(id string) (LoadBalancer, error) {
 		method: http.MethodGet,
 	}
 	var response LoadBalancer
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
@@ -223,7 +224,7 @@ func (c *Client) GetLoadBalancer(id string) (LoadBalancer, error) {
 //Note: loadbalancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createLoadbalancer
-func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error) {
+func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error) {
 	if body.Labels == nil {
 		body.Labels = make([]string, 0)
 	}
@@ -233,12 +234,12 @@ func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalance
 		body:   body,
 	}
 	var response LoadBalancerCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return LoadBalancerCreateResponse{}, err
 	}
 	if c.cfg.sync {
-		err = c.waitForRequestCompleted(response.RequestUUID)
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
 }
@@ -248,7 +249,7 @@ func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalance
 //Note: loadbalancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateLoadbalancer
-func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) error {
+func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBalancerUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -261,20 +262,20 @@ func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) e
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForLoadbalancerActive(id)
+		return c.waitForLoadbalancerActive(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //GetLoadBalancerEventList retrieves events of a given uuid
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancerEvents
-func (c *Client) GetLoadBalancerEventList(id string) ([]Event, error) {
+func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -284,7 +285,7 @@ func (c *Client) GetLoadBalancerEventList(id string) ([]Event, error) {
 	}
 	var response EventList
 	var loadBalancerEvents []Event
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		loadBalancerEvents = append(loadBalancerEvents, Event{Properties: properties})
 	}
@@ -294,7 +295,7 @@ func (c *Client) GetLoadBalancerEventList(id string) ([]Event, error) {
 //DeleteLoadBalancer deletes a loadbalancer
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteLoadbalancer
-func (c *Client) DeleteLoadBalancer(id string) error {
+func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -303,18 +304,18 @@ func (c *Client) DeleteLoadBalancer(id string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForLoadbalancerDeleted(id)
+		return c.waitForLoadbalancerDeleted(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //waitForLoadbalancerActive allows to wait until the loadbalancer's status is active
-func (c *Client) waitForLoadbalancerActive(id string) error {
+func (c *Client) waitForLoadbalancerActive(ctx context.Context, id string) error {
 	timer := time.After(c.cfg.requestCheckTimeoutSecs)
 	delayInterval := c.cfg.delayInterval
 	for {
@@ -325,7 +326,7 @@ func (c *Client) waitForLoadbalancerActive(id string) error {
 			return errors.New(errorMessage)
 		default:
 			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			lb, err := c.GetLoadBalancer(id)
+			lb, err := c.GetLoadBalancer(ctx, id)
 			if err != nil {
 				return err
 			}
@@ -337,7 +338,7 @@ func (c *Client) waitForLoadbalancerActive(id string) error {
 }
 
 //waitForLoadbalancerDeleted allows to wait until the loadbalancer is deleted
-func (c *Client) waitForLoadbalancerDeleted(id string) error {
+func (c *Client) waitForLoadbalancerDeleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -356,7 +357,7 @@ func (c *Client) waitForLoadbalancerDeleted(id string) error {
 				method:       http.MethodGet,
 				skipPrint404: true,
 			}
-			err := r.execute(*c, nil)
+			err := r.execute(ctx, *c, nil)
 			if err != nil {
 				if requestError, ok := err.(RequestError); ok {
 					if requestError.StatusCode == 404 {
