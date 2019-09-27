@@ -24,11 +24,6 @@ const (
 	apiDeletedBase       = "/objects/deleted"
 )
 
-const (
-	activeStatus      = "active"
-	requestDoneStatus = "done"
-)
-
 //Client struct of a gridscale golang client
 type Client struct {
 	cfg *Config
@@ -42,7 +37,7 @@ func NewClient(c *Config) *Client {
 	return client
 }
 
-//waitForRequestCompleted allows to wait for a request to complete. Timeouts are currently hardcoded
+//waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(id string) error {
 	r := Request{
 		uri:    path.Join("/requests/", id),
