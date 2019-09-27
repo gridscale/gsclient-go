@@ -43,7 +43,7 @@ type Config struct {
 //		+ requestCheckTimeoutSecs int: Timeout (in second) for checking requests (for synchronous feature)
 //		+ delayIntervalMilliSecs int: delay (in MilliSecond) between requests when checking request (or retry 5xx, 424 error code)
 //		+ maxNumberOfRetries int: number of retries when server returns 5xx, 424 error code.
-func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync bool, requestCheckTimeoutSecs,
+func NewConfiguration(apiURL, uuid, token string, debugMode, sync bool, requestCheckTimeoutSecs,
 	delayIntervalMilliSecs, maxNumberOfRetries int) *Config {
 	logLevel := logrus.InfoLevel
 	if debugMode {
