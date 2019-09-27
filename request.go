@@ -97,7 +97,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 			json.Unmarshal(iostream, &errorMessage)
 			//If internal server error or object is in status that does not allow the request, retry
 			if result.StatusCode >= 500 || result.StatusCode == 424 {
-				return true, nil
+				return true, errorMessage
 			}
 			if r.skipPrint404 && result.StatusCode == 404 {
 				c.cfg.logger.Debug("Skip 404 error code.")
