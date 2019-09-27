@@ -39,7 +39,7 @@ func NewClient(c *Config) *Client {
 }
 
 //waitForRequestCompleted allows to wait for a request to complete
-func (c *Client) waitForRequestCompleted(id string) error {
+func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 	r := Request{
 		uri:    path.Join("/requests/", id),
 		method: "GET",

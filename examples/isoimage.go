@@ -34,7 +34,7 @@ func main() {
 		SourceURL:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
 		LocationUUID: locationUUID,
 	}
-	cIso, err := client.CreateISOImage(context.Background(),isoRequest)
+	cIso, err := client.CreateISOImage(context.Background(), isoRequest)
 	if err != nil {
 		logrus.Error("Create ISO-image has failed with error", err)
 		return
