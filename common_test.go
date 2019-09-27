@@ -1,8 +1,10 @@
 package gsclient
 
 import (
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func Test_isValidUUID(t *testing.T) {
@@ -24,6 +26,83 @@ func Test_isValidUUID(t *testing.T) {
 			assert.False(t, isValid)
 		} else {
 			assert.True(t, isValid)
+		}
+	}
+}
+
+func Test_retryWithTimeout(t *testing.T) {
+	type testCase struct {
+		isContinue     bool
+		err            error
+		timeout, delay time.Duration
+	}
+	testCases := []testCase{
+		{
+			true,
+			nil,
+			time.Duration(5) * time.Second,
+			time.Duration(500) * time.Millisecond,
+		},
+		{
+			false,
+			nil,
+			time.Duration(5) * time.Second,
+			time.Duration(500) * time.Millisecond,
+		},
+		{
+			false,
+			errors.New("just test"),
+			time.Duration(5) * time.Second,
+			time.Duration(500) * time.Millisecond,
+		},
+	}
+	for _, test := range testCases {
+		err := retryWithTimeout(func() (bool, error) {
+			return test.isContinue, test.err
+		}, test.timeout, test.delay)
+		if test.err != nil || test.isContinue {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err)
+		}
+	}
+}
+
+func Test_retryWithLimitedNumOfRetries(t *testing.T) {
+	type testCase struct {
+		isContinue   bool
+		err          error
+		delay        time.Duration
+		numOfRetries int
+	}
+	testCases := []testCase{
+		{
+			true,
+			nil,
+			time.Duration(500) * time.Millisecond,
+			10,
+		},
+		{
+			false,
+			nil,
+			time.Duration(500) * time.Millisecond,
+			10,
+		},
+		{
+			false,
+			errors.New("just test"),
+			time.Duration(500) * time.Millisecond,
+			10,
+		},
+	}
+	for _, test := range testCases {
+		err := retryWithLimitedNumOfRetries(func() (bool, error) {
+			return test.isContinue, test.err
+		}, test.numOfRetries, test.delay)
+		if test.err != nil || test.isContinue {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err)
 		}
 	}
 }
