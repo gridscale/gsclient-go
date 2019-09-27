@@ -2,10 +2,8 @@ package gsclient
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"path"
-	"time"
 )
 
 //ServerIPRelationList JSON struct of a list of relations between a server and IP addresses
@@ -137,70 +135,20 @@ func (c *Client) UnlinkIP(serverID string, ipID string) error {
 
 //waitForServerIPRelCreation allows to wait until the relation between a server and an IP address is created
 func (c *Client) waitForServerIPRelCreation(serverID, ipID string) error {
-	if serverID == "" || ipID == "" {
+	if !isValidUUID(serverID) || !isValidUUID(ipID) {
 		return errors.New("'serverID' and 'ipID' are required")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-RETRY:
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for sever(%v)-IP(%v) relation to be created",
-				serverID, ipID)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiServerBase, serverID, "ips", ipID),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(*c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						continue RETRY
-					}
-				}
-				return err
-			}
-			return nil
-		}
-	}
+	uri := path.Join(apiServerBase, serverID, "ips", ipID)
+	method := http.MethodGet
+	return c.waitFor200Status(uri, method)
 }
 
 //waitForServerIPRelDeleted allows to wait until the relation between a server and an IP address is deleted
 func (c *Client) waitForServerIPRelDeleted(serverID, ipID string) error {
-	if serverID == "" || ipID == "" {
+	if !isValidUUID(serverID) || !isValidUUID(ipID) {
 		return errors.New("'serverID' and 'ipID' are required")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for sever(%v)-IP(%v) relation to be deleted",
-				serverID, ipID)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiServerBase, serverID, "ips", ipID),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(*c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						return nil
-					}
-				}
-				return err
-			}
-		}
-	}
+	uri := path.Join(apiServerBase, serverID, "ips", ipID)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

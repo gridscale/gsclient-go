@@ -2,10 +2,8 @@ package gsclient
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"path"
-	"time"
 )
 
 //ISOImageList is JSON struct of a list of ISO images
@@ -294,25 +292,10 @@ func (c *Client) GetDeletedISOImages() ([]ISOImage, error) {
 
 //waitForISOImageActive allows to wait until the ISO-Image's status is active
 func (c *Client) waitForISOImageActive(id string) error {
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for firewall %v to be active", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			img, err := c.GetISOImage(id)
-			if err != nil {
-				return err
-			}
-			if img.Properties.Status == resourceActiveStatus {
-				return nil
-			}
-		}
-	}
+	return retryWithTimeout(func() (bool, error) {
+		img, err := c.GetISOImage(id)
+		return img.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForISOImageDeleted allows to wait until the ISO-Image id deleted
@@ -320,30 +303,7 @@ func (c *Client) waitForISOImageDeleted(id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for firewall %v to be deleted", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiISOBase, id),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(*c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						return nil
-					}
-				}
-				return err
-			}
-		}
-	}
+	uri := path.Join(apiISOBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

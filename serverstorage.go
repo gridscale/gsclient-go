@@ -2,10 +2,8 @@ package gsclient
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"path"
-	"time"
 )
 
 //ServerStorageRelationList JSON struct of a list of relations between a server and storages
@@ -196,70 +194,20 @@ func (c *Client) UnlinkStorage(serverID string, storageID string) error {
 
 //waitForServerStorageRelCreation allows to wait until the relation between a server and a storage is created
 func (c *Client) waitForServerStorageRelCreation(serverID, storageID string) error {
-	if serverID == "" || storageID == "" {
+	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' and 'storageID' are required")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-RETRY:
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for sever(%v)-storage(%v) relation to be created",
-				serverID, storageID)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiServerBase, serverID, "storages", storageID),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(*c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						continue RETRY
-					}
-				}
-				return err
-			}
-			return nil
-		}
-	}
+	uri := path.Join(apiServerBase, serverID, "storages", storageID)
+	method := http.MethodGet
+	return c.waitFor200Status(uri, method)
 }
 
 //waitForServerStorageRelDeleted allows to wait until the relation between a server and a storage is deleted
 func (c *Client) waitForServerStorageRelDeleted(serverID, storageID string) error {
-	if serverID == "" || storageID == "" {
+	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' and 'storageID' are required")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for sever(%v)-storage(%v) relation to be deleted",
-				serverID, storageID)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiServerBase, serverID, "storages", storageID),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(*c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						return nil
-					}
-				}
-				return err
-			}
-		}
-	}
+	uri := path.Join(apiServerBase, serverID, "storages", storageID)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }
