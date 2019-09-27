@@ -347,7 +347,7 @@ func (c *Client) waitForNetworkActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if net.Properties.Status == activeStatus {
+			if net.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

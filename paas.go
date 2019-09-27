@@ -641,7 +641,7 @@ func (c *Client) waitForPaaSServiceActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if fw.Properties.Status == activeStatus {
+			if fw.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}
@@ -697,7 +697,7 @@ func (c *Client) waitForSecurityZoneActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if fw.Properties.Status == activeStatus {
+			if fw.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

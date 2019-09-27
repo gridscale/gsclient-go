@@ -329,7 +329,7 @@ func (c *Client) waitForLoadbalancerActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if lb.Properties.Status == activeStatus {
+			if lb.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

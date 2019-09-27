@@ -207,7 +207,7 @@ func (c *Client) waitForSSHKeyActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if key.Properties.Status == activeStatus {
+			if key.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

@@ -13,7 +13,7 @@ const (
 	defaultMaxNumberOfRetries      = 100
 	defaultDelayIntervalMilliSecs  = 500
 	version                        = "1.0.0"
-	activeStatus                   = "active"
+	resourceActiveStatus           = "active"
 	requestDoneStatus              = "done"
 )
 

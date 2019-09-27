@@ -248,7 +248,7 @@ func (c *Client) waitForSnapshotScheduleActive(storageID, scheduleID string) err
 			if err != nil {
 				return err
 			}
-			if schedule.Properties.Status == activeStatus {
+			if schedule.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

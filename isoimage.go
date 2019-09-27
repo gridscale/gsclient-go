@@ -308,7 +308,7 @@ func (c *Client) waitForISOImageActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if img.Properties.Status == activeStatus {
+			if img.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

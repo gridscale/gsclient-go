@@ -340,7 +340,7 @@ func (c *Client) waitForSnapshotActive(storageID, snapshotID string) error {
 			if err != nil {
 				return err
 			}
-			if snapshot.Properties.Status == activeStatus {
+			if snapshot.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

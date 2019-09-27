@@ -294,7 +294,7 @@ func (c *Client) waitForFirewallActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if fw.Properties.Status == activeStatus {
+			if fw.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

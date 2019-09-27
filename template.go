@@ -299,7 +299,7 @@ func (c *Client) waitForTemplateActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if template.Properties.Status == activeStatus {
+			if template.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

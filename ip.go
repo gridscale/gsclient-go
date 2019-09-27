@@ -369,7 +369,7 @@ func (c *Client) waitForIPActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if ip.Properties.Status == activeStatus {
+			if ip.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}

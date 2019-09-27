@@ -424,7 +424,7 @@ func (c *Client) waitForStorageActive(id string) error {
 			if err != nil {
 				return err
 			}
-			if storage.Properties.Status == activeStatus {
+			if storage.Properties.Status == resourceActiveStatus {
 				return nil
 			}
 		}
