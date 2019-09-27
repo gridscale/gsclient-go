@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	"time"
 )
@@ -16,17 +17,20 @@ func isValidUUID(u string) bool {
 //retryWithTimeout reruns a function within a period of time
 func retryWithTimeout(targetFunc isContinue, timeout, delay time.Duration) error {
 	timer := time.After(timeout)
-	var lastError error
+	var err error
+	var continueRetrying bool
 	for {
 		select {
 		case <-timer:
-			return lastError
+			if err != nil {
+				return err
+			}
+			return errors.New("timeout reached")
 		default:
 			time.Sleep(delay) //delay between retries
-			continueRetrying, err := targetFunc()
-			lastError = err
+			continueRetrying, err = targetFunc()
 			if !continueRetrying {
-				return nil
+				return err
 			}
 		}
 	}
@@ -35,15 +39,18 @@ func retryWithTimeout(targetFunc isContinue, timeout, delay time.Duration) error
 //retryWithLimitedNumOfRetries reruns a function within a number of retries
 func retryWithLimitedNumOfRetries(targetFunc isContinue, numOfRetries int, delay time.Duration) error {
 	retryNo := 0
-	var lastError error
+	var err error
+	var continueRetrying bool
 	for retryNo <= numOfRetries {
 		time.Sleep(delay) //delay between retries
-		continueRetrying, err := targetFunc()
-		lastError = err
+		continueRetrying, err = targetFunc()
 		if !continueRetrying {
-			return nil
+			return err
 		}
 		retryNo++
 	}
-	return lastError
+	if err != nil {
+		return err
+	}
+	return errors.New("timeout reached")
 }
