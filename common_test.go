@@ -2,6 +2,7 @@ package gsclient
 
 import (
 	"errors"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -61,9 +62,9 @@ func Test_retryWithTimeout(t *testing.T) {
 			return test.isContinue, test.err
 		}, test.timeout, test.delay)
 		if test.err != nil || test.isContinue {
-			assert.NotNil(t, err)
+			assert.NotNil(t, err, fmt.Sprintf("%v %v", err, test.err))
 		} else {
-			assert.Nil(t, err)
+			assert.Nil(t, err, err)
 		}
 	}
 }
