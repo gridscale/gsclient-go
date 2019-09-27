@@ -1,9 +1,7 @@
 package gsclient
 
 import (
-	"fmt"
 	"path"
-	"time"
 )
 
 const (
@@ -39,25 +37,63 @@ func NewClient(c *Config) *Client {
 
 //waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(id string) error {
-	r := Request{
-		uri:    path.Join("/requests/", id),
-		method: "GET",
-	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			c.cfg.logger.Errorf("Timeout reached when waiting for request %v to complete", id)
-			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			var response RequestStatus
-			r.execute(*c, &response)
-			if response[id].Status == requestDoneStatus {
-				c.cfg.logger.Info("Done with creating")
-				return nil
-			}
+	return retryWithTimeout(func() (bool, error) {
+		r := Request{
+			uri:    path.Join("/requests/", id),
+			method: "GET",
 		}
-	}
+		var response RequestStatus
+		err := r.execute(*c, &response)
+		if err != nil {
+			return false, err
+		}
+		if response[id].Status == requestDoneStatus {
+			c.cfg.logger.Info("Done with creating")
+			return false, nil
+		}
+		return true, nil
+
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitFor404Status waits until server returns 404 status code
+func (c *Client) waitFor404Status(uri, method string) error {
+	return retryWithTimeout(func() (bool, error) {
+		r := Request{
+			uri:          uri,
+			method:       method,
+			skipPrint404: true,
+		}
+		err := r.execute(*c, nil)
+		if err != nil {
+			if requestError, ok := err.(RequestError); ok {
+				if requestError.StatusCode == 404 {
+					return false, nil
+				}
+			}
+			return false, err
+		}
+		return true, nil
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitFor200Status waits until server returns 200 (OK) status code
+func (c *Client) waitFor200Status(uri, method string) error {
+	return retryWithTimeout(func() (bool, error) {
+		r := Request{
+			uri:          uri,
+			method:       method,
+			skipPrint404: true,
+		}
+		err := r.execute(*c, nil)
+		if err != nil {
+			if requestError, ok := err.(RequestError); ok {
+				if requestError.StatusCode == 404 {
+					return true, nil
+				}
+			}
+			return false, err
+		}
+		return false, nil
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
