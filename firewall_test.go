@@ -17,7 +17,7 @@ func TestClient_GetFirewallList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareFirewallListHTTPGet("active"))
 	})
-	response, err := client.GetFirewallList()
+	response, err := client.GetFirewallList(emptyCtx)
 	assert.Nil(t, err, "GetFirewallList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockFirewall("active")), fmt.Sprintf("%v", response))
@@ -32,7 +32,7 @@ func TestClient_GetFirewall(t *testing.T) {
 		fmt.Fprint(w, prepareFirewallHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetFirewall(test.testUUID)
+		response, err := client.GetFirewall(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -63,20 +63,22 @@ func TestClient_CreateFirewall(t *testing.T) {
 		}
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
-			res, err := client.CreateFirewall(FirewallCreateRequest{
-				Name:   "test",
-				Labels: []string{"label"},
-				Rules: FirewallRules{
-					RulesV6In: []FirewallRuleProperties{
-						{
-							Protocol: "tcp",
-							DstPort:  "1080",
-							SrcPort:  "80",
-							Order:    0,
+			res, err := client.CreateFirewall(
+				emptyCtx,
+				FirewallCreateRequest{
+					Name:   "test",
+					Labels: []string{"label"},
+					Rules: FirewallRules{
+						RulesV6In: []FirewallRuleProperties{
+							{
+								Protocol: "tcp",
+								DstPort:  "1080",
+								SrcPort:  "80",
+								Order:    0,
+							},
 						},
 					},
-				},
-			})
+				})
 			if test.isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -107,20 +109,23 @@ func TestClient_UpdateFirewall(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.UpdateFirewall(test.testUUID, FirewallUpdateRequest{
-					Name:   "test",
-					Labels: []string{"label"},
-					Rules: &FirewallRules{
-						RulesV6In: []FirewallRuleProperties{
-							{
-								Protocol: "tcp",
-								DstPort:  "1080",
-								SrcPort:  "80",
-								Order:    0,
+				err := client.UpdateFirewall(
+					emptyCtx,
+					test.testUUID,
+					FirewallUpdateRequest{
+						Name:   "test",
+						Labels: []string{"label"},
+						Rules: &FirewallRules{
+							RulesV6In: []FirewallRuleProperties{
+								{
+									Protocol: "tcp",
+									DstPort:  "1080",
+									SrcPort:  "80",
+									Order:    0,
+								},
 							},
 						},
-					},
-				})
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -151,7 +156,7 @@ func TestClient_DeleteFirewall(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteFirewall(test.testUUID)
+				err := client.DeleteFirewall(emptyCtx, test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -172,7 +177,7 @@ func TestClient_GetFirewallEventList(t *testing.T) {
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetFirewallEventList(test.testUUID)
+		response, err := client.GetFirewallEventList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -193,7 +198,7 @@ func TestClient_waitForFirewallActive(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareFirewallHTTPGet("active"))
 	})
-	err := client.waitForFirewallActive(dummyUUID)
+	err := client.waitForFirewallActive(emptyCtx, dummyUUID)
 	assert.Nil(t, err, "waitForFirewallActive returned an error %v", err)
 }
 
@@ -208,7 +213,7 @@ func TestClient_waitForFirewallDeleted(t *testing.T) {
 
 	})
 	for _, test := range uuidCommonTestCases {
-		err := client.waitForFirewallDeleted(test.testUUID)
+		err := client.waitForFirewallDeleted(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {

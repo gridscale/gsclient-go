@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"path"
@@ -127,7 +128,7 @@ type StorageSnapshotScheduleUpdateRequest struct {
 //GetStorageSnapshotScheduleList gets a list of available storage snapshot schedules based on a given storage's id
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSnapshotSchedules
-func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSchedule, error) {
+func (c *Client) GetStorageSnapshotScheduleList(ctx context.Context, id string) ([]StorageSnapshotSchedule, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -137,7 +138,7 @@ func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSch
 	}
 	var response StorageSnapshotScheduleList
 	var schedules []StorageSnapshotSchedule
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		schedules = append(schedules, StorageSnapshotSchedule{Properties: properties})
 	}
@@ -147,7 +148,7 @@ func (c *Client) GetStorageSnapshotScheduleList(id string) ([]StorageSnapshotSch
 //GetStorageSnapshotSchedule gets a specific storage snapshot scheduler based on a given storage's id and scheduler's id
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSnapshotSchedule
-func (c *Client) GetStorageSnapshotSchedule(storageID, scheduleID string) (StorageSnapshotSchedule, error) {
+func (c *Client) GetStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string) (StorageSnapshotSchedule, error) {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return StorageSnapshotSchedule{}, errors.New("'storageID' or 'scheduleID' is invalid")
 	}
@@ -156,14 +157,14 @@ func (c *Client) GetStorageSnapshotSchedule(storageID, scheduleID string) (Stora
 		method: http.MethodGet,
 	}
 	var response StorageSnapshotSchedule
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //CreateStorageSnapshotSchedule create a storage's snapshot scheduler
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createSnapshotSchedule
-func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotScheduleCreateRequest) (
+func (c *Client) CreateStorageSnapshotSchedule(ctx context.Context, id string, body StorageSnapshotScheduleCreateRequest) (
 	StorageSnapshotScheduleCreateResponse, error) {
 	if !isValidUUID(id) {
 		return StorageSnapshotScheduleCreateResponse{}, errors.New("'id' is invalid")
@@ -174,12 +175,12 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 		body:   body,
 	}
 	var response StorageSnapshotScheduleCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return StorageSnapshotScheduleCreateResponse{}, err
 	}
 	if c.cfg.sync {
-		err = c.waitForRequestCompleted(response.RequestUUID)
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
 }
@@ -187,7 +188,7 @@ func (c *Client) CreateStorageSnapshotSchedule(id string, body StorageSnapshotSc
 //UpdateStorageSnapshotSchedule updates specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateSnapshotSchedule
-func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
+func (c *Client) UpdateStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string,
 	body StorageSnapshotScheduleUpdateRequest) error {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
@@ -198,20 +199,20 @@ func (c *Client) UpdateStorageSnapshotSchedule(storageID, scheduleID string,
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForSnapshotScheduleActive(storageID, scheduleID)
+		return c.waitForSnapshotScheduleActive(ctx, storageID, scheduleID)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //DeleteStorageSnapshotSchedule deletes specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSnapshotSchedule
-func (c *Client) DeleteStorageSnapshotSchedule(storageID, scheduleID string) error {
+func (c *Client) DeleteStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string) error {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
@@ -220,30 +221,30 @@ func (c *Client) DeleteStorageSnapshotSchedule(storageID, scheduleID string) err
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForSnapshotScheduleDeleted(storageID, scheduleID)
+		return c.waitForSnapshotScheduleDeleted(ctx, storageID, scheduleID)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //waitForSnapshotScheduleActive allows to wait until the snapshot schedule's status is active
-func (c *Client) waitForSnapshotScheduleActive(storageID, scheduleID string) error {
+func (c *Client) waitForSnapshotScheduleActive(ctx context.Context, storageID, scheduleID string) error {
 	return retryWithTimeout(func() (bool, error) {
-		schedule, err := c.GetStorageSnapshotSchedule(storageID, scheduleID)
+		schedule, err := c.GetStorageSnapshotSchedule(ctx, storageID, scheduleID)
 		return schedule.Properties.Status != resourceActiveStatus, err
 	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForSnapshotScheduleDeleted allows to wait until the snapshot schedule deleted
-func (c *Client) waitForSnapshotScheduleDeleted(storageID, scheduleID string) error {
+func (c *Client) waitForSnapshotScheduleDeleted(ctx context.Context, storageID, scheduleID string) error {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
 	uri := path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID)
 	method := http.MethodGet
-	return c.waitFor404Status(uri, method)
+	return c.waitFor404Status(ctx, uri, method)
 }

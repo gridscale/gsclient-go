@@ -46,7 +46,7 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 					BackendServers:      lb.BackendServers,
 					Labels:              testLabel,
 				}
-				response, err := client.CreateLoadBalancer(lbRequest)
+				response, err := client.CreateLoadBalancer(emptyCtx, lbRequest)
 				if testSuccessFail.isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -68,7 +68,7 @@ func TestClient_GetLoadBalancer(t *testing.T) {
 		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		loadbalancer, err := client.GetLoadBalancer(test.testUUID)
+		loadbalancer, err := client.GetLoadBalancer(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -88,7 +88,7 @@ func TestClient_GetLoadBalancerList(t *testing.T) {
 		assert.Equal(t, r.Method, http.MethodGet)
 		fmt.Fprint(w, prepareLoadBalancerHTTPListResponse("active"))
 	})
-	loadbalancers, err := client.GetLoadBalancerList()
+	loadbalancers, err := client.GetLoadBalancerList(emptyCtx)
 	assert.Nil(t, err, "GetLoadBalancerList returned error: %v", err)
 	assert.Equal(t, 1, len(loadbalancers))
 	assert.Equal(t, fmt.Sprintf("[%v]", expectedObjects), fmt.Sprintf("%v", loadbalancers))
@@ -113,13 +113,16 @@ func TestClient_UpdateLoadBalancer(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.UpdateLoadBalancer(test.testUUID, LoadBalancerUpdateRequest{
-					Name:                "test",
-					ListenIPv6UUID:      dummyUUID,
-					ListenIPv4UUID:      dummyUUID,
-					RedirectHTTPToHTTPS: false,
-					Status:              "inactive",
-				})
+				err := client.UpdateLoadBalancer(
+					emptyCtx,
+					test.testUUID,
+					LoadBalancerUpdateRequest{
+						Name:                "test",
+						ListenIPv6UUID:      dummyUUID,
+						ListenIPv4UUID:      dummyUUID,
+						RedirectHTTPToHTTPS: false,
+						Status:              "inactive",
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -150,7 +153,7 @@ func TestClient_DeleteLoadBalancer(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteLoadBalancer(test.testUUID)
+				err := client.DeleteLoadBalancer(emptyCtx, test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -172,7 +175,7 @@ func TestClient_GetLoadBalancerEventList(t *testing.T) {
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetLoadBalancerEventList(test.testUUID)
+		response, err := client.GetLoadBalancerEventList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -191,7 +194,7 @@ func TestClient_waitForLoadbalancerActive(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
 	})
-	err := client.waitForLoadbalancerActive(dummyUUID)
+	err := client.waitForLoadbalancerActive(emptyCtx, dummyUUID)
 	assert.Nil(t, err, "waitForLoadbalancerActive returned an error %v", err)
 }
 
@@ -204,7 +207,7 @@ func TestClient_waitForLoadbalancerDeleted(t *testing.T) {
 		w.WriteHeader(404)
 	})
 	for _, test := range uuidCommonTestCases {
-		err := client.waitForLoadbalancerDeleted(test.testUUID)
+		err := client.waitForLoadbalancerDeleted(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {

@@ -18,7 +18,7 @@ func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetStorageSnapshotScheduleList(test.testUUID)
+		res, err := client.GetStorageSnapshotScheduleList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -39,7 +39,7 @@ func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
 	})
 	for _, testStorageID := range uuidCommonTestCases {
 		for _, testScheduleID := range uuidCommonTestCases {
-			res, err := client.GetStorageSnapshotSchedule(testStorageID.testUUID, testScheduleID.testUUID)
+			res, err := client.GetStorageSnapshotSchedule(emptyCtx, testStorageID.testUUID, testScheduleID.testUUID)
 			if testStorageID.isFailed || testScheduleID.isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -72,13 +72,16 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
 			for _, test := range uuidCommonTestCases {
-				response, err := client.CreateStorageSnapshotSchedule(test.testUUID, StorageSnapshotScheduleCreateRequest{
-					Name:          "test",
-					Labels:        []string{"test"},
-					RunInterval:   60,
-					KeepSnapshots: 1,
-					NextRuntime:   &dummyTime,
-				})
+				response, err := client.CreateStorageSnapshotSchedule(
+					emptyCtx,
+					test.testUUID,
+					StorageSnapshotScheduleCreateRequest{
+						Name:          "test",
+						Labels:        []string{"test"},
+						RunInterval:   60,
+						KeepSnapshots: 1,
+						NextRuntime:   &dummyTime,
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -111,13 +114,17 @@ func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 			isFailed = serverTest.isFailed
 			for _, testStorageID := range uuidCommonTestCases {
 				for _, testScheduleID := range uuidCommonTestCases {
-					err := client.UpdateStorageSnapshotSchedule(testStorageID.testUUID, testScheduleID.testUUID, StorageSnapshotScheduleUpdateRequest{
-						Name:          "test",
-						Labels:        []string{"label"},
-						RunInterval:   60,
-						KeepSnapshots: 1,
-						NextRuntime:   &dummyTime,
-					})
+					err := client.UpdateStorageSnapshotSchedule(
+						emptyCtx,
+						testStorageID.testUUID,
+						testScheduleID.testUUID,
+						StorageSnapshotScheduleUpdateRequest{
+							Name:          "test",
+							Labels:        []string{"label"},
+							RunInterval:   60,
+							KeepSnapshots: 1,
+							NextRuntime:   &dummyTime,
+						})
 					if testStorageID.isFailed || testScheduleID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -150,7 +157,7 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 			isFailed = serverTest.isFailed
 			for _, testStorageID := range uuidCommonTestCases {
 				for _, testScheduleID := range uuidCommonTestCases {
-					err := client.DeleteStorageSnapshotSchedule(testStorageID.testUUID, testScheduleID.testUUID)
+					err := client.DeleteStorageSnapshotSchedule(emptyCtx, testStorageID.testUUID, testScheduleID.testUUID)
 					if testStorageID.isFailed || testScheduleID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -171,7 +178,7 @@ func TestClient_waitForSnapshotScheduleActive(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprint(writer, prepareStorageSnapshotScheduleHTTPGet("active"))
 	})
-	err := client.waitForSnapshotScheduleActive(dummyUUID, dummyUUID)
+	err := client.waitForSnapshotScheduleActive(emptyCtx, dummyUUID, dummyUUID)
 	assert.Nil(t, err, "waitForSnapshotScheduleActive returned an error %v", err)
 }
 
@@ -185,7 +192,7 @@ func TestClient_waitForSnapshotScheduleDeleted(t *testing.T) {
 	})
 	for _, testStorageID := range uuidCommonTestCases {
 		for _, testScheduleID := range uuidCommonTestCases {
-			err := client.waitForSnapshotScheduleDeleted(testStorageID.testUUID, testScheduleID.testUUID)
+			err := client.waitForSnapshotScheduleDeleted(emptyCtx, testStorageID.testUUID, testScheduleID.testUUID)
 			if testStorageID.isFailed || testScheduleID.isFailed {
 				assert.NotNil(t, err)
 			} else {

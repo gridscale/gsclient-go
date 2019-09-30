@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -111,7 +112,7 @@ type TemplateUpdateRequest struct {
 //GetTemplate gets a template
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getTemplate
-func (c *Client) GetTemplate(id string) (Template, error) {
+func (c *Client) GetTemplate(ctx context.Context, id string) (Template, error) {
 	if !isValidUUID(id) {
 		return Template{}, errors.New("'id' is invalid")
 	}
@@ -120,21 +121,21 @@ func (c *Client) GetTemplate(id string) (Template, error) {
 		method: http.MethodGet,
 	}
 	var response Template
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //GetTemplateList gets a list of templates
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getTemplates
-func (c *Client) GetTemplateList() ([]Template, error) {
+func (c *Client) GetTemplateList(ctx context.Context) ([]Template, error) {
 	r := Request{
 		uri:    apiTemplateBase,
 		method: http.MethodGet,
 	}
 	var response TemplateList
 	var templates []Template
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		templates = append(templates, Template{
 			Properties: properties,
@@ -144,11 +145,11 @@ func (c *Client) GetTemplateList() ([]Template, error) {
 }
 
 //GetTemplateByName gets a template by its name
-func (c *Client) GetTemplateByName(name string) (Template, error) {
+func (c *Client) GetTemplateByName(ctx context.Context, name string) (Template, error) {
 	if name == "" {
 		return Template{}, errors.New("'name' is required")
 	}
-	templates, err := c.GetTemplateList()
+	templates, err := c.GetTemplateList(ctx)
 	if err != nil {
 		return Template{}, err
 	}
@@ -163,19 +164,19 @@ func (c *Client) GetTemplateByName(name string) (Template, error) {
 //CreateTemplate creates a template
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createTemplate
-func (c *Client) CreateTemplate(body TemplateCreateRequest) (CreateResponse, error) {
+func (c *Client) CreateTemplate(ctx context.Context, body TemplateCreateRequest) (CreateResponse, error) {
 	r := Request{
 		uri:    apiTemplateBase,
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response CreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return CreateResponse{}, err
 	}
 	if c.cfg.sync {
-		err = c.waitForRequestCompleted(response.RequestUUID)
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
 }
@@ -183,7 +184,7 @@ func (c *Client) CreateTemplate(body TemplateCreateRequest) (CreateResponse, err
 //UpdateTemplate updates a template
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateTemplate
-func (c *Client) UpdateTemplate(id string, body TemplateUpdateRequest) error {
+func (c *Client) UpdateTemplate(ctx context.Context, id string, body TemplateUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -193,20 +194,20 @@ func (c *Client) UpdateTemplate(id string, body TemplateUpdateRequest) error {
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForTemplateActive(id)
+		return c.waitForTemplateActive(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //DeleteTemplate deletes a template
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteTemplate
-func (c *Client) DeleteTemplate(id string) error {
+func (c *Client) DeleteTemplate(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -215,20 +216,20 @@ func (c *Client) DeleteTemplate(id string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForTemplateDeleted(id)
+		return c.waitForTemplateDeleted(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //GetTemplateEventList gets a list of a template's events
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getTemplateEvents
-func (c *Client) GetTemplateEventList(id string) ([]Event, error) {
+func (c *Client) GetTemplateEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -238,7 +239,7 @@ func (c *Client) GetTemplateEventList(id string) ([]Event, error) {
 	}
 	var response EventList
 	var templateEvents []Event
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		templateEvents = append(templateEvents, Event{Properties: properties})
 	}
@@ -248,7 +249,7 @@ func (c *Client) GetTemplateEventList(id string) ([]Event, error) {
 //GetTemplatesByLocation gets a list of templates by location
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationTemplates
-func (c *Client) GetTemplatesByLocation(id string) ([]Template, error) {
+func (c *Client) GetTemplatesByLocation(ctx context.Context, id string) ([]Template, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -258,7 +259,7 @@ func (c *Client) GetTemplatesByLocation(id string) ([]Template, error) {
 	}
 	var response TemplateList
 	var templates []Template
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		templates = append(templates, Template{Properties: properties})
 	}
@@ -268,14 +269,14 @@ func (c *Client) GetTemplatesByLocation(id string) ([]Template, error) {
 //GetDeletedTemplates gets a list of deleted templates
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedTemplates
-func (c *Client) GetDeletedTemplates() ([]Template, error) {
+func (c *Client) GetDeletedTemplates(ctx context.Context) ([]Template, error) {
 	r := Request{
 		uri:    path.Join(apiDeletedBase, "templates"),
 		method: http.MethodGet,
 	}
 	var response DeletedTemplateList
 	var templates []Template
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		templates = append(templates, Template{Properties: properties})
 	}
@@ -283,19 +284,19 @@ func (c *Client) GetDeletedTemplates() ([]Template, error) {
 }
 
 //waitForTemplateActive allows to wait until the template's status is active
-func (c *Client) waitForTemplateActive(id string) error {
+func (c *Client) waitForTemplateActive(ctx context.Context, id string) error {
 	return retryWithTimeout(func() (bool, error) {
-		template, err := c.GetTemplate(id)
+		template, err := c.GetTemplate(ctx, id)
 		return template.Properties.Status != resourceActiveStatus, err
 	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForTemplateDeleted allows to wait until the template is deleted
-func (c *Client) waitForTemplateDeleted(id string) error {
+func (c *Client) waitForTemplateDeleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	uri := path.Join(apiTemplateBase, id)
 	method := http.MethodGet
-	return c.waitFor404Status(uri, method)
+	return c.waitFor404Status(ctx, uri, method)
 }

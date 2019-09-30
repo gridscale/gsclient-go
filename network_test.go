@@ -17,7 +17,7 @@ func TestClient_GetNetworkList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet(true, "active"))
 	})
-	res, err := client.GetNetworkList()
+	res, err := client.GetNetworkList(emptyCtx)
 	assert.Nil(t, err, "GetNetworkList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetwork(true, "active")), fmt.Sprintf("%v", res))
@@ -32,7 +32,7 @@ func TestClient_GetNetwork(t *testing.T) {
 		fmt.Fprintf(writer, prepareNetworkHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetNetwork(test.testUUID)
+		res, err := client.GetNetwork(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -63,12 +63,14 @@ func TestClient_CreateNetwork(t *testing.T) {
 		}
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
-			response, err := client.CreateNetwork(NetworkCreateRequest{
-				Name:         "test",
-				Labels:       []string{"label"},
-				LocationUUID: dummyUUID,
-				L2Security:   false,
-			})
+			response, err := client.CreateNetwork(
+				emptyCtx,
+				NetworkCreateRequest{
+					Name:         "test",
+					Labels:       []string{"label"},
+					LocationUUID: dummyUUID,
+					L2Security:   false,
+				})
 			if isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -99,10 +101,13 @@ func TestClient_UpdateNetwork(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.UpdateNetwork(test.testUUID, NetworkUpdateRequest{
-					Name:       "test",
-					L2Security: false,
-				})
+				err := client.UpdateNetwork(
+					emptyCtx,
+					test.testUUID,
+					NetworkUpdateRequest{
+						Name:       "test",
+						L2Security: false,
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -133,7 +138,7 @@ func TestClient_DeleteNetwork(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteNetwork(test.testUUID)
+				err := client.DeleteNetwork(emptyCtx, test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -154,7 +159,7 @@ func TestClient_GetNetworkEventList(t *testing.T) {
 		fmt.Fprintf(writer, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetNetworkEventList(test.testUUID)
+		res, err := client.GetNetworkEventList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -184,7 +189,7 @@ func TestClient_GetNetworkPublic(t *testing.T) {
 		isFailed = successFailTest.isFailed
 		for _, publicNetTest := range pubNetCases {
 			isPublicNet = publicNetTest
-			res, err := client.GetNetworkPublic()
+			res, err := client.GetNetworkPublic(emptyCtx)
 			if isFailed || !publicNetTest {
 				assert.NotNil(t, err)
 			} else {
@@ -204,7 +209,7 @@ func TestClient_GetNetworksByLocation(t *testing.T) {
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet(true, "active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetNetworksByLocation(test.testUUID)
+		res, err := client.GetNetworksByLocation(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -223,7 +228,7 @@ func TestClient_GetDeletedNetworks(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareDeletedNetworkListHTTPGet("active"))
 	})
-	res, err := client.GetDeletedNetworks()
+	res, err := client.GetDeletedNetworks(emptyCtx)
 	assert.Nil(t, err, "GetDeletedNetworks returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetwork(true, "active")), fmt.Sprintf("%v", res))
@@ -237,7 +242,7 @@ func TestClient_waitForNetworkActive(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareNetworkHTTPGet("active"))
 	})
-	err := client.waitForNetworkActive(dummyUUID)
+	err := client.waitForNetworkActive(emptyCtx, dummyUUID)
 	assert.Nil(t, err, "waitForNetworkActive returned an error %v", err)
 }
 
@@ -250,7 +255,7 @@ func TestClient_waitForNetworkDeleted(t *testing.T) {
 		w.WriteHeader(404)
 	})
 	for _, test := range uuidCommonTestCases {
-		err := client.waitForNetworkDeleted(test.testUUID)
+		err := client.waitForNetworkDeleted(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {

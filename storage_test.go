@@ -17,7 +17,7 @@ func TestClient_GetStorageList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareStorageListHTTPGet())
 	})
-	response, err := client.GetStorageList()
+	response, err := client.GetStorageList(emptyCtx)
 	assert.Nil(t, err, "GetStorageList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorage("active")), fmt.Sprintf("%v", response))
@@ -32,7 +32,7 @@ func TestClient_GetStorage(t *testing.T) {
 		fmt.Fprint(w, prepareStorageHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetStorage(test.testUUID)
+		response, err := client.GetStorage(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -63,19 +63,21 @@ func TestClient_CreateStorage(t *testing.T) {
 		}
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
-			res, err := client.CreateStorage(StorageCreateRequest{
-				Capacity:     10,
-				LocationUUID: dummyUUID,
-				Name:         "test",
-				StorageType:  DefaultStorageType,
-				Template: &StorageTemplate{
-					TemplateUUID: dummyUUID,
-					Password:     "pass",
-					PasswordType: CryptPasswordType,
-					Hostname:     "example.com",
-				},
-				Labels: []string{"label"},
-			})
+			res, err := client.CreateStorage(
+				emptyCtx,
+				StorageCreateRequest{
+					Capacity:     10,
+					LocationUUID: dummyUUID,
+					Name:         "test",
+					StorageType:  DefaultStorageType,
+					Template: &StorageTemplate{
+						TemplateUUID: dummyUUID,
+						Password:     "pass",
+						PasswordType: CryptPasswordType,
+						Hostname:     "example.com",
+					},
+					Labels: []string{"label"},
+				})
 			if isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -106,11 +108,14 @@ func TestClient_UpdateStorage(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.UpdateStorage(test.testUUID, StorageUpdateRequest{
-					Name:     "test",
-					Labels:   []string{"label"},
-					Capacity: 20,
-				})
+				err := client.UpdateStorage(
+					emptyCtx,
+					test.testUUID,
+					StorageUpdateRequest{
+						Name:     "test",
+						Labels:   []string{"label"},
+						Capacity: 20,
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -141,7 +146,7 @@ func TestClient_DeleteStorage(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteStorage(test.testUUID)
+				err := client.DeleteStorage(emptyCtx, test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -162,7 +167,7 @@ func TestClient_GetStorageEventList(t *testing.T) {
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetStorageEventList(test.testUUID)
+		response, err := client.GetStorageEventList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -182,7 +187,7 @@ func TestClient_GetStoragesByLocation(t *testing.T) {
 		fmt.Fprint(w, prepareStorageListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetStoragesByLocation(test.testUUID)
+		response, err := client.GetStoragesByLocation(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -201,7 +206,7 @@ func TestClient_GetDeletedStorages(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareDeletedStorageListHTTPGet())
 	})
-	response, err := client.GetDeletedStorages()
+	response, err := client.GetDeletedStorages(emptyCtx)
 	assert.Nil(t, err, "GetDeletedStorages returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorage("deleted")), fmt.Sprintf("%v", response))
@@ -215,7 +220,7 @@ func TestClient_waitForStorageActive(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareStorageHTTPGet("active"))
 	})
-	err := client.waitForStorageActive(dummyUUID)
+	err := client.waitForStorageActive(emptyCtx, dummyUUID)
 	assert.Nil(t, err, "waitForStorageActive returned an error %v", err)
 }
 
@@ -228,7 +233,7 @@ func TestClient_waitForStorageDeleted(t *testing.T) {
 		w.WriteHeader(404)
 	})
 	for _, test := range uuidCommonTestCases {
-		err := client.waitForStorageDeleted(test.testUUID)
+		err := client.waitForStorageDeleted(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {

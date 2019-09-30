@@ -18,7 +18,7 @@ func TestClient_GetObjectStorageAccessKeyList(t *testing.T) {
 		fmt.Fprintf(writer, prepareObjectStorageAccessKeyListHTTPGet())
 	})
 
-	res, err := client.GetObjectStorageAccessKeyList()
+	res, err := client.GetObjectStorageAccessKeyList(emptyCtx)
 	assert.Nil(t, err, "GetObjectStorageAccessKeyList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockObjectStorageAccessKey()), fmt.Sprintf("%v", res))
@@ -33,7 +33,7 @@ func TestClient_GetObjectStorageAccessKey(t *testing.T) {
 		fmt.Fprintf(writer, prepareObjectStorageAccessKeyHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetObjectStorageAccessKey(test.testUUID)
+		res, err := client.GetObjectStorageAccessKey(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -64,7 +64,7 @@ func TestClient_CreateObjectStorageAccessKey(t *testing.T) {
 		}
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
-			res, err := client.CreateObjectStorageAccessKey()
+			res, err := client.CreateObjectStorageAccessKey(emptyCtx)
 			if isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -95,7 +95,7 @@ func TestClient_DeleteObjectStorageAccessKey(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteObjectStorageAccessKey(test.testUUID)
+				err := client.DeleteObjectStorageAccessKey(emptyCtx, test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -116,7 +116,7 @@ func TestClient_GetObjectStorageBucketList(t *testing.T) {
 		fmt.Fprintf(writer, prepareObjectStorageBucketListHTTPGet())
 	})
 
-	res, err := client.GetObjectStorageBucketList()
+	res, err := client.GetObjectStorageBucketList(emptyCtx)
 	assert.Nil(t, err, "GetObjectStorageBucketList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockObjectStorageBucket()), fmt.Sprintf("%v", res))
@@ -131,7 +131,7 @@ func TestClient_waitForObjectStorageAccessKeyDeleted(t *testing.T) {
 		w.WriteHeader(404)
 	})
 	for _, test := range uuidCommonTestCases {
-		err := client.waitForObjectStorageAccessKeyDeleted(test.testUUID)
+		err := client.waitForObjectStorageAccessKeyDeleted(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
