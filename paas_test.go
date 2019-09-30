@@ -60,7 +60,7 @@ func TestClient_CreatePaaSService(t *testing.T) {
 		})
 		if clientTest {
 			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprint(w, httpResponse)
 			})
 		}
@@ -198,7 +198,7 @@ func TestClient_GetPaaSTemplateList(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockPaasTemplate()), fmt.Sprintf("%v", res))
 }
 
-func TestClient_GetSecurityZoneList(t *testing.T) {
+func TestClient_GetPaaSSecurityZoneList(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiPaaSBase, "security_zones")
@@ -226,7 +226,7 @@ func TestClient_CreatePaaSSecurityZone(t *testing.T) {
 			}
 		})
 		httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-		mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, httpResponse)
 		})
 		for _, test := range commonSuccessFailTestCases {
@@ -349,65 +349,29 @@ func TestClient_GetDeletedPaaSServices(t *testing.T) {
 func TestClient_waitForPaaSServiceActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiPaaSBase, "services", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, preparePaaSHTTPGetResponse("in-provisioning"))
-			} else {
-				fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
-			}
-		}
+		fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			err := client.waitForPaaSServiceActive(dummyUUID)
-			if isFailed || isTimeout {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForPaaSServiceActive returned an error %v", err)
-			}
-		}
-	}
+	err := client.waitForPaaSServiceActive(dummyUUID)
+	assert.Nil(t, err, "waitForPaaSServiceActive returned an error %v", err)
 }
 
 func TestClient_waitForPaaSServiceDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiPaaSBase, "services", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, preparePaaSHTTPGetResponse("to-be-deleted"))
-			} else {
-				w.WriteHeader(404)
-			}
-		}
+		w.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, test := range uuidCommonTestCases {
-				err := client.waitForPaaSServiceDeleted(test.testUUID)
-				if test.isFailed || isFailed || isTimeout {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "waitForPaaSServiceDeleted returned an error %v", err)
-				}
-			}
+	for _, test := range uuidCommonTestCases {
+		err := client.waitForPaaSServiceDeleted(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForPaaSServiceDeleted returned an error %v", err)
 		}
 	}
 }
@@ -415,65 +379,29 @@ func TestClient_waitForPaaSServiceDeleted(t *testing.T) {
 func TestClient_waitForSecurityZoneActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, preparePaaSHTTPGetSecurityZone("in-provisioning"))
-			} else {
-				fmt.Fprint(w, preparePaaSHTTPGetSecurityZone("active"))
-			}
-		}
+		fmt.Fprint(w, preparePaaSHTTPGetSecurityZone("active"))
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			err := client.waitForSecurityZoneActive(dummyUUID)
-			if isFailed || isTimeout {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForSecurityZoneActive returned an error %v", err)
-			}
-		}
-	}
+	err := client.waitForSecurityZoneActive(dummyUUID)
+	assert.Nil(t, err, "waitForSecurityZoneActive returned an error %v", err)
 }
 
 func TestClient_waitForSecurityZoneDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, preparePaaSHTTPGetSecurityZone("to-be-deleted"))
-			} else {
-				w.WriteHeader(404)
-			}
-		}
+		w.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, test := range uuidCommonTestCases {
-				err := client.waitForSecurityZoneDeleted(test.testUUID)
-				if test.isFailed || isFailed || isTimeout {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "waitForSecurityZoneDeleted returned an error %v", err)
-				}
-			}
+	for _, test := range uuidCommonTestCases {
+		err := client.waitForSecurityZoneDeleted(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForSecurityZoneDeleted returned an error %v", err)
 		}
 	}
 }

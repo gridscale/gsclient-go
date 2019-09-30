@@ -41,20 +41,26 @@ func Test_retryWithTimeout(t *testing.T) {
 		{
 			true,
 			nil,
-			time.Duration(5) * time.Second,
-			time.Duration(500) * time.Millisecond,
+			time.Duration(1) * time.Second,
+			time.Duration(100) * time.Millisecond,
 		},
 		{
 			false,
 			nil,
-			time.Duration(5) * time.Second,
-			time.Duration(500) * time.Millisecond,
+			time.Duration(1) * time.Second,
+			time.Duration(100) * time.Millisecond,
 		},
 		{
 			false,
 			errors.New("just test"),
-			time.Duration(5) * time.Second,
-			time.Duration(500) * time.Millisecond,
+			time.Duration(1) * time.Second,
+			time.Duration(100) * time.Millisecond,
+		},
+		{
+			true,
+			errors.New("just test"),
+			time.Duration(1) * time.Second,
+			time.Duration(100) * time.Millisecond,
 		},
 	}
 	for _, test := range testCases {

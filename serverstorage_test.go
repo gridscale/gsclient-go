@@ -181,34 +181,18 @@ func TestClient_UnlinkStorage(t *testing.T) {
 func TestClient_waitForServerStorageRelCreation(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			if isTimeout {
-				writer.WriteHeader(404)
-			} else {
-				fmt.Fprintf(writer, prepareServerIsoImageHTTPGet())
-			}
-		}
+		fmt.Fprintf(writer, prepareServerIsoImageHTTPGet())
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, testServerID := range uuidCommonTestCases {
-				for _, testIPID := range uuidCommonTestCases {
-					err := client.waitForServerStorageRelCreation(testServerID.testUUID, testIPID.testUUID)
-					if testServerID.isFailed || testIPID.isFailed || isFailed || isTimeout {
-						assert.NotNil(t, err)
-					} else {
-						assert.Nil(t, err, "waitForServerStorageRelCreation returned an error %v", err)
-					}
-				}
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testIPID := range uuidCommonTestCases {
+			err := client.waitForServerStorageRelCreation(testServerID.testUUID, testIPID.testUUID)
+			if testServerID.isFailed || testIPID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "waitForServerStorageRelCreation returned an error %v", err)
 			}
 		}
 	}
@@ -217,34 +201,18 @@ func TestClient_waitForServerStorageRelCreation(t *testing.T) {
 func TestClient_waitForServerStorageRelDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprintf(writer, prepareServerStorageHTTPGet())
-			} else {
-				writer.WriteHeader(404)
-			}
-		}
+		writer.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, testServerID := range uuidCommonTestCases {
-				for _, testIPID := range uuidCommonTestCases {
-					err := client.waitForServerStorageRelDeleted(testServerID.testUUID, testIPID.testUUID)
-					if testServerID.isFailed || testIPID.isFailed || isFailed || isTimeout {
-						assert.NotNil(t, err)
-					} else {
-						assert.Nil(t, err, "waitForServerStorageRelDeleted returned an error %v", err)
-					}
-				}
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testIPID := range uuidCommonTestCases {
+			err := client.waitForServerStorageRelDeleted(testServerID.testUUID, testIPID.testUUID)
+			if testServerID.isFailed || testIPID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "waitForServerStorageRelDeleted returned an error %v", err)
 			}
 		}
 	}

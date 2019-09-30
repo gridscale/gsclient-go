@@ -57,7 +57,7 @@ func TestClient_CreateStorage(t *testing.T) {
 		})
 		if clientTest {
 			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprint(w, httpResponse)
 			})
 		}
@@ -210,65 +210,29 @@ func TestClient_GetDeletedStorages(t *testing.T) {
 func TestClient_waitForStorageActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiStorageBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, prepareStorageHTTPGet("in-provisioning"))
-			} else {
-				fmt.Fprint(w, prepareStorageHTTPGet("active"))
-			}
-		}
+		fmt.Fprint(w, prepareStorageHTTPGet("active"))
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			err := client.waitForStorageActive(dummyUUID)
-			if isFailed || isTimeout {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForStorageActive returned an error %v", err)
-			}
-		}
-	}
+	err := client.waitForStorageActive(dummyUUID)
+	assert.Nil(t, err, "waitForStorageActive returned an error %v", err)
 }
 
 func TestClient_waitForStorageDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiStorageBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, prepareStorageHTTPGet("to-be-deleted"))
-			} else {
-				w.WriteHeader(404)
-			}
-		}
+		w.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, test := range uuidCommonTestCases {
-				err := client.waitForStorageDeleted(test.testUUID)
-				if test.isFailed || isFailed || isTimeout {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "waitForStorageDeleted returned an error %v", err)
-				}
-			}
+	for _, test := range uuidCommonTestCases {
+		err := client.waitForStorageDeleted(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForStorageDeleted returned an error %v", err)
 		}
 	}
 }

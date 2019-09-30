@@ -188,34 +188,18 @@ func TestClient_UnlinkNetwork(t *testing.T) {
 func TestClient_waitForServerNetworkRelCreation(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			if isTimeout {
-				writer.WriteHeader(404)
-			} else {
-				fmt.Fprintf(writer, prepareServerNetworkHTTPGet())
-			}
-		}
+		fmt.Fprintf(writer, prepareServerNetworkHTTPGet())
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, testServerID := range uuidCommonTestCases {
-				for _, testIPID := range uuidCommonTestCases {
-					err := client.waitForServerNetworkRelCreation(testServerID.testUUID, testIPID.testUUID)
-					if testServerID.isFailed || testIPID.isFailed || isFailed || isTimeout {
-						assert.NotNil(t, err)
-					} else {
-						assert.Nil(t, err, "waitForServerNetworkRelCreation returned an error %v", err)
-					}
-				}
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testIPID := range uuidCommonTestCases {
+			err := client.waitForServerNetworkRelCreation(testServerID.testUUID, testIPID.testUUID)
+			if testServerID.isFailed || testIPID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "waitForServerNetworkRelCreation returned an error %v", err)
 			}
 		}
 	}
@@ -224,34 +208,18 @@ func TestClient_waitForServerNetworkRelCreation(t *testing.T) {
 func TestClient_waitForServerNetworkRelDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprintf(writer, prepareServerNetworkHTTPGet())
-			} else {
-				writer.WriteHeader(404)
-			}
-		}
+		writer.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, testServerID := range uuidCommonTestCases {
-				for _, testIPID := range uuidCommonTestCases {
-					err := client.waitForServerNetworkRelDeleted(testServerID.testUUID, testIPID.testUUID)
-					if testServerID.isFailed || testIPID.isFailed || isFailed || isTimeout {
-						assert.NotNil(t, err)
-					} else {
-						assert.Nil(t, err, "waitForServerNetworkRelDeleted returned an error %v", err)
-					}
-				}
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testIPID := range uuidCommonTestCases {
+			err := client.waitForServerNetworkRelDeleted(testServerID.testUUID, testIPID.testUUID)
+			if testServerID.isFailed || testIPID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "waitForServerNetworkRelDeleted returned an error %v", err)
 			}
 		}
 	}

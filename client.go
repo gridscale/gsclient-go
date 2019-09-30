@@ -1,10 +1,13 @@
 package gsclient
 
 import (
+	"errors"
 	"path"
+	"strings"
 )
 
 const (
+	requestBase          = "/requests/"
 	apiServerBase        = "/objects/servers"
 	apiStorageBase       = "/objects/storages"
 	apiNetworkBase       = "/objects/networks"
@@ -37,9 +40,12 @@ func NewClient(c *Config) *Client {
 
 //waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(id string) error {
+	if strings.TrimSpace(id) == "" {
+		return errors.New("'id' is required")
+	}
 	return retryWithTimeout(func() (bool, error) {
 		r := Request{
-			uri:    path.Join("/requests/", id),
+			uri:    path.Join(requestBase, id),
 			method: "GET",
 		}
 		var response RequestStatus
@@ -52,7 +58,6 @@ func (c *Client) waitForRequestCompleted(id string) error {
 			return false, nil
 		}
 		return true, nil
-
 	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 

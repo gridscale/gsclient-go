@@ -65,7 +65,7 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 		})
 		if clientTest {
 			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprint(w, httpResponse)
 			})
 		}
@@ -166,66 +166,30 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 func TestClient_waitForSnapshotScheduleActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(writer, prepareStorageSnapshotScheduleHTTPGet("in-provisioning"))
-			} else {
-				fmt.Fprint(writer, prepareStorageSnapshotScheduleHTTPGet("active"))
-			}
-		}
+		fmt.Fprint(writer, prepareStorageSnapshotScheduleHTTPGet("active"))
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			err := client.waitForSnapshotScheduleActive(dummyUUID, dummyUUID)
-			if isFailed || isTimeout {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForSnapshotScheduleActive returned an error %v", err)
-			}
-		}
-	}
+	err := client.waitForSnapshotScheduleActive(dummyUUID, dummyUUID)
+	assert.Nil(t, err, "waitForSnapshotScheduleActive returned an error %v", err)
 }
 
 func TestClient_waitForSnapshotScheduleDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(writer, prepareStorageSnapshotScheduleHTTPGet("to-be-deleted"))
-			} else {
-				writer.WriteHeader(404)
-			}
-		}
+		writer.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, testStorageID := range uuidCommonTestCases {
-				for _, testScheduleID := range uuidCommonTestCases {
-					err := client.waitForSnapshotScheduleDeleted(testStorageID.testUUID, testScheduleID.testUUID)
-					if testStorageID.isFailed || testScheduleID.isFailed || isFailed || isTimeout {
-						assert.NotNil(t, err)
-					} else {
-						assert.Nil(t, err, "waitForSnapshotScheduleDeleted returned an error %v", err)
-					}
-				}
+	for _, testStorageID := range uuidCommonTestCases {
+		for _, testScheduleID := range uuidCommonTestCases {
+			err := client.waitForSnapshotScheduleDeleted(testStorageID.testUUID, testScheduleID.testUUID)
+			if testStorageID.isFailed || testScheduleID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "waitForSnapshotScheduleDeleted returned an error %v", err)
 			}
 		}
 	}
