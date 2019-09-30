@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetSshkeyList(t *testing.T) {
@@ -31,11 +32,6 @@ func TestClient_GetSshkey(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareSshkeyHTTPGet())
 	})
-<<<<<<< HEAD
-	res, err := client.GetSshkey(dummyUUID)
-	if err != nil {
-		t.Errorf("GetSshkey returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetSshkey(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -44,33 +40,11 @@ func TestClient_GetSshkey(t *testing.T) {
 			assert.Nil(t, err, "GetSshkey returned an error %v", err)
 			assert.Equal(t, fmt.Sprintf("%v", getMockSshkey("active")), fmt.Sprintf("%v", res))
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockSshkey()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateSshkey(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := apiSshkeyBase
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprintf(writer, prepareSshkeyCreateResponse())
-	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-
-	response, err := client.CreateSshkey(SshkeyCreateRequest{
-		Name:   "test",
-		Sshkey: "example",
-		Labels: []string{"label"},
-	})
-	if err != nil {
-		t.Errorf("CreateSshkey returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -106,29 +80,12 @@ func TestClient_CreateSshkey(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 
 	assert.Equal(t, fmt.Sprintf("%v", getMockSshkeyCreateResponse()), fmt.Sprintf("%s", response))
 }
 
 func TestClient_UpdateSshkey(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiSshkeyBase, dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPatch, request.Method)
-		fmt.Fprint(writer, "")
-	})
-
-	err := client.UpdateSshkey(dummyUUID, SshkeyUpdateRequest{
-		Name:   "test",
-		Sshkey: "example",
-	})
-	if err != nil {
-		t.Errorf("UpdateSshkey returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -162,23 +119,10 @@ func TestClient_UpdateSshkey(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
 func TestClient_DeleteSshkey(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiSshkeyBase, dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodDelete, request.Method)
-		fmt.Fprint(writer, "")
-	})
-	err := client.DeleteSshkey(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteSshkey returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -206,7 +150,6 @@ func TestClient_DeleteSshkey(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
@@ -232,9 +175,6 @@ func TestClient_GetSshkeyEventList(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockSshkeyEvent()), fmt.Sprintf("%v", res))
 }
 
-<<<<<<< HEAD
-func getMockSshkey() Sshkey {
-=======
 func TestClient_waitForSSHKeyActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
@@ -266,7 +206,6 @@ func TestClient_waitForSSHKeyDeleted(t *testing.T) {
 }
 
 func getMockSshkey(status string) Sshkey {
->>>>>>> 8d4aa0e... add `context`
 	mock := Sshkey{Properties: SshkeyProperties{
 		Name:       "test",
 		ObjectUUID: dummyUUID,

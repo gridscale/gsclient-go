@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetIPList(t *testing.T) {
@@ -31,11 +32,6 @@ func TestClient_GetIP(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareIPHTTPGet())
 	})
-<<<<<<< HEAD
-	res, err := client.GetIP(dummyUUID)
-	if err != nil {
-		t.Errorf("GetIP returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetIP(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -44,35 +40,11 @@ func TestClient_GetIP(t *testing.T) {
 			assert.Nil(t, err, "GetIP returned an error %v", err)
 			assert.Equal(t, fmt.Sprintf("%v", getMockIP("active")), fmt.Sprintf("%v", res))
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockIP()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateIP(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := apiIPBase
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprintf(writer, prepareIPCreateResponse())
-	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-
-	response, err := client.CreateIP(IPCreateRequest{
-		Name:         "test",
-		Family:       1,
-		LocationUUID: dummyUUID,
-		Failover:     false,
-		ReverseDNS:   "8.8.8.8",
-	})
-	if err != nil {
-		t.Errorf("CreateIP returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -110,30 +82,12 @@ func TestClient_CreateIP(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 
 	assert.Equal(t, fmt.Sprintf("%v", getMockIPCreateResponse()), fmt.Sprintf("%s", response))
 }
 
 func TestClient_UpdateIP(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiIPBase, dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPatch, request.Method)
-		fmt.Fprint(writer, "")
-	})
-
-	err := client.UpdateIP(dummyUUID, IPUpdateRequest{
-		Name:       "test",
-		Failover:   false,
-		ReverseDNS: "8.8.4.4",
-	})
-	if err != nil {
-		t.Errorf("UpdateIP returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -168,23 +122,10 @@ func TestClient_UpdateIP(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
 func TestClient_DeleteIP(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiIPBase, dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodDelete, request.Method)
-		fmt.Fprint(writer, "")
-	})
-	err := client.DeleteIP(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteIP returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -212,7 +153,6 @@ func TestClient_DeleteIP(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
@@ -244,16 +184,6 @@ func TestClient_GetIPVersion(t *testing.T) {
 	uri := path.Join(apiIPBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-<<<<<<< HEAD
-		fmt.Fprintf(writer, prepareIPHTTPGet())
-	})
-	res := client.GetIPVersion(dummyUUID)
-	if res == 0 {
-		t.Error("GetIPVersion has an error")
-	}
-	assert.Equal(t, 1, res)
-
-=======
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -333,7 +263,6 @@ func TestClient_waitForIPDeleted(t *testing.T) {
 			assert.Nil(t, err, "waitForIPDeleted returned an error %v", err)
 		}
 	}
->>>>>>> 8d4aa0e... add `context`
 }
 
 func getMockIP() IP {

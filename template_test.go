@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetTemplateList(t *testing.T) {
@@ -31,11 +32,6 @@ func TestClient_GetTemplate(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareTemplateHTTPGet())
 	})
-<<<<<<< HEAD
-	response, err := client.GetTemplate(dummyUUID)
-	if err != nil {
-		t.Errorf("GetTemplate returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		response, err := client.GetTemplate(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -45,7 +41,6 @@ func TestClient_GetTemplate(t *testing.T) {
 			assert.Equal(t, fmt.Sprintf("%v", getMockTemplate("active")), fmt.Sprintf("%v", response))
 		}
 
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockTemplate()), fmt.Sprintf("%v", response))
 }
@@ -58,11 +53,6 @@ func TestClient_GetTemplateByName(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
-<<<<<<< HEAD
-	response, err := client.GetTemplateByName("test")
-	if err != nil {
-		t.Errorf("GetTemplateByName returned an error %v", err)
-=======
 	for _, test := range testCases {
 		response, err := client.GetTemplateByName(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -71,15 +61,11 @@ func TestClient_GetTemplateByName(t *testing.T) {
 			assert.Nil(t, err, "GetTemplateByName returned an error %v", err)
 			assert.Equal(t, fmt.Sprintf("%v", getMockTemplate("active")), fmt.Sprintf("%v", response))
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockTemplate()), fmt.Sprintf("%v", response))
 }
 
 func TestClient_CreateTemplate(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -188,15 +174,12 @@ func TestClient_DeleteTemplate(t *testing.T) {
 
 func TestClient_GetTemplateEventList(t *testing.T) {
 	server, client, mux := setupTestClient(true)
->>>>>>> 8d4aa0e... add `context`
 	defer server.Close()
 	uri := apiTemplateBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		fmt.Fprintf(w, prepareTemplateCreateResponse())
 	})
-<<<<<<< HEAD
-=======
 	for _, test := range uuidCommonTestCases {
 		response, err := client.GetTemplateEventList(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -208,22 +191,11 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 		}
 	}
 }
->>>>>>> 8d4aa0e... add `context`
 
 	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
 	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
-<<<<<<< HEAD
-
-	res, err := client.CreateTemplate(TemplateCreateRequest{
-		Name:         "test",
-		SnapshotUUID: dummyUUID,
-		Labels:       []string{"label"},
-	})
-	if err != nil {
-		t.Errorf("CreateTemplate returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		response, err := client.GetTemplatesByLocation(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -233,7 +205,6 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 			assert.Equal(t, 1, len(response))
 			assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate("active")), fmt.Sprintf("%v", response))
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockTemplateCreateResponse()), fmt.Sprintf("%v", res))
 }
@@ -246,20 +217,10 @@ func TestClient_UpdateTemplate(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, r.Method)
 		fmt.Fprintf(w, "")
 	})
-<<<<<<< HEAD
-	err := client.UpdateTemplate(dummyUUID, TemplateUpdateRequest{
-		Name:   "test",
-		Labels: []string{"labels"},
-	})
-	if err != nil {
-		t.Errorf("UpdateTemplate returned an error %v", err)
-	}
-=======
 	response, err := client.GetDeletedTemplates(emptyCtx)
 	assert.Nil(t, err, "GetDeletedTemplates returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate("deleted")), fmt.Sprintf("%v", response))
->>>>>>> 8d4aa0e... add `context`
 }
 
 func TestClient_DeleteTemplate(t *testing.T) {
@@ -270,15 +231,8 @@ func TestClient_DeleteTemplate(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 		fmt.Fprintf(w, "")
 	})
-<<<<<<< HEAD
-	err := client.DeleteTemplate(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteTemplate returned an error %v", err)
-	}
-=======
 	err := client.waitForTemplateActive(emptyCtx, dummyUUID)
 	assert.Nil(t, err, "waitForTemplateActive returned an error %v", err)
->>>>>>> 8d4aa0e... add `context`
 }
 
 func TestClient_GetTemplateEventList(t *testing.T) {
@@ -289,11 +243,6 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareTemplateEventListHTTPGet())
 	})
-<<<<<<< HEAD
-	response, err := client.GetTemplateEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetTemplateEventList returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		err := client.waitForTemplateDeleted(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -301,7 +250,6 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 		} else {
 			assert.Nil(t, err, "waitForTemplateDeleted returned an error %v", err)
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplateEvent()), fmt.Sprintf("%v", response))

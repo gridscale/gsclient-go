@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -79,9 +76,6 @@ func (c *Client) CreateServerIP(ctx context.Context, id string, body ServerIPRel
 		method: http.MethodPost,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -90,7 +84,6 @@ func (c *Client) CreateServerIP(ctx context.Context, id string, body ServerIPRel
 		return c.waitForServerIPRelCreation(ctx, id, body.ObjectUUID)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteServerIP delete a link between a server and an IP
@@ -104,9 +97,6 @@ func (c *Client) DeleteServerIP(ctx context.Context, serverID, ipID string) erro
 		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -115,7 +105,6 @@ func (c *Client) DeleteServerIP(ctx context.Context, serverID, ipID string) erro
 		return c.waitForServerIPRelDeleted(ctx, serverID, ipID)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //LinkIP attaches an IP to a server
@@ -130,8 +119,6 @@ func (c *Client) LinkIP(ctx context.Context, serverID string, ipID string) error
 func (c *Client) UnlinkIP(ctx context.Context, serverID string, ipID string) error {
 	return c.DeleteServerIP(ctx, serverID, ipID)
 }
-<<<<<<< HEAD
-=======
 
 //waitForServerIPRelCreation allows to wait until the relation between a server and an IP address is created
 func (c *Client) waitForServerIPRelCreation(ctx context.Context, serverID, ipID string) error {
@@ -152,4 +139,3 @@ func (c *Client) waitForServerIPRelDeleted(ctx context.Context, serverID, ipID s
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

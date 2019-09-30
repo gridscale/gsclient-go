@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -233,9 +230,6 @@ func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (Se
 	if err != nil {
 		return ServerCreateResponse{}, err
 	}
-<<<<<<< HEAD
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-=======
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
@@ -246,7 +240,6 @@ func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (Se
 	} else if response.ObjectUUID == "" && response.ServerUUID != "" {
 		response.ObjectUUID = response.ServerUUID
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -261,9 +254,6 @@ func (c *Client) DeleteServer(ctx context.Context, id string) error {
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -273,7 +263,6 @@ func (c *Client) DeleteServer(ctx context.Context, id string) error {
 		return c.waitForServerDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //UpdateServer updates a specific server
@@ -288,9 +277,6 @@ func (c *Client) UpdateServer(ctx context.Context, id string, body ServerUpdateR
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -300,7 +286,6 @@ func (c *Client) UpdateServer(ctx context.Context, id string, body ServerUpdateR
 		return c.waitForServerActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //GetServerEventList gets a list of a specific server's events
@@ -373,14 +358,10 @@ func (c *Client) setServerPowerState(ctx context.Context, id string, powerState 
 	if err != nil {
 		return err
 	}
-<<<<<<< HEAD
-	return c.WaitForServerPowerStatus(id, powerState)
-=======
 	if c.cfg.sync {
 		return c.waitForServerPowerStatus(ctx, id, powerState)
 	}
 	return nil
->>>>>>> 8d4aa0e... add `context`
 }
 
 //StartServer starts a server
@@ -420,16 +401,6 @@ func (c *Client) ShutdownServer(ctx context.Context, id string) error {
 		return err
 	}
 
-<<<<<<< HEAD
-	//If we get an error, which includes a timeout, power off the server instead
-	err = c.WaitForServerPowerStatus(id, false)
-	if err != nil {
-		c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
-		return c.StopServer(id)
-	}
-	return nil
-}
-=======
 	if c.cfg.sync {
 		//If we get an error, which includes a timeout, power off the server instead
 		err = c.waitForServerPowerStatus(ctx, id, false)
@@ -503,4 +474,3 @@ func (c *Client) waitForServerDeleted(ctx context.Context, id string) error {
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -99,9 +96,6 @@ func (c *Client) CreateServerIsoImage(ctx context.Context, id string, body Serve
 		method: http.MethodPost,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -110,7 +104,6 @@ func (c *Client) CreateServerIsoImage(ctx context.Context, id string, body Serve
 		return c.waitForServerISOImageRelCreation(ctx, id, body.ObjectUUID)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteServerIsoImage deletes a link between an ISO image and a server
@@ -124,9 +117,6 @@ func (c *Client) DeleteServerIsoImage(ctx context.Context, serverID, isoImageID 
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -135,7 +125,6 @@ func (c *Client) DeleteServerIsoImage(ctx context.Context, serverID, isoImageID 
 		return c.waitForServerISOImageRelDeleted(ctx, serverID, isoImageID)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //LinkIsoImage attaches an ISO image to a server
@@ -150,8 +139,6 @@ func (c *Client) LinkIsoImage(ctx context.Context, serverID string, isoimageID s
 func (c *Client) UnlinkIsoImage(ctx context.Context, serverID string, isoimageID string) error {
 	return c.DeleteServerIsoImage(ctx, serverID, isoimageID)
 }
-<<<<<<< HEAD
-=======
 
 //waitForServerISOImageRelCreation allows to wait until the relation between a server and an ISO-Image is created
 func (c *Client) waitForServerISOImageRelCreation(ctx context.Context, serverID, isoimageID string) error {
@@ -172,4 +159,3 @@ func (c *Client) waitForServerISOImageRelDeleted(ctx context.Context, serverID, 
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

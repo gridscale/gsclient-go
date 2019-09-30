@@ -1,13 +1,11 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
+
 )
 
 //StorageSnapshotList is JSON structure of a list of storage snapshots
@@ -130,13 +128,9 @@ func (c *Client) CreateStorageSnapshot(ctx context.Context, id string, body Stor
 	if err != nil {
 		return StorageSnapshotCreateResponse{}, err
 	}
-<<<<<<< HEAD
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-=======
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -152,9 +146,6 @@ func (c *Client) UpdateStorageSnapshot(ctx context.Context, storageID, snapshotI
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -164,7 +155,6 @@ func (c *Client) UpdateStorageSnapshot(ctx context.Context, storageID, snapshotI
 		return c.waitForSnapshotActive(ctx, storageID, snapshotID)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteStorageSnapshot deletes a specific storage's snapshot
@@ -178,9 +168,6 @@ func (c *Client) DeleteStorageSnapshot(ctx context.Context, storageID, snapshotI
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -190,7 +177,6 @@ func (c *Client) DeleteStorageSnapshot(ctx context.Context, storageID, snapshotI
 		return c.waitForSnapshotDeleted(ctx, storageID, snapshotID)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //RollbackStorage rollbacks a storage
@@ -205,13 +191,6 @@ func (c *Client) RollbackStorage(ctx context.Context, storageID, snapshotID stri
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-}
-
-//ExportStorageSnapshotToS3 export a storage's snapshot to S3
-func (c *Client) ExportStorageSnapshotToS3(storageID, snapshotID string, body StorageSnapshotExportToS3Request) error {
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -230,16 +209,11 @@ func (c *Client) ExportStorageSnapshotToS3(ctx context.Context, storageID, snaps
 	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
 		return errors.New("'storageID' and 'snapshotID' is invalid")
 	}
->>>>>>> 8d4aa0e... add `context`
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID, "export_to_s3"),
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-}
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -305,4 +279,3 @@ func (c *Client) waitForSnapshotDeleted(ctx context.Context, storageID, snapshot
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

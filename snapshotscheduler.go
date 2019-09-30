@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -122,13 +119,9 @@ func (c *Client) CreateStorageSnapshotSchedule(ctx context.Context, id string, b
 	if err != nil {
 		return StorageSnapshotScheduleCreateResponse{}, err
 	}
-<<<<<<< HEAD
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-=======
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -142,9 +135,6 @@ func (c *Client) UpdateStorageSnapshotSchedule(ctx context.Context, storageID, s
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -154,7 +144,6 @@ func (c *Client) UpdateStorageSnapshotSchedule(ctx context.Context, storageID, s
 		return c.waitForSnapshotScheduleActive(ctx, storageID, scheduleID)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteStorageSnapshotSchedule deletes specific Storage's snapshot scheduler based on a given storage's id and scheduler's id
@@ -168,10 +157,6 @@ func (c *Client) DeleteStorageSnapshotSchedule(ctx context.Context, storageID, s
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-}
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -200,4 +185,3 @@ func (c *Client) waitForSnapshotScheduleDeleted(ctx context.Context, storageID, 
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

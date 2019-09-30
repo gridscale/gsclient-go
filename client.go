@@ -1,7 +1,5 @@
 package gsclient
 
-<<<<<<< HEAD
-=======
 import (
 	"context"
 	"errors"
@@ -9,7 +7,6 @@ import (
 	"strings"
 )
 
->>>>>>> 8d4aa0e... add `context`
 const (
 	apiServerBase        = "/objects/servers"
 	apiStorageBase       = "/objects/storages"
@@ -37,8 +34,6 @@ func NewClient(c *Config) *Client {
 	}
 	return client
 }
-<<<<<<< HEAD
-=======
 
 //waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
@@ -104,4 +99,3 @@ func (c *Client) waitFor200Status(ctx context.Context, uri, method string) error
 		return false, nil
 	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
->>>>>>> 8d4aa0e... add `context`

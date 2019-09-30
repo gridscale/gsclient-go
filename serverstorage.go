@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -109,9 +106,6 @@ func (c *Client) CreateServerStorage(ctx context.Context, id string, body Server
 		method: http.MethodPost,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -120,7 +114,6 @@ func (c *Client) CreateServerStorage(ctx context.Context, id string, body Server
 		return c.waitForServerStorageRelCreation(ctx, id, body.ObjectUUID)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteServerStorage delete a link between a storage and a server
@@ -134,9 +127,6 @@ func (c *Client) DeleteServerStorage(ctx context.Context, serverID, storageID st
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -145,7 +135,6 @@ func (c *Client) DeleteServerStorage(ctx context.Context, serverID, storageID st
 		return c.waitForServerStorageRelDeleted(ctx, serverID, storageID)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //LinkStorage attaches a storage to a server
@@ -161,8 +150,6 @@ func (c *Client) LinkStorage(ctx context.Context, serverID string, storageID str
 func (c *Client) UnlinkStorage(ctx context.Context, serverID string, storageID string) error {
 	return c.DeleteServerStorage(ctx, serverID, storageID)
 }
-<<<<<<< HEAD
-=======
 
 //waitForServerStorageRelCreation allows to wait until the relation between a server and a storage is created
 func (c *Client) waitForServerStorageRelCreation(ctx context.Context, serverID, storageID string) error {
@@ -183,4 +170,3 @@ func (c *Client) waitForServerStorageRelDeleted(ctx context.Context, serverID, s
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

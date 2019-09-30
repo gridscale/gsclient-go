@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -101,13 +98,9 @@ func (c *Client) CreateObjectStorageAccessKey(ctx context.Context) (ObjectStorag
 	if err != nil {
 		return ObjectStorageAccessKeyCreateResponse{}, err
 	}
-<<<<<<< HEAD
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-=======
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -122,9 +115,6 @@ func (c *Client) DeleteObjectStorageAccessKey(ctx context.Context, id string) er
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -134,7 +124,6 @@ func (c *Client) DeleteObjectStorageAccessKey(ctx context.Context, id string) er
 		return c.waitForObjectStorageAccessKeyDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //GetObjectStorageBucketList gets a list of object storage buckets
@@ -153,8 +142,6 @@ func (c *Client) GetObjectStorageBucketList(ctx context.Context) ([]ObjectStorag
 	}
 	return buckets, err
 }
-<<<<<<< HEAD
-=======
 
 //waitForObjectStorageAccessKeyDeleted allows to wait until the object storage's access key is deleted
 func (c *Client) waitForObjectStorageAccessKeyDeleted(ctx context.Context, id string) error {
@@ -165,4 +152,3 @@ func (c *Client) waitForObjectStorageAccessKeyDeleted(ctx context.Context, id st
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

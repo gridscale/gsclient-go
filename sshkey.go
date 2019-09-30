@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -117,13 +114,9 @@ func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (Cr
 	if err != nil {
 		return CreateResponse{}, err
 	}
-<<<<<<< HEAD
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-=======
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -137,10 +130,6 @@ func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodDelete,
-	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -149,8 +138,6 @@ func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
 		//Block until the request is finished
 		return c.waitForSSHKeyDeleted(ctx, id)
 	}
-	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //UpdateSshkey updates a ssh key
@@ -165,9 +152,6 @@ func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateR
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -177,7 +161,6 @@ func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateR
 		return c.waitForSSHKeyActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //GetSshkeyEventList gets a ssh key's events
@@ -199,8 +182,6 @@ func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, er
 	}
 	return sshEvents, err
 }
-<<<<<<< HEAD
-=======
 
 //waitForSSHKeyActive allows to wait until the SSH-Key's status is active
 func (c *Client) waitForSSHKeyActive(ctx context.Context, id string) error {
@@ -219,4 +200,3 @@ func (c *Client) waitForSSHKeyDeleted(ctx context.Context, id string) error {
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

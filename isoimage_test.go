@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetISOImageList(t *testing.T) {
@@ -31,11 +32,6 @@ func TestClient_GetISOImage(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareISOImageHTTPGet())
 	})
-<<<<<<< HEAD
-	res, err := client.GetISOImage(dummyUUID)
-	if err != nil {
-		t.Errorf("GetISOImage returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetISOImage(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -44,34 +40,11 @@ func TestClient_GetISOImage(t *testing.T) {
 			assert.Nil(t, err, "GetISOImage returned an error %v", err)
 			assert.Equal(t, fmt.Sprintf("%v", getMockISOImage("active")), fmt.Sprintf("%v", res))
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockISOImage()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateISOImage(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiISOBase)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprintf(writer, prepareISOImageHTTPCreateResponse())
-	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-
-	response, err := client.CreateISOImage(ISOImageCreateRequest{
-		Name:         "Test",
-		SourceURL:    "http://example.org",
-		Labels:       []string{"label"},
-		LocationUUID: "aa-bb-cc",
-	})
-	if err != nil {
-		t.Errorf("CreateISOImage returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		uri := path.Join(apiISOBase)
@@ -145,12 +118,8 @@ func TestClient_UpdateISOImage(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 
-<<<<<<< HEAD
-	assert.Equal(t, fmt.Sprintf("%v", getMockISOImageCreateResponse()), fmt.Sprintf("%s", response))
-=======
 func TestClient_DeleteISOImage(t *testing.T) {
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
@@ -180,7 +149,6 @@ func TestClient_DeleteISOImage(t *testing.T) {
 		}
 		server.Close()
 	}
->>>>>>> 8d4aa0e... add `context`
 }
 
 func TestClient_UpdateISOImage(t *testing.T) {
@@ -207,10 +175,6 @@ func TestClient_UpdateISOImage(t *testing.T) {
 		Name:   "test",
 		Labels: []string{},
 	})
-<<<<<<< HEAD
-	if err != nil {
-		t.Errorf("UpdateISOImage returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetISOImagesByLocation(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -220,7 +184,6 @@ func TestClient_UpdateISOImage(t *testing.T) {
 			assert.Equal(t, 1, len(res))
 			assert.Equal(t, fmt.Sprintf("[%v]", getMockISOImage("active")), fmt.Sprintf("%v", res))
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
@@ -232,17 +195,10 @@ func TestClient_DeleteISOImage(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-<<<<<<< HEAD
-	err := client.DeleteISOImage(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteISOImage returned an error %v", err)
-	}
-=======
 	res, err := client.GetDeletedISOImages(emptyCtx)
 	assert.Nil(t, err, "GetDeletedISOImages returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockISOImage("deleted")), fmt.Sprintf("%v", res))
->>>>>>> 8d4aa0e... add `context`
 }
 
 func TestClient_GetISOImageEventList(t *testing.T) {
@@ -253,12 +209,6 @@ func TestClient_GetISOImageEventList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprint(writer, prepareISOImageHTTPGetEventList())
 	})
-<<<<<<< HEAD
-
-	res, err := client.GetISOImageEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetISOImageEventList returned an error %v", err)
-=======
 	err := client.waitForISOImageActive(emptyCtx, dummyUUID)
 	assert.Nil(t, err, "waitForISOImageActive returned an error %v", err)
 }
@@ -278,7 +228,6 @@ func TestClient_waitForISOImageDeleted(t *testing.T) {
 		} else {
 			assert.Nil(t, err, "waitForISOImageDeleted returned an error %v", err)
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockISOImageEvent()), fmt.Sprintf("%v", res))

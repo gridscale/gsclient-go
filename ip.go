@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -168,15 +165,9 @@ func (c *Client) CreateIP(ctx context.Context, body IPCreateRequest) (IPCreateRe
 	if err != nil {
 		return IPCreateResponse{}, err
 	}
-<<<<<<< HEAD
-
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-
-=======
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -191,10 +182,6 @@ func (c *Client) DeleteIP(ctx context.Context, id string) error {
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -204,7 +191,6 @@ func (c *Client) DeleteIP(ctx context.Context, id string) error {
 		return c.waitForIPDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //UpdateIP updates a specific IP based on given id
@@ -219,10 +205,6 @@ func (c *Client) UpdateIP(ctx context.Context, id string, body IPUpdateRequest) 
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -232,7 +214,6 @@ func (c *Client) UpdateIP(ctx context.Context, id string, body IPUpdateRequest) 
 		return c.waitForIPActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //GetIPEventList gets a list of an IP's events
@@ -263,8 +244,6 @@ func (c *Client) GetIPVersion(ctx context.Context, id string) int {
 	}
 	return ip.Properties.Family
 }
-<<<<<<< HEAD
-=======
 
 //GetIPsByLocation gets a list of IPs by location
 //
@@ -320,4 +299,3 @@ func (c *Client) waitForIPDeleted(ctx context.Context, id string) error {
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

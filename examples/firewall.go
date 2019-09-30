@@ -2,10 +2,19 @@ package main
 
 import (
 	"bufio"
+	"context"
+	"github.com/gridscale/gsclient-go"
+	log "github.com/sirupsen/logrus"
+	"os"
+
+	log "github.com/sirupsen/logrus"
+
 	"github.com/gridscale/gsclient-go"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
+
+var emptyCtx = context.Background()
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -35,7 +44,7 @@ func main() {
 		},
 	}
 	//Create a new firewall
-	cfw, err := client.CreateFirewall(fwRequest)
+	cfw, err := client.CreateFirewall(emptyCtx, fwRequest)
 	if err != nil {
 		log.Error("Create firewall has failed with error", err)
 		return
@@ -43,7 +52,7 @@ func main() {
 	log.WithFields(log.Fields{"Firewall_uuid": cfw.ObjectUUID}).Info("Firewall successfully created")
 	log.Info("Update firewall: Press 'Enter' to continue...")
 	defer func() {
-		err := client.DeleteFirewall(cfw.ObjectUUID)
+		err := client.DeleteFirewall(emptyCtx, cfw.ObjectUUID)
 		if err != nil {
 			log.Error("Delete firewall has failed with error", err)
 			return
@@ -53,7 +62,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get a firewall to update
-	fw, err := client.GetFirewall(cfw.ObjectUUID)
+	fw, err := client.GetFirewall(emptyCtx, cfw.ObjectUUID)
 	if err != nil {
 		log.Errorf("Get firewall %s has failed with error %v", cfw.ObjectUUID, err)
 		return
@@ -63,14 +72,14 @@ func main() {
 		Labels: fw.Properties.Labels,
 		Rules:  fw.Properties.Rules,
 	}
-	err = client.UpdateFirewall(fw.Properties.ObjectUUID, fwUpdateRequest)
+	err = client.UpdateFirewall(emptyCtx, fw.Properties.ObjectUUID, fwUpdateRequest)
 	if err != nil {
 		log.Error("Update firewall has failed with error", err)
 		return
 	}
 
 	//Get firewall events
-	events, err := client.GetFirewallEventList(fw.Properties.ObjectUUID)
+	events, err := client.GetFirewallEventList(emptyCtx, fw.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get firewall's events has failed with error", err)
 		return

@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
@@ -17,12 +18,6 @@ func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleListHTTPGet())
 	})
-<<<<<<< HEAD
-
-	res, err := client.GetStorageSnapshotScheduleList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetStorageSnapshotScheduleList returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetStorageSnapshotScheduleList(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -32,7 +27,6 @@ func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
 			assert.Equal(t, 1, len(res))
 			assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshotSchedule("active")), fmt.Sprintf("%v", res))
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshotSchedule()), fmt.Sprintf("%v", res))
@@ -46,12 +40,6 @@ func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleHTTPGet())
 	})
-<<<<<<< HEAD
-
-	res, err := client.GetStorageSnapshotSchedule(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("GetStorageSnapshotSchedule returned an error %v", err)
-=======
 	for _, testStorageID := range uuidCommonTestCases {
 		for _, testScheduleID := range uuidCommonTestCases {
 			res, err := client.GetStorageSnapshotSchedule(emptyCtx, testStorageID.testUUID, testScheduleID.testUUID)
@@ -62,35 +50,11 @@ func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
 				assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotSchedule("active")), fmt.Sprintf("%v", res))
 			}
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotSchedule()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules")
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprintf(writer, prepareStorageSnapshotScheduleHTTPCreateResponse())
-	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-
-	response, err := client.CreateStorageSnapshotSchedule(dummyUUID, StorageSnapshotScheduleCreateRequest{
-		Name:          "test",
-		Labels:        []string{"test"},
-		RunInterval:   60,
-		KeepSnapshots: 1,
-		NextRuntime:   dummyTime,
-	})
-	if err != nil {
-		t.Errorf("CreateStorageSnapshotSchedule returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -131,16 +95,12 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 
 	assert.Equal(t, fmt.Sprintf("%v", getMockStorageSnapshotScheduleHTTPCreateResponse()), fmt.Sprintf("%s", response))
 }
 
 func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -218,7 +178,6 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 
 func TestClient_waitForSnapshotScheduleActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
->>>>>>> 8d4aa0e... add `context`
 	defer server.Close()
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
@@ -233,14 +192,8 @@ func TestClient_waitForSnapshotScheduleActive(t *testing.T) {
 		KeepSnapshots: 1,
 		NextRuntime:   dummyTime,
 	})
-<<<<<<< HEAD
-	if err != nil {
-		t.Errorf("UpdateStorageSnapshotSchedule returned an error %v", err)
-	}
-=======
 	err := client.waitForSnapshotScheduleActive(emptyCtx, dummyUUID, dummyUUID)
 	assert.Nil(t, err, "waitForSnapshotScheduleActive returned an error %v", err)
->>>>>>> 8d4aa0e... add `context`
 }
 
 func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
@@ -251,11 +204,6 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-<<<<<<< HEAD
-	err := client.DeleteStorageSnapshotSchedule(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteStorageSnapshotSchedule returned an error %v", err)
-=======
 	for _, testStorageID := range uuidCommonTestCases {
 		for _, testScheduleID := range uuidCommonTestCases {
 			err := client.waitForSnapshotScheduleDeleted(emptyCtx, testStorageID.testUUID, testScheduleID.testUUID)
@@ -265,7 +213,6 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 				assert.Nil(t, err, "waitForSnapshotScheduleDeleted returned an error %v", err)
 			}
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 

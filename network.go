@@ -135,13 +135,9 @@ func (c *Client) CreateNetwork(ctx context.Context, body NetworkCreateRequest) (
 	if err != nil {
 		return NetworkCreateResponse{}, err
 	}
-<<<<<<< HEAD
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-=======
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -156,9 +152,6 @@ func (c *Client) DeleteNetwork(ctx context.Context, id string) error {
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -168,7 +161,6 @@ func (c *Client) DeleteNetwork(ctx context.Context, id string) error {
 		return c.waitForNetworkDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //UpdateNetwork updates a specific network based on given id
@@ -183,10 +175,6 @@ func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdat
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -196,7 +184,6 @@ func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdat
 		return c.waitForNetworkActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //GetNetworkList gets a list of available networks
@@ -251,8 +238,6 @@ func (c *Client) GetNetworkPublic(ctx context.Context) (Network, error) {
 	}
 	return Network{}, fmt.Errorf("Public Network not found")
 }
-<<<<<<< HEAD
-=======
 
 //GetNetworksByLocation gets a list of networks by location
 //
@@ -308,4 +293,3 @@ func (c *Client) waitForNetworkDeleted(ctx context.Context, id string) error {
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

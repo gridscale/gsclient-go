@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetNetworkList(t *testing.T) {
@@ -31,11 +32,6 @@ func TestClient_GetNetwork(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareNetworkHTTPGet())
 	})
-<<<<<<< HEAD
-	res, err := client.GetNetwork(dummyUUID)
-	if err != nil {
-		t.Errorf("GetNetwork returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetNetwork(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -44,34 +40,11 @@ func TestClient_GetNetwork(t *testing.T) {
 			assert.Nil(t, err, "GetNetwork returned an error %v", err)
 			assert.Equal(t, fmt.Sprintf("%v", getMockNetwork(true, "active")), fmt.Sprintf("%v", res))
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockNetwork()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateNetwork(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := apiNetworkBase
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprintf(writer, prepareNetworkCreateResponse())
-	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-
-	response, err := client.CreateNetwork(NetworkCreateRequest{
-		Name:         "test",
-		Labels:       []string{"label"},
-		LocationUUID: dummyUUID,
-		L2Security:   false,
-	})
-	if err != nil {
-		t.Errorf("CreateNetwork returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -108,29 +81,12 @@ func TestClient_CreateNetwork(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 
 	assert.Equal(t, fmt.Sprintf("%v", getMockNetworkCreateResponse()), fmt.Sprintf("%s", response))
 }
 
 func TestClient_UpdateNetwork(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiNetworkBase, dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPatch, request.Method)
-		fmt.Fprint(writer, "")
-	})
-
-	err := client.UpdateNetwork(dummyUUID, NetworkUpdateRequest{
-		Name:       "test",
-		L2Security: false,
-	})
-	if err != nil {
-		t.Errorf("UpdateNetwork returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -164,23 +120,10 @@ func TestClient_UpdateNetwork(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
 func TestClient_DeleteNetwork(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiNetworkBase, dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodDelete, request.Method)
-		fmt.Fprint(writer, "")
-	})
-	err := client.DeleteNetwork(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteNetwork returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -208,7 +151,6 @@ func TestClient_DeleteNetwork(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
@@ -242,11 +184,6 @@ func TestClient_GetNetworkPublic(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet())
 	})
-<<<<<<< HEAD
-	res, err := client.GetNetworkPublic()
-	if err != nil {
-		t.Errorf("GetNetworkPublic returned an error %v", err)
-=======
 	for _, successFailTest := range commonSuccessFailTestCases {
 		isFailed = successFailTest.isFailed
 		for _, publicNetTest := range pubNetCases {
@@ -259,14 +196,10 @@ func TestClient_GetNetworkPublic(t *testing.T) {
 				assert.Equal(t, fmt.Sprintf("%v", getMockNetwork(publicNetTest, "active")), fmt.Sprintf("%v", res))
 			}
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockNetwork()), fmt.Sprintf("%v", res))
 }
 
-<<<<<<< HEAD
-func getMockNetwork() Network {
-=======
 func TestClient_GetNetworksByLocation(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
@@ -332,7 +265,6 @@ func TestClient_waitForNetworkDeleted(t *testing.T) {
 }
 
 func getMockNetwork(isPublic bool, status string) Network {
->>>>>>> 8d4aa0e... add `context`
 	mock := Network{Properties: NetworkProperties{
 		LocationCountry: "Germany",
 		LocationUUID:    "",

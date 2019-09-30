@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetObjectStorageAccessKeyList(t *testing.T) {
@@ -46,22 +47,6 @@ func TestClient_GetObjectStorageAccessKey(t *testing.T) {
 }
 
 func TestClient_CreateObjectStorageAccessKey(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiObjectStorageBase, "access_keys")
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
-		fmt.Fprint(writer, prepareObjectStorageAccessKeyHTTPCreateResponse())
-	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-	res, err := client.CreateObjectStorageAccessKey()
-	if err != nil {
-		t.Errorf("DeleteObjectStorageAccessKey returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -91,25 +76,11 @@ func TestClient_CreateObjectStorageAccessKey(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockObjectStorageAccessKeyCreateResponse()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_DeleteObjectStorageAccessKey(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiObjectStorageBase, "access_keys", dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodDelete, request.Method)
-		fmt.Fprint(writer, "")
-	})
-
-	err := client.DeleteObjectStorageAccessKey(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteObjectStorageAccessKey returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -137,7 +108,6 @@ func TestClient_DeleteObjectStorageAccessKey(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
@@ -156,8 +126,6 @@ func TestClient_GetObjectStorageBucketList(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockObjectStorageBucket()), fmt.Sprintf("%v", res))
 }
 
-<<<<<<< HEAD
-=======
 func TestClient_waitForObjectStorageAccessKeyDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
@@ -176,7 +144,6 @@ func TestClient_waitForObjectStorageAccessKeyDeleted(t *testing.T) {
 	}
 }
 
->>>>>>> 8d4aa0e... add `context`
 func getMockObjectStorageAccessKey() ObjectStorageAccessKey {
 	mock := ObjectStorageAccessKey{Properties: ObjectStorageAccessKeyProperties{
 		SecretKey: "dummy-secret-key",

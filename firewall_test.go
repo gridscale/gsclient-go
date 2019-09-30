@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetFirewallList(t *testing.T) {
@@ -31,11 +32,6 @@ func TestClient_GetFirewall(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareFirewallHTTPGet())
 	})
-<<<<<<< HEAD
-	response, err := client.GetFirewall(dummyUUID)
-	if err != nil {
-		t.Errorf("GetFirewall returned an error %v", err)
-=======
 	for _, test := range uuidCommonTestCases {
 		response, err := client.GetFirewall(emptyCtx, test.testUUID)
 		if test.isFailed {
@@ -44,43 +40,11 @@ func TestClient_GetFirewall(t *testing.T) {
 			assert.Nil(t, err, "GetFirewall returned an error %v", err)
 			assert.Equal(t, fmt.Sprintf("%v", getMockFirewall("active")), fmt.Sprintf("%v", response))
 		}
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockFirewall()), fmt.Sprintf("%v", response))
 }
 
 func TestClient_CreateFirewall(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiFirewallBase)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
-		fmt.Fprintf(w, prepareFirewallCreateResponse())
-	})
-
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-
-	res, err := client.CreateFirewall(FirewallCreateRequest{
-		Name:   "test",
-		Labels: []string{"label"},
-		Rules: FirewallRules{
-			RulesV6In: []FirewallRuleProperties{
-				{
-					Protocol: "tcp",
-					DstPort:  "1080",
-					SrcPort:  "80",
-					Order:    0,
-				},
-			},
-		},
-	})
-	if err != nil {
-		t.Errorf("CreateFirewall returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		uri := path.Join(apiFirewallBase)
@@ -125,37 +89,11 @@ func TestClient_CreateFirewall(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockFirewallCreateResponse()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_UpdateFirewall(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiFirewallBase, dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPatch, r.Method)
-		fmt.Fprintf(w, "")
-	})
-	err := client.UpdateFirewall(dummyUUID, FirewallUpdateRequest{
-		Name:   "test",
-		Labels: []string{"label"},
-		Rules: FirewallRules{
-			RulesV6In: []FirewallRuleProperties{
-				{
-					Protocol: "tcp",
-					DstPort:  "1080",
-					SrcPort:  "80",
-					Order:    0,
-				},
-			},
-		},
-	})
-	if err != nil {
-		t.Errorf("UpdateFirewall returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -199,23 +137,10 @@ func TestClient_UpdateFirewall(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
 func TestClient_DeleteFirewall(t *testing.T) {
-<<<<<<< HEAD
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiFirewallBase, dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodDelete, r.Method)
-		fmt.Fprintf(w, "")
-	})
-	err := client.DeleteFirewall(dummyUUID)
-	if err != nil {
-		t.Errorf("DeleteFirewall returned an error %v", err)
-=======
 	for _, clientTest := range syncClientTestCases {
 		server, client, mux := setupTestClient(clientTest)
 		var isFailed bool
@@ -243,7 +168,6 @@ func TestClient_DeleteFirewall(t *testing.T) {
 			}
 		}
 		server.Close()
->>>>>>> 8d4aa0e... add `context`
 	}
 }
 
@@ -270,9 +194,6 @@ func TestClient_GetFirewallEventList(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockFirewallEvent()), fmt.Sprintf("%v", response))
 }
 
-<<<<<<< HEAD
-func getMockFirewall() Firewall {
-=======
 func TestClient_waitForFirewallActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
@@ -306,7 +227,6 @@ func TestClient_waitForFirewallDeleted(t *testing.T) {
 }
 
 func getMockFirewall(status string) Firewall {
->>>>>>> 8d4aa0e... add `context`
 	mock := Firewall{Properties: FirewallProperties{
 		Status:     "active",
 		Labels:     []string{"label"},

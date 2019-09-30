@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -166,13 +163,9 @@ func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreate
 	if err != nil {
 		return LoadBalancerCreateResponse{}, err
 	}
-<<<<<<< HEAD
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-=======
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -193,9 +186,6 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBal
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -205,7 +195,6 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBal
 		return c.waitForLoadbalancerActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //GetLoadBalancerEventList retrieves events of a given uuid
@@ -239,10 +228,6 @@ func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-}
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -271,4 +256,3 @@ func (c *Client) waitForLoadbalancerDeleted(ctx context.Context, id string) erro
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

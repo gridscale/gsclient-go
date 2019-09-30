@@ -1,11 +1,8 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -159,14 +156,10 @@ func (c *Client) CreateFirewall(ctx context.Context, body FirewallCreateRequest)
 	if err != nil {
 		return FirewallCreateResponse{}, err
 	}
-<<<<<<< HEAD
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-=======
 	//Block until the request is finished
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -182,9 +175,6 @@ func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpd
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -194,7 +184,6 @@ func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpd
 		return c.waitForFirewallActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteFirewall delete a specific firewall
@@ -208,9 +197,6 @@ func (c *Client) DeleteFirewall(ctx context.Context, id string) error {
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -220,7 +206,6 @@ func (c *Client) DeleteFirewall(ctx context.Context, id string) error {
 		return c.waitForFirewallDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //GetFirewallEventList get list of a firewall's events
@@ -242,8 +227,6 @@ func (c *Client) GetFirewallEventList(ctx context.Context, id string) ([]Event, 
 	}
 	return firewallEvents, err
 }
-<<<<<<< HEAD
-=======
 
 //waitForFirewallActive allows to wait until the firewall's status is active
 func (c *Client) waitForFirewallActive(ctx context.Context, id string) error {
@@ -262,4 +245,3 @@ func (c *Client) waitForFirewallDeleted(ctx context.Context, id string) error {
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

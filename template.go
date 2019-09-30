@@ -139,9 +139,6 @@ func (c *Client) CreateTemplate(ctx context.Context, body TemplateCreateRequest)
 		body:   body,
 	}
 	var response CreateResponse
-<<<<<<< HEAD
-	err := r.execute(*c, &response)
-=======
 	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return CreateResponse{}, err
@@ -149,7 +146,6 @@ func (c *Client) CreateTemplate(ctx context.Context, body TemplateCreateRequest)
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -165,9 +161,6 @@ func (c *Client) UpdateTemplate(ctx context.Context, id string, body TemplateUpd
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -177,7 +170,6 @@ func (c *Client) UpdateTemplate(ctx context.Context, id string, body TemplateUpd
 		return c.waitForTemplateActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteTemplate deletes a template
@@ -191,9 +183,6 @@ func (c *Client) DeleteTemplate(ctx context.Context, id string) error {
 		uri:    path.Join(apiTemplateBase, id),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -203,7 +192,6 @@ func (c *Client) DeleteTemplate(ctx context.Context, id string) error {
 		return c.waitForTemplateDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //GetTemplateEventList gets a list of a template's events
@@ -225,8 +213,6 @@ func (c *Client) GetTemplateEventList(ctx context.Context, id string) ([]Event, 
 	}
 	return templateEvents, err
 }
-<<<<<<< HEAD
-=======
 
 //GetTemplatesByLocation gets a list of templates by location
 //
@@ -282,4 +268,3 @@ func (c *Client) waitForTemplateDeleted(ctx context.Context, id string) error {
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`

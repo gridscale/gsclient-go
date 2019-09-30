@@ -1,13 +1,11 @@
 package gsclient
 
 import (
-<<<<<<< HEAD
-=======
 	"context"
 	"errors"
->>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
+
 )
 
 //ISOImageList is JSON struct of a list of ISO images
@@ -145,13 +143,9 @@ func (c *Client) CreateISOImage(ctx context.Context, body ISOImageCreateRequest)
 	if err != nil {
 		return ISOImageCreateResponse{}, err
 	}
-<<<<<<< HEAD
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-=======
 	if c.cfg.sync {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
->>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
@@ -167,9 +161,6 @@ func (c *Client) UpdateISOImage(ctx context.Context, id string, body ISOImageUpd
 		method: http.MethodPatch,
 		body:   body,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -179,7 +170,6 @@ func (c *Client) UpdateISOImage(ctx context.Context, id string, body ISOImageUpd
 		return c.waitForISOImageActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteISOImage deletes a specific ISO image
@@ -193,9 +183,6 @@ func (c *Client) DeleteISOImage(ctx context.Context, id string) error {
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodDelete,
 	}
-<<<<<<< HEAD
-	return r.execute(*c, nil)
-=======
 	if c.cfg.sync {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
@@ -205,7 +192,6 @@ func (c *Client) DeleteISOImage(ctx context.Context, id string) error {
 		return c.waitForISOImageDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
->>>>>>> 8d4aa0e... add `context`
 }
 
 //GetISOImageEventList returns a list of events of an ISO image
@@ -227,8 +213,6 @@ func (c *Client) GetISOImageEventList(ctx context.Context, id string) ([]Event, 
 	}
 	return isoImageEvents, err
 }
-<<<<<<< HEAD
-=======
 
 //GetISOImagesByLocation gets a list of ISO images by location
 //
@@ -284,4 +268,3 @@ func (c *Client) waitForISOImageDeleted(ctx context.Context, id string) error {
 	method := http.MethodGet
 	return c.waitFor404Status(ctx, uri, method)
 }
->>>>>>> 8d4aa0e... add `context`
