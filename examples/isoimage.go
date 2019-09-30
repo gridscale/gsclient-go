@@ -2,12 +2,15 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"github.com/gridscale/gsclient-go"
 	"github.com/sirupsen/logrus"
 	"os"
 )
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
+
+var emptyCtx = context.Background()
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -33,7 +36,7 @@ func main() {
 		SourceURL:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
 		LocationUUID: locationUUID,
 	}
-	cIso, err := client.CreateISOImage(isoRequest)
+	cIso, err := client.CreateISOImage(emptyCtx, isoRequest)
 	if err != nil {
 		logrus.Error("Create ISO-image has failed with error", err)
 		return
@@ -41,7 +44,7 @@ func main() {
 	logrus.WithFields(logrus.Fields{"isoimage_uuid": cIso.ObjectUUID}).Info("ISO Image successfully created")
 	defer func() {
 		//Delete ISO-image
-		err := client.DeleteISOImage(cIso.ObjectUUID)
+		err := client.DeleteISOImage(emptyCtx, cIso.ObjectUUID)
 		if err != nil {
 			logrus.Error("Delete ISO-image has failed with error", err)
 			return
@@ -50,7 +53,7 @@ func main() {
 
 		logrus.Info("Get deleted ISO-images: Press 'Enter' to continue...")
 		bufio.NewReader(os.Stdin).ReadBytes('\n')
-		isoImages, err := client.GetDeletedISOImages()
+		isoImages, err := client.GetDeletedISOImages(emptyCtx)
 		if err != nil {
 			logrus.Error("Get deleted ISO-images has failed with error", err)
 			return
@@ -64,7 +67,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get ISO-image to update
-	iso, err := client.GetISOImage(cIso.ObjectUUID)
+	iso, err := client.GetISOImage(emptyCtx, cIso.ObjectUUID)
 	if err != nil {
 		logrus.Error("Get ISO-image has failed with error", err)
 		return
@@ -74,7 +77,7 @@ func main() {
 		Name:   "updated ISO",
 		Labels: iso.Properties.Labels,
 	}
-	err = client.UpdateISOImage(iso.Properties.ObjectUUID, isoUpdateRequest)
+	err = client.UpdateISOImage(emptyCtx, iso.Properties.ObjectUUID, isoUpdateRequest)
 	if err != nil {
 		logrus.Error("Update ISO-image has failed with error", err)
 		return
@@ -82,7 +85,7 @@ func main() {
 	logrus.WithFields(logrus.Fields{"isoimage_uuid": iso.Properties.ObjectUUID}).Info("ISO image successfully updated")
 
 	//get ISO-image's events
-	events, err := client.GetISOImageEventList(iso.Properties.ObjectUUID)
+	events, err := client.GetISOImageEventList(emptyCtx, iso.Properties.ObjectUUID)
 	if err != nil {
 		logrus.Error("Get ISO-image's events has failed with error", err)
 		return

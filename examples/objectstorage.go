@@ -2,11 +2,14 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"os"
 
 	"github.com/gridscale/gsclient-go"
 	log "github.com/sirupsen/logrus"
 )
+
+var emptyCtx = context.Background()
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -27,7 +30,7 @@ func main() {
 	log.Info("Create object storage access key: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	cobj, err := client.CreateObjectStorageAccessKey()
+	cobj, err := client.CreateObjectStorageAccessKey(emptyCtx)
 	if err != nil {
 		log.Error("Create object storage access key has failed with error", err)
 		return
@@ -37,7 +40,7 @@ func main() {
 	}).Info("Create access key successfully")
 	defer func() {
 		//Delete access key
-		err := client.DeleteObjectStorageAccessKey(cobj.AccessKey.AccessKey)
+		err := client.DeleteObjectStorageAccessKey(emptyCtx, cobj.AccessKey.AccessKey)
 		if err != nil {
 			log.Error("Delete access key has failed with error", err)
 			return
@@ -47,7 +50,7 @@ func main() {
 
 	log.Info("Get object storage access key: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	key, err := client.GetObjectStorageAccessKey(cobj.AccessKey.AccessKey)
+	key, err := client.GetObjectStorageAccessKey(emptyCtx, cobj.AccessKey.AccessKey)
 	if err != nil {
 		log.Error("Retrieve object storage access key has failed with error", err)
 		return
@@ -58,7 +61,7 @@ func main() {
 
 	log.Info("Get buckets: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	buckets, err := client.GetObjectStorageBucketList()
+	buckets, err := client.GetObjectStorageBucketList(emptyCtx)
 	if err != nil {
 		log.Error("Retrieve buckets has failed with error", err)
 		return
