@@ -1,6 +1,11 @@
 package gsclient
 
 import (
+<<<<<<< HEAD
+=======
+	"context"
+	"errors"
+>>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -108,14 +113,16 @@ type FirewallEventProperties struct {
 }
 
 //GetFirewallList gets a list of available firewalls
-func (c *Client) GetFirewallList() ([]Firewall, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewalls
+func (c *Client) GetFirewallList(ctx context.Context) ([]Firewall, error) {
 	r := Request{
 		uri:    path.Join(apiFirewallBase),
 		method: http.MethodGet,
 	}
 	var response FirewallList
 	var firewalls []Firewall
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		firewalls = append(firewalls, Firewall{Properties: properties})
 	}
@@ -123,62 +130,136 @@ func (c *Client) GetFirewallList() ([]Firewall, error) {
 }
 
 //GetFirewall gets a specific firewall based on given id
-func (c *Client) GetFirewall(id string) (Firewall, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewall
+func (c *Client) GetFirewall(ctx context.Context, id string) (Firewall, error) {
+	if !isValidUUID(id) {
+		return Firewall{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodGet,
 	}
 	var response Firewall
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //CreateFirewall creates a new firewall
-func (c *Client) CreateFirewall(body FirewallCreateRequest) (FirewallCreateResponse, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createFirewall
+func (c *Client) CreateFirewall(ctx context.Context, body FirewallCreateRequest) (FirewallCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiFirewallBase),
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response FirewallCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return FirewallCreateResponse{}, err
 	}
+<<<<<<< HEAD
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+=======
+	//Block until the request is finished
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
+>>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
 //UpdateFirewall update a specific firewall
-func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateFirewall
+func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodPatch,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForFirewallActive(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteFirewall delete a specific firewall
-func (c *Client) DeleteFirewall(id string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteFirewall
+func (c *Client) DeleteFirewall(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForFirewallDeleted(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //GetFirewallEventList get list of a firewall's events
-func (c *Client) GetFirewallEventList(id string) ([]FirewallEvent, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewallEvents
+func (c *Client) GetFirewallEventList(ctx context.Context, id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiFirewallBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response FirewallEventList
-	var firewallEvents []FirewallEvent
-	err := r.execute(*c, &response)
+	var response EventList
+	var firewallEvents []Event
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		firewallEvents = append(firewallEvents, FirewallEvent{Properties: properties})
 	}
 	return firewallEvents, err
 }
+<<<<<<< HEAD
+=======
+
+//waitForFirewallActive allows to wait until the firewall's status is active
+func (c *Client) waitForFirewallActive(ctx context.Context, id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		fw, err := c.GetFirewall(ctx, id)
+		return fw.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForFirewallDeleted allows to wait until the firewall is deleted
+func (c *Client) waitForFirewallDeleted(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiFirewallBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

@@ -1,6 +1,11 @@
 package gsclient
 
 import (
+<<<<<<< HEAD
+=======
+	"context"
+	"errors"
+>>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -73,14 +78,19 @@ type StorageSnapshotExportToS3Request struct {
 }
 
 //GetStorageSnapshotList gets a list of storage snapshots
-func (c *Client) GetStorageSnapshotList(id string) ([]StorageSnapshot, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSnapshots
+func (c *Client) GetStorageSnapshotList(ctx context.Context, id string) ([]StorageSnapshot, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "snapshots"),
 		method: http.MethodGet,
 	}
 	var response StorageSnapshotList
 	var snapshots []StorageSnapshot
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		snapshots = append(snapshots, StorageSnapshot{Properties: properties})
 	}
@@ -88,67 +98,211 @@ func (c *Client) GetStorageSnapshotList(id string) ([]StorageSnapshot, error) {
 }
 
 //GetStorageSnapshot gets a specific storage's snapshot based on given storage id and snapshot id.
-func (c *Client) GetStorageSnapshot(storageID, snapshotID string) (StorageSnapshot, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSnapshot
+func (c *Client) GetStorageSnapshot(ctx context.Context, storageID, snapshotID string) (StorageSnapshot, error) {
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return StorageSnapshot{}, errors.New("'storageID' or 'snapshotID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodGet,
 	}
 	var response StorageSnapshot
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //CreateStorageSnapshot creates a new storage's snapshot
-func (c *Client) CreateStorageSnapshot(id string, body StorageSnapshotCreateRequest) (StorageSnapshotCreateResponse, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createSnapshot
+func (c *Client) CreateStorageSnapshot(ctx context.Context, id string, body StorageSnapshotCreateRequest) (StorageSnapshotCreateResponse, error) {
+	if !isValidUUID(id) {
+		return StorageSnapshotCreateResponse{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "snapshots"),
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response StorageSnapshotCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return StorageSnapshotCreateResponse{}, err
 	}
+<<<<<<< HEAD
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+=======
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
+>>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
 //UpdateStorageSnapshot updates a specific storage's snapshot
-func (c *Client) UpdateStorageSnapshot(storageID, snapshotID string, body StorageSnapshotUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateSnapshot
+func (c *Client) UpdateStorageSnapshot(ctx context.Context, storageID, snapshotID string, body StorageSnapshotUpdateRequest) error {
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' or 'snapshotID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodPatch,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotActive(ctx, storageID, snapshotID)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteStorageSnapshot deletes a specific storage's snapshot
-func (c *Client) DeleteStorageSnapshot(storageID, snapshotID string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSnapshot
+func (c *Client) DeleteStorageSnapshot(ctx context.Context, storageID, snapshotID string) error {
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' or 'snapshotID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotDeleted(ctx, storageID, snapshotID)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //RollbackStorage rollbacks a storage
-func (c *Client) RollbackStorage(storageID, snapshotID string, body StorageRollbackRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/StorageRollback
+func (c *Client) RollbackStorage(ctx context.Context, storageID, snapshotID string, body StorageRollbackRequest) error {
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' or 'snapshotID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID, "rollback"),
 		method: http.MethodPatch,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
 }
 
 //ExportStorageSnapshotToS3 export a storage's snapshot to S3
 func (c *Client) ExportStorageSnapshotToS3(storageID, snapshotID string, body StorageSnapshotExportToS3Request) error {
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotActive(ctx, storageID, snapshotID)
+	}
+	return r.execute(ctx, *c, nil)
+}
+
+//ExportStorageSnapshotToS3 export a storage's snapshot to S3
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/SnapshotExportToS3
+func (c *Client) ExportStorageSnapshotToS3(ctx context.Context, storageID, snapshotID string, body StorageSnapshotExportToS3Request) error {
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' and 'snapshotID' is invalid")
+	}
+>>>>>>> 8d4aa0e... add `context`
 	r := Request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID, "export_to_s3"),
 		method: http.MethodPatch,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
 }
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSnapshotActive(ctx, storageID, snapshotID)
+	}
+	return r.execute(ctx, *c, nil)
+}
+
+//GetSnapshotsByLocation gets a list of storage snapshots by location
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationSnapshots
+func (c *Client) GetSnapshotsByLocation(ctx context.Context, id string) ([]StorageSnapshot, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "snapshots"),
+		method: http.MethodGet,
+	}
+	var response StorageSnapshotList
+	var snapshots []StorageSnapshot
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		snapshots = append(snapshots, StorageSnapshot{Properties: properties})
+	}
+	return snapshots, err
+}
+
+//GetDeletedSnapshots gets a list of deleted storage snapshots
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedSnapshots
+func (c *Client) GetDeletedSnapshots(ctx context.Context) ([]StorageSnapshot, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "snapshots"),
+		method: http.MethodGet,
+	}
+	var response DeletedStorageSnapshotList
+	var snapshots []StorageSnapshot
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		snapshots = append(snapshots, StorageSnapshot{Properties: properties})
+	}
+	return snapshots, err
+}
+
+//waitForSnapshotActive allows to wait until the snapshot's status is active
+func (c *Client) waitForSnapshotActive(ctx context.Context, storageID, snapshotID string) error {
+	return retryWithTimeout(func() (bool, error) {
+		snapshot, err := c.GetStorageSnapshot(ctx, storageID, snapshotID)
+		return snapshot.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForSnapshotDeleted allows to wait until the snapshot is deleted
+func (c *Client) waitForSnapshotDeleted(ctx context.Context, storageID, snapshotID string) error {
+	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
+		return errors.New("'storageID' or 'snapshotID' is invalid")
+	}
+	uri := path.Join(apiStorageBase, storageID, "snapshots", snapshotID)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

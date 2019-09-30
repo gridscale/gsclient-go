@@ -17,10 +17,8 @@ func TestClient_GetFirewallList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareFirewallListHTTPGet())
 	})
-	response, err := client.GetFirewallList()
-	if err != nil {
-		t.Errorf("GetFirewallList returned an error %v", err)
-	}
+	response, err := client.GetFirewallList(emptyCtx)
+	assert.Nil(t, err, "GetFirewallList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockFirewall()), fmt.Sprintf("%v", response))
 }
@@ -33,14 +31,26 @@ func TestClient_GetFirewall(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareFirewallHTTPGet())
 	})
+<<<<<<< HEAD
 	response, err := client.GetFirewall(dummyUUID)
 	if err != nil {
 		t.Errorf("GetFirewall returned an error %v", err)
+=======
+	for _, test := range uuidCommonTestCases {
+		response, err := client.GetFirewall(emptyCtx, test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetFirewall returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockFirewall("active")), fmt.Sprintf("%v", response))
+		}
+>>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockFirewall()), fmt.Sprintf("%v", response))
 }
 
 func TestClient_CreateFirewall(t *testing.T) {
+<<<<<<< HEAD
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiFirewallBase)
@@ -70,11 +80,58 @@ func TestClient_CreateFirewall(t *testing.T) {
 	})
 	if err != nil {
 		t.Errorf("CreateFirewall returned an error %v", err)
+=======
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		uri := path.Join(apiFirewallBase)
+		var isFailed bool
+		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, http.MethodPost, r.Method)
+			if isFailed {
+				w.WriteHeader(400)
+			} else {
+				fmt.Fprintf(w, prepareFirewallCreateResponse())
+			}
+		})
+		if clientTest {
+			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
+			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprint(w, httpResponse)
+			})
+		}
+		for _, test := range commonSuccessFailTestCases {
+			isFailed = test.isFailed
+			res, err := client.CreateFirewall(
+				emptyCtx,
+				FirewallCreateRequest{
+					Name:   "test",
+					Labels: []string{"label"},
+					Rules: FirewallRules{
+						RulesV6In: []FirewallRuleProperties{
+							{
+								Protocol: "tcp",
+								DstPort:  "1080",
+								SrcPort:  "80",
+								Order:    0,
+							},
+						},
+					},
+				})
+			if test.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "CreateFirewall returned an error %v", err)
+				assert.Equal(t, fmt.Sprintf("%v", getMockFirewallCreateResponse()), fmt.Sprintf("%v", res))
+			}
+		}
+		server.Close()
+>>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockFirewallCreateResponse()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_UpdateFirewall(t *testing.T) {
+<<<<<<< HEAD
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiFirewallBase, dummyUUID)
@@ -98,10 +155,56 @@ func TestClient_UpdateFirewall(t *testing.T) {
 	})
 	if err != nil {
 		t.Errorf("UpdateFirewall returned an error %v", err)
+=======
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiFirewallBase, dummyUUID)
+		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+			if isFailed {
+				w.WriteHeader(400)
+			} else {
+				if r.Method == http.MethodPatch {
+					fmt.Fprintf(w, "")
+				} else if r.Method == http.MethodGet {
+					fmt.Fprint(w, prepareFirewallHTTPGet("active"))
+				}
+			}
+		})
+		for _, serverTest := range commonSuccessFailTestCases {
+			isFailed = serverTest.isFailed
+			for _, test := range uuidCommonTestCases {
+				err := client.UpdateFirewall(
+					emptyCtx,
+					test.testUUID,
+					FirewallUpdateRequest{
+						Name:   "test",
+						Labels: []string{"label"},
+						Rules: &FirewallRules{
+							RulesV6In: []FirewallRuleProperties{
+								{
+									Protocol: "tcp",
+									DstPort:  "1080",
+									SrcPort:  "80",
+									Order:    0,
+								},
+							},
+						},
+					})
+				if test.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "UpdateFirewall returned an error %v", err)
+				}
+			}
+		}
+		server.Close()
+>>>>>>> 8d4aa0e... add `context`
 	}
 }
 
 func TestClient_DeleteFirewall(t *testing.T) {
+<<<<<<< HEAD
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiFirewallBase, dummyUUID)
@@ -112,6 +215,35 @@ func TestClient_DeleteFirewall(t *testing.T) {
 	err := client.DeleteFirewall(dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteFirewall returned an error %v", err)
+=======
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiFirewallBase, dummyUUID)
+		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+			if isFailed {
+				w.WriteHeader(400)
+			} else {
+				if r.Method == http.MethodDelete {
+					fmt.Fprintf(w, "")
+				} else if r.Method == http.MethodGet {
+					w.WriteHeader(404)
+				}
+			}
+		})
+		for _, serverTest := range commonSuccessFailTestCases {
+			isFailed = serverTest.isFailed
+			for _, test := range uuidCommonTestCases {
+				err := client.DeleteFirewall(emptyCtx, test.testUUID)
+				if test.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "DeleteFirewall returned an error %v", err)
+				}
+			}
+		}
+		server.Close()
+>>>>>>> 8d4aa0e... add `context`
 	}
 }
 
@@ -123,15 +255,58 @@ func TestClient_GetFirewallEventList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareFirewallEventListHTTPGet())
 	})
-	response, err := client.GetFirewallEventList(dummyUUID)
-	if err != nil {
-		t.Errorf("GetFirewallEventList returned an error %v", err)
+	for _, test := range uuidCommonTestCases {
+		response, err := client.GetFirewallEventList(emptyCtx, test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetFirewallEventList returned an error %v", err)
+			assert.Equal(t, 1, len(response))
+			assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", response))
+		}
+
 	}
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockFirewallEvent()), fmt.Sprintf("%v", response))
 }
 
+<<<<<<< HEAD
 func getMockFirewall() Firewall {
+=======
+func TestClient_waitForFirewallActive(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiFirewallBase, dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, prepareFirewallHTTPGet("active"))
+	})
+	err := client.waitForFirewallActive(emptyCtx, dummyUUID)
+	assert.Nil(t, err, "waitForFirewallActive returned an error %v", err)
+}
+
+func TestClient_waitForFirewallDeleted(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiFirewallBase, dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		w.WriteHeader(404)
+
+	})
+	for _, test := range uuidCommonTestCases {
+		err := client.waitForFirewallDeleted(emptyCtx, test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForFirewallDeleted returned an error %v", err)
+		}
+	}
+}
+
+func getMockFirewall(status string) Firewall {
+>>>>>>> 8d4aa0e... add `context`
 	mock := Firewall{Properties: FirewallProperties{
 		Status:     "active",
 		Labels:     []string{"label"},

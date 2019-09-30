@@ -1,6 +1,11 @@
 package gsclient
 
 import (
+<<<<<<< HEAD
+=======
+	"context"
+	"errors"
+>>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -65,18 +70,25 @@ type SshkeyEventProperties struct {
 }
 
 //GetSshkey gets a ssh key
-func (c *Client) GetSshkey(id string) (Sshkey, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKey
+func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
+	if !isValidUUID(id) {
+		return Sshkey{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodGet,
 	}
 	var response Sshkey
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //GetSshkeyList gets a list of ssh keys
-func (c *Client) GetSshkeyList() ([]Sshkey, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeys
+func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
 	r := Request{
 		uri:    apiSshkeyBase,
 		method: http.MethodGet,
@@ -84,7 +96,7 @@ func (c *Client) GetSshkeyList() ([]Sshkey, error) {
 
 	var response SshkeyList
 	var sshKeys []Sshkey
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		sshKeys = append(sshKeys, Sshkey{Properties: properties})
 	}
@@ -92,51 +104,119 @@ func (c *Client) GetSshkeyList() ([]Sshkey, error) {
 }
 
 //CreateSshkey creates a ssh key
-func (c *Client) CreateSshkey(body SshkeyCreateRequest) (CreateResponse, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createSshKey
+func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (CreateResponse, error) {
 	r := Request{
 		uri:    apiSshkeyBase,
 		method: "POST",
 		body:   body,
 	}
 	var response CreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return CreateResponse{}, err
 	}
+<<<<<<< HEAD
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+=======
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
+>>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
 //DeleteSshkey deletes a ssh key
-func (c *Client) DeleteSshkey(id string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSshKey
+func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSSHKeyDeleted(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //UpdateSshkey updates a ssh key
-func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateSshKey
+func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodPatch,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSSHKeyActive(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //GetSshkeyEventList gets a ssh key's events
-func (c *Client) GetSshkeyEventList(id string) ([]SshkeyEvent, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeyEvents
+func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response SshkeyEventList
-	var sshEvents []SshkeyEvent
-	err := r.execute(*c, &response)
+	var response EventList
+	var sshEvents []Event
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		sshEvents = append(sshEvents, SshkeyEvent{Properties: properties})
 	}
 	return sshEvents, err
 }
+<<<<<<< HEAD
+=======
+
+//waitForSSHKeyActive allows to wait until the SSH-Key's status is active
+func (c *Client) waitForSSHKeyActive(ctx context.Context, id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		key, err := c.GetSshkey(ctx, id)
+		return key.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForSSHKeyDeleted allows to wait until the SSH-Key is deleted
+func (c *Client) waitForSSHKeyDeleted(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiSshkeyBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

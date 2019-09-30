@@ -1,6 +1,11 @@
 package gsclient
 
 import (
+<<<<<<< HEAD
+=======
+	"context"
+	"errors"
+>>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -57,59 +62,111 @@ type ServerNetworkRelationUpdateRequest struct {
 }
 
 //GetServerNetworkList gets a list of a specific server's networks
-func (c *Client) GetServerNetworkList(id string) ([]ServerNetworkRelationProperties, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedNetworks
+func (c *Client) GetServerNetworkList(ctx context.Context, id string) ([]ServerNetworkRelationProperties, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "networks"),
 		method: http.MethodGet,
 	}
 	var response ServerNetworkRelationList
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response.List, err
 }
 
 //GetServerNetwork gets a network of a specific server
-func (c *Client) GetServerNetwork(serverID, networkID string) (ServerNetworkRelationProperties, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedNetwork
+func (c *Client) GetServerNetwork(ctx context.Context, serverID, networkID string) (ServerNetworkRelationProperties, error) {
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return ServerNetworkRelationProperties{}, errors.New("'serverID' or 'networksID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodGet,
 	}
 	var response ServerNetworkRelation
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response.Properties, err
 }
 
 //UpdateServerNetwork updates a link between a network and a server
-func (c *Client) UpdateServerNetwork(serverID, networkID string, body ServerNetworkRelationUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateServerLinkedNetwork
+func (c *Client) UpdateServerNetwork(ctx context.Context, serverID, networkID string, body ServerNetworkRelationUpdateRequest) error {
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return errors.New("'serverID' or 'networksID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodPatch,
 		body:   body,
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //CreateServerNetwork creates a link between a network and a storage
-func (c *Client) CreateServerNetwork(id string, body ServerNetworkRelationCreateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/linkNetworkToServer
+func (c *Client) CreateServerNetwork(ctx context.Context, id string, body ServerNetworkRelationCreateRequest) error {
+	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
+		return errors.New("'serverID' or 'network_id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "networks"),
 		method: http.MethodPost,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerNetworkRelCreation(ctx, id, body.ObjectUUID)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteServerNetwork deletes a link between a network and a server
-func (c *Client) DeleteServerNetwork(serverID, networkID string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/unlinkNetworkFromServer
+func (c *Client) DeleteServerNetwork(ctx context.Context, serverID, networkID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return errors.New("'serverID' or 'networkID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
 }
 
 //LinkNetwork attaches a network to a server
 func (c *Client) LinkNetwork(serverID, networkID, firewallTemplate string, bootdevice bool, order int,
 	l3security []string, firewall FirewallRules) error {
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerNetworkRelDeleted(ctx, serverID, networkID)
+	}
+	return r.execute(ctx, *c, nil)
+}
+
+//LinkNetwork attaches a network to a server
+func (c *Client) LinkNetwork(ctx context.Context, serverID, networkID, firewallTemplate string, bootdevice bool, order int,
+	l3security []string, firewall *FirewallRules) error {
+>>>>>>> 8d4aa0e... add `context`
 	body := ServerNetworkRelationCreateRequest{
 		ObjectUUID:           networkID,
 		Ordering:             order,
@@ -118,10 +175,33 @@ func (c *Client) LinkNetwork(serverID, networkID, firewallTemplate string, bootd
 		FirewallTemplateUUID: firewallTemplate,
 		Firewall:             firewall,
 	}
-	return c.CreateServerNetwork(serverID, body)
+	return c.CreateServerNetwork(ctx, serverID, body)
 }
 
 //UnlinkNetwork removes the link between a network and a server
-func (c *Client) UnlinkNetwork(serverID string, networkID string) error {
-	return c.DeleteServerNetwork(serverID, networkID)
+func (c *Client) UnlinkNetwork(ctx context.Context, serverID string, networkID string) error {
+	return c.DeleteServerNetwork(ctx, serverID, networkID)
 }
+<<<<<<< HEAD
+=======
+
+//waitForServerNetworkRelCreation allows to wait until the relation between a server and a network is created
+func (c *Client) waitForServerNetworkRelCreation(ctx context.Context, serverID, networkID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return errors.New("'serverID' and 'networkID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "networks", networkID)
+	method := http.MethodGet
+	return c.waitFor200Status(ctx, uri, method)
+}
+
+//waitForServerNetworkRelDeleted allows to wait until the relation between a server and a network is deleted
+func (c *Client) waitForServerNetworkRelDeleted(ctx context.Context, serverID, networkID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return errors.New("'serverID' and 'networkID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "networks", networkID)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

@@ -1,6 +1,8 @@
 package gsclient
 
 import (
+	"context"
+	"errors"
 	"net/http"
 	"path"
 )
@@ -199,14 +201,16 @@ type PaaSSecurityZoneUpdateRequest struct {
 }
 
 //GetPaaSServiceList returns a list of PaaS Services
-func (c *Client) GetPaaSServiceList() ([]PaaSService, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasServices
+func (c *Client) GetPaaSServiceList(ctx context.Context) ([]PaaSService, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services"),
 		method: http.MethodGet,
 	}
 	var response PaaSServices
 	var paasServices []PaaSService
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		paasServices = append(paasServices, PaaSService{
 			Properties: properties,
@@ -216,60 +220,100 @@ func (c *Client) GetPaaSServiceList() ([]PaaSService, error) {
 }
 
 //CreatePaaSService creates a new PaaS service
-func (c *Client) CreatePaaSService(body PaaSServiceCreateRequest) (PaaSServiceCreateResponse, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createPaasService
+func (c *Client) CreatePaaSService(ctx context.Context, body PaaSServiceCreateRequest) (PaaSServiceCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services"),
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response PaaSServiceCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return PaaSServiceCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
 	return response, err
 }
 
 //GetPaaSService returns a specific PaaS Service based on given id
-func (c *Client) GetPaaSService(id string) (PaaSService, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasService
+func (c *Client) GetPaaSService(ctx context.Context, id string) (PaaSService, error) {
+	if !isValidUUID(id) {
+		return PaaSService{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodGet,
 	}
 	var response PaaSService
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //UpdatePaaSService updates a specific PaaS Service based on a given id
-func (c *Client) UpdatePaaSService(id string, body PaaSServiceUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updatePaasService
+func (c *Client) UpdatePaaSService(ctx context.Context, id string, body PaaSServiceUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodPatch,
 		body:   body,
 	}
-	return r.execute(*c, nil)
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForPaaSServiceActive(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
 }
 
 //DeletePaaSService deletes a PaaS service
-func (c *Client) DeletePaaSService(id string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deletePaasService
+func (c *Client) DeletePaaSService(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodDelete,
 	}
-	return r.execute(*c, nil)
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForPaaSServiceDeleted(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
 }
 
 //GetPaaSServiceMetrics get a specific PaaS Service's metrics based on a given id
-func (c *Client) GetPaaSServiceMetrics(id string) ([]PaaSServiceMetric, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasServiceMetrics
+func (c *Client) GetPaaSServiceMetrics(ctx context.Context, id string) ([]PaaSServiceMetric, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "services", id, "metrics"),
 		method: http.MethodGet,
 	}
 	var response PaaSServiceMetrics
 	var metrics []PaaSServiceMetric
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		metrics = append(metrics, PaaSServiceMetric{
 			Properties: properties,
@@ -279,14 +323,16 @@ func (c *Client) GetPaaSServiceMetrics(id string) ([]PaaSServiceMetric, error) {
 }
 
 //GetPaaSTemplateList returns a list of PaaS service templates
-func (c *Client) GetPaaSTemplateList() ([]PaaSTemplate, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasServiceTemplates
+func (c *Client) GetPaaSTemplateList(ctx context.Context) ([]PaaSTemplate, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "service_templates"),
 		method: http.MethodGet,
 	}
 	var response PaaSTemplates
 	var paasTemplates []PaaSTemplate
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		paasTemplate := PaaSTemplate{
 			Properties: properties,
@@ -297,14 +343,16 @@ func (c *Client) GetPaaSTemplateList() ([]PaaSTemplate, error) {
 }
 
 //GetPaaSSecurityZoneList get available security zones
-func (c *Client) GetPaaSSecurityZoneList() ([]PaaSSecurityZone, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasSecurityZones
+func (c *Client) GetPaaSSecurityZoneList(ctx context.Context) ([]PaaSSecurityZone, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones"),
 		method: http.MethodGet,
 	}
 	var response PaaSSecurityZones
 	var securityZones []PaaSSecurityZone
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		securityZones = append(securityZones, PaaSSecurityZone{
 			Properties: properties,
@@ -314,47 +362,137 @@ func (c *Client) GetPaaSSecurityZoneList() ([]PaaSSecurityZone, error) {
 }
 
 //CreatePaaSSecurityZone creates a new PaaS security zone
-func (c *Client) CreatePaaSSecurityZone(body PaaSSecurityZoneCreateRequest) (PaaSSecurityZoneCreateResponse, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createPaasSecurityZone
+func (c *Client) CreatePaaSSecurityZone(ctx context.Context, body PaaSSecurityZoneCreateRequest) (PaaSSecurityZoneCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones"),
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response PaaSSecurityZoneCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return PaaSSecurityZoneCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
 	return response, err
 }
 
 //GetPaaSSecurityZone get a specific PaaS Security Zone based on given id
-func (c *Client) GetPaaSSecurityZone(id string) (PaaSSecurityZone, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasSecurityZone
+func (c *Client) GetPaaSSecurityZone(ctx context.Context, id string) (PaaSSecurityZone, error) {
+	if !isValidUUID(id) {
+		return PaaSSecurityZone{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodGet,
 	}
 	var response PaaSSecurityZone
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //UpdatePaaSSecurityZone update a specific PaaS security zone based on given id
-func (c *Client) UpdatePaaSSecurityZone(id string, body PaaSSecurityZoneUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updatePaasSecurityZone
+func (c *Client) UpdatePaaSSecurityZone(ctx context.Context, id string, body PaaSSecurityZoneUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodPatch,
 		body:   body,
 	}
-	return r.execute(*c, nil)
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSecurityZoneActive(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
 }
 
 //DeletePaaSSecurityZone delete a specific PaaS Security Zone based on given id
-func (c *Client) DeletePaaSSecurityZone(id string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deletePaasSecurityZone
+func (c *Client) DeletePaaSSecurityZone(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodDelete,
 	}
-	return r.execute(*c, nil)
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSecurityZoneDeleted(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+}
+
+//GetDeletedPaaSServices returns a list of deleted PaaS Services
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedPaasServices
+func (c *Client) GetDeletedPaaSServices(ctx context.Context) ([]PaaSService, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "paas_services"),
+		method: http.MethodGet,
+	}
+	var response DeletedPaaSServices
+	var paasServices []PaaSService
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		paasServices = append(paasServices, PaaSService{
+			Properties: properties,
+		})
+	}
+	return paasServices, err
+}
+
+//waitForPaaSServiceActive allows to wait until the PaaS service's status is active
+func (c *Client) waitForPaaSServiceActive(ctx context.Context, id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		paas, err := c.GetPaaSService(ctx, id)
+		return paas.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForPaaSServiceDeleted allows to wait until the PaaS service is deleted
+func (c *Client) waitForPaaSServiceDeleted(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiPaaSBase, "services", id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+
+//waitForSecurityZoneActive allows to wait until the security zone's status is active
+func (c *Client) waitForSecurityZoneActive(ctx context.Context, id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		secZone, err := c.GetPaaSSecurityZone(ctx, id)
+		return secZone.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForSecurityZoneDeleted allows to wait until the security zone is deleted
+func (c *Client) waitForSecurityZoneDeleted(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiPaaSBase, "security_zones", id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
 }

@@ -1,6 +1,8 @@
 package gsclient
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -104,61 +106,110 @@ type NetworkEventProperties struct {
 }
 
 //GetNetwork get a specific network based on given id
-func (c *Client) GetNetwork(id string) (Network, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getNetwork
+func (c *Client) GetNetwork(ctx context.Context, id string) (Network, error) {
+	if !isValidUUID(id) {
+		return Network{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodGet,
 	}
 	var response Network
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //CreateNetwork creates a network
-func (c *Client) CreateNetwork(body NetworkCreateRequest) (NetworkCreateResponse, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#tag/network
+func (c *Client) CreateNetwork(ctx context.Context, body NetworkCreateRequest) (NetworkCreateResponse, error) {
 	r := Request{
 		uri:    apiNetworkBase,
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response NetworkCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return NetworkCreateResponse{}, err
 	}
+<<<<<<< HEAD
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+=======
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
+>>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
 //DeleteNetwork deletes a specific network based on given id
-func (c *Client) DeleteNetwork(id string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteNetwork
+func (c *Client) DeleteNetwork(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForNetworkDeleted(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //UpdateNetwork updates a specific network based on given id
-func (c *Client) UpdateNetwork(id string, body NetworkUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateNetwork
+func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodPatch,
 		body:   body,
 	}
+<<<<<<< HEAD
 
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForNetworkActive(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //GetNetworkList gets a list of available networks
-func (c *Client) GetNetworkList() ([]Network, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getNetworks
+func (c *Client) GetNetworkList(ctx context.Context) ([]Network, error) {
 	r := Request{
 		uri:    apiNetworkBase,
 		method: http.MethodGet,
 	}
 	var response NetworkList
 	var networks []Network
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		networks = append(networks, Network{
 			Properties: properties,
@@ -168,14 +219,19 @@ func (c *Client) GetNetworkList() ([]Network, error) {
 }
 
 //GetNetworkEventList gets a list of a network's events
-func (c *Client) GetNetworkEventList(id string) ([]NetworkEvent, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#tag/network
+func (c *Client) GetNetworkEventList(ctx context.Context, id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response NetworkEventList
-	var networkEvents []NetworkEvent
-	err := r.execute(*c, &response)
+	var response EventList
+	var networkEvents []Event
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		networkEvents = append(networkEvents, NetworkEvent{Properties: properties})
 	}
@@ -183,8 +239,8 @@ func (c *Client) GetNetworkEventList(id string) ([]NetworkEvent, error) {
 }
 
 //GetNetworkPublic gets public network
-func (c *Client) GetNetworkPublic() (Network, error) {
-	networks, err := c.GetNetworkList()
+func (c *Client) GetNetworkPublic(ctx context.Context) (Network, error) {
+	networks, err := c.GetNetworkList(ctx)
 	if err != nil {
 		return Network{}, err
 	}
@@ -195,3 +251,61 @@ func (c *Client) GetNetworkPublic() (Network, error) {
 	}
 	return Network{}, fmt.Errorf("Public Network not found")
 }
+<<<<<<< HEAD
+=======
+
+//GetNetworksByLocation gets a list of networks by location
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedNetworks
+func (c *Client) GetNetworksByLocation(ctx context.Context, id string) ([]Network, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "networks"),
+		method: http.MethodGet,
+	}
+	var response NetworkList
+	var networks []Network
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		networks = append(networks, Network{Properties: properties})
+	}
+	return networks, err
+}
+
+//GetDeletedNetworks gets a list of deleted networks
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedNetworks
+func (c *Client) GetDeletedNetworks(ctx context.Context) ([]Network, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "networks"),
+		method: http.MethodGet,
+	}
+	var response DeletedNetworkList
+	var networks []Network
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		networks = append(networks, Network{Properties: properties})
+	}
+	return networks, err
+}
+
+//waitForNetworkActive allows to wait until the network's status is active
+func (c *Client) waitForNetworkActive(ctx context.Context, id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		net, err := c.GetNetwork(ctx, id)
+		return net.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForNetworkDeleted allows to wait until the network is deleted
+func (c *Client) waitForNetworkDeleted(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiNetworkBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

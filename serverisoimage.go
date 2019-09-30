@@ -1,6 +1,11 @@
 package gsclient
 
 import (
+<<<<<<< HEAD
+=======
+	"context"
+	"errors"
+>>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -36,65 +41,135 @@ type ServerIsoImageRelationUpdateRequest struct {
 }
 
 //GetServerIsoImageList gets a list of a specific server's ISO images
-func (c *Client) GetServerIsoImageList(id string) ([]ServerIsoImageRelationProperties, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedIsoimages
+func (c *Client) GetServerIsoImageList(ctx context.Context, id string) ([]ServerIsoImageRelationProperties, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),
 		method: http.MethodGet,
 	}
 	var response ServerIsoImageRelationList
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response.List, err
 }
 
 //GetServerIsoImage gets an ISO image of a specific server
-func (c *Client) GetServerIsoImage(serverID, isoImageID string) (ServerIsoImageRelationProperties, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedIsoimage
+func (c *Client) GetServerIsoImage(ctx context.Context, serverID, isoImageID string) (ServerIsoImageRelationProperties, error) {
+	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
+		return ServerIsoImageRelationProperties{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodGet,
 	}
 	var response ServerIsoImageRelation
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response.Properties, err
 }
 
 //UpdateServerIsoImage updates a link between a storage and an ISO image
-func (c *Client) UpdateServerIsoImage(serverID, isoImageID string, body ServerIsoImageRelationUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateServerLinkedIsoimage
+func (c *Client) UpdateServerIsoImage(ctx context.Context, serverID, isoImageID string, body ServerIsoImageRelationUpdateRequest) error {
+	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
+		return errors.New("'serverID' or 'isoImageID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodPatch,
 		body:   body,
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //CreateServerIsoImage creates a link between a server and an ISO image
-func (c *Client) CreateServerIsoImage(id string, body ServerIsoImageRelationCreateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/linkIsoimageToServer
+func (c *Client) CreateServerIsoImage(ctx context.Context, id string, body ServerIsoImageRelationCreateRequest) error {
+	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
+		return errors.New("'serverID' or 'isoImageID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),
 		method: http.MethodPost,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerISOImageRelCreation(ctx, id, body.ObjectUUID)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteServerIsoImage deletes a link between an ISO image and a server
-func (c *Client) DeleteServerIsoImage(serverID, isoImageID string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/unlinkIsoimageFromServer
+func (c *Client) DeleteServerIsoImage(ctx context.Context, serverID, isoImageID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
+		return errors.New("'serverID' or 'isoImageID' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerISOImageRelDeleted(ctx, serverID, isoImageID)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //LinkIsoImage attaches an ISO image to a server
-func (c *Client) LinkIsoImage(serverID string, isoimageID string) error {
+func (c *Client) LinkIsoImage(ctx context.Context, serverID string, isoimageID string) error {
 	body := ServerIsoImageRelationCreateRequest{
 		ObjectUUID: isoimageID,
 	}
-	return c.CreateServerIsoImage(serverID, body)
+	return c.CreateServerIsoImage(ctx, serverID, body)
 }
 
 //UnlinkIsoImage removes the link between an ISO image and a server
-func (c *Client) UnlinkIsoImage(serverID string, isoimageID string) error {
-	return c.DeleteServerIsoImage(serverID, isoimageID)
+func (c *Client) UnlinkIsoImage(ctx context.Context, serverID string, isoimageID string) error {
+	return c.DeleteServerIsoImage(ctx, serverID, isoimageID)
 }
+<<<<<<< HEAD
+=======
+
+//waitForServerISOImageRelCreation allows to wait until the relation between a server and an ISO-Image is created
+func (c *Client) waitForServerISOImageRelCreation(ctx context.Context, serverID, isoimageID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
+		return errors.New("'serverID' and 'isoimageID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
+	method := http.MethodGet
+	return c.waitFor200Status(ctx, uri, method)
+}
+
+//waitForServerISOImageRelDeleted allows to wait until the relation between a server and an ISO-Image is deleted
+func (c *Client) waitForServerISOImageRelDeleted(ctx context.Context, serverID, isoimageID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
+		return errors.New("'serverID' and 'isoimageID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

@@ -1,6 +1,11 @@
 package gsclient
 
 import (
+<<<<<<< HEAD
+=======
+	"context"
+	"errors"
+>>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -94,14 +99,16 @@ type ISOImageEventProperties struct {
 }
 
 //GetISOImageList returns a list of available ISO images
-func (c *Client) GetISOImageList() ([]ISOImage, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getIsoimages
+func (c *Client) GetISOImageList(ctx context.Context) ([]ISOImage, error) {
 	r := Request{
 		uri:    path.Join(apiISOBase),
 		method: http.MethodGet,
 	}
 	var response ISOImageList
 	var isoImages []ISOImage
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		isoImages = append(isoImages, ISOImage{Properties: properties})
 	}
@@ -109,62 +116,172 @@ func (c *Client) GetISOImageList() ([]ISOImage, error) {
 }
 
 //GetISOImage returns a specific ISO image based on given id
-func (c *Client) GetISOImage(id string) (ISOImage, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getIsoimage
+func (c *Client) GetISOImage(ctx context.Context, id string) (ISOImage, error) {
+	if !isValidUUID(id) {
+		return ISOImage{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodGet,
 	}
 	var response ISOImage
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //CreateISOImage creates an ISO image
-func (c *Client) CreateISOImage(body ISOImageCreateRequest) (ISOImageCreateResponse, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createIsoimage
+func (c *Client) CreateISOImage(ctx context.Context, body ISOImageCreateRequest) (ISOImageCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiISOBase),
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response ISOImageCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return ISOImageCreateResponse{}, err
 	}
+<<<<<<< HEAD
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+=======
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
+>>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
 //UpdateISOImage updates a specific ISO Image
-func (c *Client) UpdateISOImage(id string, body ISOImageUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateIsoimage
+func (c *Client) UpdateISOImage(ctx context.Context, id string, body ISOImageUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodPatch,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForISOImageActive(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //DeleteISOImage deletes a specific ISO image
-func (c *Client) DeleteISOImage(id string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteIsoimage
+func (c *Client) DeleteISOImage(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForISOImageDeleted(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //GetISOImageEventList returns a list of events of an ISO image
-func (c *Client) GetISOImageEventList(id string) ([]ISOImageEvent, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getIsoimageEvents
+func (c *Client) GetISOImageEventList(ctx context.Context, id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiISOBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response ISOImageEventList
-	var isoImageEvents []ISOImageEvent
-	err := r.execute(*c, &response)
+	var response EventList
+	var isoImageEvents []Event
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		isoImageEvents = append(isoImageEvents, ISOImageEvent{Properties: properties})
 	}
 	return isoImageEvents, err
 }
+<<<<<<< HEAD
+=======
+
+//GetISOImagesByLocation gets a list of ISO images by location
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationIsoimages
+func (c *Client) GetISOImagesByLocation(ctx context.Context, id string) ([]ISOImage, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "isoimages"),
+		method: http.MethodGet,
+	}
+	var response ISOImageList
+	var isoImages []ISOImage
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		isoImages = append(isoImages, ISOImage{Properties: properties})
+	}
+	return isoImages, err
+}
+
+//GetDeletedISOImages gets a list of deleted ISO images
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedIsoimages
+func (c *Client) GetDeletedISOImages(ctx context.Context) ([]ISOImage, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "isoimages"),
+		method: http.MethodGet,
+	}
+	var response DeletedISOImageList
+	var isoImages []ISOImage
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		isoImages = append(isoImages, ISOImage{Properties: properties})
+	}
+	return isoImages, err
+}
+
+//waitForISOImageActive allows to wait until the ISO-Image's status is active
+func (c *Client) waitForISOImageActive(ctx context.Context, id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		img, err := c.GetISOImage(ctx, id)
+		return img.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForISOImageDeleted allows to wait until the ISO-Image id deleted
+func (c *Client) waitForISOImageDeleted(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiISOBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

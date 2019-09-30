@@ -1,6 +1,11 @@
 package gsclient
 
 import (
+<<<<<<< HEAD
+=======
+	"context"
+	"errors"
+>>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -110,14 +115,16 @@ type LoadBalancerEventProperties struct {
 }
 
 //GetLoadBalancerList returns a list of loadbalancers
-func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancers
+func (c *Client) GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error) {
 	r := Request{
 		uri:    apiLoadBalancerBase,
 		method: http.MethodGet,
 	}
 	var response LoadBalancers
 	var loadBalancers []LoadBalancer
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		loadBalancers = append(loadBalancers, LoadBalancer{Properties: properties})
 	}
@@ -125,51 +132,96 @@ func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
 }
 
 //GetLoadBalancer returns a loadbalancer of a given uuid
-func (c *Client) GetLoadBalancer(id string) (LoadBalancer, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancer
+func (c *Client) GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, error) {
+	if !isValidUUID(id) {
+		return LoadBalancer{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodGet,
 	}
 	var response LoadBalancer
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //CreateLoadBalancer creates a new loadbalancer
-func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error) {
+//
+//Note: loadbalancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createLoadbalancer
+func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error) {
+	if body.Labels == nil {
+		body.Labels = make([]string, 0)
+	}
 	r := Request{
 		uri:    apiLoadBalancerBase,
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response LoadBalancerCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return LoadBalancerCreateResponse{}, err
 	}
+<<<<<<< HEAD
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+=======
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
+>>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
 //UpdateLoadBalancer update configuration of a loadbalancer
-func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) error {
+//
+//Note: loadbalancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateLoadbalancer
+func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBalancerUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	if body.Labels == nil {
+		body.Labels = make([]string, 0)
+	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodPatch,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForLoadbalancerActive(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //GetLoadBalancerEventList retrieves events of a given uuid
-func (c *Client) GetLoadBalancerEventList(id string) ([]LoadBalancerEvent, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancerEvents
+func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response LoadBalancerEventList
-	var loadBalancerEvents []LoadBalancerEvent
-	err := r.execute(*c, &response)
+	var response EventList
+	var loadBalancerEvents []Event
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		loadBalancerEvents = append(loadBalancerEvents, LoadBalancerEvent{Properties: properties})
 	}
@@ -177,10 +229,46 @@ func (c *Client) GetLoadBalancerEventList(id string) ([]LoadBalancerEvent, error
 }
 
 //DeleteLoadBalancer deletes a loadbalancer
-func (c *Client) DeleteLoadBalancer(id string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteLoadbalancer
+func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
 }
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForLoadbalancerDeleted(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+}
+
+//waitForLoadbalancerActive allows to wait until the loadbalancer's status is active
+func (c *Client) waitForLoadbalancerActive(ctx context.Context, id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		lb, err := c.GetLoadBalancer(ctx, id)
+		return lb.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForLoadbalancerDeleted allows to wait until the loadbalancer is deleted
+func (c *Client) waitForLoadbalancerDeleted(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiLoadBalancerBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

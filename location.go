@@ -1,6 +1,8 @@
 package gsclient
 
 import (
+	"context"
+	"errors"
 	"net/http"
 	"path"
 )
@@ -25,15 +27,17 @@ type LocationProperties struct {
 	Country    string   `json:"country"`
 }
 
-//GetLocationList gets a list of available locations
-func (c *Client) GetLocationList() ([]Location, error) {
+//GetLocationList gets a list of available locations]
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getLocations
+func (c *Client) GetLocationList(ctx context.Context) ([]Location, error) {
 	r := Request{
 		uri:    apiLocationBase,
 		method: http.MethodGet,
 	}
 	var response LocationList
 	var locations []Location
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		locations = append(locations, Location{Properties: properties})
 	}
@@ -41,12 +45,17 @@ func (c *Client) GetLocationList() ([]Location, error) {
 }
 
 //GetLocation gets a specific location
-func (c *Client) GetLocation(id string) (Location, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getLocation
+func (c *Client) GetLocation(ctx context.Context, id string) (Location, error) {
+	if !isValidUUID(id) {
+		return Location{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiLocationBase, id),
 		method: http.MethodGet,
 	}
 	var location Location
-	err := r.execute(*c, &location)
+	err := r.execute(ctx, *c, &location)
 	return location, err
 }

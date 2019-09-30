@@ -1,6 +1,11 @@
 package gsclient
 
 import (
+<<<<<<< HEAD
+=======
+	"context"
+	"errors"
+>>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -51,14 +56,16 @@ type ObjectStorageBucketProperties struct {
 }
 
 //GetObjectStorageAccessKeyList gets a list of available object storage access keys
-func (c *Client) GetObjectStorageAccessKeyList() ([]ObjectStorageAccessKey, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getAccessKeys
+func (c *Client) GetObjectStorageAccessKeyList(ctx context.Context) ([]ObjectStorageAccessKey, error) {
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys"),
 		method: http.MethodGet,
 	}
 	var response ObjectStorageAccessKeyList
 	var accessKeys []ObjectStorageAccessKey
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		accessKeys = append(accessKeys, ObjectStorageAccessKey{Properties: properties})
 	}
@@ -66,51 +73,96 @@ func (c *Client) GetObjectStorageAccessKeyList() ([]ObjectStorageAccessKey, erro
 }
 
 //GetObjectStorageAccessKey gets a specific object storage access key based on given id
-func (c *Client) GetObjectStorageAccessKey(id string) (ObjectStorageAccessKey, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getAccessKey
+func (c *Client) GetObjectStorageAccessKey(ctx context.Context, id string) (ObjectStorageAccessKey, error) {
+	if strings.TrimSpace(id) == "" {
+		return ObjectStorageAccessKey{}, errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodGet,
 	}
 	var response ObjectStorageAccessKey
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //CreateObjectStorageAccessKey creates an object storage access key
-func (c *Client) CreateObjectStorageAccessKey() (ObjectStorageAccessKeyCreateResponse, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createAccessKey
+func (c *Client) CreateObjectStorageAccessKey(ctx context.Context) (ObjectStorageAccessKeyCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys"),
 		method: http.MethodPost,
 	}
 	var response ObjectStorageAccessKeyCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return ObjectStorageAccessKeyCreateResponse{}, err
 	}
+<<<<<<< HEAD
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+=======
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
+>>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
 //DeleteObjectStorageAccessKey deletes a specific object storage access key based on given id
-func (c *Client) DeleteObjectStorageAccessKey(id string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteAccessKey
+func (c *Client) DeleteObjectStorageAccessKey(ctx context.Context, id string) error {
+	if strings.TrimSpace(id) == "" {
+		return errors.New("'id' is required")
+	}
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForObjectStorageAccessKeyDeleted(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //GetObjectStorageBucketList gets a list of object storage buckets
-func (c *Client) GetObjectStorageBucketList() ([]ObjectStorageBucket, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getBuckets
+func (c *Client) GetObjectStorageBucketList(ctx context.Context) ([]ObjectStorageBucket, error) {
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "buckets"),
 		method: http.MethodGet,
 	}
 	var response ObjectStorageBucketList
 	var buckets []ObjectStorageBucket
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		buckets = append(buckets, ObjectStorageBucket{Properties: properties})
 	}
 	return buckets, err
 }
+<<<<<<< HEAD
+=======
+
+//waitForObjectStorageAccessKeyDeleted allows to wait until the object storage's access key is deleted
+func (c *Client) waitForObjectStorageAccessKeyDeleted(ctx context.Context, id string) error {
+	if strings.TrimSpace(id) == "" {
+		return errors.New("'id' is required")
+	}
+	uri := path.Join(apiObjectStorageBase, "access_keys", id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

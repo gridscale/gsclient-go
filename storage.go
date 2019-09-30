@@ -1,6 +1,11 @@
 package gsclient
 
 import (
+<<<<<<< HEAD
+=======
+	"context"
+	"errors"
+>>>>>>> 8d4aa0e... add `context`
 	"net/http"
 	"path"
 )
@@ -129,25 +134,32 @@ type StorageEventProperties struct {
 }
 
 //GetStorage get a storage
-func (c *Client) GetStorage(id string) (Storage, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getStorage
+func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
+	if !isValidUUID(id) {
+		return Storage{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodGet,
 	}
 	var response Storage
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //GetStorageList gets a list of available storages
-func (c *Client) GetStorageList() ([]Storage, error) {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getStorages
+func (c *Client) GetStorageList(ctx context.Context) ([]Storage, error) {
 	r := Request{
 		uri:    apiStorageBase,
 		method: http.MethodGet,
 	}
 	var response StorageList
 	var storages []Storage
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		storages = append(storages, Storage{
 			Properties: properties,
@@ -157,51 +169,162 @@ func (c *Client) GetStorageList() ([]Storage, error) {
 }
 
 //CreateStorage create a storage
-func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error) {
+//
+//NOTE:
+//
+// - Allowed value for `StorageType`: nil, DefaultStorageType, HighStorageType, InsaneStorageType.
+//
+// - Allowed value for `PasswordType`: nil, PlainPasswordType, CryptPasswordType.
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createStorage
+func (c *Client) CreateStorage(ctx context.Context, body StorageCreateRequest) (CreateResponse, error) {
 	r := Request{
 		uri:    apiStorageBase,
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response CreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return CreateResponse{}, err
 	}
+<<<<<<< HEAD
 	err = c.WaitForRequestCompletion(response.RequestUUID)
+=======
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
+	}
+>>>>>>> 8d4aa0e... add `context`
 	return response, err
 }
 
 //DeleteStorage delete a storage
-func (c *Client) DeleteStorage(id string) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteStorage
+func (c *Client) DeleteStorage(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodDelete,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForStorageDeleted(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 //UpdateStorage update a storage
-func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateStorage
+func (c *Client) UpdateStorage(ctx context.Context, id string, body StorageUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodPatch,
 		body:   body,
 	}
+<<<<<<< HEAD
 	return r.execute(*c, nil)
+=======
+	if c.cfg.sync {
+		err := r.execute(ctx, *c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForStorageActive(ctx, id)
+	}
+	return r.execute(ctx, *c, nil)
+>>>>>>> 8d4aa0e... add `context`
 }
 
-//GetStorageEventList get list of a storage's events
-func (c *Client) GetStorageEventList(id string) ([]StorageEvent, error) {
+//GetStorageEventList get list of a storage's event
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageEvents
+func (c *Client) GetStorageEventList(ctx context.Context, id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiStorageBase, id, "events"),
 		method: http.MethodGet,
 	}
-	var response StorageEventList
-	var storageEvents []StorageEvent
-	err := r.execute(*c, &response)
+	var response EventList
+	var storageEvents []Event
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		storageEvents = append(storageEvents, StorageEvent{Properties: properties})
 	}
 	return storageEvents, err
 }
+<<<<<<< HEAD
+=======
+
+//GetStoragesByLocation gets a list of storages by location
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationStorages
+func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storage, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "storages"),
+		method: http.MethodGet,
+	}
+	var response StorageList
+	var storages []Storage
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		storages = append(storages, Storage{Properties: properties})
+	}
+	return storages, err
+}
+
+//GetDeletedStorages gets a list of deleted storages
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedStorages
+func (c *Client) GetDeletedStorages(ctx context.Context) ([]Storage, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "storages"),
+		method: http.MethodGet,
+	}
+	var response DeletedStorageList
+	var storages []Storage
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		storages = append(storages, Storage{Properties: properties})
+	}
+	return storages, err
+}
+
+//waitForStorageActive allows to wait until the storage's status is active
+func (c *Client) waitForStorageActive(ctx context.Context, id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		storage, err := c.GetStorage(ctx, id)
+		return storage.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForStorageDeleted allows to wait until the storage is deleted
+func (c *Client) waitForStorageDeleted(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiStorageBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
+}
+>>>>>>> 8d4aa0e... add `context`

@@ -17,9 +17,21 @@ func TestClient_GetServerNetworkList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerNetworkListHTTPGet())
 	})
+<<<<<<< HEAD
 	res, err := client.GetServerNetworkList(dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerNetworkList returned an error %v", err)
+=======
+	for _, test := range uuidCommonTestCases {
+		res, err := client.GetServerNetworkList(emptyCtx, test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetServerNetworkList returned an error %v", err)
+			assert.Equal(t, 1, len(res))
+			assert.Equal(t, fmt.Sprintf("[%v]", getMockServerNetwork("test")), fmt.Sprintf("%v", res))
+		}
+>>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockServerNetwork()), fmt.Sprintf("%v", res))
@@ -33,14 +45,28 @@ func TestClient_GetServerNetwork(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerNetworkHTTPGet())
 	})
+<<<<<<< HEAD
 	res, err := client.GetServerNetwork(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("GetServerNetwork returned an error %v", err)
+=======
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testNetworkID := range uuidCommonTestCases {
+			res, err := client.GetServerNetwork(emptyCtx, testServerID.testUUID, testNetworkID.testUUID)
+			if testServerID.isFailed || testNetworkID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "GetServerNetwork returned an error %v", err)
+				assert.Equal(t, fmt.Sprintf("%v", getMockServerNetwork("test")), fmt.Sprintf("%v", res))
+			}
+		}
+>>>>>>> 8d4aa0e... add `context`
 	}
 	assert.Equal(t, fmt.Sprintf("%v", getMockServerNetwork()), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreateServerNetwork(t *testing.T) {
+<<<<<<< HEAD
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "networks")
@@ -57,6 +83,49 @@ func TestClient_CreateServerNetwork(t *testing.T) {
 	})
 	if err != nil {
 		t.Errorf("CreateServerNetwork returned an error %v", err)
+=======
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiServerBase, dummyUUID, "networks")
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			assert.Equal(t, http.MethodPost, request.Method)
+			if isFailed {
+				writer.WriteHeader(400)
+			} else {
+				fmt.Fprint(writer, "")
+			}
+		})
+		if clientTest {
+			mux.HandleFunc(path.Join(apiServerBase, dummyUUID, "networks", dummyUUID), func(writer http.ResponseWriter, request *http.Request) {
+				assert.Equal(t, http.MethodGet, request.Method)
+				fmt.Fprintf(writer, prepareServerNetworkHTTPGet())
+			})
+		}
+		for _, test := range commonSuccessFailTestCases {
+			isFailed = test.isFailed
+			for _, testServerID := range uuidCommonTestCases {
+				for _, testNetworkID := range uuidCommonTestCases {
+					err := client.CreateServerNetwork(
+						emptyCtx,
+						testServerID.testUUID,
+						ServerNetworkRelationCreateRequest{
+							ObjectUUID:           testNetworkID.testUUID,
+							Ordering:             1,
+							BootDevice:           false,
+							L3security:           nil,
+							FirewallTemplateUUID: dummyUUID,
+						})
+					if testServerID.isFailed || testNetworkID.isFailed || isFailed {
+						assert.NotNil(t, err)
+					} else {
+						assert.Nil(t, err, "CreateServerNetwork returned an error %v", err)
+					}
+				}
+			}
+		}
+		server.Close()
+>>>>>>> 8d4aa0e... add `context`
 	}
 }
 
@@ -68,17 +137,28 @@ func TestClient_UpdateServerNetwork(t *testing.T) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UpdateServerNetwork(dummyUUID, dummyUUID, ServerNetworkRelationUpdateRequest{
-		Ordering:             0,
-		BootDevice:           true,
-		FirewallTemplateUUID: dummyUUID,
-	})
-	if err != nil {
-		t.Errorf("UpdateServerNetwork returned an error %v", err)
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testNetworkID := range uuidCommonTestCases {
+			err := client.UpdateServerNetwork(
+				emptyCtx,
+				testServerID.testUUID,
+				testNetworkID.testUUID,
+				ServerNetworkRelationUpdateRequest{
+					Ordering:             0,
+					BootDevice:           true,
+					FirewallTemplateUUID: dummyUUID,
+				})
+			if testServerID.isFailed || testNetworkID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "UpdateServerNetwork returned an error %v", err)
+			}
+		}
 	}
 }
 
 func TestClient_DeleteServerNetwork(t *testing.T) {
+<<<<<<< HEAD
 	server, client, mux := setupTestClient()
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
@@ -89,6 +169,37 @@ func TestClient_DeleteServerNetwork(t *testing.T) {
 	err := client.DeleteServerNetwork(dummyUUID, dummyUUID)
 	if err != nil {
 		t.Errorf("DeleteServerNetwork returned an error %v", err)
+=======
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			if isFailed {
+				writer.WriteHeader(400)
+			} else {
+				if request.Method == http.MethodDelete {
+					fmt.Fprintf(writer, "")
+				} else if request.Method == http.MethodGet {
+					writer.WriteHeader(404)
+				}
+			}
+		})
+		for _, test := range commonSuccessFailTestCases {
+			isFailed = test.isFailed
+			for _, testServerID := range uuidCommonTestCases {
+				for _, testNetworkID := range uuidCommonTestCases {
+					err := client.DeleteServerNetwork(emptyCtx, testServerID.testUUID, testNetworkID.testUUID)
+					if testServerID.isFailed || testNetworkID.isFailed || isFailed {
+						assert.NotNil(t, err)
+					} else {
+						assert.Nil(t, err, "DeleteServerNetwork returned an error %v", err)
+					}
+				}
+			}
+		}
+		server.Close()
+>>>>>>> 8d4aa0e... add `context`
 	}
 }
 
@@ -100,10 +211,15 @@ func TestClient_LinkNetwork(t *testing.T) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		fmt.Fprint(writer, "")
 	})
+<<<<<<< HEAD
 	err := client.LinkNetwork(dummyUUID, dummyUUID, dummyUUID, true, 0, nil, FirewallRules{})
 	if err != nil {
 		t.Errorf("LinkNetwork returned an error %v", err)
 	}
+=======
+	err := client.LinkNetwork(emptyCtx, dummyUUID, dummyUUID, dummyUUID, false, 1, nil, nil)
+	assert.Nil(t, err, "LinkNetwork returned an error %v", err)
+>>>>>>> 8d4aa0e... add `context`
 }
 
 func TestClient_UnlinkNetwork(t *testing.T) {
@@ -114,13 +230,55 @@ func TestClient_UnlinkNetwork(t *testing.T) {
 		assert.Equal(t, http.MethodDelete, request.Method)
 		fmt.Fprint(writer, "")
 	})
-	err := client.UnlinkNetwork(dummyUUID, dummyUUID)
-	if err != nil {
-		t.Errorf("UnlinkNetwork returned an error %v", err)
+	err := client.UnlinkNetwork(emptyCtx, dummyUUID, dummyUUID)
+	assert.Nil(t, err, "UnlinkNetwork returned an error %v", err)
+}
+
+<<<<<<< HEAD
+func getMockServerNetwork() ServerNetworkRelationProperties {
+=======
+func TestClient_waitForServerNetworkRelCreation(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		fmt.Fprintf(writer, prepareServerNetworkHTTPGet())
+	})
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testIPID := range uuidCommonTestCases {
+			err := client.waitForServerNetworkRelCreation(emptyCtx, testServerID.testUUID, testIPID.testUUID)
+			if testServerID.isFailed || testIPID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "waitForServerNetworkRelCreation returned an error %v", err)
+			}
+		}
 	}
 }
 
-func getMockServerNetwork() ServerNetworkRelationProperties {
+func TestClient_waitForServerNetworkRelDeleted(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		writer.WriteHeader(404)
+	})
+	for _, testServerID := range uuidCommonTestCases {
+		for _, testIPID := range uuidCommonTestCases {
+			err := client.waitForServerNetworkRelDeleted(emptyCtx, testServerID.testUUID, testIPID.testUUID)
+			if testServerID.isFailed || testIPID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "waitForServerNetworkRelDeleted returned an error %v", err)
+			}
+		}
+	}
+}
+
+func getMockServerNetwork(name string) ServerNetworkRelationProperties {
+>>>>>>> 8d4aa0e... add `context`
 	mock := ServerNetworkRelationProperties{
 		L2security:           true,
 		ServerUUID:           dummyUUID,
