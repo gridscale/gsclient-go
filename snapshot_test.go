@@ -65,7 +65,7 @@ func TestClient_CreateStorageSnapshot(t *testing.T) {
 		})
 		if clientTest {
 			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprint(w, httpResponse)
 			})
 		}
@@ -292,66 +292,30 @@ func TestClient_GetDeletedSnapshots(t *testing.T) {
 func TestClient_waitForSnapshotActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(writer, prepareStorageSnapshotHTTPGet("in-provisioning"))
-			} else {
-				fmt.Fprint(writer, prepareStorageSnapshotHTTPGet("active"))
-			}
-		}
+		fmt.Fprint(writer, prepareStorageSnapshotHTTPGet("active"))
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			err := client.waitForSnapshotActive(dummyUUID, dummyUUID)
-			if isFailed || isTimeout {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForSnapshotActive returned an error %v", err)
-			}
-		}
-	}
+	err := client.waitForSnapshotActive(dummyUUID, dummyUUID)
+	assert.Nil(t, err, "waitForSnapshotActive returned an error %v", err)
 }
 
 func TestClient_waitForSnapshotDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(writer, prepareStorageSnapshotHTTPGet("to-be-deleted"))
-			} else {
-				writer.WriteHeader(404)
-			}
-		}
+		writer.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, testStorageID := range uuidCommonTestCases {
-				for _, testSnapshotID := range uuidCommonTestCases {
-					err := client.waitForSnapshotDeleted(testStorageID.testUUID, testSnapshotID.testUUID)
-					if testStorageID.isFailed || testSnapshotID.isFailed || isFailed || isTimeout {
-						assert.NotNil(t, err)
-					} else {
-						assert.Nil(t, err, "waitForSnapshotDeleted returned an error %v", err)
-					}
-				}
+	for _, testStorageID := range uuidCommonTestCases {
+		for _, testSnapshotID := range uuidCommonTestCases {
+			err := client.waitForSnapshotDeleted(testStorageID.testUUID, testSnapshotID.testUUID)
+			if testStorageID.isFailed || testSnapshotID.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "waitForSnapshotDeleted returned an error %v", err)
 			}
 		}
 	}

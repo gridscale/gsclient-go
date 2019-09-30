@@ -47,7 +47,7 @@ func TestClient_CreateLabel(t *testing.T) {
 		}
 	})
 	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, httpResponse)
 	})
 	for _, test := range commonSuccessFailTestCases {
@@ -66,33 +66,17 @@ func TestClient_CreateLabel(t *testing.T) {
 func TestClient_waitForLabelDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := apiLabelBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, prepareLabelListHTTPGet("test"))
-			} else {
-				fmt.Fprint(w, prepareLabelListHTTPGet("not-test"))
-			}
-		}
+		fmt.Fprint(w, prepareLabelListHTTPGet("not-test"))
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, test := range labelTestCases {
-				err := client.waitForLabelDeleted(test.testUUID)
-				if test.isFailed || isFailed || isTimeout {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "waitForFirewallDeleted returned an error %v", err)
-				}
-			}
+	for _, test := range labelTestCases {
+		err := client.waitForLabelDeleted(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForFirewallDeleted returned an error %v", err)
 		}
 	}
 }

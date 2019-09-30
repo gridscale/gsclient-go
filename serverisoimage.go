@@ -2,10 +2,8 @@ package gsclient
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"path"
-	"time"
 )
 
 //ServerIsoImageRelationList JSON struct of a list of relations between a server and ISO-Images
@@ -156,70 +154,20 @@ func (c *Client) UnlinkIsoImage(serverID string, isoimageID string) error {
 
 //waitForServerISOImageRelCreation allows to wait until the relation between a server and an ISO-Image is created
 func (c *Client) waitForServerISOImageRelCreation(serverID, isoimageID string) error {
-	if serverID == "" || isoimageID == "" {
+	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
 		return errors.New("'serverID' and 'isoimageID' are required")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-RETRY:
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for sever(%v)-ISOImage(%v) relation to be created",
-				serverID, isoimageID)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiServerBase, serverID, "isoimages", isoimageID),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(*c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						continue RETRY
-					}
-				}
-				return err
-			}
-			return nil
-		}
-	}
+	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
+	method := http.MethodGet
+	return c.waitFor200Status(uri, method)
 }
 
 //waitForServerISOImageRelDeleted allows to wait until the relation between a server and an ISO-Image is deleted
 func (c *Client) waitForServerISOImageRelDeleted(serverID, isoimageID string) error {
-	if serverID == "" || isoimageID == "" {
+	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
 		return errors.New("'serverID' and 'isoimageID' are required")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for sever(%v)-ISOImage(%v) relation to be deleted",
-				serverID, isoimageID)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiServerBase, serverID, "isoimages", isoimageID),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(*c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						return nil
-					}
-				}
-				return err
-			}
-		}
-	}
+	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

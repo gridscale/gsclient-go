@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"path"
-	"time"
 )
 
 //NetworkList is JSON struct of a list of networks
@@ -333,25 +332,10 @@ func (c *Client) GetDeletedNetworks() ([]Network, error) {
 
 //waitForNetworkActive allows to wait until the network's status is active
 func (c *Client) waitForNetworkActive(id string) error {
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for network %v to be active", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			net, err := c.GetNetwork(id)
-			if err != nil {
-				return err
-			}
-			if net.Properties.Status == resourceActiveStatus {
-				return nil
-			}
-		}
-	}
+	return retryWithTimeout(func() (bool, error) {
+		net, err := c.GetNetwork(id)
+		return net.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForNetworkDeleted allows to wait until the network is deleted
@@ -359,30 +343,7 @@ func (c *Client) waitForNetworkDeleted(id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for network %v to be deleted", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiNetworkBase, id),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(*c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						return nil
-					}
-				}
-				return err
-			}
-		}
-	}
+	uri := path.Join(apiNetworkBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

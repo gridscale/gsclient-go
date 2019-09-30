@@ -58,7 +58,7 @@ func TestClient_CreateObjectStorageAccessKey(t *testing.T) {
 		})
 		if clientTest {
 			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprint(w, httpResponse)
 			})
 		}
@@ -125,33 +125,17 @@ func TestClient_GetObjectStorageBucketList(t *testing.T) {
 func TestClient_waitForObjectStorageAccessKeyDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiObjectStorageBase, "access_keys", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, prepareObjectStorageAccessKeyHTTPGet())
-			} else {
-				w.WriteHeader(404)
-			}
-		}
+		w.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, test := range uuidCommonTestCases {
-				err := client.waitForObjectStorageAccessKeyDeleted(test.testUUID)
-				if test.isFailed || isFailed || isTimeout {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "waitForObjectStorageAccessKeyDeleted returned an error %v", err)
-				}
-			}
+	for _, test := range uuidCommonTestCases {
+		err := client.waitForObjectStorageAccessKeyDeleted(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForObjectStorageAccessKeyDeleted returned an error %v", err)
 		}
 	}
 }

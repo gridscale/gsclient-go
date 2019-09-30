@@ -2,10 +2,8 @@ package gsclient
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"path"
-	"time"
 )
 
 //IPList is JSON struct of a list of IPs
@@ -355,25 +353,10 @@ func (c *Client) GetDeletedIPs() ([]IP, error) {
 
 //waitForIPActive allows to wait until the IP address's status is active
 func (c *Client) waitForIPActive(id string) error {
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for IP %v to be active", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			ip, err := c.GetIP(id)
-			if err != nil {
-				return err
-			}
-			if ip.Properties.Status == resourceActiveStatus {
-				return nil
-			}
-		}
-	}
+	return retryWithTimeout(func() (bool, error) {
+		ip, err := c.GetIP(id)
+		return ip.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForIPDeleted allows to wait until the IP address is deleted
@@ -381,30 +364,7 @@ func (c *Client) waitForIPDeleted(id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for IP %v to be deleted", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiIPBase, id),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(*c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						return nil
-					}
-				}
-				return err
-			}
-		}
-	}
+	uri := path.Join(apiIPBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

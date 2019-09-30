@@ -58,7 +58,7 @@ func TestClient_CreateServer(t *testing.T) {
 		})
 		if clientTest {
 			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprint(w, httpResponse)
 			})
 		}
@@ -360,97 +360,41 @@ func TestClient_GetDeletedServers(t *testing.T) {
 func TestClient_waitForServerPowerStatus(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			fmt.Fprint(w, prepareServerHTTPGet(true, "active"))
-		}
+		fmt.Fprint(w, prepareServerHTTPGet(true, "active"))
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			power := true
-			if isTimeout {
-				power = false
-			}
-			err := client.waitForServerPowerStatus(dummyUUID, power)
-			if isFailed || isTimeout {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForServerPowerStatus returned an error %v", err)
-			}
-		}
-	}
+	err := client.waitForServerPowerStatus(dummyUUID, true)
+	assert.Nil(t, err, "waitForServerPowerStatus returned an error %v", err)
 }
 
 func TestClient_waitForServerActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, prepareServerHTTPGet(true, "in-provisioning"))
-			} else {
-				fmt.Fprint(w, prepareServerHTTPGet(true, "active"))
-			}
-		}
+		fmt.Fprint(w, prepareServerHTTPGet(true, "active"))
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			err := client.waitForServerActive(dummyUUID)
-			if isFailed || isTimeout {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForServerActive returned an error %v", err)
-			}
-		}
-	}
+	err := client.waitForServerActive(dummyUUID)
+	assert.Nil(t, err, "waitForServerActive returned an error %v", err)
 }
 
 func TestClient_waitForServerDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, prepareServerHTTPGet(false, "to-be-deleted"))
-			} else {
-				w.WriteHeader(404)
-			}
-		}
+		w.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, test := range uuidCommonTestCases {
-				err := client.waitForServerDeleted(test.testUUID)
-				if test.isFailed || isFailed || isTimeout {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "waitForServerDeleted returned an error %v", err)
-				}
-			}
+	for _, test := range uuidCommonTestCases {
+		err := client.waitForServerDeleted(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForServerDeleted returned an error %v", err)
 		}
 	}
 }

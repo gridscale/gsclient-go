@@ -28,7 +28,7 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 
 		if clientTest {
 			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprint(w, httpResponse)
 			})
 		}
@@ -186,65 +186,29 @@ func TestClient_GetLoadBalancerEventList(t *testing.T) {
 func TestClient_waitForLoadbalancerActive(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiLoadBalancerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("in-provisioning"))
-			} else {
-				fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
-			}
-		}
+		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			err := client.waitForLoadbalancerActive(dummyUUID)
-			if isFailed || isTimeout {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForLoadbalancerActive returned an error %v", err)
-			}
-		}
-	}
+	err := client.waitForLoadbalancerActive(dummyUUID)
+	assert.Nil(t, err, "waitForLoadbalancerActive returned an error %v", err)
 }
 
 func TestClient_waitForLoadbalancerDeleted(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	var isFailed bool
-	var isTimeout bool
 	uri := path.Join(apiLoadBalancerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			if isTimeout {
-				fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("to-be-deleted"))
-			} else {
-				w.WriteHeader(404)
-			}
-		}
+		w.WriteHeader(404)
 	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, isTimeoutTest := range timeoutTestCases {
-			isTimeout = isTimeoutTest
-			for _, test := range uuidCommonTestCases {
-				err := client.waitForLoadbalancerDeleted(test.testUUID)
-				if test.isFailed || isFailed || isTimeout {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "waitForLoadbalancerDeleted returned an error %v", err)
-				}
-			}
+	for _, test := range uuidCommonTestCases {
+		err := client.waitForLoadbalancerDeleted(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForLoadbalancerDeleted returned an error %v", err)
 		}
 	}
 }

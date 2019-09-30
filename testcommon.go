@@ -49,6 +49,6 @@ var timeoutTestCases []bool = []bool{true, false}
 func setupTestClient(sync bool) (*httptest.Server, *Client, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
-	config := NewConfiguration(server.URL, "uuid", "token", true, sync, 5, 500, 5)
+	config := NewConfiguration(server.URL, "uuid", "token", true, sync, 1, 100, 5)
 	return server, NewClient(config), mux
 }
