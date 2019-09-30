@@ -17,7 +17,7 @@ func TestClient_GetTemplateList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
-	response, err := client.GetTemplateList()
+	response, err := client.GetTemplateList(emptyCtx)
 	assert.Nil(t, err, "GetTemplateList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate("active")), fmt.Sprintf("%v", response))
@@ -32,7 +32,7 @@ func TestClient_GetTemplate(t *testing.T) {
 		fmt.Fprint(w, prepareTemplateHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetTemplate(test.testUUID)
+		response, err := client.GetTemplate(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -62,7 +62,7 @@ func TestClient_GetTemplateByName(t *testing.T) {
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	for _, test := range testCases {
-		response, err := client.GetTemplateByName(test.testUUID)
+		response, err := client.GetTemplateByName(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -93,11 +93,13 @@ func TestClient_CreateTemplate(t *testing.T) {
 		}
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
-			res, err := client.CreateTemplate(TemplateCreateRequest{
-				Name:         "test",
-				SnapshotUUID: dummyUUID,
-				Labels:       []string{"label"},
-			})
+			res, err := client.CreateTemplate(
+				emptyCtx,
+				TemplateCreateRequest{
+					Name:         "test",
+					SnapshotUUID: dummyUUID,
+					Labels:       []string{"label"},
+				})
 			if isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -128,10 +130,13 @@ func TestClient_UpdateTemplate(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.UpdateTemplate(test.testUUID, TemplateUpdateRequest{
-					Name:   "test",
-					Labels: []string{"labels"},
-				})
+				err := client.UpdateTemplate(
+					emptyCtx,
+					test.testUUID,
+					TemplateUpdateRequest{
+						Name:   "test",
+						Labels: []string{"labels"},
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -162,7 +167,7 @@ func TestClient_DeleteTemplate(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteTemplate(test.testUUID)
+				err := client.DeleteTemplate(emptyCtx, test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -183,7 +188,7 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetTemplateEventList(test.testUUID)
+		response, err := client.GetTemplateEventList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -203,7 +208,7 @@ func TestClient_GetTemplatesByLocation(t *testing.T) {
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		response, err := client.GetTemplatesByLocation(test.testUUID)
+		response, err := client.GetTemplatesByLocation(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -222,7 +227,7 @@ func TestClient_GetDeletedTemplates(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareDeletedTemplateListHTTPGet())
 	})
-	response, err := client.GetDeletedTemplates()
+	response, err := client.GetDeletedTemplates(emptyCtx)
 	assert.Nil(t, err, "GetDeletedTemplates returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate("deleted")), fmt.Sprintf("%v", response))
@@ -236,7 +241,7 @@ func TestClient_waitForTemplateActive(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareTemplateHTTPGet("active"))
 	})
-	err := client.waitForTemplateActive(dummyUUID)
+	err := client.waitForTemplateActive(emptyCtx, dummyUUID)
 	assert.Nil(t, err, "waitForTemplateActive returned an error %v", err)
 }
 
@@ -249,7 +254,7 @@ func TestClient_waitForTemplateDeleted(t *testing.T) {
 		w.WriteHeader(404)
 	})
 	for _, test := range uuidCommonTestCases {
-		err := client.waitForTemplateDeleted(test.testUUID)
+		err := client.waitForTemplateDeleted(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {

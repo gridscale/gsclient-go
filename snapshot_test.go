@@ -18,7 +18,7 @@ func TestClient_GetStorageSnapshotList(t *testing.T) {
 		fmt.Fprintf(writer, prepareStorageSnapshotListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetStorageSnapshotList(test.testUUID)
+		res, err := client.GetStorageSnapshotList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -39,7 +39,7 @@ func TestClient_GetStorageSnapshot(t *testing.T) {
 	})
 	for _, testStorageID := range uuidCommonTestCases {
 		for _, testSnapshotID := range uuidCommonTestCases {
-			res, err := client.GetStorageSnapshot(testStorageID.testUUID, testSnapshotID.testUUID)
+			res, err := client.GetStorageSnapshot(emptyCtx, testStorageID.testUUID, testSnapshotID.testUUID)
 			if testStorageID.isFailed || testSnapshotID.isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -72,10 +72,13 @@ func TestClient_CreateStorageSnapshot(t *testing.T) {
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
 			for _, test := range uuidCommonTestCases {
-				response, err := client.CreateStorageSnapshot(test.testUUID, StorageSnapshotCreateRequest{
-					Name:   "test",
-					Labels: []string{"label"},
-				})
+				response, err := client.CreateStorageSnapshot(
+					emptyCtx,
+					test.testUUID,
+					StorageSnapshotCreateRequest{
+						Name:   "test",
+						Labels: []string{"label"},
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -108,10 +111,14 @@ func TestClient_UpdateStorageSnapshot(t *testing.T) {
 			isFailed = serverTest.isFailed
 			for _, testStorageID := range uuidCommonTestCases {
 				for _, testSnapshotID := range uuidCommonTestCases {
-					err := client.UpdateStorageSnapshot(testStorageID.testUUID, testSnapshotID.testUUID, StorageSnapshotUpdateRequest{
-						Name:   "test",
-						Labels: []string{"label"},
-					})
+					err := client.UpdateStorageSnapshot(
+						emptyCtx,
+						testStorageID.testUUID,
+						testSnapshotID.testUUID,
+						StorageSnapshotUpdateRequest{
+							Name:   "test",
+							Labels: []string{"label"},
+						})
 					if testStorageID.isFailed || testSnapshotID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -144,7 +151,7 @@ func TestClient_DeleteStorageSnapshot(t *testing.T) {
 			isFailed = serverTest.isFailed
 			for _, testStorageID := range uuidCommonTestCases {
 				for _, testSnapshotID := range uuidCommonTestCases {
-					err := client.DeleteStorageSnapshot(testStorageID.testUUID, testSnapshotID.testUUID)
+					err := client.DeleteStorageSnapshot(emptyCtx, testStorageID.testUUID, testSnapshotID.testUUID)
 					if testStorageID.isFailed || testSnapshotID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -182,7 +189,7 @@ func TestClient_RollbackStorage(t *testing.T) {
 			isFailed = serverTest.isFailed
 			for _, testStorageID := range uuidCommonTestCases {
 				for _, testSnapshotID := range uuidCommonTestCases {
-					err := client.RollbackStorage(testStorageID.testUUID, testSnapshotID.testUUID, StorageRollbackRequest{Rollback: true})
+					err := client.RollbackStorage(emptyCtx, testStorageID.testUUID, testSnapshotID.testUUID, StorageRollbackRequest{Rollback: true})
 					if testStorageID.isFailed || testSnapshotID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -220,28 +227,32 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 			isFailed = serverTest.isFailed
 			for _, testStorageID := range uuidCommonTestCases {
 				for _, testSnapshotID := range uuidCommonTestCases {
-					err := client.ExportStorageSnapshotToS3(testStorageID.testUUID, testSnapshotID.testUUID, StorageSnapshotExportToS3Request{
-						S3auth: struct {
-							Host      string `json:"host"`
-							AccessKey string `json:"access_key"`
-							SecretKey string `json:"secret_key"`
-						}{
-							Host:      "example.com",
-							AccessKey: "access_key",
-							SecretKey: "secret_key",
-						},
-						S3data: struct {
-							Host     string `json:"host"`
-							Bucket   string `json:"bucket"`
-							Filename string `json:"filename"`
-							Private  bool   `json:"private"`
-						}{
-							Host:     "example.com",
-							Bucket:   "bucket",
-							Filename: "filename",
-							Private:  true,
-						},
-					})
+					err := client.ExportStorageSnapshotToS3(
+						emptyCtx,
+						testStorageID.testUUID,
+						testSnapshotID.testUUID,
+						StorageSnapshotExportToS3Request{
+							S3auth: struct {
+								Host      string `json:"host"`
+								AccessKey string `json:"access_key"`
+								SecretKey string `json:"secret_key"`
+							}{
+								Host:      "example.com",
+								AccessKey: "access_key",
+								SecretKey: "secret_key",
+							},
+							S3data: struct {
+								Host     string `json:"host"`
+								Bucket   string `json:"bucket"`
+								Filename string `json:"filename"`
+								Private  bool   `json:"private"`
+							}{
+								Host:     "example.com",
+								Bucket:   "bucket",
+								Filename: "filename",
+								Private:  true,
+							},
+						})
 					if testStorageID.isFailed || testSnapshotID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -263,7 +274,7 @@ func TestClient_GetSnapshotsByLocation(t *testing.T) {
 		fmt.Fprintf(writer, prepareStorageSnapshotListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetSnapshotsByLocation(test.testUUID)
+		res, err := client.GetSnapshotsByLocation(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -283,7 +294,7 @@ func TestClient_GetDeletedSnapshots(t *testing.T) {
 		fmt.Fprintf(writer, prepareDeletedStorageSnapshotListHTTPGet())
 	})
 
-	res, err := client.GetDeletedSnapshots()
+	res, err := client.GetDeletedSnapshots(emptyCtx)
 	assert.Nil(t, err, "GetSnapshotsByLocation returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorageSnapshot("deleted")), fmt.Sprintf("%v", res))
@@ -297,7 +308,7 @@ func TestClient_waitForSnapshotActive(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprint(writer, prepareStorageSnapshotHTTPGet("active"))
 	})
-	err := client.waitForSnapshotActive(dummyUUID, dummyUUID)
+	err := client.waitForSnapshotActive(emptyCtx, dummyUUID, dummyUUID)
 	assert.Nil(t, err, "waitForSnapshotActive returned an error %v", err)
 }
 
@@ -311,7 +322,7 @@ func TestClient_waitForSnapshotDeleted(t *testing.T) {
 	})
 	for _, testStorageID := range uuidCommonTestCases {
 		for _, testSnapshotID := range uuidCommonTestCases {
-			err := client.waitForSnapshotDeleted(testStorageID.testUUID, testSnapshotID.testUUID)
+			err := client.waitForSnapshotDeleted(emptyCtx, testStorageID.testUUID, testSnapshotID.testUUID)
 			if testStorageID.isFailed || testSnapshotID.isFailed {
 				assert.NotNil(t, err)
 			} else {

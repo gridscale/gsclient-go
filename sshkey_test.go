@@ -17,7 +17,7 @@ func TestClient_GetSshkeyList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareSshkeyListHTTPGet())
 	})
-	res, err := client.GetSshkeyList()
+	res, err := client.GetSshkeyList(emptyCtx)
 	assert.Nil(t, err, "GetSshkeyList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockSshkey("active")), fmt.Sprintf("%v", res))
@@ -32,7 +32,7 @@ func TestClient_GetSshkey(t *testing.T) {
 		fmt.Fprintf(writer, prepareSshkeyHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetSshkey(test.testUUID)
+		res, err := client.GetSshkey(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -63,11 +63,13 @@ func TestClient_CreateSshkey(t *testing.T) {
 		}
 		for _, test := range commonSuccessFailTestCases {
 			isFailed = test.isFailed
-			response, err := client.CreateSshkey(SshkeyCreateRequest{
-				Name:   "test",
-				Sshkey: "example",
-				Labels: []string{"label"},
-			})
+			response, err := client.CreateSshkey(
+				emptyCtx,
+				SshkeyCreateRequest{
+					Name:   "test",
+					Sshkey: "example",
+					Labels: []string{"label"},
+				})
 			if isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -98,10 +100,13 @@ func TestClient_UpdateSshkey(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.UpdateSshkey(test.testUUID, SshkeyUpdateRequest{
-					Name:   "test",
-					Sshkey: "example",
-				})
+				err := client.UpdateSshkey(
+					emptyCtx,
+					test.testUUID,
+					SshkeyUpdateRequest{
+						Name:   "test",
+						Sshkey: "example",
+					})
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -132,7 +137,7 @@ func TestClient_DeleteSshkey(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, test := range uuidCommonTestCases {
-				err := client.DeleteSshkey(test.testUUID)
+				err := client.DeleteSshkey(emptyCtx, test.testUUID)
 				if test.isFailed || isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -153,7 +158,7 @@ func TestClient_GetSshkeyEventList(t *testing.T) {
 		fmt.Fprint(writer, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetSshkeyEventList(test.testUUID)
+		res, err := client.GetSshkeyEventList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -172,7 +177,7 @@ func TestClient_waitForSSHKeyActive(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareSshkeyHTTPGet("active"))
 	})
-	err := client.waitForSSHKeyActive(dummyUUID)
+	err := client.waitForSSHKeyActive(emptyCtx, dummyUUID)
 	assert.Nil(t, err, "waitForSSHKeyActive returned an error %v", err)
 }
 
@@ -185,7 +190,7 @@ func TestClient_waitForSSHKeyDeleted(t *testing.T) {
 		w.WriteHeader(404)
 	})
 	for _, test := range uuidCommonTestCases {
-		err := client.waitForSSHKeyDeleted(test.testUUID)
+		err := client.waitForSSHKeyDeleted(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {

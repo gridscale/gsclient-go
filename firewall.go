@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"path"
@@ -160,14 +161,14 @@ type FirewallUpdateRequest struct {
 //GetFirewallList gets a list of available firewalls
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewalls
-func (c *Client) GetFirewallList() ([]Firewall, error) {
+func (c *Client) GetFirewallList(ctx context.Context) ([]Firewall, error) {
 	r := Request{
 		uri:    path.Join(apiFirewallBase),
 		method: http.MethodGet,
 	}
 	var response FirewallList
 	var firewalls []Firewall
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		firewalls = append(firewalls, Firewall{Properties: properties})
 	}
@@ -177,7 +178,7 @@ func (c *Client) GetFirewallList() ([]Firewall, error) {
 //GetFirewall gets a specific firewall based on given id
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewall
-func (c *Client) GetFirewall(id string) (Firewall, error) {
+func (c *Client) GetFirewall(ctx context.Context, id string) (Firewall, error) {
 	if !isValidUUID(id) {
 		return Firewall{}, errors.New("'id' is invalid")
 	}
@@ -186,27 +187,27 @@ func (c *Client) GetFirewall(id string) (Firewall, error) {
 		method: http.MethodGet,
 	}
 	var response Firewall
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //CreateFirewall creates a new firewall
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createFirewall
-func (c *Client) CreateFirewall(body FirewallCreateRequest) (FirewallCreateResponse, error) {
+func (c *Client) CreateFirewall(ctx context.Context, body FirewallCreateRequest) (FirewallCreateResponse, error) {
 	r := Request{
 		uri:    path.Join(apiFirewallBase),
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response FirewallCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return FirewallCreateResponse{}, err
 	}
 	//Block until the request is finished
 	if c.cfg.sync {
-		err = c.waitForRequestCompleted(response.RequestUUID)
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
 }
@@ -214,7 +215,7 @@ func (c *Client) CreateFirewall(body FirewallCreateRequest) (FirewallCreateRespo
 //UpdateFirewall update a specific firewall
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateFirewall
-func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
+func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -224,20 +225,20 @@ func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForFirewallActive(id)
+		return c.waitForFirewallActive(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //DeleteFirewall delete a specific firewall
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteFirewall
-func (c *Client) DeleteFirewall(id string) error {
+func (c *Client) DeleteFirewall(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -246,20 +247,20 @@ func (c *Client) DeleteFirewall(id string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForFirewallDeleted(id)
+		return c.waitForFirewallDeleted(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //GetFirewallEventList get list of a firewall's events
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewallEvents
-func (c *Client) GetFirewallEventList(id string) ([]Event, error) {
+func (c *Client) GetFirewallEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -269,7 +270,7 @@ func (c *Client) GetFirewallEventList(id string) ([]Event, error) {
 	}
 	var response EventList
 	var firewallEvents []Event
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		firewallEvents = append(firewallEvents, Event{Properties: properties})
 	}
@@ -277,19 +278,19 @@ func (c *Client) GetFirewallEventList(id string) ([]Event, error) {
 }
 
 //waitForFirewallActive allows to wait until the firewall's status is active
-func (c *Client) waitForFirewallActive(id string) error {
+func (c *Client) waitForFirewallActive(ctx context.Context, id string) error {
 	return retryWithTimeout(func() (bool, error) {
-		fw, err := c.GetFirewall(id)
+		fw, err := c.GetFirewall(ctx, id)
 		return fw.Properties.Status != resourceActiveStatus, err
 	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForFirewallDeleted allows to wait until the firewall is deleted
-func (c *Client) waitForFirewallDeleted(id string) error {
+func (c *Client) waitForFirewallDeleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	uri := path.Join(apiFirewallBase, id)
 	method := http.MethodGet
-	return c.waitFor404Status(uri, method)
+	return c.waitFor404Status(ctx, uri, method)
 }

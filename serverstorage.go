@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"path"
@@ -91,7 +92,7 @@ type ServerStorageRelationUpdateRequest struct {
 //GetServerStorageList gets a list of a specific server's storages
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedStorages
-func (c *Client) GetServerStorageList(id string) ([]ServerStorageRelationProperties, error) {
+func (c *Client) GetServerStorageList(ctx context.Context, id string) ([]ServerStorageRelationProperties, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -100,14 +101,14 @@ func (c *Client) GetServerStorageList(id string) ([]ServerStorageRelationPropert
 		method: http.MethodGet,
 	}
 	var response ServerStorageRelationList
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response.List, err
 }
 
 //GetServerStorage gets a storage of a specific server
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedStorage
-func (c *Client) GetServerStorage(serverID, storageID string) (ServerStorageRelationProperties, error) {
+func (c *Client) GetServerStorage(ctx context.Context, serverID, storageID string) (ServerStorageRelationProperties, error) {
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return ServerStorageRelationProperties{}, errors.New("'serverID' or 'storageID' is invalid")
 	}
@@ -116,14 +117,14 @@ func (c *Client) GetServerStorage(serverID, storageID string) (ServerStorageRela
 		method: http.MethodGet,
 	}
 	var response ServerStorageRelationSingle
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response.Properties, err
 }
 
 //UpdateServerStorage updates a link between a storage and a server
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateServerLinkedStorage
-func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStorageRelationUpdateRequest) error {
+func (c *Client) UpdateServerStorage(ctx context.Context, serverID, storageID string, body ServerStorageRelationUpdateRequest) error {
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' or 'storageID' is invalid")
 	}
@@ -132,13 +133,13 @@ func (c *Client) UpdateServerStorage(serverID, storageID string, body ServerStor
 		method: http.MethodPatch,
 		body:   body,
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //CreateServerStorage create a link between a server and a storage
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/linkStorageToServer
-func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreateRequest) error {
+func (c *Client) CreateServerStorage(ctx context.Context, id string, body ServerStorageRelationCreateRequest) error {
 	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
 		return errors.New("'server_id' or 'storage_id' is invalid")
 	}
@@ -148,19 +149,19 @@ func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreate
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
-		return c.waitForServerStorageRelCreation(id, body.ObjectUUID)
+		return c.waitForServerStorageRelCreation(ctx, id, body.ObjectUUID)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //DeleteServerStorage delete a link between a storage and a server
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/unlinkStorageFromServer
-func (c *Client) DeleteServerStorage(serverID, storageID string) error {
+func (c *Client) DeleteServerStorage(ctx context.Context, serverID, storageID string) error {
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' or 'storageID' is invalid")
 	}
@@ -169,45 +170,45 @@ func (c *Client) DeleteServerStorage(serverID, storageID string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
-		return c.waitForServerStorageRelDeleted(serverID, storageID)
+		return c.waitForServerStorageRelDeleted(ctx, serverID, storageID)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //LinkStorage attaches a storage to a server
-func (c *Client) LinkStorage(serverID string, storageID string, bootdevice bool) error {
+func (c *Client) LinkStorage(ctx context.Context, serverID string, storageID string, bootdevice bool) error {
 	body := ServerStorageRelationCreateRequest{
 		ObjectUUID: storageID,
 		BootDevice: bootdevice,
 	}
-	return c.CreateServerStorage(serverID, body)
+	return c.CreateServerStorage(ctx, serverID, body)
 }
 
 //UnlinkStorage remove a storage from a server
-func (c *Client) UnlinkStorage(serverID string, storageID string) error {
-	return c.DeleteServerStorage(serverID, storageID)
+func (c *Client) UnlinkStorage(ctx context.Context, serverID string, storageID string) error {
+	return c.DeleteServerStorage(ctx, serverID, storageID)
 }
 
 //waitForServerStorageRelCreation allows to wait until the relation between a server and a storage is created
-func (c *Client) waitForServerStorageRelCreation(serverID, storageID string) error {
+func (c *Client) waitForServerStorageRelCreation(ctx context.Context, serverID, storageID string) error {
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' and 'storageID' are required")
 	}
 	uri := path.Join(apiServerBase, serverID, "storages", storageID)
 	method := http.MethodGet
-	return c.waitFor200Status(uri, method)
+	return c.waitFor200Status(ctx, uri, method)
 }
 
 //waitForServerStorageRelDeleted allows to wait until the relation between a server and a storage is deleted
-func (c *Client) waitForServerStorageRelDeleted(serverID, storageID string) error {
+func (c *Client) waitForServerStorageRelDeleted(ctx context.Context, serverID, storageID string) error {
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' and 'storageID' are required")
 	}
 	uri := path.Join(apiServerBase, serverID, "storages", storageID)
 	method := http.MethodGet
-	return c.waitFor404Status(uri, method)
+	return c.waitFor404Status(ctx, uri, method)
 }

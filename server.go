@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"path"
@@ -292,7 +293,7 @@ var (
 //GetServer gets a specific server based on given list
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServer
-func (c *Client) GetServer(id string) (Server, error) {
+func (c *Client) GetServer(ctx context.Context, id string) (Server, error) {
 	if !isValidUUID(id) {
 		return Server{}, errors.New("'id' is invalid")
 	}
@@ -301,21 +302,21 @@ func (c *Client) GetServer(id string) (Server, error) {
 		method: http.MethodGet,
 	}
 	var response Server
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
 //GetServerList gets a list of available servers
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServers
-func (c *Client) GetServerList() ([]Server, error) {
+func (c *Client) GetServerList(ctx context.Context) ([]Server, error) {
 	r := Request{
 		uri:    apiServerBase,
 		method: http.MethodGet,
 	}
 	var response ServerList
 	var servers []Server
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		servers = append(servers, Server{
 			Properties: properties,
@@ -330,7 +331,7 @@ func (c *Client) GetServerList() ([]Server, error) {
 //CiscoCSRServerHardware, SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createServer
-func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, error) {
+func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (ServerCreateResponse, error) {
 	//check if these slices are nil
 	//make them be empty slice instead of nil
 	//so that JSON structure will be valid
@@ -352,12 +353,12 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 		body:   body,
 	}
 	var response ServerCreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return ServerCreateResponse{}, err
 	}
 	if c.cfg.sync {
-		err = c.waitForRequestCompleted(response.RequestUUID)
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	//this fixed the endpoint's bug temporarily when creating server with/without
 	//'relations' field
@@ -372,7 +373,7 @@ func (c *Client) CreateServer(body ServerCreateRequest) (ServerCreateResponse, e
 //DeleteServer deletes a specific server
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteServer
-func (c *Client) DeleteServer(id string) error {
+func (c *Client) DeleteServer(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -381,20 +382,20 @@ func (c *Client) DeleteServer(id string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForServerDeleted(id)
+		return c.waitForServerDeleted(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //UpdateServer updates a specific server
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateServer
-func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
+func (c *Client) UpdateServer(ctx context.Context, id string, body ServerUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
@@ -404,20 +405,20 @@ func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
 		body:   body,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
 		//Block until the request is finished
-		return c.waitForServerActive(id)
+		return c.waitForServerActive(ctx, id)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //GetServerEventList gets a list of a specific server's events
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServerEvents
-func (c *Client) GetServerEventList(id string) ([]Event, error) {
+func (c *Client) GetServerEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -427,7 +428,7 @@ func (c *Client) GetServerEventList(id string) ([]Event, error) {
 	}
 	var response EventList
 	var serverEvents []Event
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		serverEvents = append(serverEvents, Event{Properties: properties})
 	}
@@ -437,7 +438,7 @@ func (c *Client) GetServerEventList(id string) ([]Event, error) {
 //GetServerMetricList gets a list of a specific server's metrics
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServerMetrics
-func (c *Client) GetServerMetricList(id string) ([]ServerMetric, error) {
+func (c *Client) GetServerMetricList(ctx context.Context, id string) ([]ServerMetric, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -447,7 +448,7 @@ func (c *Client) GetServerMetricList(id string) ([]ServerMetric, error) {
 	}
 	var response ServerMetricList
 	var serverMetrics []ServerMetric
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		serverMetrics = append(serverMetrics, ServerMetric{Properties: properties})
 	}
@@ -455,8 +456,8 @@ func (c *Client) GetServerMetricList(id string) ([]ServerMetric, error) {
 }
 
 //IsServerOn returns true if the server's power is on, otherwise returns false
-func (c *Client) IsServerOn(id string) (bool, error) {
-	server, err := c.GetServer(id)
+func (c *Client) IsServerOn(ctx context.Context, id string) (bool, error) {
+	server, err := c.GetServer(ctx, id)
 	if err != nil {
 		return false, err
 	}
@@ -465,8 +466,8 @@ func (c *Client) IsServerOn(id string) (bool, error) {
 
 //setServerPowerState turn on/off a specific server.
 //turnOn=true to turn on, turnOn=false to turn off
-func (c *Client) setServerPowerState(id string, powerState bool) error {
-	isOn, err := c.IsServerOn(id)
+func (c *Client) setServerPowerState(ctx context.Context, id string, powerState bool) error {
+	isOn, err := c.IsServerOn(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -480,30 +481,30 @@ func (c *Client) setServerPowerState(id string, powerState bool) error {
 			Power: powerState,
 		},
 	}
-	err = r.execute(*c, nil)
+	err = r.execute(ctx, *c, nil)
 	if err != nil {
 		return err
 	}
 	if c.cfg.sync {
-		return c.waitForServerPowerStatus(id, powerState)
+		return c.waitForServerPowerStatus(ctx, id, powerState)
 	}
 	return nil
 }
 
 //StartServer starts a server
-func (c *Client) StartServer(id string) error {
-	return c.setServerPowerState(id, true)
+func (c *Client) StartServer(ctx context.Context, id string) error {
+	return c.setServerPowerState(ctx, id, true)
 }
 
 //StopServer stops a server
-func (c *Client) StopServer(id string) error {
-	return c.setServerPowerState(id, false)
+func (c *Client) StopServer(ctx context.Context, id string) error {
+	return c.setServerPowerState(ctx, id, false)
 }
 
 //ShutdownServer shutdowns a specific server
-func (c *Client) ShutdownServer(id string) error {
+func (c *Client) ShutdownServer(ctx context.Context, id string) error {
 	//Make sure the server exists and that it isn't already in the state we need it to be
-	server, err := c.GetServer(id)
+	server, err := c.GetServer(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -516,12 +517,12 @@ func (c *Client) ShutdownServer(id string) error {
 		body:   map[string]string{},
 	}
 
-	err = r.execute(*c, nil)
+	err = r.execute(ctx, *c, nil)
 	if err != nil {
 		if requestError, ok := err.(RequestError); ok {
 			if requestError.StatusCode == 500 {
 				c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
-				return c.StopServer(id)
+				return c.StopServer(ctx, id)
 			}
 		}
 		return err
@@ -529,10 +530,10 @@ func (c *Client) ShutdownServer(id string) error {
 
 	if c.cfg.sync {
 		//If we get an error, which includes a timeout, power off the server instead
-		err = c.waitForServerPowerStatus(id, false)
+		err = c.waitForServerPowerStatus(ctx, id, false)
 		if err != nil {
 			c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
-			return c.StopServer(id)
+			return c.StopServer(ctx, id)
 		}
 	}
 	return nil
@@ -541,7 +542,7 @@ func (c *Client) ShutdownServer(id string) error {
 //GetServersByLocation gets a list of servers by location
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationServers
-func (c *Client) GetServersByLocation(id string) ([]Server, error) {
+func (c *Client) GetServersByLocation(ctx context.Context, id string) ([]Server, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
@@ -551,7 +552,7 @@ func (c *Client) GetServersByLocation(id string) ([]Server, error) {
 	}
 	var response ServerList
 	var servers []Server
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		servers = append(servers, Server{Properties: properties})
 	}
@@ -561,14 +562,14 @@ func (c *Client) GetServersByLocation(id string) ([]Server, error) {
 //GetDeletedServers gets a list of deleted servers
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedServers
-func (c *Client) GetDeletedServers() ([]Server, error) {
+func (c *Client) GetDeletedServers(ctx context.Context) ([]Server, error) {
 	r := Request{
 		uri:    path.Join(apiDeletedBase, "servers"),
 		method: http.MethodGet,
 	}
 	var response DeletedServerList
 	var servers []Server
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		servers = append(servers, Server{Properties: properties})
 	}
@@ -576,27 +577,27 @@ func (c *Client) GetDeletedServers() ([]Server, error) {
 }
 
 //waitForServerPowerStatus  allows to wait for a server changing its power status.
-func (c *Client) waitForServerPowerStatus(id string, status bool) error {
+func (c *Client) waitForServerPowerStatus(ctx context.Context, id string, status bool) error {
 	return retryWithTimeout(func() (bool, error) {
-		server, err := c.GetServer(id)
+		server, err := c.GetServer(ctx, id)
 		return server.Properties.Power != status, err
 	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForServerActive allows to wait until the server's status is active
-func (c *Client) waitForServerActive(id string) error {
+func (c *Client) waitForServerActive(ctx context.Context, id string) error {
 	return retryWithTimeout(func() (bool, error) {
-		server, err := c.GetServer(id)
+		server, err := c.GetServer(ctx, id)
 		return server.Properties.Status != resourceActiveStatus, err
 	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForServerDeleted allows to wait until the server is deleted
-func (c *Client) waitForServerDeleted(id string) error {
+func (c *Client) waitForServerDeleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	uri := path.Join(apiServerBase, id)
 	method := http.MethodGet
-	return c.waitFor404Status(uri, method)
+	return c.waitFor404Status(ctx, uri, method)
 }
