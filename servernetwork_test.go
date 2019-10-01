@@ -237,7 +237,6 @@ func getMockServerNetwork(name string) ServerNetworkRelationProperties {
 		BootDevice:           true,
 		PartnerUUID:          dummyUUID,
 		Ordering:             0,
-		Firewall:             "",
 		NetworkType:          "",
 		NetworkUUID:          dummyUUID,
 		ObjectUUID:           dummyUUID,
