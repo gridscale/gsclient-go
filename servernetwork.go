@@ -19,24 +19,57 @@ type ServerNetworkRelation struct {
 
 //ServerNetworkRelationProperties JSON struct of properties of a relation between a server and a network
 type ServerNetworkRelationProperties struct {
-	L2security           bool     `json:"l2security"`
-	ServerUUID           string   `json:"server_uuid"`
-	CreateTime           string   `json:"create_time"`
-	PublicNet            bool     `json:"public_net"`
-	FirewallTemplateUUID string   `json:"firewall_template_uuid,omitempty"`
-	ObjectName           string   `json:"object_name"`
-	Mac                  string   `json:"mac"`
-	BootDevice           bool     `json:"bootdevice"`
-	PartnerUUID          string   `json:"partner_uuid"`
-	Ordering             int      `json:"ordering"`
-	Firewall             string   `json:"firewall,omitempty"`
-	NetworkType          string   `json:"network_type"`
-	NetworkUUID          string   `json:"network_uuid"`
-	ObjectUUID           string   `json:"object_uuid"`
-	L3security           []string `json:"l3security"`
-	//Vlan                 int          `json:"vlan,omitempty"`
-	//Vxlan                int          `json:"vxlan,omitempty"`
-	//Mcast                string       `json:"mcast, omitempty"`
+	//Defines information about MAC spoofing protection (filters layer2 and ARP traffic based on MAC source).
+	//It can only be (de-)activated on a private network - the public network always has l2security enabled.
+	//It will be true if the network is public, and false if the network is private.
+	L2security bool `json:"l2security"`
+
+	//The UUID of the Server.
+	ServerUUID string `json:"server_uuid"`
+
+	//Defines the date and time the object was initially created.
+	CreateTime GSTime `json:"create_time"`
+
+	//True if the network is public. If private it will be false.
+	//Each private network is a secure and fully transparent 2-Layer network between servers.
+	//There is no limit on how many servers can be connected to the same private network.
+	PublicNet bool `json:"public_net"`
+
+	//The UUID of firewall template.
+	FirewallTemplateUUID string `json:"firewall_template_uuid"`
+
+	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	ObjectName string `json:"object_name"`
+
+	//network_mac defines the MAC address of the network interface.
+	Mac string `json:"mac"`
+
+	//Defines if this object is the bootdevice. Storages, Networks and ISO-Images can have a bootdevice configured,
+	//but only one bootdevice per Storage, Network or ISO-Image.
+	//The boot order is as follows => Network > ISO-Image > Storage.
+	BootDevice bool `json:"bootdevice"`
+
+	//PartnerUUID
+	PartnerUUID string `json:"partner_uuid"`
+
+	//Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs.
+	Ordering int `json:"ordering"`
+
+	//Firewall that is used to this server network relation
+	Firewall FirewallRules `json:"firewall"`
+
+	//(one of network, network_high, network_insane)
+	NetworkType string `json:"network_type"`
+
+	//The UUID of the network you're requesting.
+	NetworkUUID string `json:"network_uuid"`
+
+	//The UUID of an object is always unique, and refers to a specific object.
+	ObjectUUID string `json:"object_uuid"`
+
+	//Defines information about IP prefix spoof protection (it allows source traffic only from the IPv4/IPv4 network prefixes).
+	//If empty, it allow no IPv4/IPv6 source traffic. If set to null, l3security is disabled (default).
+	L3security []string `json:"l3security"`
 }
 
 //ServerNetworkRelationCreateRequest JSON struct of a request for creating a relation between a server and a network
