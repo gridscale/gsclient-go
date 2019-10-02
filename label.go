@@ -73,7 +73,9 @@ func (c *Client) CreateLabel(body LabelCreateRequest) (CreateResponse, error) {
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -88,5 +90,33 @@ func (c *Client) DeleteLabel(label string) error {
 		uri:    path.Join(apiLabelBase, label),
 		method: http.MethodDelete,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForLabelDeleted(label)
+	}
 	return r.execute(*c, nil)
+}
+
+//waitForLabelDeleted allows to wait until the label is deleted
+func (c *Client) waitForLabelDeleted(label string) error {
+	if label == "" {
+		return errors.New("'label' is required")
+	}
+	return retryWithTimeout(func() (bool, error) {
+		labels, err := c.GetLabelList()
+		return isLabelInSlice(label, labels), err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//isLabelInSlice check if a label in a lice of labels
+func isLabelInSlice(a string, list []Label) bool {
+	for _, b := range list {
+		if b.Properties.Label == a {
+			return true
+		}
+	}
+	return false
 }

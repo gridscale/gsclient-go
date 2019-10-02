@@ -118,7 +118,9 @@ func (c *Client) CreateObjectStorageAccessKey() (ObjectStorageAccessKeyCreateRes
 	if err != nil {
 		return ObjectStorageAccessKeyCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -132,6 +134,14 @@ func (c *Client) DeleteObjectStorageAccessKey(id string) error {
 	r := Request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForObjectStorageAccessKeyDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -151,4 +161,14 @@ func (c *Client) GetObjectStorageBucketList() ([]ObjectStorageBucket, error) {
 		buckets = append(buckets, ObjectStorageBucket{Properties: properties})
 	}
 	return buckets, err
+}
+
+//waitForObjectStorageAccessKeyDeleted allows to wait until the object storage's access key is deleted
+func (c *Client) waitForObjectStorageAccessKeyDeleted(id string) error {
+	if strings.TrimSpace(id) == "" {
+		return errors.New("'id' is required")
+	}
+	uri := path.Join(apiObjectStorageBase, "access_keys", id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

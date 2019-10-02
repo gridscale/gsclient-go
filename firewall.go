@@ -154,7 +154,7 @@ type FirewallUpdateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 
 	//FirewallRules. Leave it if you do not want to update the firewall rules
-	Rules FirewallRules `json:"rules,omitempty"`
+	Rules *FirewallRules `json:"rules,omitempty"`
 }
 
 //GetFirewallList gets a list of available firewalls
@@ -204,7 +204,10 @@ func (c *Client) CreateFirewall(body FirewallCreateRequest) (FirewallCreateRespo
 	if err != nil {
 		return FirewallCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	//Block until the request is finished
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -220,6 +223,14 @@ func (c *Client) UpdateFirewall(id string, body FirewallUpdateRequest) error {
 		method: http.MethodPatch,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForFirewallActive(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -233,6 +244,14 @@ func (c *Client) DeleteFirewall(id string) error {
 	r := Request{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForFirewallDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -255,4 +274,22 @@ func (c *Client) GetFirewallEventList(id string) ([]Event, error) {
 		firewallEvents = append(firewallEvents, Event{Properties: properties})
 	}
 	return firewallEvents, err
+}
+
+//waitForFirewallActive allows to wait until the firewall's status is active
+func (c *Client) waitForFirewallActive(id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		fw, err := c.GetFirewall(id)
+		return fw.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForFirewallDeleted allows to wait until the firewall is deleted
+func (c *Client) waitForFirewallDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiFirewallBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

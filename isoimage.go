@@ -182,7 +182,9 @@ func (c *Client) CreateISOImage(body ISOImageCreateRequest) (ISOImageCreateRespo
 	if err != nil {
 		return ISOImageCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -198,6 +200,14 @@ func (c *Client) UpdateISOImage(id string, body ISOImageUpdateRequest) error {
 		method: http.MethodPatch,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForISOImageActive(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -211,6 +221,14 @@ func (c *Client) DeleteISOImage(id string) error {
 	r := Request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForISOImageDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -270,4 +288,22 @@ func (c *Client) GetDeletedISOImages() ([]ISOImage, error) {
 		isoImages = append(isoImages, ISOImage{Properties: properties})
 	}
 	return isoImages, err
+}
+
+//waitForISOImageActive allows to wait until the ISO-Image's status is active
+func (c *Client) waitForISOImageActive(id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		img, err := c.GetISOImage(id)
+		return img.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForISOImageDeleted allows to wait until the ISO-Image id deleted
+func (c *Client) waitForISOImageDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiISOBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

@@ -37,7 +37,7 @@ type ServerNetworkRelationProperties struct {
 	PublicNet bool `json:"public_net"`
 
 	//The UUID of firewall template.
-	FirewallTemplateUUID string `json:"firewall_template_uuid,omitempty"`
+	FirewallTemplateUUID string `json:"firewall_template_uuid"`
 
 	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
@@ -57,7 +57,7 @@ type ServerNetworkRelationProperties struct {
 	Ordering int `json:"ordering"`
 
 	//Firewall that is used to this server network relation
-	Firewall interface{} `json:"firewall,omitempty"`
+	Firewall FirewallRules `json:"firewall"`
 
 	//(one of network, network_high, network_insane)
 	NetworkType string `json:"network_type"`
@@ -90,7 +90,7 @@ type ServerNetworkRelationCreateRequest struct {
 	L3security []string `json:"l3security,omitempty"`
 
 	//All rules of Firewall. Can be empty
-	Firewall FirewallRules `json:"firewall,omitempty"`
+	Firewall *FirewallRules `json:"firewall,omitempty"`
 
 	//Instead of setting firewall rules manually, you can use a firewall template by setting UUID of the firewall template.
 	//Can be empty.
@@ -111,7 +111,7 @@ type ServerNetworkRelationUpdateRequest struct {
 	L3security []string `json:"l3security,omitempty"`
 
 	//All rules of Firewall. Optional.
-	Firewall FirewallRules `json:"firewall,omitempty"`
+	Firewall *FirewallRules `json:"firewall,omitempty"`
 
 	//Instead of setting firewall rules manually, you can use a firewall template by setting UUID of the firewall template.
 	//Optional.
@@ -177,6 +177,13 @@ func (c *Client) CreateServerNetwork(id string, body ServerNetworkRelationCreate
 		method: http.MethodPost,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerNetworkRelCreation(id, body.ObjectUUID)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -191,12 +198,19 @@ func (c *Client) DeleteServerNetwork(serverID, networkID string) error {
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodDelete,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerNetworkRelDeleted(serverID, networkID)
+	}
 	return r.execute(*c, nil)
 }
 
 //LinkNetwork attaches a network to a server
 func (c *Client) LinkNetwork(serverID, networkID, firewallTemplate string, bootdevice bool, order int,
-	l3security []string, firewall FirewallRules) error {
+	l3security []string, firewall *FirewallRules) error {
 	body := ServerNetworkRelationCreateRequest{
 		ObjectUUID:           networkID,
 		Ordering:             order,
@@ -211,4 +225,24 @@ func (c *Client) LinkNetwork(serverID, networkID, firewallTemplate string, bootd
 //UnlinkNetwork removes the link between a network and a server
 func (c *Client) UnlinkNetwork(serverID string, networkID string) error {
 	return c.DeleteServerNetwork(serverID, networkID)
+}
+
+//waitForServerNetworkRelCreation allows to wait until the relation between a server and a network is created
+func (c *Client) waitForServerNetworkRelCreation(serverID, networkID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return errors.New("'serverID' and 'networkID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "networks", networkID)
+	method := http.MethodGet
+	return c.waitFor200Status(uri, method)
+}
+
+//waitForServerNetworkRelDeleted allows to wait until the relation between a server and a network is deleted
+func (c *Client) waitForServerNetworkRelDeleted(serverID, networkID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(networkID) {
+		return errors.New("'serverID' and 'networkID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "networks", networkID)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

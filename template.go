@@ -171,6 +171,12 @@ func (c *Client) CreateTemplate(body TemplateCreateRequest) (CreateResponse, err
 	}
 	var response CreateResponse
 	err := r.execute(*c, &response)
+	if err != nil {
+		return CreateResponse{}, err
+	}
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -186,6 +192,14 @@ func (c *Client) UpdateTemplate(id string, body TemplateUpdateRequest) error {
 		method: http.MethodPatch,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForTemplateActive(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -199,6 +213,14 @@ func (c *Client) DeleteTemplate(id string) error {
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForTemplateDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -258,4 +280,22 @@ func (c *Client) GetDeletedTemplates() ([]Template, error) {
 		templates = append(templates, Template{Properties: properties})
 	}
 	return templates, err
+}
+
+//waitForTemplateActive allows to wait until the template's status is active
+func (c *Client) waitForTemplateActive(id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		template, err := c.GetTemplate(id)
+		return template.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForTemplateDeleted allows to wait until the template is deleted
+func (c *Client) waitForTemplateDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiTemplateBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

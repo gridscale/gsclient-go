@@ -108,6 +108,13 @@ func (c *Client) CreateServerIsoImage(id string, body ServerIsoImageRelationCrea
 		method: http.MethodPost,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerISOImageRelCreation(id, body.ObjectUUID)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -121,6 +128,13 @@ func (c *Client) DeleteServerIsoImage(serverID, isoImageID string) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerISOImageRelDeleted(serverID, isoImageID)
 	}
 	return r.execute(*c, nil)
 }
@@ -136,4 +150,24 @@ func (c *Client) LinkIsoImage(serverID string, isoimageID string) error {
 //UnlinkIsoImage removes the link between an ISO image and a server
 func (c *Client) UnlinkIsoImage(serverID string, isoimageID string) error {
 	return c.DeleteServerIsoImage(serverID, isoimageID)
+}
+
+//waitForServerISOImageRelCreation allows to wait until the relation between a server and an ISO-Image is created
+func (c *Client) waitForServerISOImageRelCreation(serverID, isoimageID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
+		return errors.New("'serverID' and 'isoimageID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
+	method := http.MethodGet
+	return c.waitFor200Status(uri, method)
+}
+
+//waitForServerISOImageRelDeleted allows to wait until the relation between a server and an ISO-Image is deleted
+func (c *Client) waitForServerISOImageRelDeleted(serverID, isoimageID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
+		return errors.New("'serverID' and 'isoimageID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

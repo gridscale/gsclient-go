@@ -235,7 +235,9 @@ func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalance
 	if err != nil {
 		return LoadBalancerCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -255,6 +257,14 @@ func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) e
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodPatch,
 		body:   body,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForLoadbalancerActive(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -290,5 +300,31 @@ func (c *Client) DeleteLoadBalancer(id string) error {
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodDelete,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForLoadbalancerDeleted(id)
+	}
 	return r.execute(*c, nil)
+}
+
+//waitForLoadbalancerActive allows to wait until the loadbalancer's status is active
+func (c *Client) waitForLoadbalancerActive(id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		lb, err := c.GetLoadBalancer(id)
+		return lb.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForLoadbalancerDeleted allows to wait until the loadbalancer is deleted
+func (c *Client) waitForLoadbalancerDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiLoadBalancerBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

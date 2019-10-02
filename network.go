@@ -189,7 +189,9 @@ func (c *Client) CreateNetwork(body NetworkCreateRequest) (NetworkCreateResponse
 	if err != nil {
 		return NetworkCreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -203,6 +205,14 @@ func (c *Client) DeleteNetwork(id string) error {
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForNetworkDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -219,7 +229,14 @@ func (c *Client) UpdateNetwork(id string, body NetworkUpdateRequest) error {
 		method: http.MethodPatch,
 		body:   body,
 	}
-
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForNetworkActive(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -311,4 +328,22 @@ func (c *Client) GetDeletedNetworks() ([]Network, error) {
 		networks = append(networks, Network{Properties: properties})
 	}
 	return networks, err
+}
+
+//waitForNetworkActive allows to wait until the network's status is active
+func (c *Client) waitForNetworkActive(id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		net, err := c.GetNetwork(id)
+		return net.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForNetworkDeleted allows to wait until the network is deleted
+func (c *Client) waitForNetworkDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiNetworkBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

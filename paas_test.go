@@ -10,13 +10,13 @@ import (
 )
 
 func TestClient_GetPaaSServiceList(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiPaaSBase, "services")
-	expectedObj := getMockPaaSService()
+	expectedObj := getMockPaaSService("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		fmt.Fprint(w, preparePaaSHTTPGetListResponse())
+		fmt.Fprint(w, preparePaaSHTTPGetListResponse("active"))
 	})
 	paasList, err := client.GetPaaSServiceList()
 	assert.Nil(t, err, "GetPaaSServiceList returned an error %v", err)
@@ -25,13 +25,13 @@ func TestClient_GetPaaSServiceList(t *testing.T) {
 }
 
 func TestClient_GetPaaSService(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiPaaSBase, "services", dummyUUID)
-	expectedObj := getMockPaaSService()
+	expectedObj := getMockPaaSService("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		fmt.Fprint(w, preparePaaSHTTPGetResponse())
+		fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
 	})
 	for _, test := range uuidCommonTestCases {
 		paas, err := client.GetPaaSService(test.testUUID)
@@ -45,98 +45,127 @@ func TestClient_GetPaaSService(t *testing.T) {
 }
 
 func TestClient_CreatePaaSService(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	var isFailed bool
-	uri := path.Join(apiPaaSBase, "services")
-	expectedRespObj := getMockPaaSServiceCreateResponse()
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, r.Method, http.MethodPost)
-		if isFailed {
-			w.WriteHeader(400)
-		} else {
-			fmt.Fprintf(w, preparePaaSHTTPCreateResponse())
-		}
-	})
-
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-	for _, test := range commonSuccessFailTestCases {
-		isFailed = test.isFailed
-		response, err := client.CreatePaaSService(PaaSServiceCreateRequest{
-			Name:                    "test",
-			PaaSServiceTemplateUUID: "test-template",
-			Labels:                  []string{"label"},
-			PaaSSecurityZoneUUID:    "test-security-zone-id",
-			ResourceLimits: []ResourceLimit{
-				{
-					Resource: "cpu",
-					Limit:    2,
-				},
-			},
-			Parameters: nil,
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiPaaSBase, "services")
+		expectedRespObj := getMockPaaSServiceCreateResponse()
+		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, r.Method, http.MethodPost)
+			if isFailed {
+				w.WriteHeader(400)
+			} else {
+				fmt.Fprintf(w, preparePaaSHTTPCreateResponse())
+			}
 		})
-		if isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "CreatePaaSService returned error %v", err)
-			assert.Equal(t, fmt.Sprintf("%v", expectedRespObj), fmt.Sprintf("%v", response))
+		if clientTest {
+			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
+			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprint(w, httpResponse)
+			})
 		}
+		for _, test := range commonSuccessFailTestCases {
+			isFailed = test.isFailed
+			response, err := client.CreatePaaSService(PaaSServiceCreateRequest{
+				Name:                    "test",
+				PaaSServiceTemplateUUID: "test-template",
+				Labels:                  []string{"label"},
+				PaaSSecurityZoneUUID:    "test-security-zone-id",
+				ResourceLimits: []ResourceLimit{
+					{
+						Resource: "cpu",
+						Limit:    2,
+					},
+				},
+				Parameters: nil,
+			})
+			if isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "CreatePaaSService returned error %v", err)
+				assert.Equal(t, fmt.Sprintf("%v", expectedRespObj), fmt.Sprintf("%v", response))
+			}
+		}
+		server.Close()
 	}
 }
 
 func TestClient_UpdatePaaSService(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiPaaSBase, "services", dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, r.Method, http.MethodPatch)
-		fmt.Fprintf(w, "")
-	})
-	parameters := make(map[string]interface{})
-	parameters["TEST_PARAM"] = "param value"
-	for _, test := range uuidCommonTestCases {
-		err := client.UpdatePaaSService(test.testUUID, PaaSServiceUpdateRequest{
-			Name:       "test",
-			Labels:     []string{"label"},
-			Parameters: parameters,
-			ResourceLimits: []ResourceLimit{
-				{
-					Resource: "cpu",
-					Limit:    2,
-				},
-			},
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiPaaSBase, "services", dummyUUID)
+		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+			if isFailed {
+				w.WriteHeader(400)
+			} else {
+				if r.Method == http.MethodPatch {
+					fmt.Fprintf(w, "")
+				} else if r.Method == http.MethodGet {
+					fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
+				}
+			}
 		})
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "UpdatePaaSService returned an error %v", err)
+		parameters := make(map[string]interface{})
+		parameters["TEST_PARAM"] = "param value"
+		for _, serverTest := range commonSuccessFailTestCases {
+			isFailed = serverTest.isFailed
+			for _, test := range uuidCommonTestCases {
+				err := client.UpdatePaaSService(test.testUUID, PaaSServiceUpdateRequest{
+					Name:       "test",
+					Labels:     []string{"label"},
+					Parameters: parameters,
+					ResourceLimits: []ResourceLimit{
+						{
+							Resource: "cpu",
+							Limit:    2,
+						},
+					},
+				})
+				if test.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "UpdatePaaSService returned an error %v", err)
+				}
+			}
 		}
+		server.Close()
 	}
 }
 
 func TestClient_DeletePaaSService(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiPaaSBase, "services", dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, r.Method, http.MethodDelete)
-		fmt.Fprintf(w, "")
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.DeletePaaSService(test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "DeletePaaSService returned an error %v", err)
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiPaaSBase, "services", dummyUUID)
+		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+			if isFailed {
+				w.WriteHeader(400)
+			} else {
+				if r.Method == http.MethodDelete {
+					fmt.Fprintf(w, "")
+				} else if r.Method == http.MethodGet {
+					w.WriteHeader(404)
+				}
+			}
+		})
+		for _, serverTest := range commonSuccessFailTestCases {
+			isFailed = serverTest.isFailed
+			for _, test := range uuidCommonTestCases {
+				err := client.DeletePaaSService(test.testUUID)
+				if test.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "DeletePaaSService returned an error %v", err)
+				}
+			}
 		}
+		server.Close()
 	}
 }
 
 func TestClient_GetPaaSServiceMetrics(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiPaaSBase, "services", dummyUUID, "metrics")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
@@ -156,7 +185,7 @@ func TestClient_GetPaaSServiceMetrics(t *testing.T) {
 }
 
 func TestClient_GetPaaSTemplateList(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiPaaSBase, "service_templates")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
@@ -169,59 +198,61 @@ func TestClient_GetPaaSTemplateList(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockPaasTemplate()), fmt.Sprintf("%v", res))
 }
 
-func TestClient_GetSecurityZoneList(t *testing.T) {
-	server, client, mux := setupTestClient()
+func TestClient_GetPaaSSecurityZoneList(t *testing.T) {
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiPaaSBase, "security_zones")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
-		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZoneList())
+		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZoneList("active"))
 	})
 	res, err := client.GetPaaSSecurityZoneList()
 	assert.Nil(t, err, "GetPaaSSecurityZone returned an error %v", err)
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockSecurityZone()), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockSecurityZone("active")), fmt.Sprintf("%v", res))
 }
 
 func TestClient_CreatePaaSSecurityZone(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	var isFailed bool
-	uri := path.Join(apiPaaSBase, "security_zones")
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, request.Method, http.MethodPost)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			fmt.Fprintf(writer, preparePaaSHTTPCreateSecurityZone())
-		}
-	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc("/requests/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
-	})
-	for _, test := range commonSuccessFailTestCases {
-		isFailed = test.isFailed
-		res, err := client.CreatePaaSSecurityZone(PaaSSecurityZoneCreateRequest{
-			Name:         "test",
-			LocationUUID: "aa-bb-cc",
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiPaaSBase, "security_zones")
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			assert.Equal(t, request.Method, http.MethodPost)
+			if isFailed {
+				writer.WriteHeader(400)
+			} else {
+				fmt.Fprintf(writer, preparePaaSHTTPCreateSecurityZone())
+			}
 		})
-		if isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "CreatePaaSSecurityZone returned an error %v", err)
-			assert.Equal(t, fmt.Sprintf("%v", getMockPaaSSecurityZoneCreateResponse()), fmt.Sprintf("%v", res))
+		httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
+		mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprint(w, httpResponse)
+		})
+		for _, test := range commonSuccessFailTestCases {
+			isFailed = test.isFailed
+			res, err := client.CreatePaaSSecurityZone(PaaSSecurityZoneCreateRequest{
+				Name:         "test",
+				LocationUUID: "aa-bb-cc",
+			})
+			if isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "CreatePaaSSecurityZone returned an error %v", err)
+				assert.Equal(t, fmt.Sprintf("%v", getMockPaaSSecurityZoneCreateResponse()), fmt.Sprintf("%v", res))
+			}
 		}
+		server.Close()
 	}
 }
 
 func TestClient_GetPaaSSecurityZone(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
-		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZone())
+		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZone("active"))
 	})
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetPaaSSecurityZone(test.testUUID)
@@ -229,59 +260,85 @@ func TestClient_GetPaaSSecurityZone(t *testing.T) {
 			assert.NotNil(t, err)
 		} else {
 			assert.Nil(t, err, "GetPaaSSecurityZone returned an error %v", err)
-			assert.Equal(t, fmt.Sprintf("%v", getMockSecurityZone()), fmt.Sprintf("%s", res))
+			assert.Equal(t, fmt.Sprintf("%v", getMockSecurityZone("active")), fmt.Sprintf("%s", res))
 		}
 	}
 }
 
 func TestClient_UpdatePaaSSecurityZone(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, request.Method, http.MethodPatch)
-		fmt.Fprint(writer, "")
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.UpdatePaaSSecurityZone(test.testUUID, PaaSSecurityZoneUpdateRequest{
-			Name:                 "test",
-			LocationUUID:         "a-b-c",
-			PaaSSecurityZoneUUID: dummyUUID,
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			if isFailed {
+				writer.WriteHeader(400)
+			} else {
+				if request.Method == http.MethodPatch {
+					fmt.Fprintf(writer, "")
+				} else if request.Method == http.MethodGet {
+					fmt.Fprint(writer, preparePaaSHTTPGetSecurityZone("active"))
+				}
+			}
 		})
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "UpdatePaaSSecurityZone returned an error %v", err)
+		for _, serverTest := range commonSuccessFailTestCases {
+			isFailed = serverTest.isFailed
+			for _, test := range uuidCommonTestCases {
+				err := client.UpdatePaaSSecurityZone(test.testUUID, PaaSSecurityZoneUpdateRequest{
+					Name:                 "test",
+					LocationUUID:         "a-b-c",
+					PaaSSecurityZoneUUID: dummyUUID,
+				})
+				if test.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "UpdatePaaSSecurityZone returned an error %v", err)
+				}
+			}
 		}
+		server.Close()
 	}
 }
 
 func TestClient_DeletePaaSSecurityZone(t *testing.T) {
-	server, client, mux := setupTestClient()
-	defer server.Close()
-	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, request.Method, http.MethodDelete)
-		fmt.Fprint(writer, "")
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.DeletePaaSSecurityZone(test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "DeletePaaSSecurityZone returned an error %v", err)
+	for _, clientTest := range syncClientTestCases {
+		server, client, mux := setupTestClient(clientTest)
+		var isFailed bool
+		uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
+		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+			if isFailed {
+				writer.WriteHeader(400)
+			} else {
+				if request.Method == http.MethodDelete {
+					fmt.Fprintf(writer, "")
+				} else if request.Method == http.MethodGet {
+					writer.WriteHeader(404)
+				}
+			}
+		})
+		for _, serverTest := range commonSuccessFailTestCases {
+			isFailed = serverTest.isFailed
+			for _, test := range uuidCommonTestCases {
+				err := client.DeletePaaSSecurityZone(test.testUUID)
+				if test.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "DeletePaaSSecurityZone returned an error %v", err)
+				}
+			}
 		}
+		server.Close()
 	}
 }
 
 func TestClient_GetDeletedPaaSServices(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiDeletedBase, "paas_services")
-	expectedObj := getMockPaaSService()
+	expectedObj := getMockPaaSService("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		fmt.Fprint(w, prepareDeletedPaaSHTTPGetListResponse())
+		fmt.Fprint(w, prepareDeletedPaaSHTTPGetListResponse("active"))
 	})
 	paasList, err := client.GetDeletedPaaSServices()
 	assert.Nil(t, err, "GetDeletedPaaSServices returned an error %v", err)
@@ -289,7 +346,67 @@ func TestClient_GetDeletedPaaSServices(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("[%v]", expectedObj), fmt.Sprintf("%v", paasList))
 }
 
-func getMockPaaSService() PaaSService {
+func TestClient_waitForPaaSServiceActive(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "services", dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
+	})
+	err := client.waitForPaaSServiceActive(dummyUUID)
+	assert.Nil(t, err, "waitForPaaSServiceActive returned an error %v", err)
+}
+
+func TestClient_waitForPaaSServiceDeleted(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "services", dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		w.WriteHeader(404)
+	})
+	for _, test := range uuidCommonTestCases {
+		err := client.waitForPaaSServiceDeleted(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForPaaSServiceDeleted returned an error %v", err)
+		}
+	}
+}
+
+func TestClient_waitForSecurityZoneActive(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, preparePaaSHTTPGetSecurityZone("active"))
+	})
+	err := client.waitForSecurityZoneActive(dummyUUID)
+	assert.Nil(t, err, "waitForSecurityZoneActive returned an error %v", err)
+}
+
+func TestClient_waitForSecurityZoneDeleted(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		w.WriteHeader(404)
+	})
+	for _, test := range uuidCommonTestCases {
+		err := client.waitForSecurityZoneDeleted(test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "waitForSecurityZoneDeleted returned an error %v", err)
+		}
+	}
+}
+
+func getMockPaaSService(status string) PaaSService {
 	listenPort := make(map[string]map[string]int)
 	portmap := make(map[string]int)
 	portmap["mysql"] = 3306
@@ -314,7 +431,7 @@ func getMockPaaSService() PaaSService {
 			UsageInMinutes:      999,
 			CurrentPrice:        5.789,
 			ChangeTime:          dummyTime,
-			Status:              "active",
+			Status:              status,
 			Name:                "test",
 			ResourceLimits: []ResourceLimit{
 				{
@@ -351,14 +468,14 @@ func preparePaaSHTTPGetMetricsResponse() string {
 	return fmt.Sprintf(`{"paas_service_metrics": [%s]}`, string(res))
 }
 
-func preparePaaSHTTPGetListResponse() string {
-	paas := getMockPaaSService()
+func preparePaaSHTTPGetListResponse(status string) string {
+	paas := getMockPaaSService(status)
 	res, _ := json.Marshal(paas.Properties)
 	return fmt.Sprintf(`{"paas_services": {"%s" : %s}}`, dummyUUID, string(res))
 }
 
-func preparePaaSHTTPGetResponse() string {
-	paas := getMockPaaSService()
+func preparePaaSHTTPGetResponse(status string) string {
+	paas := getMockPaaSService(status)
 	res, _ := json.Marshal(paas)
 	return string(res)
 }
@@ -421,7 +538,7 @@ func preparePaaSHTTPGetTemplatesResponse() string {
 	return fmt.Sprintf(`{"paas_service_templates": {"%s" : %s}}`, "d711fc50-ad96-4070-b769-6fe2bf93792c", string(res))
 }
 
-func getMockSecurityZone() PaaSSecurityZone {
+func getMockSecurityZone(status string) PaaSSecurityZone {
 	mock := PaaSSecurityZone{Properties: PaaSSecurityZoneProperties{
 		LocationCountry: "Germany",
 		CreateTime:      dummyTime,
@@ -429,7 +546,7 @@ func getMockSecurityZone() PaaSSecurityZone {
 		ObjectUUID:      "aa-bb-cc-dd",
 		Labels:          []string{"label"},
 		LocationName:    "Bonn",
-		Status:          "active",
+		Status:          status,
 		LocationUUID:    "cc-dd-ee",
 		ChangeTime:      dummyTime,
 		Name:            "test",
@@ -438,14 +555,14 @@ func getMockSecurityZone() PaaSSecurityZone {
 	return mock
 }
 
-func preparePaaSHTTPGetSecurityZoneList() string {
-	zone := getMockSecurityZone()
+func preparePaaSHTTPGetSecurityZoneList(status string) string {
+	zone := getMockSecurityZone(status)
 	res, _ := json.Marshal(zone.Properties)
 	return fmt.Sprintf(`{"paas_security_zones": {"%s": %s}}`, "test", string(res))
 }
 
-func preparePaaSHTTPGetSecurityZone() string {
-	zone := getMockSecurityZone()
+func preparePaaSHTTPGetSecurityZone(status string) string {
+	zone := getMockSecurityZone(status)
 	res, _ := json.Marshal(zone)
 	return string(res)
 }
@@ -463,8 +580,8 @@ func preparePaaSHTTPCreateSecurityZone() string {
 	return string(res)
 }
 
-func prepareDeletedPaaSHTTPGetListResponse() string {
-	paas := getMockPaaSService()
+func prepareDeletedPaaSHTTPGetListResponse(status string) string {
+	paas := getMockPaaSService(status)
 	res, _ := json.Marshal(paas.Properties)
 	return fmt.Sprintf(`{"deleted_paas_services": {"%s" : %s}}`, dummyUUID, string(res))
 }

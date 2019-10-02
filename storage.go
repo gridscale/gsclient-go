@@ -298,7 +298,9 @@ func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -312,6 +314,14 @@ func (c *Client) DeleteStorage(id string) error {
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForStorageDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -327,6 +337,14 @@ func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodPatch,
 		body:   body,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForStorageActive(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -386,4 +404,22 @@ func (c *Client) GetDeletedStorages() ([]Storage, error) {
 		storages = append(storages, Storage{Properties: properties})
 	}
 	return storages, err
+}
+
+//waitForStorageActive allows to wait until the storage's status is active
+func (c *Client) waitForStorageActive(id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		storage, err := c.GetStorage(id)
+		return storage.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForStorageDeleted allows to wait until the storage is deleted
+func (c *Client) waitForStorageDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiStorageBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

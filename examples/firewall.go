@@ -14,7 +14,8 @@ func main() {
 		"https://api.gridscale.io",
 		uuid,
 		token,
-		false,
+		true,
+		true,
 		0,
 		0,
 		0,
@@ -64,7 +65,7 @@ func main() {
 	fwUpdateRequest := gsclient.FirewallUpdateRequest{
 		Name:   "Updated name",
 		Labels: fw.Properties.Labels,
-		Rules:  fw.Properties.Rules,
+		Rules:  &fw.Properties.Rules,
 	}
 	err = client.UpdateFirewall(fw.Properties.ObjectUUID, fwUpdateRequest)
 	if err != nil {

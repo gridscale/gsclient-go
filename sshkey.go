@@ -118,7 +118,9 @@ func (c *Client) CreateSshkey(body SshkeyCreateRequest) (CreateResponse, error) 
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	err = c.WaitForRequestCompletion(response.RequestUUID)
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -132,6 +134,14 @@ func (c *Client) DeleteSshkey(id string) error {
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSSHKeyDeleted(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -147,6 +157,14 @@ func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodPatch,
 		body:   body,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForSSHKeyActive(id)
 	}
 	return r.execute(*c, nil)
 }
@@ -169,4 +187,22 @@ func (c *Client) GetSshkeyEventList(id string) ([]Event, error) {
 		sshEvents = append(sshEvents, Event{Properties: properties})
 	}
 	return sshEvents, err
+}
+
+//waitForSSHKeyActive allows to wait until the SSH-Key's status is active
+func (c *Client) waitForSSHKeyActive(id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		key, err := c.GetSshkey(id)
+		return key.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForSSHKeyDeleted allows to wait until the SSH-Key is deleted
+func (c *Client) waitForSSHKeyDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiSshkeyBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

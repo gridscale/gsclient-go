@@ -147,6 +147,13 @@ func (c *Client) CreateServerStorage(id string, body ServerStorageRelationCreate
 		method: http.MethodPost,
 		body:   body,
 	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerStorageRelCreation(id, body.ObjectUUID)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -160,6 +167,13 @@ func (c *Client) DeleteServerStorage(serverID, storageID string) error {
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodDelete,
+	}
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		return c.waitForServerStorageRelDeleted(serverID, storageID)
 	}
 	return r.execute(*c, nil)
 }
@@ -176,4 +190,24 @@ func (c *Client) LinkStorage(serverID string, storageID string, bootdevice bool)
 //UnlinkStorage remove a storage from a server
 func (c *Client) UnlinkStorage(serverID string, storageID string) error {
 	return c.DeleteServerStorage(serverID, storageID)
+}
+
+//waitForServerStorageRelCreation allows to wait until the relation between a server and a storage is created
+func (c *Client) waitForServerStorageRelCreation(serverID, storageID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(storageID) {
+		return errors.New("'serverID' and 'storageID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "storages", storageID)
+	method := http.MethodGet
+	return c.waitFor200Status(uri, method)
+}
+
+//waitForServerStorageRelDeleted allows to wait until the relation between a server and a storage is deleted
+func (c *Client) waitForServerStorageRelDeleted(serverID, storageID string) error {
+	if !isValidUUID(serverID) || !isValidUUID(storageID) {
+		return errors.New("'serverID' and 'storageID' are required")
+	}
+	uri := path.Join(apiServerBase, serverID, "storages", storageID)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }

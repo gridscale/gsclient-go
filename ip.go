@@ -234,9 +234,9 @@ func (c *Client) CreateIP(body IPCreateRequest) (IPCreateResponse, error) {
 	if err != nil {
 		return IPCreateResponse{}, err
 	}
-
-	err = c.WaitForRequestCompletion(response.RequestUUID)
-
+	if c.cfg.sync {
+		err = c.waitForRequestCompleted(response.RequestUUID)
+	}
 	return response, err
 }
 
@@ -251,7 +251,14 @@ func (c *Client) DeleteIP(id string) error {
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodDelete,
 	}
-
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForIPDeleted(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -267,7 +274,14 @@ func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
 		method: http.MethodPatch,
 		body:   body,
 	}
-
+	if c.cfg.sync {
+		err := r.execute(*c, nil)
+		if err != nil {
+			return err
+		}
+		//Block until the request is finished
+		return c.waitForIPActive(id)
+	}
 	return r.execute(*c, nil)
 }
 
@@ -335,4 +349,22 @@ func (c *Client) GetDeletedIPs() ([]IP, error) {
 		IPs = append(IPs, IP{Properties: properties})
 	}
 	return IPs, err
+}
+
+//waitForIPActive allows to wait until the IP address's status is active
+func (c *Client) waitForIPActive(id string) error {
+	return retryWithTimeout(func() (bool, error) {
+		ip, err := c.GetIP(id)
+		return ip.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+}
+
+//waitForIPDeleted allows to wait until the IP address is deleted
+func (c *Client) waitForIPDeleted(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	uri := path.Join(apiIPBase, id)
+	method := http.MethodGet
+	return c.waitFor404Status(uri, method)
 }
