@@ -33,12 +33,7 @@ type enhancedClient struct {
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration(
-		"https://api.gridscale.io",
-		uuid,
-		token,
-		true,
-	)
+	config := gsclient.DefaultConfiguration(uuid, token)
 	client := enhancedClient{
 		gsclient.NewClient(config),
 	}

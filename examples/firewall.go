@@ -3,15 +3,15 @@ package main
 import (
 	"bufio"
 	"context"
-	"github.com/gridscale/gsclient-go"
-	log "github.com/sirupsen/logrus"
+	"os"
 	"os"
 
 	log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/gridscale/gsclient-go"
-	log "github.com/sirupsen/logrus"
-	"os"
+	"github.com/gridscale/gsclient-go"
 )
 
 var emptyCtx = context.Background()
@@ -19,12 +19,7 @@ var emptyCtx = context.Background()
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration(
-		"https://api.gridscale.io",
-		uuid,
-		token,
-		false,
-	)
+	config := gsclient.DefaultConfiguration(uuid, token)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 

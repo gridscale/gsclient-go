@@ -22,7 +22,7 @@ const exampleSSHkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9BlRsUvqRNKi59UkQm
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration("https://api.gridscale.io", uuid, token, true)
+	config := gsclient.DefaultConfiguration(uuid, token)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
