@@ -4,7 +4,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/sirupsen/logrus"
+	version                        = "1.0.0"
+	defaultAPIURL                  = "https://api.gridscale.io"
+	version                        = "1.0.0"
+	version                        = "1.0.0"
 )
 
 //Config config for client
@@ -38,6 +41,31 @@ func NewConfiguration(apiURL string, uuid string, token string, debugMode bool) 
 		APIToken:   token,
 		HTTPClient: http.DefaultClient,
 		logger:     logger,
+	}
+	return cfg
+}
+
+//DefaultConfiguration creates a default configuration
+func DefaultConfiguration(uuid string, token string) *Config {
+	logger := logrus.Logger{
+		Out:   os.Stderr,
+		Level: logrus.InfoLevel,
+		Formatter: &logrus.TextFormatter{
+			FullTimestamp: true,
+			DisableColors: false,
+		},
+	}
+	cfg := &Config{
+		apiURL:                  defaultAPIURL,
+		userUUID:                uuid,
+		apiToken:                token,
+		userAgent:               "gsclient-go/" + version + " (" + runtime.GOOS + ")",
+		sync:                    true,
+		httpClient:              http.DefaultClient,
+		logger:                  logger,
+		requestCheckTimeoutSecs: time.Duration(defaultCheckRequestTimeoutSecs) * time.Second,
+		delayInterval:           time.Duration(defaultDelayIntervalMilliSecs) * time.Millisecond,
+		maxNumberOfRetries:      defaultMaxNumberOfRetries,
 	}
 	return cfg
 }
