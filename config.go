@@ -15,6 +15,7 @@ const (
 	version                        = "1.0.0"
 	resourceActiveStatus           = "active"
 	requestDoneStatus              = "done"
+	DefaultApiURL                  = "https://my.gridscale.io"
 )
 
 //Config config for client
