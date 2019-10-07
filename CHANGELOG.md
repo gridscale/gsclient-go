@@ -6,6 +6,7 @@ FEATURES:
 * Add `sync` mode
 * The library now can be fully controlled through `context`
 * Auto retry when server returns 5xx and 424 http codes
+* Add a default configuration for the client
 
 IMPROVEMENTS:
 * Server type is now limited to pre-defined values
