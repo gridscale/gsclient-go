@@ -18,7 +18,7 @@ func TestClient_GetServerIPList(t *testing.T) {
 		fmt.Fprintf(writer, prepareServerIPListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetServerIPList(test.testUUID)
+		res, err := client.GetServerIPList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -39,7 +39,7 @@ func TestClient_GetServerIP(t *testing.T) {
 	})
 	for _, testServerID := range uuidCommonTestCases {
 		for _, testIPID := range uuidCommonTestCases {
-			res, err := client.GetServerIP(testServerID.testUUID, testIPID.testUUID)
+			res, err := client.GetServerIP(emptyCtx, testServerID.testUUID, testIPID.testUUID)
 			if testServerID.isFailed || testIPID.isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -73,9 +73,12 @@ func TestClient_CreateServerIP(t *testing.T) {
 			isFailed = test.isFailed
 			for _, testServerID := range uuidCommonTestCases {
 				for _, testIPID := range uuidCommonTestCases {
-					err := client.CreateServerIP(testServerID.testUUID, ServerIPRelationCreateRequest{
-						ObjectUUID: testIPID.testUUID,
-					})
+					err := client.CreateServerIP(
+						emptyCtx,
+						testServerID.testUUID,
+						ServerIPRelationCreateRequest{
+							ObjectUUID: testIPID.testUUID,
+						})
 					if testServerID.isFailed || testIPID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -108,7 +111,7 @@ func TestClient_DeleteServerIP(t *testing.T) {
 			isFailed = test.isFailed
 			for _, testServerID := range uuidCommonTestCases {
 				for _, testIPID := range uuidCommonTestCases {
-					err := client.DeleteServerIP(testServerID.testUUID, testIPID.testUUID)
+					err := client.DeleteServerIP(emptyCtx, testServerID.testUUID, testIPID.testUUID)
 					if testServerID.isFailed || testIPID.isFailed || isFailed {
 						assert.NotNil(t, err)
 					} else {
@@ -133,7 +136,7 @@ func TestClient_LinkIP(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareServerIPHTTPGet())
 	})
-	err := client.LinkIP(dummyUUID, dummyUUID)
+	err := client.LinkIP(emptyCtx, dummyUUID, dummyUUID)
 	assert.Nil(t, err, "LinkIP returned an error %v", err)
 }
 
@@ -148,7 +151,7 @@ func TestClient_UnlinkIP(t *testing.T) {
 			writer.WriteHeader(404)
 		}
 	})
-	err := client.UnlinkIP(dummyUUID, dummyUUID)
+	err := client.UnlinkIP(emptyCtx, dummyUUID, dummyUUID)
 	assert.Nil(t, err, "DeleteServerIP returned an error %v", err)
 }
 
@@ -162,7 +165,7 @@ func TestClient_waitForServerIPRelCreation(t *testing.T) {
 	})
 	for _, testServerID := range uuidCommonTestCases {
 		for _, testIPID := range uuidCommonTestCases {
-			err := client.waitForServerIPRelCreation(testServerID.testUUID, testIPID.testUUID)
+			err := client.waitForServerIPRelCreation(emptyCtx, testServerID.testUUID, testIPID.testUUID)
 			if testServerID.isFailed || testIPID.isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -182,7 +185,7 @@ func TestClient_waitForServerIPRelDeleted(t *testing.T) {
 	})
 	for _, testServerID := range uuidCommonTestCases {
 		for _, testIPID := range uuidCommonTestCases {
-			err := client.waitForServerIPRelDeleted(testServerID.testUUID, testIPID.testUUID)
+			err := client.waitForServerIPRelDeleted(emptyCtx, testServerID.testUUID, testIPID.testUUID)
 			if testServerID.isFailed || testIPID.isFailed {
 				assert.NotNil(t, err)
 			} else {

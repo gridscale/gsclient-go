@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"os"
 
 	"github.com/gridscale/gsclient-go"
@@ -10,19 +11,12 @@ import (
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
+var emptyCtx = context.Background()
+
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration(
-		"https://api.gridscale.io",
-		uuid,
-		token,
-		true,
-		true,
-		0,
-		0,
-		0,
-	)
+	config := gsclient.DefaultConfiguration(uuid, token)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
@@ -33,7 +27,7 @@ func main() {
 		Name:         "go-client-network",
 		LocationUUID: locationUUID,
 	}
-	cnetwork, err := client.CreateNetwork(networkRequest)
+	cnetwork, err := client.CreateNetwork(emptyCtx, networkRequest)
 	if err != nil {
 		log.Error("Create network has failed with error", err)
 		return
@@ -43,7 +37,7 @@ func main() {
 	}).Info("Network successfully created")
 	defer func() {
 		//delete network
-		err := client.DeleteNetwork(cnetwork.ObjectUUID)
+		err := client.DeleteNetwork(emptyCtx, cnetwork.ObjectUUID)
 		if err != nil {
 			log.Error("Delete network has failed with error", err)
 			return
@@ -52,7 +46,7 @@ func main() {
 
 		log.Info("Get deleted networks: Press 'Enter' to continue...")
 		bufio.NewReader(os.Stdin).ReadBytes('\n')
-		networks, err := client.GetDeletedNetworks()
+		networks, err := client.GetDeletedNetworks(emptyCtx)
 		if err != nil {
 			log.Error("Get deleted networks has failed with error", err)
 			return
@@ -63,7 +57,7 @@ func main() {
 	}()
 
 	//Get network to update
-	net, err := client.GetNetwork(cnetwork.ObjectUUID)
+	net, err := client.GetNetwork(emptyCtx, cnetwork.ObjectUUID)
 	if err != nil {
 		log.Error("Create network has failed ")
 		return
@@ -75,7 +69,7 @@ func main() {
 	netUpdateRequest := gsclient.NetworkUpdateRequest{
 		Name: "Updated network",
 	}
-	err = client.UpdateNetwork(net.Properties.ObjectUUID, netUpdateRequest)
+	err = client.UpdateNetwork(emptyCtx, net.Properties.ObjectUUID, netUpdateRequest)
 	if err != nil {
 		log.Error("Update network has failed with error", err)
 		return
@@ -87,7 +81,7 @@ func main() {
 	log.Info("Retrieve network's events: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//get network's events
-	events, err := client.GetNetworkEventList(net.Properties.ObjectUUID)
+	events, err := client.GetNetworkEventList(emptyCtx, net.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get network's events has failed with error", err)
 		return

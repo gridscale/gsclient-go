@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"path"
@@ -45,14 +46,14 @@ type LabelCreateRequest struct {
 //GetLabelList gets a list of available labels
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/GetLabels
-func (c *Client) GetLabelList() ([]Label, error) {
+func (c *Client) GetLabelList(ctx context.Context) ([]Label, error) {
 	r := Request{
 		uri:    apiLabelBase,
 		method: http.MethodGet,
 	}
 	var response LabelList
 	var labels []Label
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		labels = append(labels, Label{Properties: properties})
 	}
@@ -62,19 +63,19 @@ func (c *Client) GetLabelList() ([]Label, error) {
 //CreateLabel creates a new label
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/CreateLabel
-func (c *Client) CreateLabel(body LabelCreateRequest) (CreateResponse, error) {
+func (c *Client) CreateLabel(ctx context.Context, body LabelCreateRequest) (CreateResponse, error) {
 	r := Request{
 		uri:    apiLabelBase,
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response CreateResponse
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	if err != nil {
 		return CreateResponse{}, err
 	}
 	if c.cfg.sync {
-		err = c.waitForRequestCompleted(response.RequestUUID)
+		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
 }
@@ -82,7 +83,7 @@ func (c *Client) CreateLabel(body LabelCreateRequest) (CreateResponse, error) {
 //DeleteLabel deletes a label
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/DeleteLabel
-func (c *Client) DeleteLabel(label string) error {
+func (c *Client) DeleteLabel(ctx context.Context, label string) error {
 	if label == "" {
 		return errors.New("'label' is required")
 	}
@@ -91,22 +92,22 @@ func (c *Client) DeleteLabel(label string) error {
 		method: http.MethodDelete,
 	}
 	if c.cfg.sync {
-		err := r.execute(*c, nil)
+		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
 		}
-		return c.waitForLabelDeleted(label)
+		return c.waitForLabelDeleted(ctx, label)
 	}
-	return r.execute(*c, nil)
+	return r.execute(ctx, *c, nil)
 }
 
 //waitForLabelDeleted allows to wait until the label is deleted
-func (c *Client) waitForLabelDeleted(label string) error {
+func (c *Client) waitForLabelDeleted(ctx context.Context, label string) error {
 	if label == "" {
 		return errors.New("'label' is required")
 	}
 	return retryWithTimeout(func() (bool, error) {
-		labels, err := c.GetLabelList()
+		labels, err := c.GetLabelList(ctx)
 		return isLabelInSlice(label, labels), err
 	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }

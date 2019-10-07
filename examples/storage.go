@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -11,19 +12,12 @@ import (
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
+var emptyCtx = context.Background()
+
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration(
-		"https://api.gridscale.io",
-		uuid,
-		token,
-		true,
-		true,
-		0,
-		0,
-		0,
-	)
+	config := gsclient.DefaultConfiguration(uuid, token)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
@@ -31,12 +25,14 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Create a storage
-	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
-		Capacity:     1,
-		LocationUUID: locationUUID,
-		Name:         "go-client-storage",
-		StorageType:  gsclient.InsaneStorageType,
-	})
+	cStorage, err := client.CreateStorage(
+		emptyCtx,
+		gsclient.StorageCreateRequest{
+			Capacity:     1,
+			LocationUUID: locationUUID,
+			Name:         "go-client-storage",
+			StorageType:  gsclient.InsaneStorageType,
+		})
 	if err != nil {
 		log.Error("Create storage has failed with error", err)
 		return
@@ -45,7 +41,7 @@ func main() {
 		"storage_uuid": cStorage.ObjectUUID,
 	}).Info("Storage successfully created")
 	defer func() {
-		err := client.DeleteStorage(cStorage.ObjectUUID)
+		err := client.DeleteStorage(emptyCtx, cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)
 			return
@@ -54,7 +50,7 @@ func main() {
 
 		log.Info("Get deleted storages: Press 'Enter' to continue...")
 		bufio.NewReader(os.Stdin).ReadBytes('\n')
-		storages, err := client.GetDeletedStorages()
+		storages, err := client.GetDeletedStorages(emptyCtx)
 		if err != nil {
 			log.Error("Get deleted storages has failed with error", err)
 			return
@@ -65,7 +61,7 @@ func main() {
 	}()
 
 	//Get storage to update
-	storage, err := client.GetStorage(cStorage.ObjectUUID)
+	storage, err := client.GetStorage(emptyCtx, cStorage.ObjectUUID)
 	if err != nil {
 		log.Error("Get storage has failed with error", err)
 		return
@@ -77,11 +73,14 @@ func main() {
 	log.Info("Update storage: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	err = client.UpdateStorage(storage.Properties.ObjectUUID, gsclient.StorageUpdateRequest{
-		Name:     "updated storage",
-		Labels:   storage.Properties.Labels,
-		Capacity: storage.Properties.Capacity,
-	})
+	err = client.UpdateStorage(
+		emptyCtx,
+		storage.Properties.ObjectUUID,
+		gsclient.StorageUpdateRequest{
+			Name:     "updated storage",
+			Labels:   storage.Properties.Labels,
+			Capacity: storage.Properties.Capacity,
+		})
 	if err != nil {
 		log.Error("Update storage has failed with error", err)
 		return
@@ -91,7 +90,7 @@ func main() {
 	log.Info("Get storage's events: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	events, err := client.GetStorageEventList(storage.Properties.ObjectUUID)
+	events, err := client.GetStorageEventList(emptyCtx, storage.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get storage's events has failed with error", err)
 		return

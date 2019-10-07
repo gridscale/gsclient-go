@@ -25,7 +25,7 @@ func TestClient_waitForRequestCompleted(t *testing.T) {
 		for _, serverTest := range commonSuccessFailTestCases {
 			isFailed = serverTest.isFailed
 			for _, testUUID := range uuidCommonTestCases {
-				err := client.waitForRequestCompleted(testUUID.testUUID)
+				err := client.waitForRequestCompleted(emptyCtx, testUUID.testUUID)
 				if isFailed || reqStatus != requestDoneStatus || testUUID.isFailed {
 					assert.NotNil(t, err)
 				} else {
@@ -51,7 +51,7 @@ func TestClient_waitFor404Status(t *testing.T) {
 	})
 	for _, notFound := range notfoundTestCases {
 		isNotFound = notFound
-		err := client.waitFor404Status(uri, http.MethodGet)
+		err := client.waitFor404Status(emptyCtx, uri, http.MethodGet)
 		if isNotFound {
 			assert.Nil(t, err)
 		} else {
@@ -75,7 +75,7 @@ func TestClient_waitFor200Status(t *testing.T) {
 	})
 	for _, found := range foundTestCases {
 		isFound = found
-		err := client.waitFor200Status(uri, http.MethodGet)
+		err := client.waitFor200Status(emptyCtx, uri, http.MethodGet)
 		if found {
 			assert.Nil(t, err)
 		} else {

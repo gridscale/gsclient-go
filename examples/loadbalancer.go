@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"github.com/gridscale/gsclient-go"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -9,35 +10,32 @@ import (
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
+var emptyCtx = context.Background()
+
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration(
-		"https://api.gridscale.io",
-		uuid,
-		token,
-		true,
-		true,
-		0,
-		0,
-		0,
-	)
+	config := gsclient.DefaultConfiguration(uuid, token)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
 	log.Info("Create IPs and loadbalancer: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	// required to create IPv6 and IPv4 to create LB
-	ipv4, _ := client.CreateIP(gsclient.IPCreateRequest{
-		Family:       gsclient.IPv4Type,
-		LocationUUID: locationUUID,
-	})
+	ipv4, _ := client.CreateIP(
+		emptyCtx,
+		gsclient.IPCreateRequest{
+			Family:       gsclient.IPv4Type,
+			LocationUUID: locationUUID,
+		})
 	log.Info("IPv4 has been created")
 
-	ipv6, _ := client.CreateIP(gsclient.IPCreateRequest{
-		Family:       gsclient.IPv6Type,
-		LocationUUID: locationUUID,
-	})
+	ipv6, _ := client.CreateIP(
+		emptyCtx,
+		gsclient.IPCreateRequest{
+			Family:       gsclient.IPv6Type,
+			LocationUUID: locationUUID,
+		})
 	log.Info("[INFO] IPv6 has been created")
 
 	// populate settings into LoadBalancerCreateRequest
@@ -67,7 +65,7 @@ func main() {
 		Labels: labels,
 	}
 
-	clb, err := client.CreateLoadBalancer(lbRequest)
+	clb, err := client.CreateLoadBalancer(emptyCtx, lbRequest)
 	if err != nil {
 		log.Fatal("Create loadbalancer has failed with error", err)
 	}
@@ -75,7 +73,7 @@ func main() {
 		"Loadbalancer_uuid": clb.ObjectUUID}).Info("Loadbalancer successfully created")
 
 	// Get the loadbalacer to update some settings
-	glb, err := client.GetLoadBalancer(clb.ObjectUUID)
+	glb, err := client.GetLoadBalancer(emptyCtx, clb.ObjectUUID)
 	if err != nil {
 		log.Fatal("Get loadbalancer has failed with error", err)
 	}
@@ -100,7 +98,7 @@ func main() {
 		BackendServers: glb.Properties.BackendServers,
 		Labels:         labels,
 	}
-	err = client.UpdateLoadBalancer(glb.Properties.ObjectUUID, lbUpdateRequest)
+	err = client.UpdateLoadBalancer(emptyCtx, glb.Properties.ObjectUUID, lbUpdateRequest)
 
 	if err != nil {
 		log.Fatal("Update loadbalancer has failed with error", err)
@@ -112,7 +110,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	//Get loadbalancer events
-	response, err := client.GetLoadBalancerEventList(glb.Properties.ObjectUUID)
+	response, err := client.GetLoadBalancerEventList(emptyCtx, glb.Properties.ObjectUUID)
 	if err != nil {
 		log.Fatal("Events loadbalancer has failed with error", err)
 	}
@@ -125,20 +123,20 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	// finallly clean up delete IPs and loadbalancer
-	err = client.DeleteLoadBalancer(glb.Properties.ObjectUUID)
+	err = client.DeleteLoadBalancer(emptyCtx, glb.Properties.ObjectUUID)
 	if err != nil {
 		log.Fatal("Delete loadbalancer has failed with error", err)
 	}
 	log.WithFields(log.Fields{
 		"Loadbalancer_uuid": glb.Properties.ObjectUUID}).Info("Loadbalancer successfully deleted")
 
-	err = client.DeleteIP(ipv4.ObjectUUID)
+	err = client.DeleteIP(emptyCtx, ipv4.ObjectUUID)
 	if err != nil {
 		log.Fatal("Delete ipv4 has failed with error", err)
 	}
 	log.Info("IPv4 successfully deleted")
 
-	err = client.DeleteIP(ipv6.ObjectUUID)
+	err = client.DeleteIP(emptyCtx, ipv6.ObjectUUID)
 	if err != nil {
 		log.Fatal("Delete ipv6 has failed with error", err)
 	}

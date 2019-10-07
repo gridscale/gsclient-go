@@ -17,7 +17,7 @@ func TestClient_GetLocationList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		fmt.Fprintf(writer, prepareLocationListHTTPGet())
 	})
-	res, err := client.GetLocationList()
+	res, err := client.GetLocationList(emptyCtx)
 	assert.Nil(t, err, "GetLocationList returned an aerror %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockLocation()), fmt.Sprintf("%v", res))
@@ -32,7 +32,7 @@ func TestClient_GetLocation(t *testing.T) {
 		fmt.Fprintf(writer, prepareLocationHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetLocation(test.testUUID)
+		res, err := client.GetLocation(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {

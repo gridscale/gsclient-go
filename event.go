@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"net/http"
 )
 
@@ -49,14 +50,14 @@ type EventProperties struct {
 //GetEventList gets a list of events
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/EventGetAll
-func (c *Client) GetEventList() ([]Event, error) {
+func (c *Client) GetEventList(ctx context.Context) ([]Event, error) {
 	r := Request{
 		uri:    apiEventBase,
 		method: http.MethodGet,
 	}
 	var response EventList
 	var events []Event
-	err := r.execute(*c, &response)
+	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
 		events = append(events, Event{Properties: properties})
 	}
