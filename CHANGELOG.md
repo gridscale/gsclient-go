@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (unreleased)
+## 2.0.0 (October 07, 2019)
 
 FEATURES:
 * Add `sync` mode
