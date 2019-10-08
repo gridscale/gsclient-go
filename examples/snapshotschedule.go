@@ -2,31 +2,34 @@ package main
 
 import (
 	"bufio"
-	"os"
-	"time"
-
+	"context"
 	log "github.com/sirupsen/logrus"
+	"os"
 
 	"github.com/gridscale/gsclient-go"
 )
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
+var emptyCtx = context.Background()
+
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration("https://api.gridscale.io", uuid, token, true)
+	config := gsclient.DefaultConfiguration(uuid, token)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
 	log.Info("Create storage and snapshot schedule: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//Create storage
-	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
-		Capacity:     1,
-		LocationUUID: locationUUID,
-		Name:         "go-client-storage",
-	})
+	cStorage, err := client.CreateStorage(
+		emptyCtx,
+		gsclient.StorageCreateRequest{
+			Capacity:     1,
+			LocationUUID: locationUUID,
+			Name:         "go-client-storage",
+		})
 	if err != nil {
 		log.Error("Create storage has failed with error", err)
 		return
@@ -35,23 +38,21 @@ func main() {
 		"storage_uuid": cStorage.ObjectUUID,
 	}).Info("Storage successfully created")
 	defer func() {
-		time.Sleep(30 * time.Second)
 		//Delete all snapshots has been made so far
-		snapshots, err := client.GetStorageSnapshotList(cStorage.ObjectUUID)
+		snapshots, err := client.GetStorageSnapshotList(emptyCtx, cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Get storage's snapshots has failed with error", err)
 			return
 		}
 		for _, snapshot := range snapshots {
-			err = client.DeleteStorageSnapshot(cStorage.ObjectUUID, snapshot.Properties.ObjectUUID)
+			err = client.DeleteStorageSnapshot(emptyCtx, cStorage.ObjectUUID, snapshot.Properties.ObjectUUID)
 			if err != nil {
 				log.Error("Delete storage's snapshot has failed with error", err)
 				return
 			}
 		}
 		//we have to wait for the snapshot getting deleted firstly
-		time.Sleep(30 * time.Second)
-		err = client.DeleteStorage(cStorage.ObjectUUID)
+		err = client.DeleteStorage(emptyCtx, cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)
 			return
@@ -60,11 +61,14 @@ func main() {
 	}()
 
 	//Create Snapshot Schedule
-	cSnapshotSchedule, err := client.CreateStorageSnapshotSchedule(cStorage.ObjectUUID, gsclient.StorageSnapshotScheduleCreateRequest{
-		Name:          "go-client-snapshot-schedule",
-		RunInterval:   120,
-		KeepSnapshots: 2,
-	})
+	cSnapshotSchedule, err := client.CreateStorageSnapshotSchedule(
+		emptyCtx,
+		cStorage.ObjectUUID,
+		gsclient.StorageSnapshotScheduleCreateRequest{
+			Name:          "go-client-snapshot-schedule",
+			RunInterval:   120,
+			KeepSnapshots: 2,
+		})
 	if err != nil {
 		log.Error("Create snapshot schedule has failed with error", err)
 		return
@@ -73,7 +77,7 @@ func main() {
 		"snapshotschedule_uuid": cSnapshotSchedule.ObjectUUID,
 	}).Info("Snapshot schedule successfully created")
 	defer func() {
-		err := client.DeleteStorageSnapshotSchedule(cStorage.ObjectUUID, cSnapshotSchedule.ObjectUUID)
+		err := client.DeleteStorageSnapshotSchedule(emptyCtx, cStorage.ObjectUUID, cSnapshotSchedule.ObjectUUID)
 		if err != nil {
 			log.Error("Delete snapshot schedule has failed with error", err)
 			return
@@ -82,7 +86,7 @@ func main() {
 	}()
 
 	//Get snapshot schedule to update
-	snapshotSchedule, err := client.GetStorageSnapshotSchedule(cStorage.ObjectUUID, cSnapshotSchedule.ObjectUUID)
+	snapshotSchedule, err := client.GetStorageSnapshotSchedule(emptyCtx, cStorage.ObjectUUID, cSnapshotSchedule.ObjectUUID)
 	if err != nil {
 		log.Error("Get snapshot schedule has failed with error", err)
 		return
@@ -93,11 +97,15 @@ func main() {
 
 	log.Info("Update snapshot schedule: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	err = client.UpdateStorageSnapshotSchedule(cStorage.ObjectUUID, snapshotSchedule.Properties.ObjectUUID, gsclient.StorageSnapshotScheduleUpdateRequest{
-		Name:          "updated snapshot schedule",
-		RunInterval:   snapshotSchedule.Properties.RunInterval,
-		KeepSnapshots: snapshotSchedule.Properties.KeepSnapshots,
-	})
+	err = client.UpdateStorageSnapshotSchedule(
+		emptyCtx,
+		cStorage.ObjectUUID,
+		snapshotSchedule.Properties.ObjectUUID,
+		gsclient.StorageSnapshotScheduleUpdateRequest{
+			Name:          "updated snapshot schedule",
+			RunInterval:   snapshotSchedule.Properties.RunInterval,
+			KeepSnapshots: snapshotSchedule.Properties.KeepSnapshots,
+		})
 	if err != nil {
 		log.Error("Update snapshot schedule has failed with error", err)
 		return

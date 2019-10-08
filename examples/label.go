@@ -2,36 +2,36 @@ package main
 
 import (
 	"bufio"
-	"github.com/nvthongswansea/gsclient-go"
+	"context"
+	"github.com/gridscale/gsclient-go"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
 
+var emptyCtx = context.Background()
+
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration(
-		"https://api.gridscale.io",
-		uuid,
-		token,
-		true,
-	)
+	config := gsclient.DefaultConfiguration(uuid, token)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
 	log.Info("Create label: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	_, err := client.CreateLabel(gsclient.LabelCreateRequest{
-		Label: "go-client-label",
-	})
+	_, err := client.CreateLabel(
+		emptyCtx,
+		gsclient.LabelCreateRequest{
+			Label: "go-client-label",
+		})
 	if err != nil {
 		log.Error("Create label has failed with error", err)
 		return
 	}
 	log.Info("Label successfully created")
 	defer func() {
-		err := client.DeleteLabel("go-client-label")
+		err := client.DeleteLabel(emptyCtx, "go-client-label")
 		if err != nil {
 			log.Error("Delete label has failed with error", err)
 			return
@@ -41,7 +41,7 @@ func main() {
 	log.Info("Retrieve labels: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	labels, err := client.GetLabelList()
+	labels, err := client.GetLabelList(emptyCtx)
 	if err != nil {
 		log.Error("Retrieve labels has failed with error", err)
 		return

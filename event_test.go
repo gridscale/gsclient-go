@@ -9,14 +9,14 @@ import (
 )
 
 func TestClient_GetEventList(t *testing.T) {
-	server, client, mux := setupTestClient()
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := apiEventBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
-	response, err := client.GetEventList()
+	response, err := client.GetEventList(emptyCtx)
 	assert.Nil(t, err, "GetEventList returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", response))

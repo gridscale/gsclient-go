@@ -2,25 +2,20 @@ package main
 
 import (
 	"bufio"
-	"os"
-	"time"
-
-	log "github.com/sirupsen/logrus"
-
+	"context"
 	"github.com/gridscale/gsclient-go"
+	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 
+var emptyCtx = context.Background()
+
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
 	token := os.Getenv("GRIDSCALE_TOKEN")
-	config := gsclient.NewConfiguration(
-		"https://api.gridscale.io",
-		uuid,
-		token,
-		true,
-	)
+	config := gsclient.DefaultConfiguration(uuid, token)
 	client := gsclient.NewClient(config)
 	log.Info("gridscale client configured")
 
@@ -28,18 +23,19 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//In order to create a template, we need to create a storage and its snapshot
 	//Create storage
-	cStorage, err := client.CreateStorage(gsclient.StorageCreateRequest{
-		Capacity:     1,
-		LocationUUID: locationUUID,
-		Name:         "go-client-storage",
-	})
+	cStorage, err := client.CreateStorage(
+		emptyCtx,
+		gsclient.StorageCreateRequest{
+			Capacity:     1,
+			LocationUUID: locationUUID,
+			Name:         "go-client-storage",
+		})
 	if err != nil {
 		log.Error("Create storage has failed with error", err)
 		return
 	}
 	defer func() {
-		time.Sleep(30 * time.Second)
-		err := client.DeleteStorage(cStorage.ObjectUUID)
+		err := client.DeleteStorage(emptyCtx, cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)
 			return
@@ -48,16 +44,18 @@ func main() {
 	}()
 
 	//Create storage snapshot
-	cSnapshot, err := client.CreateStorageSnapshot(cStorage.ObjectUUID, gsclient.StorageSnapshotCreateRequest{
-		Name: "go-client-snapshot",
-	})
+	cSnapshot, err := client.CreateStorageSnapshot(
+		emptyCtx,
+		cStorage.ObjectUUID,
+		gsclient.StorageSnapshotCreateRequest{
+			Name: "go-client-snapshot",
+		})
 	if err != nil {
 		log.Error("Create storage snapshot has failed with error", err)
 		return
 	}
 	defer func() {
-		time.Sleep(40 * time.Second)
-		err := client.DeleteStorageSnapshot(cStorage.ObjectUUID, cSnapshot.ObjectUUID)
+		err := client.DeleteStorageSnapshot(emptyCtx, cStorage.ObjectUUID, cSnapshot.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage snapshot has failed with error", err)
 			return
@@ -66,7 +64,7 @@ func main() {
 	}()
 
 	//Create template
-	cTemplate, err := client.CreateTemplate(gsclient.TemplateCreateRequest{
+	cTemplate, err := client.CreateTemplate(emptyCtx, gsclient.TemplateCreateRequest{
 		Name:         "go-client-template",
 		SnapshotUUID: cSnapshot.ObjectUUID,
 	})
@@ -78,7 +76,7 @@ func main() {
 		"template_uuid": cTemplate.ObjectUUID,
 	}).Info("Template successfully created")
 	defer func() {
-		err := client.DeleteTemplate(cTemplate.ObjectUUID)
+		err := client.DeleteTemplate(emptyCtx, cTemplate.ObjectUUID)
 		if err != nil {
 			log.Error("Delete template has failed with error", err)
 			return
@@ -87,7 +85,7 @@ func main() {
 
 		log.Info("Get deleted templates: Press 'Enter' to continue...")
 		bufio.NewReader(os.Stdin).ReadBytes('\n')
-		templates, err := client.GetDeletedTemplates()
+		templates, err := client.GetDeletedTemplates(emptyCtx)
 		if err != nil {
 			log.Error("Get deleted templates has failed with error", err)
 			return
@@ -98,7 +96,7 @@ func main() {
 	}()
 
 	//get a template to update
-	template, err := client.GetTemplate(cTemplate.ObjectUUID)
+	template, err := client.GetTemplate(emptyCtx, cTemplate.ObjectUUID)
 	if err != nil {
 		log.Error("Get template has failed with error", err)
 		return
@@ -110,7 +108,7 @@ func main() {
 	log.Info("Update template: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//Update template
-	err = client.UpdateTemplate(template.Properties.ObjectUUID, gsclient.TemplateUpdateRequest{
+	err = client.UpdateTemplate(emptyCtx, template.Properties.ObjectUUID, gsclient.TemplateUpdateRequest{
 		Name:   "updated template",
 		Labels: template.Properties.Labels,
 	})
@@ -123,7 +121,7 @@ func main() {
 	log.Info("Get template's events: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	//Get template's events
-	events, err := client.GetTemplateEventList(template.Properties.ObjectUUID)
+	events, err := client.GetTemplateEventList(emptyCtx, template.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get template's events has failed with error", err)
 		return
