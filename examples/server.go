@@ -5,8 +5,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/gridscale/gsclient-go"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/gridscale/gsclient-go"
 )
 
 const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
@@ -45,7 +46,7 @@ func main() {
 	serverCreateRequest := gsclient.ServerCreateRequest{
 		Name:         "go-client-server",
 		Memory:       1,
-		Cores:        1,
+		Cores:        2,
 		LocationUUID: locationUUID,
 	}
 	cServer, err := client.CreateServer(emptyCtx, serverCreateRequest)
@@ -76,10 +77,10 @@ func main() {
 
 	log.Info("Stop server: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Turn off server
-	err = client.StopServer(emptyCtx, server.Properties.ObjectUUID)
+	//Shutdown Server
+	err = client.ShutdownServer(emptyCtx, server.Properties.ObjectUUID)
 	if err != nil {
-		log.Error("Stop server has failed with error", err)
+		log.Error("ShutdownServer has failed with error", err)
 		return
 	}
 	log.Info("Server successfully stop")
@@ -93,6 +94,7 @@ func main() {
 		gsclient.ServerUpdateRequest{
 			Name:         "updated server",
 			Memory:       1,
+			Cores:        1,
 			AutoRecovery: &autoRecovery,
 		})
 	if err != nil {
