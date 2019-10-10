@@ -41,6 +41,7 @@ type RequestError struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	StatusCode  int
+	RequestUUID string
 }
 
 //Error just returns error as string
@@ -49,8 +50,14 @@ func (r RequestError) Error() string {
 	if message == "" {
 		message = "no error message received from server"
 	}
-	return fmt.Sprintf("statuscode %v returned: %s", r.StatusCode, message)
+	errorMessageFormat := "Status code: %v. Error: %s. Request UUID: %s. "
+	if r.StatusCode >= 500 {
+		errorMessageFormat += "Please report this error along with the request UUID."
+	}
+	return fmt.Sprintf(errorMessageFormat, r.StatusCode, message, r.RequestUUID)
 }
+
+const requestUUIDHeaderParam = "X-Request-Id"
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *Request) execute(ctx context.Context, c Client, output interface{}) error {
@@ -84,20 +91,22 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 			c.cfg.logger.Errorf("Error while executing the request: %v", err)
 			return false, err
 		}
-
+		statusCode := result.StatusCode
+		requestUUID := result.Header.Get(requestUUIDHeaderParam)
 		iostream, err := ioutil.ReadAll(result.Body)
 		if err != nil {
 			c.cfg.logger.Errorf("Error while reading the response's body: %v", err)
 			return false, err
 		}
 
-		c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
+		c.cfg.logger.Debugf("Status code: %v. Request UUID: %v.", statusCode, requestUUID)
 
 		if result.StatusCode >= 300 {
 			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
-			errorMessage.StatusCode = result.StatusCode
+			errorMessage.StatusCode = statusCode
+			errorMessage.RequestUUID = requestUUID
 			json.Unmarshal(iostream, &errorMessage)
-			//If internal server error or object is in status that does not allow the request, retry
+			//if internal server error OR object is in status that does not allow the request, retry
 			if result.StatusCode >= 500 || result.StatusCode == 424 {
 				return true, errorMessage
 			}
@@ -105,7 +114,13 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 				c.cfg.logger.Debug("Skip 404 error code.")
 				return false, errorMessage
 			}
-			c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
+			c.cfg.logger.Errorf(
+				"Error message: %v. Title: %v. Code: %v. Request UUID: %v.",
+				errorMessage.Description,
+				errorMessage.Title,
+				errorMessage.StatusCode,
+				errorMessage.RequestUUID,
+			)
 			return false, errorMessage
 		}
 		c.cfg.logger.Debugf("Response body: %v", string(iostream))
