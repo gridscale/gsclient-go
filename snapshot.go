@@ -111,29 +111,38 @@ type StorageRollbackRequest struct {
 
 //StorageSnapshotExportToS3Request JSON struct of a request for exporting a storage snapshot to S3
 type StorageSnapshotExportToS3Request struct {
-	S3auth struct {
-		//Host of S3
-		Host string `json:"host"`
+	//S3 authentication data
+	S3auth `json:"s3auth"`
 
-		//Access key of S3
-		AccessKey string `json:"access_key"`
+	//S3 info about snapshot being uploaded
+	S3data `json:"s3data"`
+}
 
-		//Secret key of S3
-		SecretKey string `json:"secret_key"`
-	} `json:"s3auth"`
-	S3data struct {
-		//Host of S3
-		Host string `json:"host"`
+//S3auth JSON struct of S3 authentication data
+type S3auth struct {
+	//Host of S3
+	Host string `json:"host"`
 
-		//Bucket that file will be uploaded to
-		Bucket string `json:"bucket"`
+	//Access key of S3
+	AccessKey string `json:"access_key"`
 
-		//Name of the file being uploaded
-		Filename string `json:"filename"`
+	//Secret key of S3
+	SecretKey string `json:"secret_key"`
+}
 
-		//Is the file private?
-		Private bool `json:"private"`
-	} `json:"s3data"`
+//S3data JSON struct of info about snapshot being uploaded
+type S3data struct {
+	//Host of S3
+	Host string `json:"host"`
+
+	//Bucket that file will be uploaded to
+	Bucket string `json:"bucket"`
+
+	//Name of the file being uploaded
+	Filename string `json:"filename"`
+
+	//Is the file private?
+	Private bool `json:"private"`
 }
 
 //GetStorageSnapshotList gets a list of storage snapshots
