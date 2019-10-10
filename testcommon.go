@@ -11,6 +11,7 @@ const (
 	dummyUUID        = "690de890-13c0-4e76-8a01-e10ba8786e53"
 	dummyRequestUUID = "x123xx1x-123x-1x12-123x-123xxx123x1x"
 )
+
 var emptyCtx = context.Background()
 var dummyTimeOriginal, _ = time.Parse(gsTimeLayout, "2018-04-28T09:47:41Z")
 var dummyTime = GSTime{dummyTimeOriginal}
