@@ -232,21 +232,12 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 						testStorageID.testUUID,
 						testSnapshotID.testUUID,
 						StorageSnapshotExportToS3Request{
-							S3auth: struct {
-								Host      string `json:"host"`
-								AccessKey string `json:"access_key"`
-								SecretKey string `json:"secret_key"`
-							}{
+							S3auth: S3auth{
 								Host:      "example.com",
 								AccessKey: "access_key",
 								SecretKey: "secret_key",
 							},
-							S3data: struct {
-								Host     string `json:"host"`
-								Bucket   string `json:"bucket"`
-								Filename string `json:"filename"`
-								Private  bool   `json:"private"`
-							}{
+							S3data: S3data{
 								Host:     "example.com",
 								Bucket:   "bucket",
 								Filename: "filename",
