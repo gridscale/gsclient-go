@@ -83,6 +83,9 @@ type NetworkRelations struct {
 
 	//Array of object (NetworkServer)
 	Servers []NetworkServer `json:"servers"`
+
+	//Array of object (NetworkPaaSSecurityZone)
+	PaaSSecurityZones []NetworkPaaSSecurityZone `json:"paas_security_zones"`
 }
 
 //NetworkVlan is JSON struct of a relation between a network and a VLAN
@@ -123,6 +126,17 @@ type NetworkServer struct {
 
 	//The ordering of the network interfaces. Lower numbers have lower PCI-IDs.
 	Ordering int `json:"ordering"`
+}
+
+type NetworkPaaSSecurityZone struct {
+	//IPv6 prefix of the PaaS service
+	IPv6Prefix string `json:"ipv6_prefix"`
+
+	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	ObjectName string `json:"object_name"`
+
+	//The UUID of an object is always unique, and refers to a specific object.
+	ObjectUUID string `json:"object_uuid"`
 }
 
 //NetworkCreateRequest is JSON of a request for creating a network
