@@ -90,7 +90,7 @@ func (c *Client) CreateServerIP(ctx context.Context, id string, body ServerIPRel
 		method: http.MethodPost,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -111,7 +111,7 @@ func (c *Client) DeleteServerIP(ctx context.Context, serverID, ipID string) erro
 		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err

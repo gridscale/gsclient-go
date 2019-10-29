@@ -109,7 +109,7 @@ func (c *Client) CreateServerIsoImage(ctx context.Context, id string, body Serve
 		method: http.MethodPost,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -130,7 +130,7 @@ func (c *Client) DeleteServerIsoImage(ctx context.Context, serverID, isoImageID 
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err

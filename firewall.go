@@ -206,7 +206,7 @@ func (c *Client) CreateFirewall(ctx context.Context, body FirewallCreateRequest)
 		return FirewallCreateResponse{}, err
 	}
 	//Block until the request is finished
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -224,7 +224,7 @@ func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpd
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -246,7 +246,7 @@ func (c *Client) DeleteFirewall(ctx context.Context, id string) error {
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -282,7 +282,7 @@ func (c *Client) waitForFirewallActive(ctx context.Context, id string) error {
 	return retryWithTimeout(func() (bool, error) {
 		fw, err := c.GetFirewall(ctx, id)
 		return fw.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForFirewallDeleted allows to wait until the firewall is deleted

@@ -235,7 +235,7 @@ func (c *Client) CreateIP(ctx context.Context, body IPCreateRequest) (IPCreateRe
 	if err != nil {
 		return IPCreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -252,7 +252,7 @@ func (c *Client) DeleteIP(ctx context.Context, id string) error {
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -275,7 +275,7 @@ func (c *Client) UpdateIP(ctx context.Context, id string, body IPUpdateRequest) 
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -357,7 +357,7 @@ func (c *Client) waitForIPActive(ctx context.Context, id string) error {
 	return retryWithTimeout(func() (bool, error) {
 		ip, err := c.GetIP(ctx, id)
 		return ip.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForIPDeleted allows to wait until the IP address is deleted

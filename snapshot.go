@@ -198,7 +198,7 @@ func (c *Client) CreateStorageSnapshot(ctx context.Context, id string, body Stor
 	if err != nil {
 		return StorageSnapshotCreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -216,7 +216,7 @@ func (c *Client) UpdateStorageSnapshot(ctx context.Context, storageID, snapshotI
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -238,7 +238,7 @@ func (c *Client) DeleteStorageSnapshot(ctx context.Context, storageID, snapshotI
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -261,7 +261,7 @@ func (c *Client) RollbackStorage(ctx context.Context, storageID, snapshotID stri
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -284,7 +284,7 @@ func (c *Client) ExportStorageSnapshotToS3(ctx context.Context, storageID, snaps
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -337,7 +337,7 @@ func (c *Client) waitForSnapshotActive(ctx context.Context, storageID, snapshotI
 	return retryWithTimeout(func() (bool, error) {
 		snapshot, err := c.GetStorageSnapshot(ctx, storageID, snapshotID)
 		return snapshot.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForSnapshotDeleted allows to wait until the snapshot is deleted

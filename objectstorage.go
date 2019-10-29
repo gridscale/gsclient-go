@@ -119,7 +119,7 @@ func (c *Client) CreateObjectStorageAccessKey(ctx context.Context) (ObjectStorag
 	if err != nil {
 		return ObjectStorageAccessKeyCreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -136,7 +136,7 @@ func (c *Client) DeleteObjectStorageAccessKey(ctx context.Context, id string) er
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err

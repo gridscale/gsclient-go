@@ -178,7 +178,7 @@ func (c *Client) CreateServerNetwork(ctx context.Context, id string, body Server
 		method: http.MethodPost,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -199,7 +199,7 @@ func (c *Client) DeleteServerNetwork(ctx context.Context, serverID, networkID st
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err

@@ -357,7 +357,7 @@ func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (Se
 	if err != nil {
 		return ServerCreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	//this fixed the endpoint's bug temporarily when creating server with/without
@@ -381,7 +381,7 @@ func (c *Client) DeleteServer(ctx context.Context, id string) error {
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -404,7 +404,7 @@ func (c *Client) UpdateServer(ctx context.Context, id string, body ServerUpdateR
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -485,7 +485,7 @@ func (c *Client) setServerPowerState(ctx context.Context, id string, powerState 
 	if err != nil {
 		return err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		return c.waitForServerPowerStatus(ctx, id, powerState)
 	}
 	return nil
@@ -503,6 +503,7 @@ func (c *Client) StopServer(ctx context.Context, id string) error {
 
 //ShutdownServer shutdowns a specific server
 func (c *Client) ShutdownServer(ctx context.Context, id string) error {
+	logger := c.getLogger()
 	//Make sure the server exists and that it isn't already in the state we need it to be
 	server, err := c.GetServer(ctx, id)
 	if err != nil {
@@ -521,18 +522,18 @@ func (c *Client) ShutdownServer(ctx context.Context, id string) error {
 	if err != nil {
 		if requestError, ok := err.(RequestError); ok {
 			if requestError.StatusCode == 500 {
-				c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
+				logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
 				return c.StopServer(ctx, id)
 			}
 		}
 		return err
 	}
 
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		//If we get an error, which includes a timeout, power off the server instead
 		err = c.waitForServerPowerStatus(ctx, id, false)
 		if err != nil {
-			c.cfg.logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
+			logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
 			return c.StopServer(ctx, id)
 		}
 	}
@@ -581,7 +582,7 @@ func (c *Client) waitForServerPowerStatus(ctx context.Context, id string, status
 	return retryWithTimeout(func() (bool, error) {
 		server, err := c.GetServer(ctx, id)
 		return server.Properties.Power != status, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForServerActive allows to wait until the server's status is active
@@ -589,7 +590,7 @@ func (c *Client) waitForServerActive(ctx context.Context, id string) error {
 	return retryWithTimeout(func() (bool, error) {
 		server, err := c.GetServer(ctx, id)
 		return server.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForServerDeleted allows to wait until the server is deleted

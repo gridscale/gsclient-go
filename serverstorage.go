@@ -148,7 +148,7 @@ func (c *Client) CreateServerStorage(ctx context.Context, id string, body Server
 		method: http.MethodPost,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -169,7 +169,7 @@ func (c *Client) DeleteServerStorage(ctx context.Context, serverID, storageID st
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err

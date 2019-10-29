@@ -175,7 +175,7 @@ func (c *Client) CreateTemplate(ctx context.Context, body TemplateCreateRequest)
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -193,7 +193,7 @@ func (c *Client) UpdateTemplate(ctx context.Context, id string, body TemplateUpd
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -215,7 +215,7 @@ func (c *Client) DeleteTemplate(ctx context.Context, id string) error {
 		uri:    path.Join(apiTemplateBase, id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -288,7 +288,7 @@ func (c *Client) waitForTemplateActive(ctx context.Context, id string) error {
 	return retryWithTimeout(func() (bool, error) {
 		template, err := c.GetTemplate(ctx, id)
 		return template.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForTemplateDeleted allows to wait until the template is deleted

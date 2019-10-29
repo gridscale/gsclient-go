@@ -179,7 +179,7 @@ func (c *Client) CreateStorageSnapshotSchedule(ctx context.Context, id string, b
 	if err != nil {
 		return StorageSnapshotScheduleCreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -198,7 +198,7 @@ func (c *Client) UpdateStorageSnapshotSchedule(ctx context.Context, storageID, s
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -220,7 +220,7 @@ func (c *Client) DeleteStorageSnapshotSchedule(ctx context.Context, storageID, s
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -236,7 +236,7 @@ func (c *Client) waitForSnapshotScheduleActive(ctx context.Context, storageID, s
 	return retryWithTimeout(func() (bool, error) {
 		schedule, err := c.GetStorageSnapshotSchedule(ctx, storageID, scheduleID)
 		return schedule.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForSnapshotScheduleDeleted allows to wait until the snapshot schedule deleted

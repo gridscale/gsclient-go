@@ -204,7 +204,7 @@ func (c *Client) CreateNetwork(ctx context.Context, body NetworkCreateRequest) (
 	if err != nil {
 		return NetworkCreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -221,7 +221,7 @@ func (c *Client) DeleteNetwork(ctx context.Context, id string) error {
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -244,7 +244,7 @@ func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdat
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -350,7 +350,7 @@ func (c *Client) waitForNetworkActive(ctx context.Context, id string) error {
 	return retryWithTimeout(func() (bool, error) {
 		net, err := c.GetNetwork(ctx, id)
 		return net.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForNetworkDeleted allows to wait until the network is deleted

@@ -74,7 +74,7 @@ func (c *Client) CreateLabel(ctx context.Context, body LabelCreateRequest) (Crea
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -91,7 +91,7 @@ func (c *Client) DeleteLabel(ctx context.Context, label string) error {
 		uri:    path.Join(apiLabelBase, label),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -109,7 +109,7 @@ func (c *Client) waitForLabelDeleted(ctx context.Context, label string) error {
 	return retryWithTimeout(func() (bool, error) {
 		labels, err := c.GetLabelList(ctx)
 		return isLabelInSlice(label, labels), err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //isLabelInSlice check if a label in a lice of labels

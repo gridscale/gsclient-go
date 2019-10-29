@@ -119,7 +119,7 @@ func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (Cr
 	if err != nil {
 		return CreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -136,7 +136,7 @@ func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -159,7 +159,7 @@ func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateR
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -195,7 +195,7 @@ func (c *Client) waitForSSHKeyActive(ctx context.Context, id string) error {
 	return retryWithTimeout(func() (bool, error) {
 		key, err := c.GetSshkey(ctx, id)
 		return key.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForSSHKeyDeleted allows to wait until the SSH-Key is deleted

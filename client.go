@@ -3,8 +3,11 @@ package gsclient
 import (
 	"context"
 	"errors"
+	"github.com/sirupsen/logrus"
+	"net/http"
 	"path"
 	"strings"
+	"time"
 )
 
 const (
@@ -39,11 +42,42 @@ func NewClient(c *Config) *Client {
 	return client
 }
 
+//getLogger returns logger
+func (c *Client) getLogger() logrus.Logger {
+	return c.cfg.logger
+}
+
+//getHttpClient returns http client
+func (c *Client) getHttpClient() *http.Client {
+	return c.cfg.httpClient
+}
+
+//isSynchronous returns if the client is sync or not
+func (c *Client) isSynchronous() bool {
+	return c.cfg.sync
+}
+
+//getRequestCheckTimeout returns request check timeout
+func (c *Client) getRequestCheckTimeout() time.Duration {
+	return c.cfg.requestCheckTimeoutSecs
+}
+
+//getDelayInterval returns request delay interval
+func (c *Client) getDelayInterval() time.Duration {
+	return c.cfg.delayInterval
+}
+
+//getMaxNumberOfRetries returns max number of retries
+func (c *Client) getMaxNumberOfRetries() int {
+	return c.cfg.maxNumberOfRetries
+}
+
 //waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 	if strings.TrimSpace(id) == "" {
 		return errors.New("'id' is required")
 	}
+	logger := c.getLogger()
 	return retryWithTimeout(func() (bool, error) {
 		r := Request{
 			uri:    path.Join(requestBase, id),
@@ -55,11 +89,11 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 			return false, err
 		}
 		if response[id].Status == requestDoneStatus {
-			c.cfg.logger.Info("Done with creating")
+			logger.Info("Done with creating")
 			return false, nil
 		}
 		return true, nil
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitFor404Status waits until server returns 404 status code
@@ -80,7 +114,7 @@ func (c *Client) waitFor404Status(ctx context.Context, uri, method string) error
 			return false, err
 		}
 		return true, nil
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitFor200Status waits until server returns 200 (OK) status code
@@ -101,5 +135,5 @@ func (c *Client) waitFor200Status(ctx context.Context, uri, method string) error
 			return false, err
 		}
 		return false, nil
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }

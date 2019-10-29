@@ -396,7 +396,7 @@ func (c *Client) CreatePaaSService(ctx context.Context, body PaaSServiceCreateRe
 	if err != nil {
 		return PaaSServiceCreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -430,7 +430,7 @@ func (c *Client) UpdatePaaSService(ctx context.Context, id string, body PaaSServ
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -452,7 +452,7 @@ func (c *Client) DeletePaaSService(ctx context.Context, id string) error {
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -538,7 +538,7 @@ func (c *Client) CreatePaaSSecurityZone(ctx context.Context, body PaaSSecurityZo
 	if err != nil {
 		return PaaSSecurityZoneCreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -572,7 +572,7 @@ func (c *Client) UpdatePaaSSecurityZone(ctx context.Context, id string, body Paa
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -594,7 +594,7 @@ func (c *Client) DeletePaaSSecurityZone(ctx context.Context, id string) error {
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -629,7 +629,7 @@ func (c *Client) waitForPaaSServiceActive(ctx context.Context, id string) error 
 	return retryWithTimeout(func() (bool, error) {
 		paas, err := c.GetPaaSService(ctx, id)
 		return paas.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForPaaSServiceDeleted allows to wait until the PaaS service is deleted
@@ -647,7 +647,7 @@ func (c *Client) waitForSecurityZoneActive(ctx context.Context, id string) error
 	return retryWithTimeout(func() (bool, error) {
 		secZone, err := c.GetPaaSSecurityZone(ctx, id)
 		return secZone.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForSecurityZoneDeleted allows to wait until the security zone is deleted

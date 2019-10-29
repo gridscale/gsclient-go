@@ -62,7 +62,10 @@ const requestUUIDHeaderParam = "X-Request-Id"
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *Request) execute(ctx context.Context, c Client, output interface{}) error {
 	url := c.cfg.apiURL + r.uri
-	c.cfg.logger.Debugf("%v request sent to URL: %v", r.method, url)
+	logger := c.getLogger()
+	httpClient := c.getHttpClient()
+
+	logger.Debugf("%v request sent to URL: %v", r.method, url)
 
 	//Convert the body of the request to json
 	jsonBody := new(bytes.Buffer)
@@ -83,23 +86,23 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 	request.Header.Add("X-Auth-UserID", c.cfg.userUUID)
 	request.Header.Add("X-Auth-Token", c.cfg.apiToken)
 	request.Header.Add("Content-Type", "application/json")
-	c.cfg.logger.Debugf("Request body: %v", request.Body)
+	logger.Debugf("Request body: %v", request.Body)
 	return retryWithLimitedNumOfRetries(func() (bool, error) {
 		//execute the request
-		result, err := c.cfg.httpClient.Do(request)
+		result, err := httpClient.Do(request)
 		if err != nil {
-			c.cfg.logger.Errorf("Error while executing the request: %v", err)
+			logger.Errorf("Error while executing the request: %v", err)
 			return false, err
 		}
 		statusCode := result.StatusCode
 		requestUUID := result.Header.Get(requestUUIDHeaderParam)
 		iostream, err := ioutil.ReadAll(result.Body)
 		if err != nil {
-			c.cfg.logger.Errorf("Error while reading the response's body: %v", err)
+			logger.Errorf("Error while reading the response's body: %v", err)
 			return false, err
 		}
 
-		c.cfg.logger.Debugf("Status code: %v. Request UUID: %v.", statusCode, requestUUID)
+		logger.Debugf("Status code: %v. Request UUID: %v.", statusCode, requestUUID)
 
 		if result.StatusCode >= 300 {
 			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
@@ -111,10 +114,10 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 				return true, errorMessage
 			}
 			if r.skipPrint404 && result.StatusCode == 404 {
-				c.cfg.logger.Debug("Skip 404 error code.")
+				logger.Debug("Skip 404 error code.")
 				return false, errorMessage
 			}
-			c.cfg.logger.Errorf(
+			logger.Errorf(
 				"Error message: %v. Title: %v. Code: %v. Request UUID: %v.",
 				errorMessage.Description,
 				errorMessage.Title,
@@ -123,15 +126,15 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 			)
 			return false, errorMessage
 		}
-		c.cfg.logger.Debugf("Response body: %v", string(iostream))
+		logger.Debugf("Response body: %v", string(iostream))
 		//if output is set
 		if output != nil {
 			err = json.Unmarshal(iostream, output) //Edit the given struct
 			if err != nil {
-				c.cfg.logger.Errorf("Error while marshaling JSON: %v", err)
+				logger.Errorf("Error while marshaling JSON: %v", err)
 				return false, err
 			}
 		}
 		return false, nil
-	}, c.cfg.maxNumberOfRetries, c.cfg.delayInterval)
+	}, c.getMaxNumberOfRetries(), c.getDelayInterval())
 }

@@ -236,7 +236,7 @@ func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreate
 	if err != nil {
 		return LoadBalancerCreateResponse{}, err
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
 	}
 	return response, err
@@ -259,7 +259,7 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBal
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -301,7 +301,7 @@ func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
+	if c.isSynchronous() {
 		err := r.execute(ctx, *c, nil)
 		if err != nil {
 			return err
@@ -317,7 +317,7 @@ func (c *Client) waitForLoadbalancerActive(ctx context.Context, id string) error
 	return retryWithTimeout(func() (bool, error) {
 		lb, err := c.GetLoadBalancer(ctx, id)
 		return lb.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }
 
 //waitForLoadbalancerDeleted allows to wait until the loadbalancer is deleted
