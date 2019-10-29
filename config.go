@@ -17,6 +17,7 @@ const (
 	resourceActiveStatus           = "active"
 	requestDoneStatus              = "done"
 	requestFailStatus              = "failed"
+	bodyType                       = "application/json"
 )
 
 //Config config for client

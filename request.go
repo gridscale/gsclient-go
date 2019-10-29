@@ -85,7 +85,7 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 	request.Header.Set("User-Agent", c.getUserAgent())
 	request.Header.Add("X-Auth-UserID", c.getUserUUID())
 	request.Header.Add("X-Auth-Token", c.getAPIToken())
-	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("Content-Type", bodyType)
 	logger.Debugf("Request body: %v", request.Body)
 	return retryWithLimitedNumOfRetries(func() (bool, error) {
 		//execute the request
@@ -138,4 +138,3 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 		return false, nil
 	}, c.getMaxNumberOfRetries(), c.getDelayInterval())
 }
-
