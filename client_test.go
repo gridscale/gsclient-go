@@ -26,7 +26,7 @@ func TestClient_waitForRequestCompleted(t *testing.T) {
 			isFailed = serverTest.isFailed
 			for _, testUUID := range uuidCommonTestCases {
 				err := client.waitForRequestCompleted(emptyCtx, testUUID.testUUID)
-				if isFailed || reqStatus != requestDoneStatus || testUUID.isFailed {
+				if isFailed || reqStatus != requestDoneStatus || testUUID.isFailed || reqStatus == requestFailStatus {
 					assert.NotNil(t, err)
 				} else {
 					assert.Nil(t, err, "waitForRequestCompleted returned an error %v", err)
