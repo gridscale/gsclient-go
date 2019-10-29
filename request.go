@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 //Request gridscale's custom request struct
 type Request struct {
-	uri          string
-	method       string
-	skipPrint404 bool
-	body         interface{}
+	uri    string
+	method string
+	body   interface{}
 }
 
 //CreateResponse common struct of a response for creation
@@ -87,7 +87,13 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 	request.Header.Add("X-Auth-Token", c.getAPIToken())
 	request.Header.Add("Content-Type", bodyType)
 	logger.Debugf("Request body: %v", request.Body)
-	return retryWithLimitedNumOfRetries(func() (bool, error) {
+
+	//Init request UUID variable
+	var requestUUID string
+	//Init empty response body
+	var responseBodyBytes []byte
+	//
+	err = retryWithLimitedNumOfRetries(func() (bool, error) {
 		//execute the request
 		result, err := httpClient.Do(request)
 		if err != nil {
@@ -95,8 +101,8 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 			return false, err
 		}
 		statusCode := result.StatusCode
-		requestUUID := result.Header.Get(requestUUIDHeaderParam)
-		iostream, err := ioutil.ReadAll(result.Body)
+		requestUUID = result.Header.Get(requestUUIDHeaderParam)
+		responseBodyBytes, err = ioutil.ReadAll(result.Body)
 		if err != nil {
 			logger.Errorf("Error while reading the response's body: %v", err)
 			return false, err
@@ -108,14 +114,10 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 			errorMessage.StatusCode = statusCode
 			errorMessage.RequestUUID = requestUUID
-			json.Unmarshal(iostream, &errorMessage)
+			json.Unmarshal(responseBodyBytes, &errorMessage)
 			//if internal server error OR object is in status that does not allow the request, retry
 			if result.StatusCode >= 500 || result.StatusCode == 424 {
 				return true, errorMessage
-			}
-			if r.skipPrint404 && result.StatusCode == 404 {
-				logger.Debug("Skip 404 error code.")
-				return false, errorMessage
 			}
 			logger.Errorf(
 				"Error message: %v. Title: %v. Code: %v. Request UUID: %v.",
@@ -126,15 +128,28 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 			)
 			return false, errorMessage
 		}
-		logger.Debugf("Response body: %v", string(iostream))
-		//if output is set
-		if output != nil {
-			err = json.Unmarshal(iostream, output) //Edit the given struct
-			if err != nil {
-				logger.Errorf("Error while marshaling JSON: %v", err)
-				return false, err
-			}
-		}
+		logger.Debugf("Response body: %v", string(responseBodyBytes))
+
 		return false, nil
 	}, c.getMaxNumberOfRetries(), c.getDelayInterval())
+	//if retry fails
+	if err != nil {
+		return err
+	}
+
+	//if output is set
+	if output != nil {
+		//Unmarshal body bytes to the given struct
+		err = json.Unmarshal(responseBodyBytes, output)
+		if err != nil {
+			logger.Errorf("Error while marshaling JSON: %v", err)
+			return err
+		}
+	}
+
+	//If the client is synchronous, wait until the request completes
+	if c.isSynchronous() && !strings.Contains(r.uri, requestBase) {
+		return c.waitForRequestCompleted(ctx, requestUUID)
+	}
+	return nil
 }
