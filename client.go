@@ -72,6 +72,26 @@ func (c *Client) getMaxNumberOfRetries() int {
 	return c.cfg.maxNumberOfRetries
 }
 
+//getAPIURL returns api URL
+func (c *Client) getAPIURL() string {
+	return c.cfg.apiURL
+}
+
+//getUserAgent returns user agent
+func (c *Client) getUserAgent() string {
+	return c.cfg.userAgent
+}
+
+//getUserUUID returns user UUID
+func (c *Client) getUserUUID() string {
+	return c.cfg.userUUID
+}
+
+//getAPIToken returns api token
+func (c *Client) getAPIToken() string {
+	return c.cfg.apiToken
+}
+
 //waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 	if strings.TrimSpace(id) == "" {
