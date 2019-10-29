@@ -3,6 +3,7 @@ package gsclient
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"path"
@@ -111,6 +112,9 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 		if response[id].Status == requestDoneStatus {
 			logger.Info("Done with creating")
 			return false, nil
+		} else if response[id].Status == requestFailStatus {
+			errMessage := fmt.Sprintf("request %s failed with error %s", id, response[id].Message)
+			return false, errors.New(errMessage)
 		}
 		return true, nil
 	}, c.getRequestCheckTimeout(), c.getDelayInterval())
