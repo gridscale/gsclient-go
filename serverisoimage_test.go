@@ -15,6 +15,7 @@ func TestClient_GetServerIsoImageList(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "isoimages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareServerIsoImageListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -35,6 +36,7 @@ func TestClient_GetServerIsoImage(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "isoimages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareServerIsoImageHTTPGet())
 	})
 	for _, testServerID := range uuidCommonTestCases {
@@ -51,52 +53,46 @@ func TestClient_GetServerIsoImage(t *testing.T) {
 }
 
 func TestClient_CreateServerIsoImage(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiServerBase, dummyUUID, "isoimages")
-		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-			assert.Equal(t, http.MethodPost, request.Method)
-			if isFailed {
-				writer.WriteHeader(400)
-			} else {
-				fmt.Fprint(writer, "")
-			}
-		})
-		if clientTest {
-			mux.HandleFunc(path.Join(apiServerBase, dummyUUID, "isoimages", dummyUUID), func(writer http.ResponseWriter, request *http.Request) {
-				assert.Equal(t, http.MethodGet, request.Method)
-				fmt.Fprintf(writer, prepareServerIPHTTPGet())
-			})
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiServerBase, dummyUUID, "isoimages")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodPost, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			fmt.Fprint(writer, "")
 		}
-		for _, test := range commonSuccessFailTestCases {
-			isFailed = test.isFailed
-			for _, testServerID := range uuidCommonTestCases {
-				for _, testISOImageID := range uuidCommonTestCases {
-					err := client.CreateServerIsoImage(
-						emptyCtx,
-						testServerID.testUUID,
-						ServerIsoImageRelationCreateRequest{
-							ObjectUUID: testISOImageID.testUUID,
-						})
-					if testServerID.isFailed || testISOImageID.isFailed || isFailed {
-						assert.NotNil(t, err)
-					} else {
-						assert.Nil(t, err, "CreateServerIsoImage returned an error %v", err)
-					}
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		for _, testServerID := range uuidCommonTestCases {
+			for _, testISOImageID := range uuidCommonTestCases {
+				err := client.CreateServerIsoImage(
+					emptyCtx,
+					testServerID.testUUID,
+					ServerIsoImageRelationCreateRequest{
+						ObjectUUID: testISOImageID.testUUID,
+					})
+				if testServerID.isFailed || testISOImageID.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "CreateServerIsoImage returned an error %v", err)
 				}
 			}
 		}
-		server.Close()
 	}
 }
 
 func TestClient_UpdateServerIsoImage(t *testing.T) {
-	server, client, mux := setupTestClient(false)
+	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "isoimages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(writer, "")
 	})
 	for _, testServerID := range uuidCommonTestCases {
@@ -119,35 +115,35 @@ func TestClient_UpdateServerIsoImage(t *testing.T) {
 }
 
 func TestClient_DeleteServerIsoImage(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiServerBase, dummyUUID, "isoimages", dummyUUID)
-		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-			if isFailed {
-				writer.WriteHeader(400)
-			} else {
-				if request.Method == http.MethodDelete {
-					fmt.Fprintf(writer, "")
-				} else if request.Method == http.MethodGet {
-					writer.WriteHeader(404)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiServerBase, dummyUUID, "isoimages", dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			if request.Method == http.MethodDelete {
+				fmt.Fprintf(writer, "")
+			} else if request.Method == http.MethodGet {
+				writer.WriteHeader(404)
 			}
-		})
-		for _, test := range commonSuccessFailTestCases {
-			isFailed = test.isFailed
-			for _, testServerID := range uuidCommonTestCases {
-				for _, testISOImageID := range uuidCommonTestCases {
-					err := client.DeleteServerIsoImage(emptyCtx, testServerID.testUUID, testISOImageID.testUUID)
-					if testServerID.isFailed || testISOImageID.isFailed || isFailed {
-						assert.NotNil(t, err)
-					} else {
-						assert.Nil(t, err, "DeleteServerIsoImage returned an error %v", err)
-					}
+		}
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		for _, testServerID := range uuidCommonTestCases {
+			for _, testISOImageID := range uuidCommonTestCases {
+				err := client.DeleteServerIsoImage(emptyCtx, testServerID.testUUID, testISOImageID.testUUID)
+				if testServerID.isFailed || testISOImageID.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "DeleteServerIsoImage returned an error %v", err)
 				}
 			}
 		}
-		server.Close()
 	}
 }
 
@@ -157,11 +153,8 @@ func TestClient_LinkIsoImage(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "isoimages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(writer, "")
-	})
-	mux.HandleFunc(path.Join(apiServerBase, dummyUUID, "isoimages", dummyUUID), func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareServerIPHTTPGet())
 	})
 	err := client.LinkIsoImage(emptyCtx, dummyUUID, dummyUUID)
 	assert.Nil(t, err, "LinkIsoImage returned an error %v", err)
@@ -173,6 +166,7 @@ func TestClient_UnlinkIsoImage(t *testing.T) {
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "isoimages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		if request.Method == http.MethodDelete {
 			fmt.Fprintf(writer, "")
 		} else if request.Method == http.MethodGet {
@@ -181,46 +175,6 @@ func TestClient_UnlinkIsoImage(t *testing.T) {
 	})
 	err := client.UnlinkIsoImage(emptyCtx, dummyUUID, dummyUUID)
 	assert.Nil(t, err, "UnlinkIsoImage returned an error %v", err)
-}
-
-func TestClient_waitForServerISOImageRelCreation(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUUID, "isoimages", dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodGet, request.Method)
-		fmt.Fprintf(writer, prepareServerIsoImageHTTPGet())
-	})
-	for _, testServerID := range uuidCommonTestCases {
-		for _, testIPID := range uuidCommonTestCases {
-			err := client.waitForServerISOImageRelCreation(emptyCtx, testServerID.testUUID, testIPID.testUUID)
-			if testServerID.isFailed || testIPID.isFailed {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForServerISOImageRelCreation returned an error %v", err)
-			}
-		}
-	}
-}
-
-func TestClient_waitForServerISOImageRelDeleted(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiServerBase, dummyUUID, "isoimages", dummyUUID)
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodGet, request.Method)
-		writer.WriteHeader(404)
-	})
-	for _, testServerID := range uuidCommonTestCases {
-		for _, testIPID := range uuidCommonTestCases {
-			err := client.waitForServerISOImageRelDeleted(emptyCtx, testServerID.testUUID, testIPID.testUUID)
-			if testServerID.isFailed || testIPID.isFailed {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "waitForServerISOImageRelDeleted returned an error %v", err)
-			}
-		}
-	}
 }
 
 func getMockServerIsoImage(name string) ServerIsoImageRelationProperties {
