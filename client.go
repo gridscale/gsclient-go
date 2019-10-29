@@ -7,7 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"path"
-	"strings"
 	"time"
 )
 
@@ -95,8 +94,8 @@ func (c *Client) getAPIToken() string {
 
 //waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
-	if strings.TrimSpace(id) == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	logger := c.getLogger()
 	return retryWithTimeout(func() (bool, error) {
