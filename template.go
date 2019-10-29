@@ -172,12 +172,6 @@ func (c *Client) CreateTemplate(ctx context.Context, body TemplateCreateRequest)
 	}
 	var response CreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return CreateResponse{}, err
-	}
-	if c.isSynchronous() {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -193,14 +187,6 @@ func (c *Client) UpdateTemplate(ctx context.Context, id string, body TemplateUpd
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForTemplateActive(ctx, id)
-	}
 	return r.execute(ctx, *c, nil)
 }
 
@@ -214,14 +200,6 @@ func (c *Client) DeleteTemplate(ctx context.Context, id string) error {
 	r := Request{
 		uri:    path.Join(apiTemplateBase, id),
 		method: http.MethodDelete,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForTemplateDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -281,22 +259,4 @@ func (c *Client) GetDeletedTemplates(ctx context.Context) ([]Template, error) {
 		templates = append(templates, Template{Properties: properties})
 	}
 	return templates, err
-}
-
-//waitForTemplateActive allows to wait until the template's status is active
-func (c *Client) waitForTemplateActive(ctx context.Context, id string) error {
-	return retryWithTimeout(func() (bool, error) {
-		template, err := c.GetTemplate(ctx, id)
-		return template.Properties.Status != resourceActiveStatus, err
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
-}
-
-//waitForTemplateDeleted allows to wait until the template is deleted
-func (c *Client) waitForTemplateDeleted(ctx context.Context, id string) error {
-	if !isValidUUID(id) {
-		return errors.New("'id' is invalid")
-	}
-	uri := path.Join(apiTemplateBase, id)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

@@ -201,12 +201,6 @@ func (c *Client) CreateNetwork(ctx context.Context, body NetworkCreateRequest) (
 	}
 	var response NetworkCreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return NetworkCreateResponse{}, err
-	}
-	if c.isSynchronous() {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -220,14 +214,6 @@ func (c *Client) DeleteNetwork(ctx context.Context, id string) error {
 	r := Request{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForNetworkDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -243,14 +229,6 @@ func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdat
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForNetworkActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -343,22 +321,4 @@ func (c *Client) GetDeletedNetworks(ctx context.Context) ([]Network, error) {
 		networks = append(networks, Network{Properties: properties})
 	}
 	return networks, err
-}
-
-//waitForNetworkActive allows to wait until the network's status is active
-func (c *Client) waitForNetworkActive(ctx context.Context, id string) error {
-	return retryWithTimeout(func() (bool, error) {
-		net, err := c.GetNetwork(ctx, id)
-		return net.Properties.Status != resourceActiveStatus, err
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
-}
-
-//waitForNetworkDeleted allows to wait until the network is deleted
-func (c *Client) waitForNetworkDeleted(ctx context.Context, id string) error {
-	if !isValidUUID(id) {
-		return errors.New("'id' is invalid")
-	}
-	uri := path.Join(apiNetworkBase, id)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

@@ -148,13 +148,6 @@ func (c *Client) CreateServerStorage(ctx context.Context, id string, body Server
 		method: http.MethodPost,
 		body:   body,
 	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerStorageRelCreation(ctx, id, body.ObjectUUID)
-	}
 	return r.execute(ctx, *c, nil)
 }
 
@@ -168,13 +161,6 @@ func (c *Client) DeleteServerStorage(ctx context.Context, serverID, storageID st
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodDelete,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerStorageRelDeleted(ctx, serverID, storageID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -191,24 +177,4 @@ func (c *Client) LinkStorage(ctx context.Context, serverID string, storageID str
 //UnlinkStorage remove a storage from a server
 func (c *Client) UnlinkStorage(ctx context.Context, serverID string, storageID string) error {
 	return c.DeleteServerStorage(ctx, serverID, storageID)
-}
-
-//waitForServerStorageRelCreation allows to wait until the relation between a server and a storage is created
-func (c *Client) waitForServerStorageRelCreation(ctx context.Context, serverID, storageID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(storageID) {
-		return errors.New("'serverID' and 'storageID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "storages", storageID)
-	method := http.MethodGet
-	return c.waitFor200Status(ctx, uri, method)
-}
-
-//waitForServerStorageRelDeleted allows to wait until the relation between a server and a storage is deleted
-func (c *Client) waitForServerStorageRelDeleted(ctx context.Context, serverID, storageID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(storageID) {
-		return errors.New("'serverID' and 'storageID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "storages", storageID)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

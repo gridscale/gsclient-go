@@ -176,12 +176,6 @@ func (c *Client) CreateStorageSnapshotSchedule(ctx context.Context, id string, b
 	}
 	var response StorageSnapshotScheduleCreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return StorageSnapshotScheduleCreateResponse{}, err
-	}
-	if c.isSynchronous() {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -198,14 +192,6 @@ func (c *Client) UpdateStorageSnapshotSchedule(ctx context.Context, storageID, s
 		method: http.MethodPatch,
 		body:   body,
 	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSnapshotScheduleActive(ctx, storageID, scheduleID)
-	}
 	return r.execute(ctx, *c, nil)
 }
 
@@ -220,31 +206,5 @@ func (c *Client) DeleteStorageSnapshotSchedule(ctx context.Context, storageID, s
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodDelete,
 	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSnapshotScheduleDeleted(ctx, storageID, scheduleID)
-	}
 	return r.execute(ctx, *c, nil)
-}
-
-//waitForSnapshotScheduleActive allows to wait until the snapshot schedule's status is active
-func (c *Client) waitForSnapshotScheduleActive(ctx context.Context, storageID, scheduleID string) error {
-	return retryWithTimeout(func() (bool, error) {
-		schedule, err := c.GetStorageSnapshotSchedule(ctx, storageID, scheduleID)
-		return schedule.Properties.Status != resourceActiveStatus, err
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
-}
-
-//waitForSnapshotScheduleDeleted allows to wait until the snapshot schedule deleted
-func (c *Client) waitForSnapshotScheduleDeleted(ctx context.Context, storageID, scheduleID string) error {
-	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
-		return errors.New("'storageID' or 'scheduleID' is invalid")
-	}
-	uri := path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

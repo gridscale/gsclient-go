@@ -354,12 +354,6 @@ func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (Se
 	}
 	var response ServerCreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return ServerCreateResponse{}, err
-	}
-	if c.isSynchronous() {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	//this fixed the endpoint's bug temporarily when creating server with/without
 	//'relations' field
 	if response.ServerUUID == "" && response.ObjectUUID != "" {
@@ -381,14 +375,6 @@ func (c *Client) DeleteServer(ctx context.Context, id string) error {
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodDelete,
 	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForServerDeleted(ctx, id)
-	}
 	return r.execute(ctx, *c, nil)
 }
 
@@ -403,14 +389,6 @@ func (c *Client) UpdateServer(ctx context.Context, id string, body ServerUpdateR
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForServerActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -583,22 +561,4 @@ func (c *Client) waitForServerPowerStatus(ctx context.Context, id string, status
 		server, err := c.GetServer(ctx, id)
 		return server.Properties.Power != status, err
 	}, c.getRequestCheckTimeout(), c.getDelayInterval())
-}
-
-//waitForServerActive allows to wait until the server's status is active
-func (c *Client) waitForServerActive(ctx context.Context, id string) error {
-	return retryWithTimeout(func() (bool, error) {
-		server, err := c.GetServer(ctx, id)
-		return server.Properties.Status != resourceActiveStatus, err
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
-}
-
-//waitForServerDeleted allows to wait until the server is deleted
-func (c *Client) waitForServerDeleted(ctx context.Context, id string) error {
-	if !isValidUUID(id) {
-		return errors.New("'id' is invalid")
-	}
-	uri := path.Join(apiServerBase, id)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

@@ -109,13 +109,6 @@ func (c *Client) CreateServerIsoImage(ctx context.Context, id string, body Serve
 		method: http.MethodPost,
 		body:   body,
 	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerISOImageRelCreation(ctx, id, body.ObjectUUID)
-	}
 	return r.execute(ctx, *c, nil)
 }
 
@@ -129,13 +122,6 @@ func (c *Client) DeleteServerIsoImage(ctx context.Context, serverID, isoImageID 
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerISOImageRelDeleted(ctx, serverID, isoImageID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -151,24 +137,4 @@ func (c *Client) LinkIsoImage(ctx context.Context, serverID string, isoimageID s
 //UnlinkIsoImage removes the link between an ISO image and a server
 func (c *Client) UnlinkIsoImage(ctx context.Context, serverID string, isoimageID string) error {
 	return c.DeleteServerIsoImage(ctx, serverID, isoimageID)
-}
-
-//waitForServerISOImageRelCreation allows to wait until the relation between a server and an ISO-Image is created
-func (c *Client) waitForServerISOImageRelCreation(ctx context.Context, serverID, isoimageID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
-		return errors.New("'serverID' and 'isoimageID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
-	method := http.MethodGet
-	return c.waitFor200Status(ctx, uri, method)
-}
-
-//waitForServerISOImageRelDeleted allows to wait until the relation between a server and an ISO-Image is deleted
-func (c *Client) waitForServerISOImageRelDeleted(ctx context.Context, serverID, isoimageID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
-		return errors.New("'serverID' and 'isoimageID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

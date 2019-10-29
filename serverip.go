@@ -90,13 +90,6 @@ func (c *Client) CreateServerIP(ctx context.Context, id string, body ServerIPRel
 		method: http.MethodPost,
 		body:   body,
 	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerIPRelCreation(ctx, id, body.ObjectUUID)
-	}
 	return r.execute(ctx, *c, nil)
 }
 
@@ -110,13 +103,6 @@ func (c *Client) DeleteServerIP(ctx context.Context, serverID, ipID string) erro
 	r := Request{
 		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
 		method: http.MethodDelete,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerIPRelDeleted(ctx, serverID, ipID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -132,24 +118,4 @@ func (c *Client) LinkIP(ctx context.Context, serverID string, ipID string) error
 //UnlinkIP removes a link between an IP and a server
 func (c *Client) UnlinkIP(ctx context.Context, serverID string, ipID string) error {
 	return c.DeleteServerIP(ctx, serverID, ipID)
-}
-
-//waitForServerIPRelCreation allows to wait until the relation between a server and an IP address is created
-func (c *Client) waitForServerIPRelCreation(ctx context.Context, serverID, ipID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(ipID) {
-		return errors.New("'serverID' and 'ipID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "ips", ipID)
-	method := http.MethodGet
-	return c.waitFor200Status(ctx, uri, method)
-}
-
-//waitForServerIPRelDeleted allows to wait until the relation between a server and an IP address is deleted
-func (c *Client) waitForServerIPRelDeleted(ctx context.Context, serverID, ipID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(ipID) {
-		return errors.New("'serverID' and 'ipID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "ips", ipID)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

@@ -97,7 +97,6 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	logger := c.getLogger()
 	return retryWithTimeout(func() (bool, error) {
 		r := Request{
 			uri:    path.Join(requestBase, id),
@@ -109,54 +108,11 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 			return false, err
 		}
 		if response[id].Status == requestDoneStatus {
-			logger.Info("Done with creating")
 			return false, nil
 		} else if response[id].Status == requestFailStatus {
 			errMessage := fmt.Sprintf("request %s failed with error %s", id, response[id].Message)
 			return false, errors.New(errMessage)
 		}
 		return true, nil
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
-}
-
-//waitFor404Status waits until server returns 404 status code
-func (c *Client) waitFor404Status(ctx context.Context, uri, method string) error {
-	return retryWithTimeout(func() (bool, error) {
-		r := Request{
-			uri:          uri,
-			method:       method,
-			skipPrint404: true,
-		}
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			if requestError, ok := err.(RequestError); ok {
-				if requestError.StatusCode == 404 {
-					return false, nil
-				}
-			}
-			return false, err
-		}
-		return true, nil
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
-}
-
-//waitFor200Status waits until server returns 200 (OK) status code
-func (c *Client) waitFor200Status(ctx context.Context, uri, method string) error {
-	return retryWithTimeout(func() (bool, error) {
-		r := Request{
-			uri:          uri,
-			method:       method,
-			skipPrint404: true,
-		}
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			if requestError, ok := err.(RequestError); ok {
-				if requestError.StatusCode == 404 {
-					return true, nil
-				}
-			}
-			return false, err
-		}
-		return false, nil
 	}, c.getRequestCheckTimeout(), c.getDelayInterval())
 }

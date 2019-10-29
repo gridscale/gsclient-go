@@ -116,12 +116,6 @@ func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (Cr
 	}
 	var response CreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return CreateResponse{}, err
-	}
-	if c.isSynchronous() {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -135,14 +129,6 @@ func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
 	r := Request{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodDelete,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSSHKeyDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -158,14 +144,6 @@ func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateR
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSSHKeyActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -188,22 +166,4 @@ func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, er
 		sshEvents = append(sshEvents, Event{Properties: properties})
 	}
 	return sshEvents, err
-}
-
-//waitForSSHKeyActive allows to wait until the SSH-Key's status is active
-func (c *Client) waitForSSHKeyActive(ctx context.Context, id string) error {
-	return retryWithTimeout(func() (bool, error) {
-		key, err := c.GetSshkey(ctx, id)
-		return key.Properties.Status != resourceActiveStatus, err
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
-}
-
-//waitForSSHKeyDeleted allows to wait until the SSH-Key is deleted
-func (c *Client) waitForSSHKeyDeleted(ctx context.Context, id string) error {
-	if !isValidUUID(id) {
-		return errors.New("'id' is invalid")
-	}
-	uri := path.Join(apiSshkeyBase, id)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

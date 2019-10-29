@@ -296,12 +296,6 @@ func (c *Client) CreateStorage(ctx context.Context, body StorageCreateRequest) (
 	}
 	var response CreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return CreateResponse{}, err
-	}
-	if c.isSynchronous() {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -315,14 +309,6 @@ func (c *Client) DeleteStorage(ctx context.Context, id string) error {
 	r := Request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodDelete,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForStorageDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -338,14 +324,6 @@ func (c *Client) UpdateStorage(ctx context.Context, id string, body StorageUpdat
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.isSynchronous() {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForStorageActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -405,22 +383,4 @@ func (c *Client) GetDeletedStorages(ctx context.Context) ([]Storage, error) {
 		storages = append(storages, Storage{Properties: properties})
 	}
 	return storages, err
-}
-
-//waitForStorageActive allows to wait until the storage's status is active
-func (c *Client) waitForStorageActive(ctx context.Context, id string) error {
-	return retryWithTimeout(func() (bool, error) {
-		storage, err := c.GetStorage(ctx, id)
-		return storage.Properties.Status != resourceActiveStatus, err
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
-}
-
-//waitForStorageDeleted allows to wait until the storage is deleted
-func (c *Client) waitForStorageDeleted(ctx context.Context, id string) error {
-	if !isValidUUID(id) {
-		return errors.New("'id' is invalid")
-	}
-	uri := path.Join(apiStorageBase, id)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }
