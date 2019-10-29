@@ -8,7 +8,7 @@ import (
 )
 
 func TestClient_waitForRequestCompleted(t *testing.T) {
-	requestTestCases := []string{"done", "not-done"}
+	requestTestCases := []string{"done", "failed", "pending"}
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
