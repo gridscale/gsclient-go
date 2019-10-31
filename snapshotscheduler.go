@@ -132,7 +132,7 @@ func (c *Client) GetStorageSnapshotScheduleList(ctx context.Context, id string) 
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, id, "snapshot_schedules"),
 		method: http.MethodGet,
 	}
@@ -152,7 +152,7 @@ func (c *Client) GetStorageSnapshotSchedule(ctx context.Context, storageID, sche
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return StorageSnapshotSchedule{}, errors.New("'storageID' or 'scheduleID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodGet,
 	}
@@ -169,7 +169,7 @@ func (c *Client) CreateStorageSnapshotSchedule(ctx context.Context, id string, b
 	if !isValidUUID(id) {
 		return StorageSnapshotScheduleCreateResponse{}, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, id, "snapshot_schedules"),
 		method: http.MethodPost,
 		body:   body,
@@ -187,7 +187,7 @@ func (c *Client) UpdateStorageSnapshotSchedule(ctx context.Context, storageID, s
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodPatch,
 		body:   body,
@@ -202,7 +202,7 @@ func (c *Client) DeleteStorageSnapshotSchedule(ctx context.Context, storageID, s
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodDelete,
 	}

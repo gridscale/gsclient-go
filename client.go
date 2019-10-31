@@ -98,7 +98,7 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 		return errors.New("'id' is invalid")
 	}
 	return retryWithTimeout(func() (bool, error) {
-		r := Request{
+		r := request{
 			uri:               path.Join(requestBase, id),
 			method:            "GET",
 			isCheckingRequest: true,

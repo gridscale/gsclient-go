@@ -188,7 +188,7 @@ func (c *Client) GetIP(ctx context.Context, id string) (IP, error) {
 	if !isValidUUID(id) {
 		return IP{}, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodGet,
 	}
@@ -203,7 +203,7 @@ func (c *Client) GetIP(ctx context.Context, id string) (IP, error) {
 //
 //https://gridscale.io/en//api-documentation/index.html#operation/getIps
 func (c *Client) GetIPList(ctx context.Context) ([]IP, error) {
-	r := Request{
+	r := request{
 		uri:    apiIPBase,
 		method: http.MethodGet,
 	}
@@ -224,7 +224,7 @@ func (c *Client) GetIPList(ctx context.Context) ([]IP, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createIp
 func (c *Client) CreateIP(ctx context.Context, body IPCreateRequest) (IPCreateResponse, error) {
-	r := Request{
+	r := request{
 		uri:    apiIPBase,
 		method: http.MethodPost,
 		body:   body,
@@ -242,7 +242,7 @@ func (c *Client) DeleteIP(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodDelete,
 	}
@@ -256,7 +256,7 @@ func (c *Client) UpdateIP(ctx context.Context, id string, body IPUpdateRequest) 
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiIPBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -271,7 +271,7 @@ func (c *Client) GetIPEventList(ctx context.Context, id string) ([]Event, error)
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiIPBase, id, "events"),
 		method: http.MethodGet,
 	}
@@ -300,7 +300,7 @@ func (c *Client) GetIPsByLocation(ctx context.Context, id string) ([]IP, error) 
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiLocationBase, id, "ips"),
 		method: http.MethodGet,
 	}
@@ -317,7 +317,7 @@ func (c *Client) GetIPsByLocation(ctx context.Context, id string) ([]IP, error) 
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedIps
 func (c *Client) GetDeletedIPs(ctx context.Context) ([]IP, error) {
-	r := Request{
+	r := request{
 		uri:    path.Join(apiDeletedBase, "ips"),
 		method: http.MethodGet,
 	}

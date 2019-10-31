@@ -47,7 +47,7 @@ type LabelCreateRequest struct {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/GetLabels
 func (c *Client) GetLabelList(ctx context.Context) ([]Label, error) {
-	r := Request{
+	r := request{
 		uri:    apiLabelBase,
 		method: http.MethodGet,
 	}
@@ -64,7 +64,7 @@ func (c *Client) GetLabelList(ctx context.Context) ([]Label, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/CreateLabel
 func (c *Client) CreateLabel(ctx context.Context, body LabelCreateRequest) (CreateResponse, error) {
-	r := Request{
+	r := request{
 		uri:    apiLabelBase,
 		method: http.MethodPost,
 		body:   body,
@@ -81,7 +81,7 @@ func (c *Client) DeleteLabel(ctx context.Context, label string) error {
 	if label == "" {
 		return errors.New("'label' is required")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiLabelBase, label),
 		method: http.MethodDelete,
 	}

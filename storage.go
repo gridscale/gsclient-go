@@ -251,7 +251,7 @@ func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
 	if !isValidUUID(id) {
 		return Storage{}, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodGet,
 	}
@@ -264,7 +264,7 @@ func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getStorages
 func (c *Client) GetStorageList(ctx context.Context) ([]Storage, error) {
-	r := Request{
+	r := request{
 		uri:    apiStorageBase,
 		method: http.MethodGet,
 	}
@@ -289,7 +289,7 @@ func (c *Client) GetStorageList(ctx context.Context) ([]Storage, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createStorage
 func (c *Client) CreateStorage(ctx context.Context, body StorageCreateRequest) (CreateResponse, error) {
-	r := Request{
+	r := request{
 		uri:    apiStorageBase,
 		method: http.MethodPost,
 		body:   body,
@@ -306,7 +306,7 @@ func (c *Client) DeleteStorage(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodDelete,
 	}
@@ -320,7 +320,7 @@ func (c *Client) UpdateStorage(ctx context.Context, id string, body StorageUpdat
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -335,7 +335,7 @@ func (c *Client) GetStorageEventList(ctx context.Context, id string) ([]Event, e
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, id, "events"),
 		method: http.MethodGet,
 	}
@@ -355,7 +355,7 @@ func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storag
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiLocationBase, id, "storages"),
 		method: http.MethodGet,
 	}
@@ -372,7 +372,7 @@ func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storag
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedStorages
 func (c *Client) GetDeletedStorages(ctx context.Context) ([]Storage, error) {
-	r := Request{
+	r := request{
 		uri:    path.Join(apiDeletedBase, "storages"),
 		method: http.MethodGet,
 	}

@@ -53,7 +53,7 @@ func (c *Client) GetServerIPList(ctx context.Context, id string) ([]ServerIPRela
 	if id == "" {
 		return nil, errors.New("'id' is required")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "ips"),
 		method: http.MethodGet,
 	}
@@ -69,7 +69,7 @@ func (c *Client) GetServerIP(ctx context.Context, serverID, ipID string) (Server
 	if serverID == "" || ipID == "" {
 		return ServerIPRelationProperties{}, errors.New("'serverID' and 'ipID' are required")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
 		method: http.MethodGet,
 	}
@@ -85,7 +85,7 @@ func (c *Client) CreateServerIP(ctx context.Context, id string, body ServerIPRel
 	if id == "" || body.ObjectUUID == "" {
 		return errors.New("'server_id' and 'ip_id' are required")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "ips"),
 		method: http.MethodPost,
 		body:   body,
@@ -100,7 +100,7 @@ func (c *Client) DeleteServerIP(ctx context.Context, serverID, ipID string) erro
 	if serverID == "" || ipID == "" {
 		return errors.New("'serverID' and 'ipID' are required")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
 		method: http.MethodDelete,
 	}

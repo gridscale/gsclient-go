@@ -57,7 +57,7 @@ func (c *Client) GetServerIsoImageList(ctx context.Context, id string) ([]Server
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),
 		method: http.MethodGet,
 	}
@@ -73,7 +73,7 @@ func (c *Client) GetServerIsoImage(ctx context.Context, serverID, isoImageID str
 	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
 		return ServerIsoImageRelationProperties{}, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodGet,
 	}
@@ -89,7 +89,7 @@ func (c *Client) UpdateServerIsoImage(ctx context.Context, serverID, isoImageID 
 	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
 		return errors.New("'serverID' or 'isoImageID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodPatch,
 		body:   body,
@@ -104,7 +104,7 @@ func (c *Client) CreateServerIsoImage(ctx context.Context, id string, body Serve
 	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
 		return errors.New("'serverID' or 'isoImageID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),
 		method: http.MethodPost,
 		body:   body,
@@ -119,7 +119,7 @@ func (c *Client) DeleteServerIsoImage(ctx context.Context, serverID, isoImageID 
 	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
 		return errors.New("'serverID' or 'isoImageID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,
 	}

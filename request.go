@@ -9,8 +9,8 @@ import (
 	"net/http"
 )
 
-//Request gridscale's custom request struct
-type Request struct {
+//request gridscale's custom request struct
+type request struct {
 	uri               string
 	method            string
 	body              interface{}
@@ -60,7 +60,7 @@ func (r RequestError) Error() string {
 const requestUUIDHeaderParam = "X-Request-Id"
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
-func (r *Request) execute(ctx context.Context, c Client, output interface{}) error {
+func (r *request) execute(ctx context.Context, c Client, output interface{}) error {
 	url := c.cfg.apiURL + r.uri
 	logger := c.getLogger()
 	httpClient := c.getHttpClient()

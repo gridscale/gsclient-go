@@ -140,7 +140,7 @@ type ISOImageUpdateRequest struct {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getIsoimages
 func (c *Client) GetISOImageList(ctx context.Context) ([]ISOImage, error) {
-	r := Request{
+	r := request{
 		uri:    path.Join(apiISOBase),
 		method: http.MethodGet,
 	}
@@ -160,7 +160,7 @@ func (c *Client) GetISOImage(ctx context.Context, id string) (ISOImage, error) {
 	if !isValidUUID(id) {
 		return ISOImage{}, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodGet,
 	}
@@ -173,7 +173,7 @@ func (c *Client) GetISOImage(ctx context.Context, id string) (ISOImage, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createIsoimage
 func (c *Client) CreateISOImage(ctx context.Context, body ISOImageCreateRequest) (ISOImageCreateResponse, error) {
-	r := Request{
+	r := request{
 		uri:    path.Join(apiISOBase),
 		method: http.MethodPost,
 		body:   body,
@@ -190,7 +190,7 @@ func (c *Client) UpdateISOImage(ctx context.Context, id string, body ISOImageUpd
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -205,7 +205,7 @@ func (c *Client) DeleteISOImage(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiISOBase, id),
 		method: http.MethodDelete,
 	}
@@ -219,7 +219,7 @@ func (c *Client) GetISOImageEventList(ctx context.Context, id string) ([]Event, 
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiISOBase, id, "events"),
 		method: http.MethodGet,
 	}
@@ -239,7 +239,7 @@ func (c *Client) GetISOImagesByLocation(ctx context.Context, id string) ([]ISOIm
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiLocationBase, id, "isoimages"),
 		method: http.MethodGet,
 	}
@@ -256,7 +256,7 @@ func (c *Client) GetISOImagesByLocation(ctx context.Context, id string) ([]ISOIm
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedIsoimages
 func (c *Client) GetDeletedISOImages(ctx context.Context) ([]ISOImage, error) {
-	r := Request{
+	r := request{
 		uri:    path.Join(apiDeletedBase, "isoimages"),
 		method: http.MethodGet,
 	}

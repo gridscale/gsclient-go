@@ -297,7 +297,7 @@ func (c *Client) GetServer(ctx context.Context, id string) (Server, error) {
 	if !isValidUUID(id) {
 		return Server{}, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodGet,
 	}
@@ -310,7 +310,7 @@ func (c *Client) GetServer(ctx context.Context, id string) (Server, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServers
 func (c *Client) GetServerList(ctx context.Context) ([]Server, error) {
-	r := Request{
+	r := request{
 		uri:    apiServerBase,
 		method: http.MethodGet,
 	}
@@ -347,7 +347,7 @@ func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (Se
 	if body.Relations != nil && body.Relations.Storages == nil {
 		body.Relations.Storages = make([]ServerCreateRequestStorage, 0)
 	}
-	r := Request{
+	r := request{
 		uri:    apiServerBase,
 		method: http.MethodPost,
 		body:   body,
@@ -371,7 +371,7 @@ func (c *Client) DeleteServer(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodDelete,
 	}
@@ -385,7 +385,7 @@ func (c *Client) UpdateServer(ctx context.Context, id string, body ServerUpdateR
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -400,7 +400,7 @@ func (c *Client) GetServerEventList(ctx context.Context, id string) ([]Event, er
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "events"),
 		method: http.MethodGet,
 	}
@@ -420,7 +420,7 @@ func (c *Client) GetServerMetricList(ctx context.Context, id string) ([]ServerMe
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "metrics"),
 		method: http.MethodGet,
 	}
@@ -452,7 +452,7 @@ func (c *Client) setServerPowerState(ctx context.Context, id string, powerState 
 	if isOn == powerState {
 		return nil
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "power"),
 		method: http.MethodPatch,
 		body: ServerPowerUpdateRequest{
@@ -490,7 +490,7 @@ func (c *Client) ShutdownServer(ctx context.Context, id string) error {
 	if !server.Properties.Power {
 		return nil
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "shutdown"),
 		method: http.MethodPatch,
 		body:   map[string]string{},
@@ -525,7 +525,7 @@ func (c *Client) GetServersByLocation(ctx context.Context, id string) ([]Server,
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiLocationBase, id, "servers"),
 		method: http.MethodGet,
 	}
@@ -542,7 +542,7 @@ func (c *Client) GetServersByLocation(ctx context.Context, id string) ([]Server,
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedServers
 func (c *Client) GetDeletedServers(ctx context.Context) ([]Server, error) {
-	r := Request{
+	r := request{
 		uri:    path.Join(apiDeletedBase, "servers"),
 		method: http.MethodGet,
 	}

@@ -126,7 +126,7 @@ func (c *Client) GetServerNetworkList(ctx context.Context, id string) ([]ServerN
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "networks"),
 		method: http.MethodGet,
 	}
@@ -142,7 +142,7 @@ func (c *Client) GetServerNetwork(ctx context.Context, serverID, networkID strin
 	if !isValidUUID(serverID) || !isValidUUID(networkID) {
 		return ServerNetworkRelationProperties{}, errors.New("'serverID' or 'networksID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodGet,
 	}
@@ -158,7 +158,7 @@ func (c *Client) UpdateServerNetwork(ctx context.Context, serverID, networkID st
 	if !isValidUUID(serverID) || !isValidUUID(networkID) {
 		return errors.New("'serverID' or 'networksID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodPatch,
 		body:   body,
@@ -173,7 +173,7 @@ func (c *Client) CreateServerNetwork(ctx context.Context, id string, body Server
 	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
 		return errors.New("'serverID' or 'network_id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "networks"),
 		method: http.MethodPost,
 		body:   body,
@@ -188,7 +188,7 @@ func (c *Client) DeleteServerNetwork(ctx context.Context, serverID, networkID st
 	if !isValidUUID(serverID) || !isValidUUID(networkID) {
 		return errors.New("'serverID' or 'networkID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodDelete,
 	}
