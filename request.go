@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 )
 
 //Request gridscale's custom request struct
 type Request struct {
-	uri    string
-	method string
-	body   interface{}
+	uri               string
+	method            string
+	body              interface{}
+	isCheckingRequest bool
 }
 
 //CreateResponse common struct of a response for creation
@@ -147,8 +147,8 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 		}
 	}
 
-	//If the client is synchronous, wait until the request completes
-	if c.isSynchronous() && !strings.Contains(r.uri, requestBase) {
+	//If the client is synchronous and NOT checking a request, wait until the request completes
+	if c.isSynchronous() && !r.isCheckingRequest {
 		return c.waitForRequestCompleted(ctx, requestUUID)
 	}
 	return nil
