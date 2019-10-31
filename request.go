@@ -11,10 +11,10 @@ import (
 
 //request gridscale's custom request struct
 type request struct {
-	uri               string
-	method            string
-	body              interface{}
-	isCheckingRequest bool
+	uri                 string
+	method              string
+	body                interface{}
+	skipCheckingRequest bool
 }
 
 //CreateResponse common struct of a response for creation
@@ -147,8 +147,9 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 		}
 	}
 
-	//If the client is synchronous and NOT checking a request, wait until the request completes
-	if c.isSynchronous() && !r.isCheckingRequest {
+	//If the client is synchronous, and the request does not skip
+	//checking a request, wait until the request completes
+	if c.isSynchronous() && !r.skipCheckingRequest {
 		return c.waitForRequestCompleted(ctx, requestUUID)
 	}
 	return nil

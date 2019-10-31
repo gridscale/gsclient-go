@@ -99,9 +99,9 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 	}
 	return retryWithTimeout(func() (bool, error) {
 		r := request{
-			uri:               path.Join(requestBase, id),
-			method:            "GET",
-			isCheckingRequest: true,
+			uri:                 path.Join(requestBase, id),
+			method:              "GET",
+			skipCheckingRequest: true,
 		}
 		var response RequestStatus
 		err := r.execute(ctx, *c, &response)
