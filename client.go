@@ -42,53 +42,53 @@ func NewClient(c *Config) *Client {
 	return client
 }
 
-//getLogger returns logger
-func (c *Client) getLogger() logrus.Logger {
+//Logger returns logger
+func (c *Client) Logger() logrus.Logger {
 	return c.cfg.logger
 }
 
-//getHttpClient returns http client
-func (c *Client) getHttpClient() *http.Client {
+//HttpClient returns http client
+func (c *Client) HttpClient() *http.Client {
 	return c.cfg.httpClient
 }
 
-//isSynchronous returns if the client is sync or not
-func (c *Client) isSynchronous() bool {
+//Synchronous returns if the client is sync or not
+func (c *Client) Synchronous() bool {
 	return c.cfg.sync
 }
 
-//getRequestCheckTimeout returns request check timeout
-func (c *Client) getRequestCheckTimeout() time.Duration {
+//RequestCheckTimeout returns request check timeout
+func (c *Client) RequestCheckTimeout() time.Duration {
 	return c.cfg.requestCheckTimeoutSecs
 }
 
-//getDelayInterval returns request delay interval
-func (c *Client) getDelayInterval() time.Duration {
+//DelayInterval returns request delay interval
+func (c *Client) DelayInterval() time.Duration {
 	return c.cfg.delayInterval
 }
 
-//getMaxNumberOfRetries returns max number of retries
-func (c *Client) getMaxNumberOfRetries() int {
+//MaxNumberOfRetries returns max number of retries
+func (c *Client) MaxNumberOfRetries() int {
 	return c.cfg.maxNumberOfRetries
 }
 
-//getAPIURL returns api URL
-func (c *Client) getAPIURL() string {
+//APIURL returns api URL
+func (c *Client) APIURL() string {
 	return c.cfg.apiURL
 }
 
-//getUserAgent returns user agent
-func (c *Client) getUserAgent() string {
+//UserAgent returns user agent
+func (c *Client) UserAgent() string {
 	return c.cfg.userAgent
 }
 
-//getUserUUID returns user UUID
-func (c *Client) getUserUUID() string {
+//UserUUID returns user UUID
+func (c *Client) UserUUID() string {
 	return c.cfg.userUUID
 }
 
-//getAPIToken returns api token
-func (c *Client) getAPIToken() string {
+//APIToken returns api token
+func (c *Client) APIToken() string {
 	return c.cfg.apiToken
 }
 
@@ -115,5 +115,5 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 			return false, errors.New(errMessage)
 		}
 		return true, nil
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
+	}, c.RequestCheckTimeout(), c.DelayInterval())
 }

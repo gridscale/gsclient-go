@@ -62,8 +62,8 @@ const requestUUIDHeaderParam = "X-Request-Id"
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *request) execute(ctx context.Context, c Client, output interface{}) error {
 	url := c.cfg.apiURL + r.uri
-	logger := c.getLogger()
-	httpClient := c.getHttpClient()
+	logger := c.Logger()
+	httpClient := c.HttpClient()
 
 	logger.Debugf("%v request sent to URL: %v", r.method, url)
 
@@ -82,9 +82,9 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 		return err
 	}
 	request = request.WithContext(ctx)
-	request.Header.Set("User-Agent", c.getUserAgent())
-	request.Header.Add("X-Auth-UserID", c.getUserUUID())
-	request.Header.Add("X-Auth-Token", c.getAPIToken())
+	request.Header.Set("User-Agent", c.UserAgent())
+	request.Header.Add("X-Auth-UserID", c.UserUUID())
+	request.Header.Add("X-Auth-Token", c.APIToken())
 	request.Header.Add("Content-Type", bodyType)
 	logger.Debugf("Request body: %v", request.Body)
 
@@ -131,7 +131,7 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 		logger.Debugf("Response body: %v", string(responseBodyBytes))
 
 		return false, nil
-	}, c.getMaxNumberOfRetries(), c.getDelayInterval())
+	}, c.MaxNumberOfRetries(), c.DelayInterval())
 	//if retry fails
 	if err != nil {
 		return err
@@ -149,7 +149,7 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 
 	//If the client is synchronous, and the request does not skip
 	//checking a request, wait until the request completes
-	if c.isSynchronous() && !r.skipCheckingRequest {
+	if c.Synchronous() && !r.skipCheckingRequest {
 		return c.waitForRequestCompleted(ctx, requestUUID)
 	}
 	return nil

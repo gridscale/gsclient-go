@@ -467,7 +467,7 @@ func (c *Client) setServerPowerState(ctx context.Context, id string, powerState 
 	if err != nil {
 		return err
 	}
-	if c.isSynchronous() {
+	if c.Synchronous() {
 		return c.waitForServerPowerStatus(ctx, id, powerState)
 	}
 	return nil
@@ -485,7 +485,7 @@ func (c *Client) StopServer(ctx context.Context, id string) error {
 
 //ShutdownServer shutdowns a specific server
 func (c *Client) ShutdownServer(ctx context.Context, id string) error {
-	logger := c.getLogger()
+	logger := c.Logger()
 	//Make sure the server exists and that it isn't already in the state we need it to be
 	server, err := c.GetServer(ctx, id)
 	if err != nil {
@@ -511,7 +511,7 @@ func (c *Client) ShutdownServer(ctx context.Context, id string) error {
 		return err
 	}
 
-	if c.isSynchronous() {
+	if c.Synchronous() {
 		//If we get an error, which includes a timeout, power off the server instead
 		err = c.waitForServerPowerStatus(ctx, id, false)
 		if err != nil {
@@ -566,5 +566,5 @@ func (c *Client) waitForServerPowerStatus(ctx context.Context, id string, status
 	return retryWithTimeout(func() (bool, error) {
 		server, err := c.GetServer(ctx, id)
 		return server.Properties.Power != status, err
-	}, c.getRequestCheckTimeout(), c.getDelayInterval())
+	}, c.RequestCheckTimeout(), c.DelayInterval())
 }
