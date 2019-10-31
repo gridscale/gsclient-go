@@ -141,8 +141,9 @@ type ISOImageUpdateRequest struct {
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getIsoimages
 func (c *Client) GetISOImageList(ctx context.Context) ([]ISOImage, error) {
 	r := request{
-		uri:    path.Join(apiISOBase),
-		method: http.MethodGet,
+		uri:                 path.Join(apiISOBase),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ISOImageList
 	var isoImages []ISOImage
@@ -161,8 +162,9 @@ func (c *Client) GetISOImage(ctx context.Context, id string) (ISOImage, error) {
 		return ISOImage{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiISOBase, id),
-		method: http.MethodGet,
+		uri:                 path.Join(apiISOBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ISOImage
 	err := r.execute(ctx, *c, &response)
@@ -220,8 +222,9 @@ func (c *Client) GetISOImageEventList(ctx context.Context, id string) ([]Event, 
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiISOBase, id, "events"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiISOBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var isoImageEvents []Event
@@ -240,8 +243,9 @@ func (c *Client) GetISOImagesByLocation(ctx context.Context, id string) ([]ISOIm
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiLocationBase, id, "isoimages"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiLocationBase, id, "isoimages"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ISOImageList
 	var isoImages []ISOImage
@@ -257,8 +261,9 @@ func (c *Client) GetISOImagesByLocation(ctx context.Context, id string) ([]ISOIm
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedIsoimages
 func (c *Client) GetDeletedISOImages(ctx context.Context) ([]ISOImage, error) {
 	r := request{
-		uri:    path.Join(apiDeletedBase, "isoimages"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiDeletedBase, "isoimages"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response DeletedISOImageList
 	var isoImages []ISOImage

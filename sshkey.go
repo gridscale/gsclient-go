@@ -79,8 +79,9 @@ func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
 		return Sshkey{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiSshkeyBase, id),
-		method: http.MethodGet,
+		uri:                 path.Join(apiSshkeyBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response Sshkey
 	err := r.execute(ctx, *c, &response)
@@ -92,8 +93,9 @@ func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeys
 func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
 	r := request{
-		uri:    apiSshkeyBase,
-		method: http.MethodGet,
+		uri:                 apiSshkeyBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 
 	var response SshkeyList
@@ -156,8 +158,9 @@ func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, er
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiSshkeyBase, id, "events"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiSshkeyBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var sshEvents []Event

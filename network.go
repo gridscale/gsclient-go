@@ -182,8 +182,9 @@ func (c *Client) GetNetwork(ctx context.Context, id string) (Network, error) {
 		return Network{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiNetworkBase, id),
-		method: http.MethodGet,
+		uri:                 path.Join(apiNetworkBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response Network
 	err := r.execute(ctx, *c, &response)
@@ -238,8 +239,9 @@ func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdat
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getNetworks
 func (c *Client) GetNetworkList(ctx context.Context) ([]Network, error) {
 	r := request{
-		uri:    apiNetworkBase,
-		method: http.MethodGet,
+		uri:                 apiNetworkBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response NetworkList
 	var networks []Network
@@ -260,8 +262,9 @@ func (c *Client) GetNetworkEventList(ctx context.Context, id string) ([]Event, e
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiNetworkBase, id, "events"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiNetworkBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var networkEvents []Event
@@ -294,8 +297,9 @@ func (c *Client) GetNetworksByLocation(ctx context.Context, id string) ([]Networ
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiLocationBase, id, "networks"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiLocationBase, id, "networks"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response NetworkList
 	var networks []Network
@@ -311,8 +315,9 @@ func (c *Client) GetNetworksByLocation(ctx context.Context, id string) ([]Networ
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedNetworks
 func (c *Client) GetDeletedNetworks(ctx context.Context) ([]Network, error) {
 	r := request{
-		uri:    path.Join(apiDeletedBase, "networks"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiDeletedBase, "networks"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response DeletedNetworkList
 	var networks []Network

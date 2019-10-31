@@ -48,8 +48,9 @@ type LabelCreateRequest struct {
 //See: https://gridscale.io/en//api-documentation/index.html#operation/GetLabels
 func (c *Client) GetLabelList(ctx context.Context) ([]Label, error) {
 	r := request{
-		uri:    apiLabelBase,
-		method: http.MethodGet,
+		uri:                 apiLabelBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response LabelList
 	var labels []Label

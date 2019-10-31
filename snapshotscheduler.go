@@ -133,8 +133,9 @@ func (c *Client) GetStorageSnapshotScheduleList(ctx context.Context, id string) 
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiStorageBase, id, "snapshot_schedules"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiStorageBase, id, "snapshot_schedules"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshotScheduleList
 	var schedules []StorageSnapshotSchedule
@@ -153,8 +154,9 @@ func (c *Client) GetStorageSnapshotSchedule(ctx context.Context, storageID, sche
 		return StorageSnapshotSchedule{}, errors.New("'storageID' or 'scheduleID' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
-		method: http.MethodGet,
+		uri:                 path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshotSchedule
 	err := r.execute(ctx, *c, &response)

@@ -189,8 +189,9 @@ func (c *Client) GetIP(ctx context.Context, id string) (IP, error) {
 		return IP{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiIPBase, id),
-		method: http.MethodGet,
+		uri:                 path.Join(apiIPBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 
 	var response IP
@@ -204,8 +205,9 @@ func (c *Client) GetIP(ctx context.Context, id string) (IP, error) {
 //https://gridscale.io/en//api-documentation/index.html#operation/getIps
 func (c *Client) GetIPList(ctx context.Context) ([]IP, error) {
 	r := request{
-		uri:    apiIPBase,
-		method: http.MethodGet,
+		uri:                 apiIPBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 
 	var response IPList
@@ -272,8 +274,9 @@ func (c *Client) GetIPEventList(ctx context.Context, id string) ([]Event, error)
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiIPBase, id, "events"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiIPBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var IPEvents []Event
@@ -301,8 +304,9 @@ func (c *Client) GetIPsByLocation(ctx context.Context, id string) ([]IP, error) 
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiLocationBase, id, "ips"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiLocationBase, id, "ips"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response IPList
 	var IPs []IP
@@ -318,8 +322,9 @@ func (c *Client) GetIPsByLocation(ctx context.Context, id string) ([]IP, error) 
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedIps
 func (c *Client) GetDeletedIPs(ctx context.Context) ([]IP, error) {
 	r := request{
-		uri:    path.Join(apiDeletedBase, "ips"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiDeletedBase, "ips"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response DeletedIPList
 	var IPs []IP

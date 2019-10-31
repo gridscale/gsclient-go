@@ -163,8 +163,9 @@ type FirewallUpdateRequest struct {
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewalls
 func (c *Client) GetFirewallList(ctx context.Context) ([]Firewall, error) {
 	r := request{
-		uri:    path.Join(apiFirewallBase),
-		method: http.MethodGet,
+		uri:                 path.Join(apiFirewallBase),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response FirewallList
 	var firewalls []Firewall
@@ -183,8 +184,9 @@ func (c *Client) GetFirewall(ctx context.Context, id string) (Firewall, error) {
 		return Firewall{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiFirewallBase, id),
-		method: http.MethodGet,
+		uri:                 path.Join(apiFirewallBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response Firewall
 	err := r.execute(ctx, *c, &response)
@@ -242,8 +244,9 @@ func (c *Client) GetFirewallEventList(ctx context.Context, id string) ([]Event, 
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiFirewallBase, id, "events"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiFirewallBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var firewallEvents []Event

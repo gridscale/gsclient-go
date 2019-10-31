@@ -153,8 +153,9 @@ func (c *Client) GetStorageSnapshotList(ctx context.Context, id string) ([]Stora
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiStorageBase, id, "snapshots"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiStorageBase, id, "snapshots"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshotList
 	var snapshots []StorageSnapshot
@@ -173,8 +174,9 @@ func (c *Client) GetStorageSnapshot(ctx context.Context, storageID, snapshotID s
 		return StorageSnapshot{}, errors.New("'storageID' or 'snapshotID' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
-		method: http.MethodGet,
+		uri:                 path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshot
 	err := r.execute(ctx, *c, &response)
@@ -265,8 +267,9 @@ func (c *Client) GetSnapshotsByLocation(ctx context.Context, id string) ([]Stora
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiLocationBase, id, "snapshots"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiLocationBase, id, "snapshots"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshotList
 	var snapshots []StorageSnapshot
@@ -282,8 +285,9 @@ func (c *Client) GetSnapshotsByLocation(ctx context.Context, id string) ([]Stora
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedSnapshots
 func (c *Client) GetDeletedSnapshots(ctx context.Context) ([]StorageSnapshot, error) {
 	r := request{
-		uri:    path.Join(apiDeletedBase, "snapshots"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiDeletedBase, "snapshots"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response DeletedStorageSnapshotList
 	var snapshots []StorageSnapshot

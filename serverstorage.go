@@ -97,8 +97,9 @@ func (c *Client) GetServerStorageList(ctx context.Context, id string) ([]ServerS
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, id, "storages"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, id, "storages"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerStorageRelationList
 	err := r.execute(ctx, *c, &response)
@@ -113,8 +114,9 @@ func (c *Client) GetServerStorage(ctx context.Context, serverID, storageID strin
 		return ServerStorageRelationProperties{}, errors.New("'serverID' or 'storageID' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, serverID, "storages", storageID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerStorageRelationSingle
 	err := r.execute(ctx, *c, &response)

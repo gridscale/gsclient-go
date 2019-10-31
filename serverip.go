@@ -54,8 +54,9 @@ func (c *Client) GetServerIPList(ctx context.Context, id string) ([]ServerIPRela
 		return nil, errors.New("'id' is required")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, id, "ips"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, id, "ips"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerIPRelationList
 	err := r.execute(ctx, *c, &response)
@@ -70,8 +71,9 @@ func (c *Client) GetServerIP(ctx context.Context, serverID, ipID string) (Server
 		return ServerIPRelationProperties{}, errors.New("'serverID' and 'ipID' are required")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, serverID, "ips", ipID),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, serverID, "ips", ipID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerIPRelation
 	err := r.execute(ctx, *c, &response)

@@ -252,8 +252,9 @@ func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
 		return Storage{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiStorageBase, id),
-		method: http.MethodGet,
+		uri:                 path.Join(apiStorageBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response Storage
 	err := r.execute(ctx, *c, &response)
@@ -265,8 +266,9 @@ func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getStorages
 func (c *Client) GetStorageList(ctx context.Context) ([]Storage, error) {
 	r := request{
-		uri:    apiStorageBase,
-		method: http.MethodGet,
+		uri:                 apiStorageBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageList
 	var storages []Storage
@@ -336,8 +338,9 @@ func (c *Client) GetStorageEventList(ctx context.Context, id string) ([]Event, e
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiStorageBase, id, "events"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiStorageBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var storageEvents []Event
@@ -356,8 +359,9 @@ func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storag
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiLocationBase, id, "storages"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiLocationBase, id, "storages"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageList
 	var storages []Storage
@@ -373,8 +377,9 @@ func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storag
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedStorages
 func (c *Client) GetDeletedStorages(ctx context.Context) ([]Storage, error) {
 	r := request{
-		uri:    path.Join(apiDeletedBase, "storages"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiDeletedBase, "storages"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response DeletedStorageList
 	var storages []Storage

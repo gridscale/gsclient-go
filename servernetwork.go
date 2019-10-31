@@ -127,8 +127,9 @@ func (c *Client) GetServerNetworkList(ctx context.Context, id string) ([]ServerN
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, id, "networks"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, id, "networks"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerNetworkRelationList
 	err := r.execute(ctx, *c, &response)
@@ -143,8 +144,9 @@ func (c *Client) GetServerNetwork(ctx context.Context, serverID, networkID strin
 		return ServerNetworkRelationProperties{}, errors.New("'serverID' or 'networksID' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, serverID, "networks", networkID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerNetworkRelation
 	err := r.execute(ctx, *c, &response)

@@ -189,8 +189,9 @@ var (
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancers
 func (c *Client) GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error) {
 	r := request{
-		uri:    apiLoadBalancerBase,
-		method: http.MethodGet,
+		uri:                 apiLoadBalancerBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response LoadBalancers
 	var loadBalancers []LoadBalancer
@@ -209,8 +210,9 @@ func (c *Client) GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, 
 		return LoadBalancer{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiLoadBalancerBase, id),
-		method: http.MethodGet,
+		uri:                 path.Join(apiLoadBalancerBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response LoadBalancer
 	err := r.execute(ctx, *c, &response)
@@ -264,8 +266,9 @@ func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Eve
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiLoadBalancerBase, id, "events"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiLoadBalancerBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var loadBalancerEvents []Event

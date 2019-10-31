@@ -298,8 +298,9 @@ func (c *Client) GetServer(ctx context.Context, id string) (Server, error) {
 		return Server{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, id),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response Server
 	err := r.execute(ctx, *c, &response)
@@ -311,8 +312,9 @@ func (c *Client) GetServer(ctx context.Context, id string) (Server, error) {
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getServers
 func (c *Client) GetServerList(ctx context.Context) ([]Server, error) {
 	r := request{
-		uri:    apiServerBase,
-		method: http.MethodGet,
+		uri:                 apiServerBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerList
 	var servers []Server
@@ -401,8 +403,9 @@ func (c *Client) GetServerEventList(ctx context.Context, id string) ([]Event, er
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, id, "events"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var serverEvents []Event
@@ -421,8 +424,9 @@ func (c *Client) GetServerMetricList(ctx context.Context, id string) ([]ServerMe
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, id, "metrics"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, id, "metrics"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerMetricList
 	var serverMetrics []ServerMetric
@@ -526,8 +530,9 @@ func (c *Client) GetServersByLocation(ctx context.Context, id string) ([]Server,
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiLocationBase, id, "servers"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiLocationBase, id, "servers"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerList
 	var servers []Server
@@ -543,8 +548,9 @@ func (c *Client) GetServersByLocation(ctx context.Context, id string) ([]Server,
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedServers
 func (c *Client) GetDeletedServers(ctx context.Context) ([]Server, error) {
 	r := request{
-		uri:    path.Join(apiDeletedBase, "servers"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiDeletedBase, "servers"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response DeletedServerList
 	var servers []Server

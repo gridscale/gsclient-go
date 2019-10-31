@@ -117,8 +117,9 @@ func (c *Client) GetTemplate(ctx context.Context, id string) (Template, error) {
 		return Template{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiTemplateBase, id),
-		method: http.MethodGet,
+		uri:                 path.Join(apiTemplateBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response Template
 	err := r.execute(ctx, *c, &response)
@@ -130,8 +131,9 @@ func (c *Client) GetTemplate(ctx context.Context, id string) (Template, error) {
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getTemplates
 func (c *Client) GetTemplateList(ctx context.Context) ([]Template, error) {
 	r := request{
-		uri:    apiTemplateBase,
-		method: http.MethodGet,
+		uri:                 apiTemplateBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response TemplateList
 	var templates []Template
@@ -212,8 +214,9 @@ func (c *Client) GetTemplateEventList(ctx context.Context, id string) ([]Event, 
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiTemplateBase, id, "events"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiTemplateBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var templateEvents []Event
@@ -232,8 +235,9 @@ func (c *Client) GetTemplatesByLocation(ctx context.Context, id string) ([]Templ
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiLocationBase, id, "templates"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiLocationBase, id, "templates"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response TemplateList
 	var templates []Template
@@ -249,8 +253,9 @@ func (c *Client) GetTemplatesByLocation(ctx context.Context, id string) ([]Templ
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedTemplates
 func (c *Client) GetDeletedTemplates(ctx context.Context) ([]Template, error) {
 	r := request{
-		uri:    path.Join(apiDeletedBase, "templates"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiDeletedBase, "templates"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response DeletedTemplateList
 	var templates []Template

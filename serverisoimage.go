@@ -58,8 +58,9 @@ func (c *Client) GetServerIsoImageList(ctx context.Context, id string) ([]Server
 		return nil, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, id, "isoimages"),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, id, "isoimages"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerIsoImageRelationList
 	err := r.execute(ctx, *c, &response)
@@ -74,8 +75,9 @@ func (c *Client) GetServerIsoImage(ctx context.Context, serverID, isoImageID str
 		return ServerIsoImageRelationProperties{}, errors.New("'id' is invalid")
 	}
 	r := request{
-		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
-		method: http.MethodGet,
+		uri:                 path.Join(apiServerBase, serverID, "isoimages", isoImageID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerIsoImageRelation
 	err := r.execute(ctx, *c, &response)
