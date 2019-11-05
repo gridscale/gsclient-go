@@ -16,6 +16,7 @@ func TestClient_GetPaaSServiceList(t *testing.T) {
 	expectedObj := getMockPaaSService("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, preparePaaSHTTPGetListResponse("active"))
 	})
 	paasList, err := client.GetPaaSServiceList(emptyCtx)
@@ -31,6 +32,7 @@ func TestClient_GetPaaSService(t *testing.T) {
 	expectedObj := getMockPaaSService("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -45,127 +47,119 @@ func TestClient_GetPaaSService(t *testing.T) {
 }
 
 func TestClient_CreatePaaSService(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiPaaSBase, "services")
-		expectedRespObj := getMockPaaSServiceCreateResponse()
-		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, r.Method, http.MethodPost)
-			if isFailed {
-				w.WriteHeader(400)
-			} else {
-				fmt.Fprintf(w, preparePaaSHTTPCreateResponse())
-			}
-		})
-		if clientTest {
-			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
-				fmt.Fprint(w, httpResponse)
-			})
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiPaaSBase, "services")
+	expectedRespObj := getMockPaaSServiceCreateResponse()
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, r.Method, http.MethodPost)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			fmt.Fprintf(w, preparePaaSHTTPCreateResponse())
 		}
-		for _, test := range commonSuccessFailTestCases {
-			isFailed = test.isFailed
-			response, err := client.CreatePaaSService(
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		response, err := client.CreatePaaSService(
+			emptyCtx,
+			PaaSServiceCreateRequest{
+				Name:                    "test",
+				PaaSServiceTemplateUUID: "test-template",
+				Labels:                  []string{"label"},
+				PaaSSecurityZoneUUID:    "test-security-zone-id",
+				ResourceLimits: []ResourceLimit{
+					{
+						Resource: "cpu",
+						Limit:    2,
+					},
+				},
+				Parameters: nil,
+			})
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreatePaaSService returned error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", expectedRespObj), fmt.Sprintf("%v", response))
+		}
+	}
+
+}
+
+func TestClient_UpdatePaaSService(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiPaaSBase, "services", dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			if r.Method == http.MethodPatch {
+				fmt.Fprintf(w, "")
+			} else if r.Method == http.MethodGet {
+				fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
+			}
+		}
+	})
+	parameters := make(map[string]interface{})
+	parameters["TEST_PARAM"] = "param value"
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.UpdatePaaSService(
 				emptyCtx,
-				PaaSServiceCreateRequest{
-					Name:                    "test",
-					PaaSServiceTemplateUUID: "test-template",
-					Labels:                  []string{"label"},
-					PaaSSecurityZoneUUID:    "test-security-zone-id",
+				test.testUUID,
+				PaaSServiceUpdateRequest{
+					Name:       "test",
+					Labels:     []string{"label"},
+					Parameters: parameters,
 					ResourceLimits: []ResourceLimit{
 						{
 							Resource: "cpu",
 							Limit:    2,
 						},
 					},
-					Parameters: nil,
 				})
-			if isFailed {
+			if test.isFailed || isFailed {
 				assert.NotNil(t, err)
 			} else {
-				assert.Nil(t, err, "CreatePaaSService returned error %v", err)
-				assert.Equal(t, fmt.Sprintf("%v", expectedRespObj), fmt.Sprintf("%v", response))
+				assert.Nil(t, err, "UpdatePaaSService returned an error %v", err)
 			}
 		}
-		server.Close()
-	}
-}
-
-func TestClient_UpdatePaaSService(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiPaaSBase, "services", dummyUUID)
-		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			if isFailed {
-				w.WriteHeader(400)
-			} else {
-				if r.Method == http.MethodPatch {
-					fmt.Fprintf(w, "")
-				} else if r.Method == http.MethodGet {
-					fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
-				}
-			}
-		})
-		parameters := make(map[string]interface{})
-		parameters["TEST_PARAM"] = "param value"
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.UpdatePaaSService(
-					emptyCtx,
-					test.testUUID,
-					PaaSServiceUpdateRequest{
-						Name:       "test",
-						Labels:     []string{"label"},
-						Parameters: parameters,
-						ResourceLimits: []ResourceLimit{
-							{
-								Resource: "cpu",
-								Limit:    2,
-							},
-						},
-					})
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "UpdatePaaSService returned an error %v", err)
-				}
-			}
-		}
-		server.Close()
 	}
 }
 
 func TestClient_DeletePaaSService(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiPaaSBase, "services", dummyUUID)
-		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			if isFailed {
-				w.WriteHeader(400)
-			} else {
-				if r.Method == http.MethodDelete {
-					fmt.Fprintf(w, "")
-				} else if r.Method == http.MethodGet {
-					w.WriteHeader(404)
-				}
-			}
-		})
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.DeletePaaSService(emptyCtx, test.testUUID)
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "DeletePaaSService returned an error %v", err)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiPaaSBase, "services", dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			if r.Method == http.MethodDelete {
+				fmt.Fprintf(w, "")
+			} else if r.Method == http.MethodGet {
+				w.WriteHeader(404)
 			}
 		}
-		server.Close()
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.DeletePaaSService(emptyCtx, test.testUUID)
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "DeletePaaSService returned an error %v", err)
+			}
+		}
 	}
 }
 
@@ -175,6 +169,7 @@ func TestClient_GetPaaSServiceMetrics(t *testing.T) {
 	uri := path.Join(apiPaaSBase, "services", dummyUUID, "metrics")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, preparePaaSHTTPGetMetricsResponse())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -195,6 +190,7 @@ func TestClient_GetPaaSTemplateList(t *testing.T) {
 	uri := path.Join(apiPaaSBase, "service_templates")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, preparePaaSHTTPGetTemplatesResponse())
 	})
 	res, err := client.GetPaaSTemplateList(emptyCtx)
@@ -209,6 +205,7 @@ func TestClient_GetPaaSSecurityZoneList(t *testing.T) {
 	uri := path.Join(apiPaaSBase, "security_zones")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZoneList("active"))
 	})
 	res, err := client.GetPaaSSecurityZoneList(emptyCtx)
@@ -218,38 +215,33 @@ func TestClient_GetPaaSSecurityZoneList(t *testing.T) {
 }
 
 func TestClient_CreatePaaSSecurityZone(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiPaaSBase, "security_zones")
-		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-			assert.Equal(t, request.Method, http.MethodPost)
-			if isFailed {
-				writer.WriteHeader(400)
-			} else {
-				fmt.Fprintf(writer, preparePaaSHTTPCreateSecurityZone())
-			}
-		})
-		httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-		mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, httpResponse)
-		})
-		for _, test := range commonSuccessFailTestCases {
-			isFailed = test.isFailed
-			res, err := client.CreatePaaSSecurityZone(
-				emptyCtx,
-				PaaSSecurityZoneCreateRequest{
-					Name:         "test",
-					LocationUUID: "aa-bb-cc",
-				})
-			if isFailed {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "CreatePaaSSecurityZone returned an error %v", err)
-				assert.Equal(t, fmt.Sprintf("%v", getMockPaaSSecurityZoneCreateResponse()), fmt.Sprintf("%v", res))
-			}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiPaaSBase, "security_zones")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, request.Method, http.MethodPost)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			fmt.Fprintf(writer, preparePaaSHTTPCreateSecurityZone())
 		}
-		server.Close()
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		res, err := client.CreatePaaSSecurityZone(
+			emptyCtx,
+			PaaSSecurityZoneCreateRequest{
+				Name:         "test",
+				LocationUUID: "aa-bb-cc",
+			})
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreatePaaSSecurityZone returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockPaaSSecurityZoneCreateResponse()), fmt.Sprintf("%v", res))
+		}
 	}
 }
 
@@ -259,6 +251,7 @@ func TestClient_GetPaaSSecurityZone(t *testing.T) {
 	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZone("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -273,71 +266,69 @@ func TestClient_GetPaaSSecurityZone(t *testing.T) {
 }
 
 func TestClient_UpdatePaaSSecurityZone(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
-		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-			if isFailed {
-				writer.WriteHeader(400)
-			} else {
-				if request.Method == http.MethodPatch {
-					fmt.Fprintf(writer, "")
-				} else if request.Method == http.MethodGet {
-					fmt.Fprint(writer, preparePaaSHTTPGetSecurityZone("active"))
-				}
-			}
-		})
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.UpdatePaaSSecurityZone(
-					emptyCtx,
-					test.testUUID,
-					PaaSSecurityZoneUpdateRequest{
-						Name:                 "test",
-						LocationUUID:         "a-b-c",
-						PaaSSecurityZoneUUID: dummyUUID,
-					})
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "UpdatePaaSSecurityZone returned an error %v", err)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			if request.Method == http.MethodPatch {
+				fmt.Fprintf(writer, "")
+			} else if request.Method == http.MethodGet {
+				fmt.Fprint(writer, preparePaaSHTTPGetSecurityZone("active"))
 			}
 		}
-		server.Close()
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.UpdatePaaSSecurityZone(
+				emptyCtx,
+				test.testUUID,
+				PaaSSecurityZoneUpdateRequest{
+					Name:                 "test",
+					LocationUUID:         "a-b-c",
+					PaaSSecurityZoneUUID: dummyUUID,
+				})
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "UpdatePaaSSecurityZone returned an error %v", err)
+			}
+		}
 	}
 }
 
 func TestClient_DeletePaaSSecurityZone(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
-		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-			if isFailed {
-				writer.WriteHeader(400)
-			} else {
-				if request.Method == http.MethodDelete {
-					fmt.Fprintf(writer, "")
-				} else if request.Method == http.MethodGet {
-					writer.WriteHeader(404)
-				}
-			}
-		})
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.DeletePaaSSecurityZone(emptyCtx, test.testUUID)
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "DeletePaaSSecurityZone returned an error %v", err)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			if request.Method == http.MethodDelete {
+				fmt.Fprintf(writer, "")
+			} else if request.Method == http.MethodGet {
+				writer.WriteHeader(404)
 			}
 		}
-		server.Close()
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.DeletePaaSSecurityZone(emptyCtx, test.testUUID)
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "DeletePaaSSecurityZone returned an error %v", err)
+			}
+		}
 	}
 }
 
@@ -348,72 +339,13 @@ func TestClient_GetDeletedPaaSServices(t *testing.T) {
 	expectedObj := getMockPaaSService("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareDeletedPaaSHTTPGetListResponse("active"))
 	})
 	paasList, err := client.GetDeletedPaaSServices(emptyCtx)
 	assert.Nil(t, err, "GetDeletedPaaSServices returned an error %v", err)
 	assert.Equal(t, 1, len(paasList))
 	assert.Equal(t, fmt.Sprintf("[%v]", expectedObj), fmt.Sprintf("%v", paasList))
-}
-
-func TestClient_waitForPaaSServiceActive(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiPaaSBase, "services", dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
-	})
-	err := client.waitForPaaSServiceActive(emptyCtx, dummyUUID)
-	assert.Nil(t, err, "waitForPaaSServiceActive returned an error %v", err)
-}
-
-func TestClient_waitForPaaSServiceDeleted(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiPaaSBase, "services", dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		w.WriteHeader(404)
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.waitForPaaSServiceDeleted(emptyCtx, test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "waitForPaaSServiceDeleted returned an error %v", err)
-		}
-	}
-}
-
-func TestClient_waitForSecurityZoneActive(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, preparePaaSHTTPGetSecurityZone("active"))
-	})
-	err := client.waitForSecurityZoneActive(emptyCtx, dummyUUID)
-	assert.Nil(t, err, "waitForSecurityZoneActive returned an error %v", err)
-}
-
-func TestClient_waitForSecurityZoneDeleted(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		w.WriteHeader(404)
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.waitForSecurityZoneDeleted(emptyCtx, test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "waitForSecurityZoneDeleted returned an error %v", err)
-		}
-	}
 }
 
 func getMockPaaSService(status string) PaaSService {

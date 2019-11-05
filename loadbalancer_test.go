@@ -11,52 +11,45 @@ import (
 )
 
 func TestClient_CreateLoadBalancer(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		lb := getMockLoadbalancer("active").Properties
-		labelSlices := [][]string{nil, lb.Labels}
-		uri := path.Join(apiLoadBalancerBase)
-		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, r.Method, http.MethodPost)
-			if isFailed {
-				w.WriteHeader(400)
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	lb := getMockLoadbalancer("active").Properties
+	labelSlices := [][]string{nil, lb.Labels}
+	uri := path.Join(apiLoadBalancerBase)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, r.Method, http.MethodPost)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			fmt.Fprint(w, prepareLoadBalancerHTTPCreateResponse())
+		}
+	})
+	for _, testSuccessFail := range commonSuccessFailTestCases {
+		isFailed = testSuccessFail.isFailed
+		for _, testLabel := range labelSlices {
+			lbRequest := LoadBalancerCreateRequest{
+				Name:                lb.Name,
+				Algorithm:           LoadbalancerLeastConnAlg,
+				LocationUUID:        lb.LocationUUID,
+				ListenIPv6UUID:      lb.ListenIPv6UUID,
+				ListenIPv4UUID:      lb.ListenIPv4UUID,
+				RedirectHTTPToHTTPS: lb.RedirectHTTPToHTTPS,
+				ForwardingRules:     lb.ForwardingRules,
+				BackendServers:      lb.BackendServers,
+				Labels:              testLabel,
+			}
+			response, err := client.CreateLoadBalancer(emptyCtx, lbRequest)
+			if testSuccessFail.isFailed {
+				assert.NotNil(t, err)
 			} else {
-				fmt.Fprint(w, prepareLoadBalancerHTTPCreateResponse())
-			}
-		})
-
-		if clientTest {
-			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
-				fmt.Fprint(w, httpResponse)
-			})
-		}
-		for _, testSuccessFail := range commonSuccessFailTestCases {
-			isFailed = testSuccessFail.isFailed
-			for _, testLabel := range labelSlices {
-				lbRequest := LoadBalancerCreateRequest{
-					Name:                lb.Name,
-					Algorithm:           LoadbalancerLeastConnAlg,
-					LocationUUID:        lb.LocationUUID,
-					ListenIPv6UUID:      lb.ListenIPv6UUID,
-					ListenIPv4UUID:      lb.ListenIPv4UUID,
-					RedirectHTTPToHTTPS: lb.RedirectHTTPToHTTPS,
-					ForwardingRules:     lb.ForwardingRules,
-					BackendServers:      lb.BackendServers,
-					Labels:              testLabel,
-				}
-				response, err := client.CreateLoadBalancer(emptyCtx, lbRequest)
-				if testSuccessFail.isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "CreateLoadBalancer returned error: %v", err)
-					assert.Equal(t, fmt.Sprintf("%s", prepareLoadBalancerObjectCreateResponse()), fmt.Sprintf("%s", response))
-				}
+				assert.Nil(t, err, "CreateLoadBalancer returned error: %v", err)
+				assert.Equal(t, fmt.Sprintf("%s", prepareLoadBalancerObjectCreateResponse()), fmt.Sprintf("%s", response))
 			}
 		}
-		server.Close()
 	}
+
 }
 
 func TestClient_GetLoadBalancer(t *testing.T) {
@@ -65,6 +58,7 @@ func TestClient_GetLoadBalancer(t *testing.T) {
 	expectedObject := getMockLoadbalancer("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -86,6 +80,7 @@ func TestClient_GetLoadBalancerList(t *testing.T) {
 	expectedObjects := getMockLoadbalancer("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareLoadBalancerHTTPListResponse("active"))
 	})
 	loadbalancers, err := client.GetLoadBalancerList(emptyCtx)
@@ -95,74 +90,73 @@ func TestClient_GetLoadBalancerList(t *testing.T) {
 }
 
 func TestClient_UpdateLoadBalancer(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiLoadBalancerBase, dummyUUID)
-		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			if isFailed {
-				w.WriteHeader(400)
-			} else {
-				if r.Method == http.MethodPatch {
-					fmt.Fprintf(w, "")
-				} else if r.Method == http.MethodGet {
-					fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
-				}
-			}
-		})
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.UpdateLoadBalancer(
-					emptyCtx,
-					test.testUUID,
-					LoadBalancerUpdateRequest{
-						Name:                "test",
-						ListenIPv6UUID:      dummyUUID,
-						ListenIPv4UUID:      dummyUUID,
-						RedirectHTTPToHTTPS: false,
-						Status:              "inactive",
-					})
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "UpdateLoadBalancer returned an error %v", err)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiLoadBalancerBase, dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			if r.Method == http.MethodPatch {
+				fmt.Fprintf(w, "")
+			} else if r.Method == http.MethodGet {
+				fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
 			}
 		}
-		server.Close()
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.UpdateLoadBalancer(
+				emptyCtx,
+				test.testUUID,
+				LoadBalancerUpdateRequest{
+					Name:                "test",
+					ListenIPv6UUID:      dummyUUID,
+					ListenIPv4UUID:      dummyUUID,
+					RedirectHTTPToHTTPS: false,
+					Status:              "inactive",
+				})
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "UpdateLoadBalancer returned an error %v", err)
+			}
+		}
 	}
 }
 
 func TestClient_DeleteLoadBalancer(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiLoadBalancerBase, dummyUUID)
-		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			if isFailed {
-				w.WriteHeader(400)
-			} else {
-				if r.Method == http.MethodDelete {
-					fmt.Fprintf(w, "")
-				} else if r.Method == http.MethodGet {
-					w.WriteHeader(404)
-				}
-			}
-		})
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.DeleteLoadBalancer(emptyCtx, test.testUUID)
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "DeleteLoadBalancer returned an error %v", err)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiLoadBalancerBase, dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			if r.Method == http.MethodDelete {
+				fmt.Fprintf(w, "")
+			} else if r.Method == http.MethodGet {
+				w.WriteHeader(404)
 			}
 		}
-		server.Close()
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.DeleteLoadBalancer(emptyCtx, test.testUUID)
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "DeleteLoadBalancer returned an error %v", err)
+			}
+		}
 	}
+
 }
 
 func TestClient_GetLoadBalancerEventList(t *testing.T) {
@@ -172,6 +166,7 @@ func TestClient_GetLoadBalancerEventList(t *testing.T) {
 	expectedObjects := getMockEvent()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -182,36 +177,6 @@ func TestClient_GetLoadBalancerEventList(t *testing.T) {
 			assert.Nil(t, err, "GetLoadBalancerEventList returned error: %v", err)
 			assert.Equal(t, 1, len(response))
 			assert.Equal(t, fmt.Sprintf("[%v]", expectedObjects), fmt.Sprintf("%v", response))
-		}
-	}
-}
-
-func TestClient_waitForLoadbalancerActive(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiLoadBalancerBase, dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
-	})
-	err := client.waitForLoadbalancerActive(emptyCtx, dummyUUID)
-	assert.Nil(t, err, "waitForLoadbalancerActive returned an error %v", err)
-}
-
-func TestClient_waitForLoadbalancerDeleted(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiLoadBalancerBase, dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		w.WriteHeader(404)
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.waitForLoadbalancerDeleted(emptyCtx, test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "waitForLoadbalancerDeleted returned an error %v", err)
 		}
 	}
 }

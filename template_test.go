@@ -15,6 +15,7 @@ func TestClient_GetTemplateList(t *testing.T) {
 	uri := apiTemplateBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	response, err := client.GetTemplateList(emptyCtx)
@@ -29,6 +30,7 @@ func TestClient_GetTemplate(t *testing.T) {
 	uri := path.Join(apiTemplateBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareTemplateHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -59,6 +61,7 @@ func TestClient_GetTemplateByName(t *testing.T) {
 	uri := apiTemplateBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	for _, test := range testCases {
@@ -73,109 +76,100 @@ func TestClient_GetTemplateByName(t *testing.T) {
 }
 
 func TestClient_CreateTemplate(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := apiTemplateBase
-		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, http.MethodPost, r.Method)
-			if isFailed {
-				w.WriteHeader(400)
-			} else {
-				fmt.Fprintf(w, prepareTemplateCreateResponse())
-			}
-		})
-		if clientTest {
-			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
-				fmt.Fprint(w, httpResponse)
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := apiTemplateBase
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			fmt.Fprintf(w, prepareTemplateCreateResponse())
+		}
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		res, err := client.CreateTemplate(
+			emptyCtx,
+			TemplateCreateRequest{
+				Name:         "test",
+				SnapshotUUID: dummyUUID,
+				Labels:       []string{"label"},
 			})
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreateTemplate returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockTemplateCreateResponse()), fmt.Sprintf("%v", res))
 		}
-		for _, test := range commonSuccessFailTestCases {
-			isFailed = test.isFailed
-			res, err := client.CreateTemplate(
-				emptyCtx,
-				TemplateCreateRequest{
-					Name:         "test",
-					SnapshotUUID: dummyUUID,
-					Labels:       []string{"label"},
-				})
-			if isFailed {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "CreateTemplate returned an error %v", err)
-				assert.Equal(t, fmt.Sprintf("%v", getMockTemplateCreateResponse()), fmt.Sprintf("%v", res))
-			}
-		}
-		server.Close()
 	}
 }
 
 func TestClient_UpdateTemplate(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiTemplateBase, dummyUUID)
-		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			if isFailed {
-				w.WriteHeader(400)
-			} else {
-				if r.Method == http.MethodPatch {
-					fmt.Fprintf(w, "")
-				} else if r.Method == http.MethodGet {
-					fmt.Fprint(w, prepareTemplateHTTPGet("active"))
-				}
-			}
-		})
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.UpdateTemplate(
-					emptyCtx,
-					test.testUUID,
-					TemplateUpdateRequest{
-						Name:   "test",
-						Labels: []string{"labels"},
-					})
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "UpdateTemplate returned an error %v", err)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiTemplateBase, dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			if r.Method == http.MethodPatch {
+				fmt.Fprintf(w, "")
+			} else if r.Method == http.MethodGet {
+				fmt.Fprint(w, prepareTemplateHTTPGet("active"))
 			}
 		}
-		server.Close()
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.UpdateTemplate(
+				emptyCtx,
+				test.testUUID,
+				TemplateUpdateRequest{
+					Name:   "test",
+					Labels: []string{"labels"},
+				})
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "UpdateTemplate returned an error %v", err)
+			}
+		}
 	}
 }
 
 func TestClient_DeleteTemplate(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiTemplateBase, dummyUUID)
-		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			if isFailed {
-				w.WriteHeader(400)
-			} else {
-				if r.Method == http.MethodDelete {
-					fmt.Fprintf(w, "")
-				} else if r.Method == http.MethodGet {
-					w.WriteHeader(404)
-				}
-			}
-		})
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.DeleteTemplate(emptyCtx, test.testUUID)
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "DeleteTemplate returned an error %v", err)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiTemplateBase, dummyUUID)
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			if r.Method == http.MethodDelete {
+				fmt.Fprintf(w, "")
+			} else if r.Method == http.MethodGet {
+				w.WriteHeader(404)
 			}
 		}
-		server.Close()
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.DeleteTemplate(emptyCtx, test.testUUID)
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "DeleteTemplate returned an error %v", err)
+			}
+		}
 	}
 }
 
@@ -185,6 +179,7 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 	uri := path.Join(apiTemplateBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -205,6 +200,7 @@ func TestClient_GetTemplatesByLocation(t *testing.T) {
 	uri := path.Join(apiLocationBase, dummyUUID, "templates")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -225,42 +221,13 @@ func TestClient_GetDeletedTemplates(t *testing.T) {
 	uri := path.Join(apiDeletedBase, "templates")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareDeletedTemplateListHTTPGet())
 	})
 	response, err := client.GetDeletedTemplates(emptyCtx)
 	assert.Nil(t, err, "GetDeletedTemplates returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockTemplate("deleted")), fmt.Sprintf("%v", response))
-}
-
-func TestClient_waitForTemplateActive(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiTemplateBase, dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, prepareTemplateHTTPGet("active"))
-	})
-	err := client.waitForTemplateActive(emptyCtx, dummyUUID)
-	assert.Nil(t, err, "waitForTemplateActive returned an error %v", err)
-}
-
-func TestClient_waitForTemplateDeleted(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiTemplateBase, dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		w.WriteHeader(404)
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.waitForTemplateDeleted(emptyCtx, test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "waitForTemplateDeleted returned an error %v", err)
-		}
-	}
 }
 
 func getMockTemplate(status string) Template {

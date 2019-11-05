@@ -16,6 +16,8 @@ const (
 	defaultAPIURL                  = "https://api.gridscale.io"
 	resourceActiveStatus           = "active"
 	requestDoneStatus              = "done"
+	requestFailStatus              = "failed"
+	bodyType                       = "application/json"
 )
 
 //Config config for client
