@@ -1,13 +1,15 @@
 # Changelog
 
-## 2.0.1 (Unreleased)
+## 2.1.0 (Unreleased)
 
 IMPROVEMENTS:
 * Errors that are from http requests now include request UUIDs
 * No need to create structs when exporting snapshots to S3
+* Waiting for asynchronous requests is now faster and more memory-friendly
 
 BUG FIXES:
 * Fix README
+* Fix missing JSON properties
 
 ## 2.0.0 (October 07, 2019)
 
