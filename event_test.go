@@ -14,6 +14,7 @@ func TestClient_GetEventList(t *testing.T) {
 	uri := apiEventBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	response, err := client.GetEventList(emptyCtx)
