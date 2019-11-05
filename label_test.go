@@ -26,6 +26,7 @@ func TestClient_GetLabelList(t *testing.T) {
 	uri := apiLabelBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareLabelListHTTPGet("test"))
 	})
 	res, err := client.GetLabelList(emptyCtx)
@@ -36,19 +37,17 @@ func TestClient_GetLabelList(t *testing.T) {
 
 func TestClient_CreateLabel(t *testing.T) {
 	server, client, mux := setupTestClient(true)
+	defer server.Close()
 	var isFailed bool
 	uri := apiLabelBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
 			fmt.Fprint(writer, prepareLabelCreateResponse())
 		}
-	})
-	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-	mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, httpResponse)
 	})
 	for _, test := range commonSuccessFailTestCases {
 		isFailed = test.isFailed
@@ -62,59 +61,33 @@ func TestClient_CreateLabel(t *testing.T) {
 			assert.Equal(t, fmt.Sprintf("%v", getMockLabelCreateResponse()), fmt.Sprintf("%v", res))
 		}
 	}
-	server.Close()
 }
-
-func TestClient_waitForLabelDeleted(t *testing.T) {
+func TestClient_DeleteLabel(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	uri := apiLabelBase
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, prepareLabelListHTTPGet("not-test"))
-	})
-	for _, test := range labelTestCases {
-		err := client.waitForLabelDeleted(emptyCtx, test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
+	var isFailed bool
+	uri := path.Join(apiLabelBase, "test")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodDelete, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
 		} else {
-			assert.Nil(t, err, "waitForFirewallDeleted returned an error %v", err)
+			fmt.Fprint(writer, "")
 		}
-	}
-}
-
-func TestClient_DeleteLabel(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiLabelBase, "test")
-		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-			assert.Equal(t, http.MethodDelete, request.Method)
-			if isFailed {
-				writer.WriteHeader(400)
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range labelTestCases {
+			err := client.DeleteLabel(emptyCtx, test.testUUID)
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
 			} else {
-				fmt.Fprint(writer, "")
-			}
-		})
-		if clientTest {
-			mux.HandleFunc(apiLabelBase, func(w http.ResponseWriter, r *http.Request) {
-				assert.Equal(t, http.MethodGet, r.Method)
-				fmt.Fprint(w, prepareLabelListHTTPGet("not-test"))
-			})
-		}
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range labelTestCases {
-				err := client.DeleteLabel(emptyCtx, test.testUUID)
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "DeleteLabel returned an error %v", err)
-				}
+				assert.Nil(t, err, "DeleteLabel returned an error %v", err)
 			}
 		}
-		server.Close()
 	}
+
 }
 
 func getMockLabel(label string) Label {

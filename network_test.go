@@ -15,6 +15,7 @@ func TestClient_GetNetworkList(t *testing.T) {
 	uri := apiNetworkBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet(true, "active"))
 	})
 	res, err := client.GetNetworkList(emptyCtx)
@@ -29,6 +30,7 @@ func TestClient_GetNetwork(t *testing.T) {
 	uri := path.Join(apiNetworkBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareNetworkHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -43,110 +45,102 @@ func TestClient_GetNetwork(t *testing.T) {
 }
 
 func TestClient_CreateNetwork(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := apiNetworkBase
-		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-			assert.Equal(t, http.MethodPost, request.Method)
-			if isFailed {
-				writer.WriteHeader(400)
-			} else {
-				fmt.Fprintf(writer, prepareNetworkCreateResponse())
-			}
-		})
-		if clientTest {
-			httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
-			mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
-				fmt.Fprint(w, httpResponse)
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := apiNetworkBase
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodPost, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			fmt.Fprintf(writer, prepareNetworkCreateResponse())
+		}
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		response, err := client.CreateNetwork(
+			emptyCtx,
+			NetworkCreateRequest{
+				Name:         "test",
+				Labels:       []string{"label"},
+				LocationUUID: dummyUUID,
+				L2Security:   false,
 			})
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreateNetwork returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockNetworkCreateResponse()), fmt.Sprintf("%s", response))
 		}
-		for _, test := range commonSuccessFailTestCases {
-			isFailed = test.isFailed
-			response, err := client.CreateNetwork(
-				emptyCtx,
-				NetworkCreateRequest{
-					Name:         "test",
-					Labels:       []string{"label"},
-					LocationUUID: dummyUUID,
-					L2Security:   false,
-				})
-			if isFailed {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "CreateNetwork returned an error %v", err)
-				assert.Equal(t, fmt.Sprintf("%v", getMockNetworkCreateResponse()), fmt.Sprintf("%s", response))
-			}
-		}
-		server.Close()
 	}
+
 }
 
 func TestClient_UpdateNetwork(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiNetworkBase, dummyUUID)
-		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-			if isFailed {
-				writer.WriteHeader(400)
-			} else {
-				if request.Method == http.MethodPatch {
-					fmt.Fprintf(writer, "")
-				} else if request.Method == http.MethodGet {
-					fmt.Fprint(writer, prepareNetworkHTTPGet("active"))
-				}
-			}
-		})
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.UpdateNetwork(
-					emptyCtx,
-					test.testUUID,
-					NetworkUpdateRequest{
-						Name:       "test",
-						L2Security: false,
-					})
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "UpdateNetwork returned an error %v", err)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiNetworkBase, dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			if request.Method == http.MethodPatch {
+				fmt.Fprintf(writer, "")
+			} else if request.Method == http.MethodGet {
+				fmt.Fprint(writer, prepareNetworkHTTPGet("active"))
 			}
 		}
-		server.Close()
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.UpdateNetwork(
+				emptyCtx,
+				test.testUUID,
+				NetworkUpdateRequest{
+					Name:       "test",
+					L2Security: false,
+				})
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "UpdateNetwork returned an error %v", err)
+			}
+		}
 	}
 }
 
 func TestClient_DeleteNetwork(t *testing.T) {
-	for _, clientTest := range syncClientTestCases {
-		server, client, mux := setupTestClient(clientTest)
-		var isFailed bool
-		uri := path.Join(apiNetworkBase, dummyUUID)
-		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-			if isFailed {
-				writer.WriteHeader(400)
-			} else {
-				if request.Method == http.MethodDelete {
-					fmt.Fprintf(writer, "")
-				} else if request.Method == http.MethodGet {
-					writer.WriteHeader(404)
-				}
-			}
-		})
-		for _, serverTest := range commonSuccessFailTestCases {
-			isFailed = serverTest.isFailed
-			for _, test := range uuidCommonTestCases {
-				err := client.DeleteNetwork(emptyCtx, test.testUUID)
-				if test.isFailed || isFailed {
-					assert.NotNil(t, err)
-				} else {
-					assert.Nil(t, err, "DeleteNetwork returned an error %v", err)
-				}
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiNetworkBase, dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			if request.Method == http.MethodDelete {
+				fmt.Fprintf(writer, "")
+			} else if request.Method == http.MethodGet {
+				writer.WriteHeader(404)
 			}
 		}
-		server.Close()
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.DeleteNetwork(emptyCtx, test.testUUID)
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "DeleteNetwork returned an error %v", err)
+			}
+		}
 	}
 }
 
@@ -156,6 +150,7 @@ func TestClient_GetNetworkEventList(t *testing.T) {
 	uri := path.Join(apiNetworkBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -179,6 +174,7 @@ func TestClient_GetNetworkPublic(t *testing.T) {
 	uri := apiNetworkBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -206,6 +202,7 @@ func TestClient_GetNetworksByLocation(t *testing.T) {
 	uri := path.Join(apiLocationBase, dummyUUID, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet(true, "active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -226,42 +223,13 @@ func TestClient_GetDeletedNetworks(t *testing.T) {
 	uri := path.Join(apiDeletedBase, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareDeletedNetworkListHTTPGet("active"))
 	})
 	res, err := client.GetDeletedNetworks(emptyCtx)
 	assert.Nil(t, err, "GetDeletedNetworks returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockNetwork(true, "active")), fmt.Sprintf("%v", res))
-}
-
-func TestClient_waitForNetworkActive(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiNetworkBase, dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, prepareNetworkHTTPGet("active"))
-	})
-	err := client.waitForNetworkActive(emptyCtx, dummyUUID)
-	assert.Nil(t, err, "waitForNetworkActive returned an error %v", err)
-}
-
-func TestClient_waitForNetworkDeleted(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	uri := path.Join(apiNetworkBase, dummyUUID)
-	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		w.WriteHeader(404)
-	})
-	for _, test := range uuidCommonTestCases {
-		err := client.waitForNetworkDeleted(emptyCtx, test.testUUID)
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "waitForNetworkDeleted returned an error %v", err)
-		}
-	}
 }
 
 func getMockNetwork(isPublic bool, status string) Network {
