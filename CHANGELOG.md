@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 (Unreleased)
+## 2.1.0 (November 05, 2019)
 
 IMPROVEMENTS:
 * Errors that are from http requests now include request UUIDs
