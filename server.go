@@ -114,9 +114,6 @@ type ServerCreateRequest struct {
 	//The number of server cores.
 	Cores int `json:"cores"`
 
-	//Helps to identify which datacenter an object belongs to.
-	LocationUUID string `json:"location_uuid"`
-
 	//Specifies the hardware settings for the virtual machine.
 	//Allowed values: nil, DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
 	//SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.

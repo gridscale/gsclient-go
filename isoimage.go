@@ -113,9 +113,6 @@ type ISOImageCreateRequest struct {
 
 	//List of labels. Can be leave empty.
 	Labels []string `json:"labels,omitempty"`
-
-	//Helps to identify which datacenter an object belongs to.
-	LocationUUID string `json:"location_uuid"`
 }
 
 //ISOImageCreateResponse is JSON struct of a response for creating an ISO-Image

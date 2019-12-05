@@ -333,10 +333,7 @@ type ServiceObject struct {
 //PaaSSecurityZoneCreateRequest JSON struct of a request for creating a PaaS security zone
 type PaaSSecurityZoneCreateRequest struct {
 	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
-	Name string `json:"name,omitempty"`
-
-	//Identifies which datacenter the object belongs to.
-	LocationUUID string `json:"location_uuid,omitempty"`
+	Name string `json:"name"`
 }
 
 //PaaSSecurityZoneCreateResponse JSON struct of a response for creating a PaaS security zone
@@ -355,9 +352,6 @@ type PaaSSecurityZoneCreateResponse struct {
 type PaaSSecurityZoneUpdateRequest struct {
 	//The new name you give to the security zone. Leave it if you do not want to update the name
 	Name string `json:"name,omitempty"`
-
-	//Identifies which datacenter the object belongs to. Leave it if you do not want to update the location
-	LocationUUID string `json:"location_uuid,omitempty"`
 
 	//The UUID for the security zone you would like to update. Leave it if you do not want to update the security zone
 	PaaSSecurityZoneUUID string `json:"paas_security_zone_uuid,omitempty"`

@@ -63,10 +63,9 @@ func TestClient_CreateISOImage(t *testing.T) {
 		response, err := client.CreateISOImage(
 			emptyCtx,
 			ISOImageCreateRequest{
-				Name:         "Test",
-				SourceURL:    "http://example.org",
-				Labels:       []string{"label"},
-				LocationUUID: "aa-bb-cc",
+				Name:      "Test",
+				SourceURL: "http://example.org",
+				Labels:    []string{"label"},
 			})
 		if test.isFailed {
 			assert.NotNil(t, err)

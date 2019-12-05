@@ -63,10 +63,9 @@ func TestClient_CreateStorage(t *testing.T) {
 		res, err := client.CreateStorage(
 			emptyCtx,
 			StorageCreateRequest{
-				Capacity:     10,
-				LocationUUID: dummyUUID,
-				Name:         "test",
-				StorageType:  DefaultStorageType,
+				Capacity:    10,
+				Name:        "test",
+				StorageType: DefaultStorageType,
 				Template: &StorageTemplate{
 					TemplateUUID: dummyUUID,
 					Password:     "pass",

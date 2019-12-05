@@ -32,7 +32,6 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 			lbRequest := LoadBalancerCreateRequest{
 				Name:                lb.Name,
 				Algorithm:           LoadbalancerLeastConnAlg,
-				LocationUUID:        lb.LocationUUID,
 				ListenIPv6UUID:      lb.ListenIPv6UUID,
 				ListenIPv4UUID:      lb.ListenIPv4UUID,
 				RedirectHTTPToHTTPS: lb.RedirectHTTPToHTTPS,
