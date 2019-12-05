@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
-
 var emptyCtx = context.Background()
 
 func main() {
@@ -23,9 +21,8 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	isoRequest := gsclient.ISOImageCreateRequest{
-		Name:         "go-client-iso",
-		SourceURL:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
-		LocationUUID: locationUUID,
+		Name:      "go-client-iso",
+		SourceURL: "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
 	}
 	cIso, err := client.CreateISOImage(emptyCtx, isoRequest)
 	if err != nil {

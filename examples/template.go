@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
-
 var emptyCtx = context.Background()
 
 func main() {
@@ -26,9 +24,8 @@ func main() {
 	cStorage, err := client.CreateStorage(
 		emptyCtx,
 		gsclient.StorageCreateRequest{
-			Capacity:     1,
-			LocationUUID: locationUUID,
-			Name:         "go-client-storage",
+			Capacity: 1,
+			Name:     "go-client-storage",
 		})
 	if err != nil {
 		log.Error("Create storage has failed with error", err)

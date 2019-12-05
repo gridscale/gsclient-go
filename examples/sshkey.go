@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
-
 var emptyCtx = context.Background()
 
 //exampleSSHkey is an example of SSH-key, don't use it in production

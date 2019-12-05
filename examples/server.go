@@ -10,7 +10,6 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
 const webServerFirewallTemplateUUID = "82aa235b-61ba-48ca-8f47-7060a0435de7"
 
 var emptyCtx = context.Background()
@@ -44,10 +43,9 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	serverCreateRequest := gsclient.ServerCreateRequest{
-		Name:         "go-client-server",
-		Memory:       1,
-		Cores:        2,
-		LocationUUID: locationUUID,
+		Name:   "go-client-server",
+		Memory: 1,
+		Cores:  2,
 	}
 	cServer, err := client.CreateServer(emptyCtx, serverCreateRequest)
 	if err != nil {
@@ -119,9 +117,8 @@ func main() {
 	cStorage, err := client.CreateStorage(
 		emptyCtx,
 		gsclient.StorageCreateRequest{
-			Capacity:     1,
-			LocationUUID: locationUUID,
-			Name:         "go-client-storage",
+			Capacity: 1,
+			Name:     "go-client-storage",
 		})
 	if err != nil {
 		log.Error("Create storage has failed with error", err)
@@ -135,8 +132,7 @@ func main() {
 	cNetwork, err := client.CreateNetwork(
 		emptyCtx,
 		gsclient.NetworkCreateRequest{
-			Name:         "go-client-network",
-			LocationUUID: locationUUID,
+			Name: "go-client-network",
 		})
 	if err != nil {
 		log.Error("Create network has failed with error", err)
@@ -150,9 +146,8 @@ func main() {
 	cIP, err := client.CreateIP(
 		emptyCtx,
 		gsclient.IPCreateRequest{
-			Name:         "go-client-ip",
-			Family:       gsclient.IPv4Type,
-			LocationUUID: locationUUID,
+			Name:   "go-client-ip",
+			Family: gsclient.IPv4Type,
 		})
 	if err != nil {
 		log.Error("Create IP has failed with error", err)
@@ -166,9 +161,8 @@ func main() {
 	cISOimage, err := client.CreateISOImage(
 		emptyCtx,
 		gsclient.ISOImageCreateRequest{
-			Name:         "go-client-iso",
-			SourceURL:    "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
-			LocationUUID: locationUUID,
+			Name:      "go-client-iso",
+			SourceURL: "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso",
 		})
 	if err != nil {
 		log.Error("Create ISO-image has failed with error", err)
