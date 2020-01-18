@@ -9,8 +9,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
-
 var emptyCtx = context.Background()
 
 func main() {
@@ -24,8 +22,7 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	networkRequest := gsclient.NetworkCreateRequest{
-		Name:         "go-client-network",
-		LocationUUID: locationUUID,
+		Name: "go-client-network",
 	}
 	cnetwork, err := client.CreateNetwork(emptyCtx, networkRequest)
 	if err != nil {

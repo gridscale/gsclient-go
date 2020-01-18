@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.2.0 (Unreleased)
+
+IMPROVEMENTS:
+* Better variables/functions' names
+* Remove `LocationUUID` as objects' location depends on Project's location
+* Add gomod
+
+BUG FIXES:
+* Fix "cannot remove all labels of an object"
+* Fix resource leak due to not closing response's body
+
 ## 2.1.0 (November 05, 2019)
 
 IMPROVEMENTS:

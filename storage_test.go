@@ -63,10 +63,9 @@ func TestClient_CreateStorage(t *testing.T) {
 		res, err := client.CreateStorage(
 			emptyCtx,
 			StorageCreateRequest{
-				Capacity:     10,
-				LocationUUID: dummyUUID,
-				Name:         "test",
-				StorageType:  DefaultStorageType,
+				Capacity:    10,
+				Name:        "test",
+				StorageType: DefaultStorageType,
 				Template: &StorageTemplate{
 					TemplateUUID: dummyUUID,
 					Password:     "pass",
@@ -109,7 +108,7 @@ func TestClient_UpdateStorage(t *testing.T) {
 				test.testUUID,
 				StorageUpdateRequest{
 					Name:     "test",
-					Labels:   []string{"label"},
+					Labels:   &[]string{"label"},
 					Capacity: 20,
 				})
 			if test.isFailed || isFailed {

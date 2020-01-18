@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
-
 var emptyCtx = context.Background()
 
 func main() {
@@ -25,16 +23,14 @@ func main() {
 	ipv4, _ := client.CreateIP(
 		emptyCtx,
 		gsclient.IPCreateRequest{
-			Family:       gsclient.IPv4Type,
-			LocationUUID: locationUUID,
+			Family: gsclient.IPv4Type,
 		})
 	log.Info("IPv4 has been created")
 
 	ipv6, _ := client.CreateIP(
 		emptyCtx,
 		gsclient.IPCreateRequest{
-			Family:       gsclient.IPv6Type,
-			LocationUUID: locationUUID,
+			Family: gsclient.IPv6Type,
 		})
 	log.Info("[INFO] IPv6 has been created")
 
@@ -44,7 +40,6 @@ func main() {
 	lbRequest := gsclient.LoadBalancerCreateRequest{
 		Name:                "go-client-lb",
 		Algorithm:           gsclient.LoadbalancerLeastConnAlg,
-		LocationUUID:        locationUUID,
 		ListenIPv6UUID:      ipv6.ObjectUUID,
 		ListenIPv4UUID:      ipv4.ObjectUUID,
 		RedirectHTTPToHTTPS: false,
@@ -83,7 +78,6 @@ func main() {
 	lbUpdateRequest := gsclient.LoadBalancerUpdateRequest{
 		Name:                "go-client-lb233",
 		Algorithm:           gsclient.LoadbalancerRoundrobinAlg,
-		LocationUUID:        glb.Properties.LocationUUID,
 		ListenIPv6UUID:      glb.Properties.ListenIPv6UUID,
 		ListenIPv4UUID:      glb.Properties.ListenIPv4UUID,
 		RedirectHTTPToHTTPS: glb.Properties.RedirectHTTPToHTTPS,

@@ -132,7 +132,7 @@ func TestClient_UpdateTemplate(t *testing.T) {
 				test.testUUID,
 				TemplateUpdateRequest{
 					Name:   "test",
-					Labels: []string{"labels"},
+					Labels: &[]string{"labels"},
 				})
 			if test.isFailed || isFailed {
 				assert.NotNil(t, err)

@@ -68,7 +68,7 @@ func TestClient_CreateFirewall(t *testing.T) {
 				Rules: FirewallRules{
 					RulesV6In: []FirewallRuleProperties{
 						{
-							Protocol: "tcp",
+							Protocol: TCPTransport,
 							DstPort:  "1080",
 							SrcPort:  "80",
 							Order:    0,
@@ -110,11 +110,11 @@ func TestClient_UpdateFirewall(t *testing.T) {
 				test.testUUID,
 				FirewallUpdateRequest{
 					Name:   "test",
-					Labels: []string{"label"},
+					Labels: &[]string{},
 					Rules: &FirewallRules{
 						RulesV6In: []FirewallRuleProperties{
 							{
-								Protocol: "tcp",
+								Protocol: TCPTransport,
 								DstPort:  "1080",
 								SrcPort:  "80",
 								Order:    0,
@@ -194,7 +194,7 @@ func getMockFirewall(status string) Firewall {
 		Rules: FirewallRules{
 			RulesV6In: []FirewallRuleProperties{
 				{
-					Protocol: "tcp",
+					Protocol: TCPTransport,
 					DstPort:  "1080",
 					SrcPort:  "80",
 					Order:    0,

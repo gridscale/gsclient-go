@@ -6,7 +6,8 @@ import (
 	"time"
 )
 
-type isContinue func() (bool, error)
+//retryableFunc defines a function that can be retried
+type retryableFunc func() (bool, error)
 
 //isValidUUID validates the uuid
 func isValidUUID(u string) bool {
@@ -15,7 +16,7 @@ func isValidUUID(u string) bool {
 }
 
 //retryWithTimeout reruns a function within a period of time
-func retryWithTimeout(targetFunc isContinue, timeout, delay time.Duration) error {
+func retryWithTimeout(targetFunc retryableFunc, timeout, delay time.Duration) error {
 	timer := time.After(timeout)
 	var err error
 	var continueRetrying bool
@@ -37,7 +38,7 @@ func retryWithTimeout(targetFunc isContinue, timeout, delay time.Duration) error
 }
 
 //retryWithLimitedNumOfRetries reruns a function within a number of retries
-func retryWithLimitedNumOfRetries(targetFunc isContinue, numOfRetries int, delay time.Duration) error {
+func retryWithLimitedNumOfRetries(targetFunc retryableFunc, numOfRetries int, delay time.Duration) error {
 	retryNo := 0
 	var err error
 	var continueRetrying bool

@@ -63,10 +63,9 @@ func TestClient_CreateNetwork(t *testing.T) {
 		response, err := client.CreateNetwork(
 			emptyCtx,
 			NetworkCreateRequest{
-				Name:         "test",
-				Labels:       []string{"label"},
-				LocationUUID: dummyUUID,
-				L2Security:   false,
+				Name:       "test",
+				Labels:     []string{"label"},
+				L2Security: false,
 			})
 		if isFailed {
 			assert.NotNil(t, err)

@@ -115,7 +115,7 @@ func TestClient_UpdatePaaSService(t *testing.T) {
 				test.testUUID,
 				PaaSServiceUpdateRequest{
 					Name:       "test",
-					Labels:     []string{"label"},
+					Labels:     &[]string{"label"},
 					Parameters: parameters,
 					ResourceLimits: []ResourceLimit{
 						{
@@ -233,8 +233,7 @@ func TestClient_CreatePaaSSecurityZone(t *testing.T) {
 		res, err := client.CreatePaaSSecurityZone(
 			emptyCtx,
 			PaaSSecurityZoneCreateRequest{
-				Name:         "test",
-				LocationUUID: "aa-bb-cc",
+				Name: "test",
 			})
 		if isFailed {
 			assert.NotNil(t, err)
@@ -290,7 +289,6 @@ func TestClient_UpdatePaaSSecurityZone(t *testing.T) {
 				test.testUUID,
 				PaaSSecurityZoneUpdateRequest{
 					Name:                 "test",
-					LocationUUID:         "a-b-c",
 					PaaSSecurityZoneUUID: dummyUUID,
 				})
 			if test.isFailed || isFailed {

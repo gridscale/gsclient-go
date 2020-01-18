@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
-
 var emptyCtx = context.Background()
 
 //exampleSSHkey is an example of SSH-key, don't use it in production
@@ -61,7 +59,7 @@ func main() {
 		gsclient.SshkeyUpdateRequest{
 			Name:   "updated SSH-key",
 			Sshkey: sshkey.Properties.Sshkey,
-			Labels: sshkey.Properties.Labels,
+			Labels: &sshkey.Properties.Labels,
 		})
 	if err != nil {
 		log.Error("Update SSH-key has failed with error", err)
