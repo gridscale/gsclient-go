@@ -115,7 +115,7 @@ func TestClient_UpdatePaaSService(t *testing.T) {
 				test.testUUID,
 				PaaSServiceUpdateRequest{
 					Name:       "test",
-					Labels:     []string{"label"},
+					Labels:     &[]string{"label"},
 					Parameters: parameters,
 					ResourceLimits: []ResourceLimit{
 						{

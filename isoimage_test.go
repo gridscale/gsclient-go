@@ -101,7 +101,7 @@ func TestClient_UpdateISOImage(t *testing.T) {
 				test.testUUID,
 				ISOImageUpdateRequest{
 					Name:   "test",
-					Labels: []string{},
+					Labels: &[]string{},
 				})
 			if test.isFailed || isFailed {
 				assert.NotNil(t, err)

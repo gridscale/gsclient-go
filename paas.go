@@ -222,7 +222,7 @@ type PaaSServiceUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//List of labels. Leave it if you do not want to update the list of labels
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 
 	//Contains the service parameters for the service. Leave it if you do not want to update the parameters
 	Parameters map[string]interface{} `json:"parameters,omitempty"`

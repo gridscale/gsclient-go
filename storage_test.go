@@ -108,7 +108,7 @@ func TestClient_UpdateStorage(t *testing.T) {
 				test.testUUID,
 				StorageUpdateRequest{
 					Name:     "test",
-					Labels:   []string{"label"},
+					Labels:   &[]string{"label"},
 					Capacity: 20,
 				})
 			if test.isFailed || isFailed {

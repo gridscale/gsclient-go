@@ -226,7 +226,7 @@ type ServerUpdateRequest struct {
 	Cores int `json:"cores,omitempty"`
 
 	//List of labels. Leave it if you do not want to update the list of labels
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 
 	//If the server should be auto-started in case of a failure (default=true).
 	//Leave it if you do not want to update this feature of the server.

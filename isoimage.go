@@ -130,7 +130,7 @@ type ISOImageUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//List of labels. Leave it if you do not want to update the list of labels.
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 }
 
 //GetISOImageList returns a list of available ISO images

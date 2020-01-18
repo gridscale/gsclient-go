@@ -169,7 +169,7 @@ type IPUpdateRequest struct {
 	ReverseDNS string `json:"reverse_dns,omitempty"`
 
 	//List of labels. Leave it if you do not want to update the labels.
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 }
 
 //Allowed IP address versions

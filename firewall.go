@@ -152,7 +152,7 @@ type FirewallUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//New list of labels. Leave it if you do not want to update the Labels
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 
 	//FirewallRules. Leave it if you do not want to update the firewall rules
 	Rules *FirewallRules `json:"rules,omitempty"`

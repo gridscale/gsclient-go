@@ -169,6 +169,9 @@ type NetworkUpdateRequest struct {
 
 	//L2Security. Leave it if you do not want to update the l2 security
 	L2Security bool `json:"l2security"`
+
+	//List of labels. Can be empty.
+	Labels *[]string `json:"labels,omitempty"`
 }
 
 //GetNetwork get a specific network based on given id

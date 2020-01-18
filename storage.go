@@ -222,7 +222,7 @@ type StorageUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//List of labels. Optional.
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 
 	//The Capacity of the Storage in GB. Optional.
 	Capacity int `json:"capacity,omitempty"`

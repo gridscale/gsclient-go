@@ -114,7 +114,7 @@ func TestClient_UpdateStorageSnapshot(t *testing.T) {
 					testSnapshotID.testUUID,
 					StorageSnapshotUpdateRequest{
 						Name:   "test",
-						Labels: []string{"label"},
+						Labels: &[]string{"label"},
 					})
 				if testStorageID.isFailed || testSnapshotID.isFailed || isFailed {
 					assert.NotNil(t, err)

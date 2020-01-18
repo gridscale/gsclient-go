@@ -110,7 +110,7 @@ func TestClient_UpdateFirewall(t *testing.T) {
 				test.testUUID,
 				FirewallUpdateRequest{
 					Name:   "test",
-					Labels: []string{"label"},
+					Labels: &[]string{},
 					Rules: &FirewallRules{
 						RulesV6In: []FirewallRuleProperties{
 							{
