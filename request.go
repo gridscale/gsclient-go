@@ -95,14 +95,14 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 	//
 	err = retryWithLimitedNumOfRetries(func() (bool, error) {
 		//execute the request
-		result, err := httpClient.Do(request)
+		resp, err := httpClient.Do(request)
 		if err != nil {
 			logger.Errorf("Error while executing the request: %v", err)
 			return false, err
 		}
-		statusCode := result.StatusCode
-		requestUUID = result.Header.Get(requestUUIDHeaderParam)
-		responseBodyBytes, err = ioutil.ReadAll(result.Body)
+		statusCode := resp.StatusCode
+		requestUUID = resp.Header.Get(requestUUIDHeaderParam)
+		responseBodyBytes, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			logger.Errorf("Error while reading the response's body: %v", err)
 			return false, err
@@ -110,13 +110,13 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 
 		logger.Debugf("Status code: %v. Request UUID: %v.", statusCode, requestUUID)
 
-		if result.StatusCode >= 300 {
+		if resp.StatusCode >= 300 {
 			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 			errorMessage.StatusCode = statusCode
 			errorMessage.RequestUUID = requestUUID
 			json.Unmarshal(responseBodyBytes, &errorMessage)
 			//if internal server error OR object is in status that does not allow the request, retry
-			if result.StatusCode >= 500 || result.StatusCode == 424 {
+			if resp.StatusCode >= 500 || resp.StatusCode == 424 {
 				return true, errorMessage
 			}
 			logger.Errorf(
