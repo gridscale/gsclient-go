@@ -58,7 +58,7 @@ func main() {
 	}
 	fwUpdateRequest := gsclient.FirewallUpdateRequest{
 		Name:   "Updated name",
-		Labels: fw.Properties.Labels,
+		Labels: &fw.Properties.Labels,
 		Rules:  &fw.Properties.Rules,
 	}
 	err = client.UpdateFirewall(emptyCtx, fw.Properties.ObjectUUID, fwUpdateRequest)

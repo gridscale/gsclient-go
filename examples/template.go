@@ -107,7 +107,7 @@ func main() {
 	//Update template
 	err = client.UpdateTemplate(emptyCtx, template.Properties.ObjectUUID, gsclient.TemplateUpdateRequest{
 		Name:   "updated template",
-		Labels: template.Properties.Labels,
+		Labels: &template.Properties.Labels,
 	})
 	if err != nil {
 		log.Error("Update template has failed with error", err)

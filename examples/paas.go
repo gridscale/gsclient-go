@@ -113,7 +113,7 @@ func main() {
 	//Update PaaS service
 	paasUpdateRequest := gsclient.PaaSServiceUpdateRequest{
 		Name:           "updated paas",
-		Labels:         paas.Properties.Labels,
+		Labels:         &paas.Properties.Labels,
 		Parameters:     paas.Properties.Parameters,
 		ResourceLimits: paas.Properties.ResourceLimits,
 	}

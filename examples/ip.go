@@ -64,7 +64,7 @@ func main() {
 		Name:       "Updated IP address",
 		Failover:   ip.Properties.Failover,
 		ReverseDNS: ip.Properties.ReverseDNS,
-		Labels:     ip.Properties.Labels,
+		Labels:     &ip.Properties.Labels,
 	}
 	err = client.UpdateIP(emptyCtx, ip.Properties.ObjectUUID, updateRequest)
 	if err != nil {

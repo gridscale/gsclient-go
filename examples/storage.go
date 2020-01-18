@@ -75,7 +75,7 @@ func main() {
 		storage.Properties.ObjectUUID,
 		gsclient.StorageUpdateRequest{
 			Name:     "updated storage",
-			Labels:   storage.Properties.Labels,
+			Labels:   &storage.Properties.Labels,
 			Capacity: storage.Properties.Capacity,
 		})
 	if err != nil {

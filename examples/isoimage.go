@@ -63,7 +63,7 @@ func main() {
 
 	isoUpdateRequest := gsclient.ISOImageUpdateRequest{
 		Name:   "updated ISO",
-		Labels: iso.Properties.Labels,
+		Labels: &iso.Properties.Labels,
 	}
 	err = client.UpdateISOImage(emptyCtx, iso.Properties.ObjectUUID, isoUpdateRequest)
 	if err != nil {
