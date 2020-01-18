@@ -26,8 +26,9 @@ func main() {
 		Rules: gsclient.FirewallRules{
 			RulesV4In: []gsclient.FirewallRuleProperties{
 				{
-					Action: "accept",
-					Order:  1,
+					Protocol: gsclient.TCPTransport,
+					Action:   "accept",
+					Order:    1,
 				},
 			},
 		},
