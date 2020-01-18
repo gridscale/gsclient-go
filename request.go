@@ -98,13 +98,18 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 		resp, err := httpClient.Do(request)
 		if err != nil {
 			logger.Errorf("Error while executing the request: %v", err)
+			//stop retrying (false) and return error
 			return false, err
 		}
+		//Close body to prevent resource leak
+		defer resp.Body.Close()
+
 		statusCode := resp.StatusCode
 		requestUUID = resp.Header.Get(requestUUIDHeaderParam)
 		responseBodyBytes, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			logger.Errorf("Error while reading the response's body: %v", err)
+			//stop retrying (false) and return error
 			return false, err
 		}
 
@@ -117,6 +122,8 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 			json.Unmarshal(responseBodyBytes, &errorMessage)
 			//if internal server error OR object is in status that does not allow the request, retry
 			if resp.StatusCode >= 500 || resp.StatusCode == 424 {
+				//retry (true) and accumulate error (in case that maximum number of retries is reached, and
+				//the latest error is still reported)
 				return true, errorMessage
 			}
 			logger.Errorf(
@@ -126,10 +133,11 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 				errorMessage.StatusCode,
 				errorMessage.RequestUUID,
 			)
+			//stop retrying (false) and return custom error
 			return false, errorMessage
 		}
 		logger.Debugf("Response body: %v", string(responseBodyBytes))
-
+		//stop retrying (false) as no more errors
 		return false, nil
 	}, c.MaxNumberOfRetries(), c.DelayInterval())
 	//if retry fails
