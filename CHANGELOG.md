@@ -5,6 +5,7 @@
 IMPROVEMENTS:
 * Better variables/functions' names
 * Remove `LocationUUID` as objects' location depends on Project's location
+* Add gomod
 
 BUG FIXES:
 * Fix "cannot remove all labels of an object"
