@@ -2,8 +2,10 @@ package gsclient
 
 import (
 	"errors"
-	"github.com/google/uuid"
 	"time"
+	"fmt"
+
+	"github.com/google/uuid"
 )
 
 //retryableFunc defines a function that can be retried
@@ -51,7 +53,7 @@ func retryWithLimitedNumOfRetries(targetFunc retryableFunc, numOfRetries int, de
 		retryNo++
 	}
 	if err != nil {
-		return err
+		return fmt.Errorf("Maximum number of trials has been exhausted with error: %v", err)
 	}
-	return errors.New("timeout reached")
+	return errors.New("Maximum number of trials has been exhausted")
 }
