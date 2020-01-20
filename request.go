@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 )
 
@@ -97,6 +98,10 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 		//execute the request
 		resp, err := httpClient.Do(request)
 		if err != nil {
+			if err, ok := err.(net.Error); ok {
+				logger.Debugf("Retrying request due to network error %v", err)
+				return true, err
+			}
 			logger.Errorf("Error while executing the request: %v", err)
 			//stop retrying (false) and return error
 			return false, err
