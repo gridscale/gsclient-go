@@ -113,7 +113,6 @@ func TestRequestPost_NetworkErrors(t *testing.T) {
 			Name:            "test",
 			Memory:          10,
 			Cores:           4,
-			LocationUUID:    dummyUUID,
 			HardwareProfile: DefaultServerHardware,
 			Labels:          []string{"label"},
 		})
