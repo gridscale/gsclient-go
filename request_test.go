@@ -31,7 +31,12 @@ var networkErrorTests []networkTestCase = []networkTestCase{
 		httpClient: http.DefaultClient,
 		expectedError: "Maximum number of trials has been exhausted with error: Get %s%s: dial tcp 127.0.0.1:80: connect: connection refused",
 	},
-	
+	{
+		name: "DNS lookup error",
+		apiURL: "http://api.unkown.domain",
+		httpClient: http.DefaultClient,
+		expectedError: "Maximum number of trials has been exhausted with error: Get %s%s: dial tcp: lookup api.unkown.domain: no such host",
+	},
 }
 
 func TestRequest_RetryNetworkErrors(t *testing.T) {
