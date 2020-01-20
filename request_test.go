@@ -12,51 +12,73 @@ import (
 )
 
 type networkTestCase struct {
-	name string
-	apiURL string
-	httpClient *http.Client
+	name          string
+	apiURL        string
+	httpClient    *http.Client
 	expectedError string
 }
 
-var getNetworkErrorTests []networkTestCase = []networkTestCase{
+type apiTestCase struct {
+	name          string
+	statusCode    int
+	dummyUUID     string
+	expectedError string
+}
+
+var getNetworkErrorTests = []networkTestCase{
 	{
-		name: "rety the GET requet in case of connection timeout",
-		apiURL: "http://127.0.0.1",
-		httpClient: &http.Client{Timeout: 1 * time.Nanosecond},
+		name:          "rety the GET request in case of connection timeout",
+		apiURL:        "http://127.0.0.1",
+		httpClient:    &http.Client{Timeout: 1 * time.Nanosecond},
 		expectedError: "Maximum number of trials has been exhausted with error: Get %s%s: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)",
 	},
 	{
-		name: "rety the GET requet in case of connection refused",
-		apiURL: "http://127.0.0.1",
-		httpClient: http.DefaultClient,
+		name:          "rety the GET request in case of connection refused",
+		apiURL:        "http://127.0.0.1",
+		httpClient:    http.DefaultClient,
 		expectedError: "Maximum number of trials has been exhausted with error: Get %s%s: dial tcp 127.0.0.1:80: connect: connection refused",
 	},
 	{
-		name: "rety the GET requet in case of DNS lookup error",
-		apiURL: "http://api.unkown.domain",
-		httpClient: http.DefaultClient,
+		name:          "rety the GET request in case of DNS lookup error",
+		apiURL:        "http://api.unkown.domain",
+		httpClient:    http.DefaultClient,
 		expectedError: "Maximum number of trials has been exhausted with error: Get %s%s: dial tcp: lookup api.unkown.domain: no such host",
 	},
 }
 
-var postNetworkErrorTests []networkTestCase = []networkTestCase{
+var postNetworkErrorTests = []networkTestCase{
 	{
-		name: "do not rety the POST requet in case of connection timeout",
-		apiURL: "http://127.0.0.1",
-		httpClient: &http.Client{Timeout: 1 * time.Nanosecond},
+		name:          "do not rety the POST request in case of connection timeout",
+		apiURL:        "http://127.0.0.1",
+		httpClient:    &http.Client{Timeout: 1 * time.Nanosecond},
 		expectedError: "Post %s%s: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)",
 	},
 	{
-		name: "rety the POST requet in case of connection refused",
-		apiURL: "http://127.0.0.1",
-		httpClient: http.DefaultClient,
+		name:          "rety the POST request in case of connection refused",
+		apiURL:        "http://127.0.0.1",
+		httpClient:    http.DefaultClient,
 		expectedError: "Maximum number of trials has been exhausted with error: Post %s%s: dial tcp 127.0.0.1:80: connect: connection refused",
 	},
 	{
-		name: "rety the POST requet in case of DNS lookup error",
-		apiURL: "http://api.unkown.domain",
-		httpClient: http.DefaultClient,
+		name:          "rety the POST request in case of DNS lookup error",
+		apiURL:        "http://api.unkown.domain",
+		httpClient:    http.DefaultClient,
 		expectedError: "Maximum number of trials has been exhausted with error: Post %s%s: dial tcp: lookup api.unkown.domain: no such host",
+	},
+}
+
+var apiErrorTests = []apiTestCase{
+	{
+		name:          "rety the request in case of API error with status code 500",
+		statusCode:    500,
+		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e53",
+		expectedError: "Maximum number of trials has been exhausted with error: Status code: %d. Error: no error message received from server. Request UUID: %s. Please report this error along with the request UUID.",
+	},
+	{
+		name:          "rety the request in case of API error with status code 424",
+		statusCode:    424,
+		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e54",
+		expectedError: "Maximum number of trials has been exhausted with error: Status code: %d. Error: no error message received from server. Request UUID: %s. ",
 	},
 }
 
@@ -66,7 +88,7 @@ func TestGetRequest_NetworkErrors(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {})
 	defer server.Close()
-	
+
 	for _, test := range getNetworkErrorTests {
 		config := NewConfiguration(test.apiURL, "uuid", "token", true, true, 1, 100, 5)
 		config.httpClient = test.httpClient
@@ -82,19 +104,56 @@ func TestPostRequest_NetworkErrors(t *testing.T) {
 	uri := apiServerBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {})
 	defer server.Close()
-	
+
 	for _, test := range postNetworkErrorTests {
 		config := NewConfiguration(test.apiURL, "uuid", "token", true, true, 1, 100, 5)
 		config.httpClient = test.httpClient
 		client := NewClient(config)
 		_, err := client.CreateServer(emptyCtx, ServerCreateRequest{
-				Name:            "test",
-				Memory:          10,
-				Cores:           4,
-				LocationUUID:    dummyUUID,
-				HardwareProfile: DefaultServerHardware,
-				Labels:          []string{"label"},
-			})
+			Name:            "test",
+			Memory:          10,
+			Cores:           4,
+			LocationUUID:    dummyUUID,
+			HardwareProfile: DefaultServerHardware,
+			Labels:          []string{"label"},
+		})
 		assert.EqualError(t, err, fmt.Sprintf(test.expectedError, config.apiURL, uri), test.name)
+	}
+}
+
+func TestGetRequest_API500and424Errors(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	for _, test := range apiErrorTests {
+		uri := path.Join(apiServerBase, test.dummyUUID)
+		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			w.WriteHeader(test.statusCode)
+		})
+		_, err := client.GetServer(emptyCtx, test.dummyUUID)
+		fmt.Print(err)
+		assert.EqualError(t, err, fmt.Sprintf(test.expectedError, test.statusCode, dummyRequestUUID), test.name)
+	}
+}
+
+func TestPatchRequest_API500and424Errors(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	for _, test := range apiErrorTests {
+		uri := path.Join(apiServerBase, test.dummyUUID)
+		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			w.WriteHeader(test.statusCode)
+		})
+		err := client.UpdateServer(
+			emptyCtx,
+			test.dummyUUID,
+			ServerUpdateRequest{
+				Name:   "test",
+				Memory: 4,
+				Cores:  2,
+				Labels: nil,
+			})
+		assert.EqualError(t, err, fmt.Sprintf(test.expectedError, test.statusCode, dummyRequestUUID), test.name)
 	}
 }
