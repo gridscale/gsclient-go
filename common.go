@@ -2,8 +2,8 @@ package gsclient
 
 import (
 	"errors"
-	"time"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -45,12 +45,13 @@ func retryWithLimitedNumOfRetries(targetFunc retryableFunc, numOfRetries int, de
 	var err error
 	var continueRetrying bool
 	for retryNo <= numOfRetries {
-		time.Sleep(delay) //delay between retries
+		retryNo++
+		time.Sleep(delay * time.Duration(retryNo)) //delay between retries
 		continueRetrying, err = targetFunc()
 		if !continueRetrying {
 			return err
 		}
-		retryNo++
+
 	}
 	if err != nil {
 		return fmt.Errorf("Maximum number of trials has been exhausted with error: %v", err)
