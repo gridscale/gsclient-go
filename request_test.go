@@ -63,7 +63,7 @@ var postNetworkErrorTests = []networkTestCase{
 		name:          "retry the POST request in case of DNS lookup error",
 		apiURL:        "http://api.unkown.domain",
 		httpClient:    http.DefaultClient,
-		expectedError: "Maximum number of trials has been exhausted with error: Post %s%s: dial tcp: lookup api.unkown.domain:",
+		expectedError: "Maximum number of trials has been exhausted with error: Post %s%s: dial tcp: lookup api.unkown.domain",
 	},
 }
 
