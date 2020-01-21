@@ -3,6 +3,9 @@
 ## 2.2.0 (Unreleased)
 
 IMPROVEMENTS:
+* Retry requests in case of network issues (timeouts, connection resets, connection refused, etc)
+* Simple requests backoff in case of retrying errors
+* Increase defaultDelayIntervalMilliSecs to 1000 to reduce stress on API
 * Better variables/functions' names
 * Remove `LocationUUID` as objects' location depends on Project's location
 * Add gomod
