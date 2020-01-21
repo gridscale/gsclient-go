@@ -1,4 +1,4 @@
-module github.com/gridscale/gsclient-go
+module github.com/gridscale/gsclient-go/v2
 
 go 1.13
 

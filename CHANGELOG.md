@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.1 (January 21, 2020)
+
+BUG FIXES:
+* (Hot fix) Fix incompatible major version when using gomod due to missing `/v2` suffix in module path of `go.mod` file 
+
 ## 2.2.0 (January 21, 2020)
 
 IMPROVEMENTS:
