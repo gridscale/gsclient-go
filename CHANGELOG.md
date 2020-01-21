@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.0 (Unreleased)
+## 2.2.0 (January 21, 2020)
 
 IMPROVEMENTS:
 * Retry requests in case of network issues (timeouts, connection resets, connection refused, etc)
