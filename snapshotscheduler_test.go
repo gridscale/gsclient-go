@@ -116,7 +116,7 @@ func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 					testScheduleID.testUUID,
 					StorageSnapshotScheduleUpdateRequest{
 						Name:          "test",
-						Labels:        []string{"label"},
+						Labels:        &[]string{"label"},
 						RunInterval:   60,
 						KeepSnapshots: 1,
 						NextRuntime:   &dummyTime,

@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
-
 var emptyCtx = context.Background()
 
 func main() {
@@ -31,8 +29,7 @@ func main() {
 
 	//Create security zone
 	secZoneRequest := gsclient.PaaSSecurityZoneCreateRequest{
-		Name:         "go-client-security-zone",
-		LocationUUID: locationUUID,
+		Name: "go-client-security-zone",
 	}
 	cSCZ, err := client.CreatePaaSSecurityZone(emptyCtx, secZoneRequest)
 	if err != nil {
@@ -96,7 +93,6 @@ func main() {
 	}
 	secZoneUpdateRequest := gsclient.PaaSSecurityZoneUpdateRequest{
 		Name:                 "updated security zone",
-		LocationUUID:         secZone.Properties.LocationUUID,
 		PaaSSecurityZoneUUID: secZone.Properties.ObjectUUID,
 	}
 	//Update security zone
@@ -117,7 +113,7 @@ func main() {
 	//Update PaaS service
 	paasUpdateRequest := gsclient.PaaSServiceUpdateRequest{
 		Name:           "updated paas",
-		Labels:         paas.Properties.Labels,
+		Labels:         &paas.Properties.Labels,
 		Parameters:     paas.Properties.Parameters,
 		ResourceLimits: paas.Properties.ResourceLimits,
 	}

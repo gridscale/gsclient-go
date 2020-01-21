@@ -26,8 +26,9 @@ func main() {
 		Rules: gsclient.FirewallRules{
 			RulesV4In: []gsclient.FirewallRuleProperties{
 				{
-					Action: "accept",
-					Order:  1,
+					Protocol: gsclient.TCPTransport,
+					Action:   "accept",
+					Order:    1,
 				},
 			},
 		},
@@ -58,7 +59,7 @@ func main() {
 	}
 	fwUpdateRequest := gsclient.FirewallUpdateRequest{
 		Name:   "Updated name",
-		Labels: fw.Properties.Labels,
+		Labels: &fw.Properties.Labels,
 		Rules:  &fw.Properties.Rules,
 	}
 	err = client.UpdateFirewall(emptyCtx, fw.Properties.ObjectUUID, fwUpdateRequest)

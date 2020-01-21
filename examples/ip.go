@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-const locationUUID = "45ed677b-3702-4b36-be2a-a2eab9827950"
-
 var emptyCtx = context.Background()
 
 func main() {
@@ -23,9 +21,8 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	ipRequest := gsclient.IPCreateRequest{
-		Name:         "go-client-ip",
-		Family:       gsclient.IPv4Type,
-		LocationUUID: locationUUID,
+		Name:   "go-client-ip",
+		Family: gsclient.IPv4Type,
 	}
 	//Create new IP
 	ipc, err := client.CreateIP(emptyCtx, ipRequest)
@@ -67,7 +64,7 @@ func main() {
 		Name:       "Updated IP address",
 		Failover:   ip.Properties.Failover,
 		ReverseDNS: ip.Properties.ReverseDNS,
-		Labels:     ip.Properties.Labels,
+		Labels:     &ip.Properties.Labels,
 	}
 	err = client.UpdateIP(emptyCtx, ip.Properties.ObjectUUID, updateRequest)
 	if err != nil {
