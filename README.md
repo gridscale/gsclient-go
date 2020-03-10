@@ -75,6 +75,39 @@ requestBody := gsclient.IPCreateRequest{
 client.CreateIP(ctx, requestBody)
 ```
 
+For updating/scaling server resources you could use:
+
+```go
+myServerUuid := "[Server UUID]"
+backgroundContext := context.Background()
+
+// No hotplug available for scaling resources down, shutdown server first via AHCI
+shutdownErr := client.ShutdownServer(backgroundContext, myServerUuid)
+if shutdownErr != nil{
+	log.Error("Shutdown server failed", shutdownErr)
+	return
+}
+
+// Update servers resources
+requestBody := gsclient.ServerUpdateRequest{
+	Memory:          12,
+	Cores:           4,
+}
+
+updateErr := client.UpdateServer(backgroundContext, myServerUuid, requestBody)
+if updateErr != nil{
+	log.Error("Serverupdate failed", updateErr)
+	return
+}
+
+// Start server again
+poweronErr := client.StartServer(backgroundContext, "70ba2037-2acb-407e-88e5-e752f9fa3b0e")
+if poweronErr != nil{
+	log.Error("Start server failed", poweronErr)
+	return
+}
+```
+
 What options are available for each create and update request can be found in the source code. After installing it should be located in: 
 ```
 ~/go/src/github.com/gridscale/gsclient-go
