@@ -37,7 +37,7 @@ config := gsclient.DefaultConfiguration("User-UUID", "API-token")
 config := gsclient.NewConfiguration(
             "API-URL", 
             "User-UUID", 
-            "API-token"), 
+            "API-token", 
             false, //Set debug mode
             true, //Set sync mode 
             120, //Timeout (in seconds) of checking requests
@@ -60,13 +60,16 @@ cxt := context.Background()
 servers := client.GetServerList(ctx)
 ```
 
-For creating and updating/patching objects in gridscale, it will be required to use the respective CreateRequest and UpdateRequest types. For creating an SSH-key that would be SshkeyCreateRequest and SshkeyUpdateRequest. Here an example:
+For creating and updating/patching objects in gridscale, it will be required to use the respective CreateRequest and UpdateRequest types. For creating an IP that would be IPCreateRequest and IPUpdateRequest. Here an example:
 
 ```go
 cxt := context.Background()
-requestBody := gsclient.IPCreateRequest {
-	Family: gsclient.IPv6Type,
-	Name:   "IPTest",
+requestBody := gsclient.IPCreateRequest{
+	Name:       "IPTest",
+	Family:     gsclient.IPv6Type,
+	Failover:   false,
+	ReverseDNS: "my-reverse-dns-entry.tld",
+	Labels:     []string{"MyLabel"},
 }
 
 client.CreateIP(ctx, requestBody)
