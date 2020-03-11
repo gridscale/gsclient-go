@@ -81,7 +81,7 @@ For updating/scaling server resources you could use:
 myServerUuid := "[Server UUID]"
 backgroundContext := context.Background()
 
-// No hotplug available for scaling resources down, shutdown server first via AHCI
+// No hotplug available for scaling resources down, shutdown server first via ACPI
 shutdownErr := client.ShutdownServer(backgroundContext, myServerUuid)
 if shutdownErr != nil{
 	log.Error("Shutdown server failed", shutdownErr)
@@ -101,7 +101,7 @@ if updateErr != nil{
 }
 
 // Start server again
-poweronErr := client.StartServer(backgroundContext, "70ba2037-2acb-407e-88e5-e752f9fa3b0e")
+poweronErr := client.StartServer(backgroundContext, myServerUuid)
 if poweronErr != nil{
 	log.Error("Start server failed", poweronErr)
 	return
