@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.2 (Unreleased)
+
+DEPRECATED FEATURES:
+* Deprecate labels create/delete options
+
 ## 2.2.1 (January 21, 2020)
 
 BUG FIXES:
