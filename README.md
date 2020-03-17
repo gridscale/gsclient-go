@@ -266,8 +266,8 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Events Get (GetEventList)
 * Label
     * Labels Get (GetLabelList)
-    * Label Create (CreateLabel)
-    * Label Delete (DeleteLabel)
+    * Label Create (CreateLabel) **DEPRECATED**
+    * Label Delete (DeleteLabel) **DEPRECATED**
 * Location
     * Locations Get (GetLocationList)
     * Location Get (GetLocation)
