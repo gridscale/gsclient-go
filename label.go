@@ -61,7 +61,7 @@ func (c *Client) GetLabelList(ctx context.Context) ([]Label, error) {
 	return labels, err
 }
 
-//CreateLabel creates a new label
+//CreateLabel creates a new label (DEPRECATED)
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/CreateLabel
 func (c *Client) CreateLabel(ctx context.Context, body LabelCreateRequest) (CreateResponse, error) {
@@ -75,7 +75,7 @@ func (c *Client) CreateLabel(ctx context.Context, body LabelCreateRequest) (Crea
 	return response, err
 }
 
-//DeleteLabel deletes a label
+//DeleteLabel deletes a label (DEPRECATED)
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/DeleteLabel
 func (c *Client) DeleteLabel(ctx context.Context, label string) error {
