@@ -56,14 +56,14 @@ Make sure to replace the user-UUID and API-token strings with valid credentials 
 After having created a Client type, as shown above, it will be possible to interact with the API. An example would be the [Servers Get endpoint](https://gridscale.io/en/api-documentation/index.html#servers-get):
 
 ```go
-cxt := context.Background()
+ctx := context.Background()
 servers := client.GetServerList(ctx)
 ```
 
 For creating and updating/patching objects in gridscale, it will be required to use the respective CreateRequest and UpdateRequest types. For creating an IP that would be IPCreateRequest and IPUpdateRequest. Here an example:
 
 ```go
-cxt := context.Background()
+ctx := context.Background()
 requestBody := gsclient.IPCreateRequest{
 	Name:       "IPTest",
 	Family:     gsclient.IPv6Type,
