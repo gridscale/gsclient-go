@@ -99,8 +99,11 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 		resp, err := httpClient.Do(request)
 		if err != nil {
 			if err, ok := err.(net.Error); ok {
-				// exclude retry request with none GET method (write operations) in case of a request timeout
-				if err.Timeout() && r.method != http.MethodGet {
+				// exclude retry request with none GET method (write operations) in case of a request timeout or a context error
+				if (err.Timeout() || ctx.Err() != nil) && r.method != http.MethodGet {
+					if ctx.Err() != nil {
+						return false, ctx.Err()
+					}
 					return false, err
 				}
 				logger.Debugf("Retrying request due to network error %v", err)
