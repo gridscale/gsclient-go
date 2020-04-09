@@ -1,9 +1,13 @@
 # Changelog
 
-## 2.2.1 (Unreleased)
+## 2.2.2 (Unreleased)
 
 DEPRECATED FEATURES:
-* Deprecate labels create/delete options. 
+* Deprecated and removed labels create/delete options. 
+
+BUG FIXES:
+* Fixed "context is expired but still retrying".
+* Fixed some typos.
 
 ## 2.2.1 (January 21, 2020)
 
