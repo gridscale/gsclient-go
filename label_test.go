@@ -3,10 +3,10 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
-	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var labelTestCases = []uuidTestCase{
@@ -33,61 +33,6 @@ func TestClient_GetLabelList(t *testing.T) {
 	assert.Nil(t, err, "GetLabelList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockLabel("test")), fmt.Sprintf("%v", res))
-}
-
-func TestClient_CreateLabel(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	var isFailed bool
-	uri := apiLabelBase
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			fmt.Fprint(writer, prepareLabelCreateResponse())
-		}
-	})
-	for _, test := range commonSuccessFailTestCases {
-		isFailed = test.isFailed
-		res, err := client.CreateLabel(
-			emptyCtx,
-			LabelCreateRequest{Label: "test"})
-		if test.isFailed {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err, "CreateLabel returned an error %v", err)
-			assert.Equal(t, fmt.Sprintf("%v", getMockLabelCreateResponse()), fmt.Sprintf("%v", res))
-		}
-	}
-}
-func TestClient_DeleteLabel(t *testing.T) {
-	server, client, mux := setupTestClient(true)
-	defer server.Close()
-	var isFailed bool
-	uri := path.Join(apiLabelBase, "test")
-	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodDelete, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
-		if isFailed {
-			writer.WriteHeader(400)
-		} else {
-			fmt.Fprint(writer, "")
-		}
-	})
-	for _, serverTest := range commonSuccessFailTestCases {
-		isFailed = serverTest.isFailed
-		for _, test := range labelTestCases {
-			err := client.DeleteLabel(emptyCtx, test.testUUID)
-			if test.isFailed || isFailed {
-				assert.NotNil(t, err)
-			} else {
-				assert.Nil(t, err, "DeleteLabel returned an error %v", err)
-			}
-		}
-	}
-
 }
 
 func getMockLabel(label string) Label {
