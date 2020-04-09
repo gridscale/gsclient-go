@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.2 (Unreleased)
+## 2.2.2 (April 8, 2020)
 
 DEPRECATED FEATURES:
 * Deprecated and removed labels create/delete options. 
