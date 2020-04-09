@@ -14,7 +14,7 @@ First the Go programming language will need to be installed. This can be done by
 Downloading the gridscale Go client can be done with the following go command:
 
 ```
-go get "github.com/gridscale/gsclient-go"
+go get github.com/gridscale/gsclient-go/v2
 ```
 
 ## Using the gridscale Client
