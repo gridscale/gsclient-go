@@ -18,28 +18,6 @@ func isValidUUID(u string) bool {
 	return err == nil
 }
 
-//retryWithTimeout reruns a function within a period of time
-func retryWithTimeout(targetFunc retryableFunc, timeout, delay time.Duration) error {
-	timer := time.After(timeout)
-	var err error
-	var continueRetrying bool
-	for {
-		select {
-		case <-timer:
-			if err != nil {
-				return err
-			}
-			return errors.New("timeout reached")
-		default:
-			time.Sleep(delay) //delay between retries
-			continueRetrying, err = targetFunc()
-			if !continueRetrying {
-				return err
-			}
-		}
-	}
-}
-
 //retryWithContext reruns a function until the context is done
 func retryWithContext(ctx context.Context, targetFunc retryableFunc, delay time.Duration) error {
 	for {
