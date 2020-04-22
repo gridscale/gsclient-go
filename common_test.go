@@ -33,50 +33,6 @@ func Test_isValidUUID(t *testing.T) {
 	}
 }
 
-func Test_retryWithTimeout(t *testing.T) {
-	type testCase struct {
-		isContinue     bool
-		err            error
-		timeout, delay time.Duration
-	}
-	testCases := []testCase{
-		{
-			true,
-			nil,
-			time.Duration(1) * time.Second,
-			time.Duration(100) * time.Millisecond,
-		},
-		{
-			false,
-			nil,
-			time.Duration(1) * time.Second,
-			time.Duration(100) * time.Millisecond,
-		},
-		{
-			false,
-			errors.New("just test"),
-			time.Duration(1) * time.Second,
-			time.Duration(100) * time.Millisecond,
-		},
-		{
-			true,
-			errors.New("just test"),
-			time.Duration(1) * time.Second,
-			time.Duration(100) * time.Millisecond,
-		},
-	}
-	for _, test := range testCases {
-		err := retryWithTimeout(func() (bool, error) {
-			return test.isContinue, test.err
-		}, test.timeout, test.delay)
-		if test.err != nil || test.isContinue {
-			assert.NotNil(t, err, fmt.Sprintf("%v %v", err, test.err))
-		} else {
-			assert.Nil(t, err, err)
-		}
-	}
-}
-
 func Test_retryWithContext(t *testing.T) {
 	type testCase struct {
 		isContinue     bool
