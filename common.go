@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -32,6 +33,22 @@ func retryWithTimeout(targetFunc retryableFunc, timeout, delay time.Duration) er
 		default:
 			time.Sleep(delay) //delay between retries
 			continueRetrying, err = targetFunc()
+			if !continueRetrying {
+				return err
+			}
+		}
+	}
+}
+
+//retryWithContext reruns a function until the context is done
+func retryWithContext(ctx context.Context, targetFunc retryableFunc, delay time.Duration) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			time.Sleep(delay) //delay between retries
+			continueRetrying, err := targetFunc()
 			if !continueRetrying {
 				return err
 			}
