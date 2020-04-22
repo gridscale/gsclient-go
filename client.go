@@ -58,11 +58,6 @@ func (c *Client) Synchronous() bool {
 	return c.cfg.sync
 }
 
-//RequestCheckTimeout returns request check timeout
-func (c *Client) RequestCheckTimeout() time.Duration {
-	return c.cfg.requestCheckTimeoutSecs
-}
-
 //DelayInterval returns request delay interval
 func (c *Client) DelayInterval() time.Duration {
 	return c.cfg.delayInterval
