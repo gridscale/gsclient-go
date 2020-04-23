@@ -42,10 +42,9 @@ type Config struct {
 //		+ debugMode bool: true => run client in debug mode.
 //		+ sync bool: true => client is in synchronous mode. The client will block until Create/Update/Delete processes
 //		are completely finished. It is safer to set this parameter to `true`.
-//		+ requestCheckTimeoutSecs int: Timeout (in second) for checking requests (for synchronous feature)
 //		+ delayIntervalMilliSecs int: delay (in MilliSecond) between requests when checking request (or retry 5xx, 424 error code)
 //		+ maxNumberOfRetries int: number of retries when server returns 5xx, 424 error code.
-func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync bool, requestCheckTimeoutSecs,
+func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync bool,
 	delayIntervalMilliSecs, maxNumberOfRetries int) *Config {
 	logLevel := logrus.InfoLevel
 	if debugMode {
