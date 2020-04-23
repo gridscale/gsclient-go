@@ -21,7 +21,6 @@ func TestClient_waitForRequestCompleted(t *testing.T) {
 		"token",
 		true,
 		true,
-		1,
 		100,
 		5,
 	)
