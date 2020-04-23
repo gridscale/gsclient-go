@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -90,7 +91,7 @@ func TestRequestGet_NetworkErrors(t *testing.T) {
 	defer server.Close()
 
 	for _, test := range getNetworkErrorTests {
-		config := NewConfiguration(test.apiURL, "uuid", "token", true, true, 1, 100, 5)
+		config := NewConfiguration(test.apiURL, "uuid", "token", true, true, 100, 5)
 		config.httpClient = test.httpClient
 		client := NewClient(config)
 		_, err := client.GetServer(emptyCtx, dummyUUID)
@@ -106,10 +107,11 @@ func TestRequestPost_NetworkErrors(t *testing.T) {
 	defer server.Close()
 
 	for _, test := range postNetworkErrorTests {
-		config := NewConfiguration(test.apiURL, "uuid", "token", true, true, 1, 100, 5)
+		config := NewConfiguration(test.apiURL, "uuid", "token", true, true, 100, 5)
 		config.httpClient = test.httpClient
 		client := NewClient(config)
-		_, err := client.CreateServer(emptyCtx, ServerCreateRequest{
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+		_, err := client.CreateServer(ctx, ServerCreateRequest{
 			Name:            "test",
 			Memory:          10,
 			Cores:           4,
@@ -117,6 +119,7 @@ func TestRequestPost_NetworkErrors(t *testing.T) {
 			Labels:          []string{"label"},
 		})
 		assert.Contains(t, fmt.Sprintf("%v", err), fmt.Sprintf(test.expectedError, config.apiURL, uri), test.name)
+		cancel()
 	}
 }
 
