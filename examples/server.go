@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -75,11 +76,22 @@ func main() {
 
 	log.Info("Stop server: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Shutdown Server
-	err = client.ShutdownServer(emptyCtx, server.Properties.ObjectUUID)
-	if err != nil {
+	//Try to shutdown Server
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
+	defer cancel()
+	err = client.ShutdownServer(shutdownCtx, server.Properties.ObjectUUID)
+	//if error is returned and it is not caused by an expired context, returns error
+	if err != nil && err != shutdownCtx.Err() {
 		log.Error("ShutdownServer has failed with error", err)
 		return
+	}
+	// if the server cannot be shutdown gracefully, try to turn it off
+	if err == shutdownCtx.Err() {
+		//force the sever to stop
+		err = client.StopServer(emptyCtx, server.Properties.ObjectUUID)
+		if err != nil {
+			return
+		}
 	}
 	log.Info("Server successfully stop")
 
