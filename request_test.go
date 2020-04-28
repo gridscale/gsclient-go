@@ -1,7 +1,6 @@
 package gsclient
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -110,8 +109,7 @@ func TestRequestPost_NetworkErrors(t *testing.T) {
 		config := NewConfiguration(test.apiURL, "uuid", "token", true, true, 100, 5)
 		config.httpClient = test.httpClient
 		client := NewClient(config)
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-		_, err := client.CreateServer(ctx, ServerCreateRequest{
+		_, err := client.CreateServer(emptyCtx, ServerCreateRequest{
 			Name:            "test",
 			Memory:          10,
 			Cores:           4,
@@ -119,7 +117,6 @@ func TestRequestPost_NetworkErrors(t *testing.T) {
 			Labels:          []string{"label"},
 		})
 		assert.Contains(t, fmt.Sprintf("%v", err), fmt.Sprintf(test.expectedError, config.apiURL, uri), test.name)
-		cancel()
 	}
 }
 
