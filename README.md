@@ -174,6 +174,7 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Storages Get (GetStorageList)
     * Storage Get (GetStorage)
     * Storage Create (CreateStorage)
+    * Storage Clone (CloneStorage)
     * Storage Patch (UpdateStorage)
     * Storage Delete (DeleteStorage)
     * Storage's events Get (GetStorageEventList)
