@@ -51,7 +51,7 @@ Make sure to replace the user-UUID and API-token strings with valid credentials 
 
 ## Using API endpoints
 
-***Note: `context` has to be passed to all APIs of `gsclient-go` as the first parameter. 
+***Note: `context` has to be passed to all APIs of `gsclient-go` as the first parameter. In case you want to set timeout for a specific operation, you can pass a context with timeout (via `context.WithTimeout` or `context.WithDeadline`)
 
 After having created a Client type, as shown above, it will be possible to interact with the API. An example would be the [Servers Get endpoint](https://gridscale.io/en/api-documentation/index.html#servers-get):
 
@@ -140,7 +140,7 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Server Delete (DeleteServer)
     * Server Events Get (GetServerEventList)
     * Server Metrics Get (GetServerMetricList)
-    * ACPI Shutdown (ShutdownServer)
+    * ACPI Shutdown (ShutdownServer) *NOTE: ShutdownServer() will not run StopServer() when it fails to shutdown a server*
     * Server On/Off (StartServer, StopServer)
     * Server's Storages Get (GetServerStorageList)
     * Server's Storage Get (GetServerStorage)
