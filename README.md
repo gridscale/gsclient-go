@@ -40,7 +40,6 @@ config := gsclient.NewConfiguration(
             "API-token", 
             false, //Set debug mode
             true, //Set sync mode 
-            120, //Timeout (in seconds) of checking requests
             500, //Delay (in milliseconds) between requests
             100, //Maximum number of retries
         )
