@@ -10,7 +10,7 @@ DEPRECATED FEATURES:
 
 IMPROVEMENTS:
 * Every function (mostly) can be controlled through context.
-* Server shutdown does not run powering off when the server cannot be shut down gracefully. Forcing a server to be shut down has to be done manually.
+* `ShutdownServer` does not run powering off when the server cannot be shut down gracefully. To ungracefully power off a server, the `StopServer` function should be used when `ShutdownServer` fails.
 * Reduce size of `vendor` directory by removing unnecessary packages.
 
 ## 2.2.2 (April 8, 2020)
