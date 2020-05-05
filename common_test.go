@@ -1,11 +1,13 @@
 package gsclient
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_isValidUUID(t *testing.T) {
@@ -31,7 +33,7 @@ func Test_isValidUUID(t *testing.T) {
 	}
 }
 
-func Test_retryWithTimeout(t *testing.T) {
+func Test_retryWithContext(t *testing.T) {
 	type testCase struct {
 		isContinue     bool
 		err            error
@@ -64,14 +66,16 @@ func Test_retryWithTimeout(t *testing.T) {
 		},
 	}
 	for _, test := range testCases {
-		err := retryWithTimeout(func() (bool, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), test.timeout)
+		err := retryWithContext(ctx, func() (bool, error) {
 			return test.isContinue, test.err
-		}, test.timeout, test.delay)
+		}, test.delay)
 		if test.err != nil || test.isContinue {
 			assert.NotNil(t, err, fmt.Sprintf("%v %v", err, test.err))
 		} else {
 			assert.Nil(t, err, err)
 		}
+		cancel()
 	}
 }
 
