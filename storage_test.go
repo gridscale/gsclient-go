@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetStorageList(t *testing.T) {
@@ -205,6 +206,32 @@ func TestClient_GetDeletedStorages(t *testing.T) {
 	assert.Nil(t, err, "GetDeletedStorages returned an error %v", err)
 	assert.Equal(t, 1, len(response))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockStorage("deleted")), fmt.Sprintf("%v", response))
+}
+
+func TestClient_CloneStorage(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiStorageBase, dummyUUID, "clone")
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			fmt.Fprintf(w, prepareStorageCreateResponse())
+		}
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		res, err := client.CloneStorage(emptyCtx, dummyUUID)
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreateStorage returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockStorageCreateResponse()), fmt.Sprintf("%v", res))
+		}
+	}
 }
 
 func getMockStorage(status string) Storage {
