@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetTemplateList(t *testing.T) {
@@ -248,7 +249,7 @@ func getMockTemplate(status string) Template {
 		Distro:           "Centos7",
 		Description:      "description",
 		CurrentPrice:     0,
-		LocationCountry:  "Germnany",
+		LocationCountry:  "Germany",
 		Name:             "test",
 		Labels:           []string{"label"},
 	}}

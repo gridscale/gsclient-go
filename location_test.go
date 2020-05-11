@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetLocationList(t *testing.T) {
@@ -19,7 +20,7 @@ func TestClient_GetLocationList(t *testing.T) {
 		fmt.Fprintf(writer, prepareLocationListHTTPGet())
 	})
 	res, err := client.GetLocationList(emptyCtx)
-	assert.Nil(t, err, "GetLocationList returned an aerror %v", err)
+	assert.Nil(t, err, "GetLocationList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockLocation()), fmt.Sprintf("%v", res))
 }
