@@ -474,6 +474,7 @@ func (c *Client) RenewK8sCredentials(ctx context.Context, id string) error {
 	r := request{
 		uri:    path.Join(apiPaaSBase, "services", id, "renew_credentials"),
 		method: http.MethodPatch,
+		body:   emptyStruct{},
 	}
 	return r.execute(ctx, *c, nil)
 }
