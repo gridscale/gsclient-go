@@ -3,9 +3,10 @@ package main
 import (
 	"bufio"
 	"context"
-	"github.com/gridscale/gsclient-go"
-	"github.com/sirupsen/logrus"
 	"os"
+
+	"github.com/gridscale/gsclient-go/v3"
+	"github.com/sirupsen/logrus"
 )
 
 var emptyCtx = context.Background()
