@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetPaaSServiceList(t *testing.T) {
@@ -180,6 +181,35 @@ func TestClient_GetPaaSServiceMetrics(t *testing.T) {
 			assert.Nil(t, err, "GetPaaSServiceMetrics returned an error %v", err)
 			assert.Equal(t, 1, len(res))
 			assert.Equal(t, fmt.Sprintf("[%v]", getMockPaaSServiceMetric()), fmt.Sprintf("%v", res))
+		}
+	}
+}
+
+func TestClient_RenewK8sCredentials(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiPaaSBase, "services", dummyUUID, "renew_credentials")
+	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			fmt.Fprintf(w, "")
+		}
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.RenewK8sCredentials(
+				emptyCtx,
+				test.testUUID,
+			)
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "RenewK8sCredentials returned an error %v", err)
+			}
 		}
 	}
 }
