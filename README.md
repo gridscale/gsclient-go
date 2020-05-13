@@ -23,7 +23,7 @@ To be able to use the gridscale Go client in an application it can be imported i
 
 ```go
 import (
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v3"
 )
 ```
 

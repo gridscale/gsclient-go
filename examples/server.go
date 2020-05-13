@@ -8,7 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 const webServerFirewallTemplateUUID = "82aa235b-61ba-48ca-8f47-7060a0435de7"

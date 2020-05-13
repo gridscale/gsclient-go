@@ -7,7 +7,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 var emptyCtx = context.Background()
