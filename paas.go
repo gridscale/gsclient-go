@@ -81,6 +81,9 @@ type Credential struct {
 
 	//The type of Service.
 	Type string `json:"type"`
+
+	//If the PaaS service is a k8s cluster, this field will be set.
+	KubeConfig string `json:"kubeconfig"`
 }
 
 //PaaSServiceCreateRequest is JSON struct of a request for creating a PaaS service
@@ -458,6 +461,21 @@ func (c *Client) GetPaaSServiceMetrics(ctx context.Context, id string) ([]PaaSSe
 		})
 	}
 	return metrics, err
+}
+
+//RenewK8sCredentials renew credentials of a k8s cluster.
+//If the PaaS is not a k8s cluster, the function will return an error.
+//
+//See:
+func (c *Client) RenewK8sCredentials(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	r := request{
+		uri:    path.Join(apiPaaSBase, "services", id, "renew_credentials"),
+		method: http.MethodPatch,
+	}
+	return r.execute(ctx, *c, nil)
 }
 
 //GetPaaSTemplateList returns a list of PaaS service templates
