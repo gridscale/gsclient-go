@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.1 (Unreleased)
+
+FEATURES:
+* Add K8S support (get k8s config, renew k8s cluster's credentials).
+
+BUG FIXES:
+* Fixed wrong import path in exmaples.
+* Fixed wrong import path in README.
+
 ## 3.0.0 (May 6, 2020)
 
 FEATURES:
