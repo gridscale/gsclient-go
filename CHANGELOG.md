@@ -25,7 +25,7 @@ IMPROVEMENTS:
 ## 2.2.2 (April 8, 2020)
 
 DEPRECATED FEATURES:
-* Deprecated and removed labels create/delete options. 
+* Deprecated and removed labels create/delete options.
 
 BUG FIXES:
 * Fixed "context is expired but still retrying".
@@ -34,7 +34,7 @@ BUG FIXES:
 ## 2.2.1 (January 21, 2020)
 
 BUG FIXES:
-* (Hot fix) Fix incompatible major version when using gomod due to missing `/v2` suffix in module path of `go.mod` file 
+* (Hot fix) Fix incompatible major version when using gomod due to missing `/v2` suffix in module path of `go.mod` file
 
 ## 2.2.0 (January 21, 2020)
 
@@ -95,7 +95,6 @@ IMPROVEMENTS:
 * Power-off server if graceful shutdown fails
 * Backward compatibility for server creation API
 
-
 ## 0.2.0 (August 23, 2019)
 
 FEATURES:
@@ -117,4 +116,3 @@ IMPROVEMENTS:
 ## 0.1.0 (January 2, 2019)
 
 - Initial release of gsclient-go.
-
