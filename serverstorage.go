@@ -37,7 +37,7 @@ type ServerStorageRelationProperties struct {
 	//The target ID is a device (e.g. disk).
 	Target int `json:"target"`
 
-	//Is the common SCSI abbreviation of the Logical Unit Number. A lun is a unique identifier for a single disk or a composite of disks.
+	//Is the common SCSI abbreviation of the Logical Unit Number. A LUN is a unique identifier for a single disk or a composite of disks.
 	Lun int `json:"lun"`
 
 	//Defines the SCSI controller id. The SCSI defines transmission routes such as Serial Attached SCSI (SAS), Fibre Channel and iSCSI.

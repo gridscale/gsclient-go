@@ -5,7 +5,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v3"
 	log "github.com/sirupsen/logrus"
 )
 
