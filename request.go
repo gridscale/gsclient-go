@@ -88,6 +88,7 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 	request.Header.Add("X-Auth-Token", c.APIToken())
 	request.Header.Add("Content-Type", bodyType)
 	logger.Debugf("Request body: %v", request.Body)
+	logger.Debugf("Request headers: %v", request.Header)
 
 	//Init request UUID variable
 	var requestUUID string
