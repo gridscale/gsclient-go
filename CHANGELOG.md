@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.1 (Unreleased)
+## 3.0.1 (May 19, 2020)
 
 FEATURES:
 * Add K8S support (get k8s config, renew k8s cluster's credentials).
