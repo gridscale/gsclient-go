@@ -84,9 +84,9 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 	}
 	request = request.WithContext(ctx)
 	request.Header.Set("User-Agent", c.UserAgent())
-	request.Header.Add("X-Auth-UserID", c.UserUUID())
-	request.Header.Add("X-Auth-Token", c.APIToken())
-	request.Header.Add("Content-Type", bodyType)
+	request.Header.Set("X-Auth-UserID", c.UserUUID())
+	request.Header.Set("X-Auth-Token", c.APIToken())
+	request.Header.Set("Content-Type", bodyType)
 
 	//Set headers based on a given list of custom headers
 	//Use Header.Set() instead of Header.Add() because we want to
