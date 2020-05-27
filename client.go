@@ -88,6 +88,12 @@ func (c *Client) APIToken() string {
 	return c.cfg.apiToken
 }
 
+//WithHTTPHeaders adds custom HTTP headers to Client
+func (c *Client) WithHTTPHeaders(headers map[string]string) *Client {
+	c.cfg.httpHeaders = headers
+	return c
+}
+
 //waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
