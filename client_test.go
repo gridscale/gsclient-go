@@ -52,3 +52,11 @@ func TestClient_waitForRequestCompleted(t *testing.T) {
 		}
 	}
 }
+func TestClient_WithHeaders(t *testing.T) {
+	config := DefaultConfiguration(dummyUUID, "token")
+	client := NewClient(config)
+	client = client.WithHTTPHeaders(map[string]string{
+		"test_header": "test_header_value",
+	})
+	assert.Equal(t, client.cfg.httpHeaders["test_header"], "test_header_value")
+}
