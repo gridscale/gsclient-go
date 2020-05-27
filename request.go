@@ -87,6 +87,13 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 	request.Header.Add("X-Auth-UserID", c.UserUUID())
 	request.Header.Add("X-Auth-Token", c.APIToken())
 	request.Header.Add("Content-Type", bodyType)
+
+	//Set headers based on a given list of custom headers
+	//Use Header.Set() instead of Header.Add() because we want to
+	//override the headers' values if they are already set.
+	for k, v := range c.cfg.httpHeaders {
+		request.Header.Set(k, v)
+	}
 	logger.Debugf("Request body: %v", request.Body)
 	logger.Debugf("Request headers: %v", request.Header)
 

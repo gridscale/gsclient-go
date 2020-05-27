@@ -26,6 +26,7 @@ type Config struct {
 	userUUID           string
 	apiToken           string
 	userAgent          string
+	httpHeaders        map[string]string
 	sync               bool
 	httpClient         *http.Client
 	delayInterval      time.Duration
