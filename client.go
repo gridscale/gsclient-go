@@ -89,9 +89,8 @@ func (c *Client) APIToken() string {
 }
 
 //WithHTTPHeaders adds custom HTTP headers to Client
-func (c *Client) WithHTTPHeaders(headers map[string]string) *Client {
+func (c *Client) WithHTTPHeaders(headers map[string]string) {
 	c.cfg.httpHeaders = headers
-	return c
 }
 
 //waitForRequestCompleted allows to wait for a request to complete
