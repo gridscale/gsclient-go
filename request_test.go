@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path"
+	"strconv"
 	"testing"
 	"time"
 
@@ -153,5 +154,34 @@ func TestRequestPatch_APIErrors(t *testing.T) {
 				Labels: nil,
 			})
 		assert.Contains(t, fmt.Sprintf("%v", err), fmt.Sprintf(test.expectedError, test.statusCode, dummyRequestUUID), test.name)
+	}
+}
+
+func Test_getDelayTimeInMs(t *testing.T) {
+	type testCase struct {
+		successful   bool
+		TimestampStr string
+	}
+	futureTimestamp := time.Now().Add(5*time.Second).UnixNano() / 1000000
+	futureTimestampStr := strconv.FormatInt(futureTimestamp, 10)
+	testCases := []testCase{
+		{
+			true,
+			futureTimestampStr,
+		},
+		{
+			false,
+			"",
+		},
+	}
+
+	for _, test := range testCases {
+		delay, err := getDelayTimeInMs(test.TimestampStr)
+		if test.successful {
+			assert.Nil(t, err)
+			assert.GreaterOrEqual(t, delay, int64(0))
+		} else {
+			assert.NotNil(t, err)
+		}
 	}
 }
