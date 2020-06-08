@@ -182,7 +182,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *htt
 			return false, err
 		}
 
-		logger.Debugf("Status code: %v. Request UUID: %v.", statusCode, requestUUID)
+		logger.Debugf("Status code: %v. Request UUID: %v. Headers: %v", statusCode, requestUUID, resp.Header)
 
 		if statusCode >= 300 {
 			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
