@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 //gsRequest gridscale's custom gsRequest struct
@@ -58,7 +61,10 @@ func (r RequestError) Error() string {
 	return fmt.Sprintf(errorMessageFormat, r.StatusCode, message, r.RequestUUID)
 }
 
-const requestUUIDHeaderParam = "X-Request-Id"
+const (
+	requestUUIDHeaderParam           = "X-Request-Id"
+	requestRateLimitResetHeaderParam = "ratelimit-reset"
+)
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *gsRequest) execute(ctx context.Context, c Client, output interface{}) error {
@@ -190,6 +196,21 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *htt
 				logger.Debugf("Retrying request: %v method sent to url %v with body %v", r.method, httpReq.RequestURI, r.body)
 				return true, errorMessage
 			}
+
+			//If status code is 429, that means we reach the rate limit
+			if resp.StatusCode == 429 {
+				//Get the time that the rate limit will be reset
+				rateLimitResetTimestamp := resp.Header.Get(requestRateLimitResetHeaderParam)
+				//Get the delay time
+				delayMs, err := getDelayTimeInMs(rateLimitResetTimestamp)
+				if err != nil {
+					return false, err
+				}
+				//Delay the retry until the rate limit is reset
+				logger.Debugf("Delay request for %d ms: %v method sent to url %v with body %v", delayMs, r.method, httpReq.RequestURI, r.body)
+				time.Sleep(time.Duration(delayMs) * time.Millisecond)
+				return true, errorMessage
+			}
 			logger.Errorf(
 				"Error message: %v. Title: %v. Code: %v. Request UUID: %v.",
 				errorMessage.Description,
@@ -211,4 +232,18 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *htt
 	default:
 	}
 	return requestUUID, responseBodyBytes, err
+}
+
+//getDelayTimeInMs return the amount of ms to delay the next HTTP request retry
+func getDelayTimeInMs(timestamp string) (int64, error) {
+	if timestamp == "" {
+		return 0, errors.New("timestamp is empty")
+	}
+	//convert timestamp from string to int
+	timestampInt, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	currentTimestampMs := time.Now().UnixNano() / 1000000
+	return timestampInt - currentTimestampMs, nil
 }
