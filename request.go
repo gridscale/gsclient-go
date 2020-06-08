@@ -193,7 +193,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *htt
 			if resp.StatusCode >= 500 || resp.StatusCode == 424 {
 				//retry (true) and accumulate error (in case that maximum number of retries is reached, and
 				//the latest error is still reported)
-				logger.Debugf("Retrying request: %v method sent to url %v with body %v", r.method, httpReq.RequestURI, r.body)
+				logger.Debugf("Retrying request: %v method sent to url %v with body %v", r.method, httpReq.URL.RequestURI(), r.body)
 				return true, errorMessage
 			}
 
@@ -207,7 +207,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *htt
 					return false, err
 				}
 				//Delay the retry until the rate limit is reset
-				logger.Debugf("Delay request for %d ms: %v method sent to url %v with body %v", delayMs, r.method, httpReq.RequestURI, r.body)
+				logger.Debugf("Delay request for %d ms: %v method sent to url %v with body %v", delayMs, r.method, httpReq.URL.RequestURI(), r.body)
 				time.Sleep(time.Duration(delayMs) * time.Millisecond)
 				return true, errorMessage
 			}
