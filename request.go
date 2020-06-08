@@ -204,5 +204,11 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *htt
 		//stop retrying (false) as no more errors
 		return false, nil
 	}, c.MaxNumberOfRetries(), c.DelayInterval())
+	//No need to return when the context is already expired.
+	select {
+	case <-ctx.Done():
+		return "", nil, ctx.Err()
+	default:
+	}
 	return requestUUID, responseBodyBytes, err
 }
