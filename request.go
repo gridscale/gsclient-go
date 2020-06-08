@@ -95,6 +95,7 @@ func (r *gsRequest) execute(ctx context.Context, c Client, output interface{}) e
 	return nil
 }
 
+//prepareHTTPRequest prepares a http request
 func (r *gsRequest) prepareHTTPRequest(ctx context.Context, url string, cfg *Config) (*http.Request, error) {
 	//Convert the body of the request to json
 	jsonBody := new(bytes.Buffer)
@@ -126,6 +127,8 @@ func (r *gsRequest) prepareHTTPRequest(ctx context.Context, url string, cfg *Con
 	return request, nil
 }
 
+//retryHTTPRequest runs & retries a HTTP request
+//returns UUID (string), response body ([]byte), error
 func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *http.Request) (string, []byte, error) {
 	logger := c.Logger()
 	httpClient := c.HttpClient()
