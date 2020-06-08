@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"path"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -41,11 +39,6 @@ func NewClient(c *Config) *Client {
 		cfg: c,
 	}
 	return client
-}
-
-//Logger returns logger
-func (c *Client) Logger() logrus.Logger {
-	return c.cfg.logger
 }
 
 //HttpClient returns http client

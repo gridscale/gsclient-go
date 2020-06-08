@@ -69,7 +69,6 @@ const (
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *gsRequest) execute(ctx context.Context, c Client, output interface{}) error {
 	url := c.cfg.apiURL + r.uri
-	logger := c.Logger()
 	logger.Debugf("Preparing %v request sent to URL: %v", r.method, url)
 
 	//Prepare http request (including HTTP headers preparation, etc.)
@@ -136,7 +135,6 @@ func (r *gsRequest) prepareHTTPRequest(ctx context.Context, url string, cfg *Con
 //retryHTTPRequest runs & retries a HTTP request
 //returns UUID (string), response body ([]byte), error
 func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *http.Request) (string, []byte, error) {
-	logger := c.Logger()
 	httpClient := c.HttpClient()
 	//Init request UUID variable
 	var requestUUID string
