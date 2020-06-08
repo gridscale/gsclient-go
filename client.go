@@ -99,7 +99,7 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 		return errors.New("'id' is invalid")
 	}
 	return retryWithContext(ctx, func() (bool, error) {
-		r := request{
+		r := gsRequest{
 			uri:                 path.Join(requestBase, id),
 			method:              "GET",
 			skipCheckingRequest: true,
