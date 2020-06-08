@@ -184,13 +184,13 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *htt
 
 		logger.Debugf("Status code: %v. Request UUID: %v.", statusCode, requestUUID)
 
-		if resp.StatusCode >= 300 {
+		if statusCode >= 300 {
 			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 			errorMessage.StatusCode = statusCode
 			errorMessage.RequestUUID = requestUUID
 			json.Unmarshal(responseBodyBytes, &errorMessage)
 			//if internal server error OR object is in status that does not allow the request, retry
-			if resp.StatusCode >= 500 || resp.StatusCode == 424 {
+			if statusCode >= 500 || statusCode == 424 {
 				//retry (true) and accumulate error (in case that maximum number of retries is reached, and
 				//the latest error is still reported)
 				logger.Debugf("Retrying request: %v method sent to url %v with body %v", r.method, httpReq.URL.RequestURI(), r.body)
@@ -198,7 +198,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, c Client, httpReq *htt
 			}
 
 			//If status code is 429, that means we reach the rate limit
-			if resp.StatusCode == 429 {
+			if statusCode == 429 {
 				//Get the time that the rate limit will be reset
 				rateLimitResetTimestamp := resp.Header.Get(requestRateLimitResetHeaderParam)
 				//Get the delay time
