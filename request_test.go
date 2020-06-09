@@ -157,7 +157,7 @@ func TestRequestPatch_APIErrors(t *testing.T) {
 	}
 }
 
-func Test_getDelayTimeInMs(t *testing.T) {
+func Test_getDelayTimeInMsFromTimestampStr(t *testing.T) {
 	type testCase struct {
 		successful   bool
 		TimestampStr string
@@ -176,7 +176,7 @@ func Test_getDelayTimeInMs(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		delay, err := getDelayTimeInMs(test.TimestampStr)
+		delay, err := getDelayTimeInMsFromTimestampStr(test.TimestampStr)
 		if test.successful {
 			assert.Nil(t, err)
 			assert.GreaterOrEqual(t, delay, int64(0))
