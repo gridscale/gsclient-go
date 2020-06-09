@@ -201,7 +201,7 @@ func (r *gsRequest) retryHTTPRequest(
 						return false, err
 					}
 					//Delay the retry until the rate limit is reset
-					logger.Debugf("Delay request for %d ms: %v method sent to url %v with body %v", delayMs, r.method, httpReq.URL.RequestURI(), r.body)
+					logger.Debugf("Delay request for %d ms: %v method sent to url %v with body %v. ratelimit-reset: %v", delayMs, r.method, httpReq.URL.RequestURI(), r.body, rateLimitResetTimestamp)
 					time.Sleep(time.Duration(delayMs) * time.Millisecond)
 				}
 				logger.Debugf("Retrying request: %v method sent to url %v with body %v", r.method, httpReq.URL.RequestURI(), r.body)
