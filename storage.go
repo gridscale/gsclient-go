@@ -226,6 +226,9 @@ type StorageUpdateRequest struct {
 
 	//The Capacity of the Storage in GB. Optional.
 	Capacity int `json:"capacity,omitempty"`
+
+	//Storage type. Allowed values: nil, DefaultStorageType, HighStorageType, InsaneStorageType. Optional. Downgrading is not supported
+	StorageType *storageType `json:"storage_type,omitempty"`
 }
 
 //All allowed storage type's values
