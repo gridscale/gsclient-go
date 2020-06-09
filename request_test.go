@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -155,6 +156,20 @@ func TestRequestPatch_APIErrors(t *testing.T) {
 			})
 		assert.Contains(t, fmt.Sprintf("%v", err), fmt.Sprintf(test.expectedError, test.statusCode, dummyRequestUUID), test.name)
 	}
+}
+
+func Test_prepareHTTPRequest(t *testing.T) {
+	r := &gsRequest{
+		uri:                 path.Join(apiDeletedBase, "networks"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
+	}
+	cfg := DefaultConfiguration("test", "test")
+	httpReq, err := r.prepareHTTPRequest(context.Background(), cfg)
+	assert.NotNil(t, httpReq)
+	assert.Equal(t, httpReq.Method, r.method)
+	assert.Equal(t, httpReq.URL.RequestURI(), r.uri)
+	assert.Nil(t, err)
 }
 
 func Test_getDelayTimeInMsFromTimestampStr(t *testing.T) {
