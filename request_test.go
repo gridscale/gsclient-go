@@ -167,8 +167,8 @@ func Test_prepareHTTPRequest(t *testing.T) {
 	cfg := DefaultConfiguration("test", "test")
 	httpReq, err := r.prepareHTTPRequest(context.Background(), cfg)
 	assert.NotNil(t, httpReq)
-	assert.Equal(t, httpReq.Method, r.method)
-	assert.Equal(t, httpReq.URL.RequestURI(), r.uri)
+	assert.Equal(t, r.method, httpReq.Method)
+	assert.Equal(t, r.uri, httpReq.URL.RequestURI())
 	assert.Nil(t, err)
 }
 
