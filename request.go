@@ -68,11 +68,9 @@ const (
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *gsRequest) execute(ctx context.Context, c Client, output interface{}) error {
-	url := c.cfg.apiURL + r.uri
-	logger.Debugf("Preparing %v request sent to URL: %v", r.method, url)
 
 	//Prepare http request (including HTTP headers preparation, etc.)
-	httpReq, err := r.prepareHTTPRequest(ctx, url, c.cfg)
+	httpReq, err := r.prepareHTTPRequest(ctx, c.cfg)
 	logger.Debugf("Request body: %v", httpReq.Body)
 	logger.Debugf("Request headers: %v", httpReq.Header)
 
@@ -101,7 +99,10 @@ func (r *gsRequest) execute(ctx context.Context, c Client, output interface{}) e
 }
 
 //prepareHTTPRequest prepares a http request
-func (r *gsRequest) prepareHTTPRequest(ctx context.Context, url string, cfg *Config) (*http.Request, error) {
+func (r *gsRequest) prepareHTTPRequest(ctx context.Context, cfg *Config) (*http.Request, error) {
+	url := cfg.apiURL + r.uri
+	logger.Debugf("Preparing %v request sent to URL: %v", r.method, url)
+
 	//Convert the body of the request to json
 	jsonBody := new(bytes.Buffer)
 	if r.body != nil {
