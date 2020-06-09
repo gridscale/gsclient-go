@@ -172,6 +172,35 @@ func Test_prepareHTTPRequest(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func Test_isErrorHTTPCodeRetryable(t *testing.T) {
+	type testCase struct {
+		code        int
+		isRetryable bool
+	}
+	testCases := []testCase{
+		{
+			500,
+			true,
+		},
+		{
+			424,
+			true,
+		},
+		{
+			429,
+			true,
+		},
+		{
+			404,
+			false,
+		},
+	}
+	for _, test := range testCases {
+		isRetryable := isErrorHTTPCodeRetryable(test.code)
+		assert.Equal(t, test.isRetryable, isRetryable)
+	}
+}
+
 func Test_getDelayTimeInMsFromTimestampStr(t *testing.T) {
 	type testCase struct {
 		successful   bool
