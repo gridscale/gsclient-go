@@ -9,6 +9,7 @@ FEATURES:
 
 IMPROVEMENTS:
 * Refactor `execute()` function.
+* Global Logger.
 
 ## 3.0.1 (May 19, 2020)
 
