@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.1.0 (Unreleased)
+
+FEATURES:
+* Storage can be increased its speed via UpdateStorag.
+* Support custom HTTP headers.
+* Be able to deal with GS rate limit.
+
+IMPROVEMENTS:
+* Refactor `execute()` function.
+* Global Logger.
+
 ## 3.0.1 (May 19, 2020)
 
 FEATURES:
