@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.1.0 (Unreleased)
+## 3.1.0 (June 30, 2020)
 
 FEATURES:
 * Storage can be increased its speed via UpdateStorag.
