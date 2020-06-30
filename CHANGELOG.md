@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.1 (Unreleased)
+## 3.1.0 (Unreleased)
 
 FEATURES:
 * Storage can be increased its speed via UpdateStorag.
