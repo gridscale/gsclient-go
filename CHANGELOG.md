@@ -6,6 +6,7 @@ FEATURES:
 * Storage can be increased its speed via UpdateStorage.
 * Support custom HTTP headers.
 * Be able to deal with gridscale API rate limiting. 
+
 IMPROVEMENTS:
 * Refactor `execute()` function.
 * Global Logger.
