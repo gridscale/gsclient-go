@@ -3,9 +3,9 @@
 ## 3.1.0 (June 30, 2020)
 
 FEATURES:
-* Storage can be increased its speed via UpdateStorag.
+* Storage can be increased its speed via UpdateStorage.
 * Support custom HTTP headers.
-* Be able to deal with GS rate limit.
+* Be able to deal with gridscale API rate limiting. 
 
 IMPROVEMENTS:
 * Refactor `execute()` function.
