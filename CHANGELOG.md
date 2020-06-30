@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.1.0 (June 30, 2020)
+
+FEATURES:
+* Storage can be increased its speed via UpdateStorage.
+* Support custom HTTP headers.
+* Be able to deal with gridscale API rate limiting. 
+
+IMPROVEMENTS:
+* Refactor `execute()` function.
+* Global Logger.
+
 ## 3.0.1 (May 19, 2020)
 
 FEATURES:
