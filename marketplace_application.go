@@ -1,5 +1,12 @@
 package gsclient
 
+import (
+	"context"
+	"errors"
+	"net/http"
+	"path"
+)
+
 //MarketplaceApplicationList JSON struct of a list of market applications
 type MarketplaceApplicationList struct {
 	//Array of market applications
@@ -173,3 +180,128 @@ var (
 	MarketplaceApplicationCloudStorageCategory      = &marketplaceApplicationCategory{"Cloud Storage"}
 	MarketplaceApplicationArchivingCategory         = &marketplaceApplicationCategory{"Archiving"}
 )
+
+//GetMarketplaceApplicationList gets a list of available marketplace applications
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getMarketplaceApplications
+func (c *Client) GetMarketplaceApplicationList(ctx context.Context) ([]MarketplaceApplication, error) {
+	r := gsRequest{
+		uri:                 apiMarketplaceApplicationBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
+	}
+	var response MarketplaceApplicationList
+	var marketApps []MarketplaceApplication
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		marketApps = append(marketApps, MarketplaceApplication{
+			Properties: properties,
+		})
+	}
+	return marketApps, err
+}
+
+//GetMarketplaceApplication get a marketplace application
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getMarketplaceApplication
+func (c *Client) GetMarketplaceApplication(ctx context.Context, id string) (MarketplaceApplication, error) {
+	if !isValidUUID(id) {
+		return MarketplaceApplication{}, errors.New("'id' is invalid")
+	}
+	r := gsRequest{
+		uri:                 path.Join(apiMarketplaceApplicationBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
+	}
+	var response MarketplaceApplication
+	err := r.execute(ctx, *c, &response)
+	return response, err
+}
+
+//CreateMarketplaceApplication create a marketplace application
+//
+//NOTE:
+//
+// - Allowed value for `Category`: nil, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
+//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory.
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createMarketplaceApplication
+func (c *Client) CreateMarketplaceApplication(ctx context.Context, body MarketplaceApplicationCreateRequest) (MarketplaceApplicationCreateResponse, error) {
+	r := gsRequest{
+		uri:    apiMarketplaceApplicationBase,
+		method: http.MethodPost,
+		body:   body,
+	}
+	var response MarketplaceApplicationCreateResponse
+	err := r.execute(ctx, *c, &response)
+	return response, err
+}
+
+//ImportMarketplaceApplication import a marketplace application
+//
+//NOTE:
+//
+// - Allowed value for `Category`: nil, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
+//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory.
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/createMarketplaceApplication
+func (c *Client) ImportMarketplaceApplication(ctx context.Context, body MarketplaceApplicationImportRequest) (MarketplaceApplicationCreateResponse, error) {
+	r := gsRequest{
+		uri:    apiMarketplaceApplicationBase,
+		method: http.MethodPost,
+		body:   body,
+	}
+	var response MarketplaceApplicationCreateResponse
+	err := r.execute(ctx, *c, &response)
+	return response, err
+}
+
+//UpdateMarketplaceApplication update a marketplace application
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/updateMarketplaceApplication
+func (c *Client) UpdateMarketplaceApplication(ctx context.Context, id string, body MarketplaceApplicationUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	r := gsRequest{
+		uri:    path.Join(apiMarketplaceApplicationBase, id),
+		method: http.MethodPatch,
+		body:   body,
+	}
+	return r.execute(ctx, *c, nil)
+}
+
+//DeleteMarketplaceApplication delete a marketplace application
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteMarketplaceApplication
+func (c *Client) DeleteMarketplaceApplication(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	r := gsRequest{
+		uri:    path.Join(apiMarketplaceApplicationBase, id),
+		method: http.MethodDelete,
+	}
+	return r.execute(ctx, *c, nil)
+}
+
+//GetMarketplaceApplicationEventList get list of a marketplace application's events
+//
+//See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageEvents
+func (c *Client) GetMarketplaceApplicationEventList(ctx context.Context, id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := gsRequest{
+		uri:                 path.Join(apiMarketplaceApplicationBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
+	}
+	var response EventList
+	var marketAppEvents []Event
+	err := r.execute(ctx, *c, &response)
+	for _, properties := range response.List {
+		marketAppEvents = append(marketAppEvents, Event{Properties: properties})
+	}
+	return marketAppEvents, err
+}
