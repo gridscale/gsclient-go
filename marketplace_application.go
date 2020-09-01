@@ -119,7 +119,7 @@ type MarketplaceApplicationCreateRequest struct {
 
 	//Category of the marketplace application. Allowed values: nil, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
 	//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory. Optional.
-	Category *MarketplaceApplication `json:"category,omitempty"`
+	Category *marketplaceApplicationCategory `json:"category,omitempty"`
 
 	//whether you want to publish your application or not. Optional
 	Publish *bool `json:"publish,omitempty"`
@@ -159,7 +159,7 @@ type MarketplaceApplicationUpdateRequest struct {
 
 	//Category of the marketplace application. Allowed values: nil, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
 	//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory. Optional.
-	Category *MarketplaceApplication `json:"category,omitempty"`
+	Category *marketplaceApplicationCategory `json:"category,omitempty"`
 
 	//whether you want to publish your application or not. Optional
 	Publish *bool `json:"publish,omitempty"`
