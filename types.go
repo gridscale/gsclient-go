@@ -91,3 +91,12 @@ func (t *transportLayerProtocol) UnmarshalJSON(b []byte) error {
 	*t = transportLayerProtocol{str}
 	return nil
 }
+
+type marketplaceApplicationCategory struct {
+	string
+}
+
+//MarshalJSON custom marshal for marketplaceApplicationCategory
+func (a marketplaceApplicationCategory) MarshalJSON() ([]byte, error) {
+	return json.Marshal(a.string)
+}
