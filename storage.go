@@ -7,6 +7,19 @@ import (
 	"path"
 )
 
+//StorageOperator is an interface defining API of a storage operator
+type StorageOperator interface {
+	GetStorage(ctx context.Context, id string) (Storage, error)
+	GetStorageList(ctx context.Context) ([]Storage, error)
+	GetStoragesByLocation(ctx context.Context, id string) ([]Storage, error)
+	CreateStorage(ctx context.Context, body StorageCreateRequest) (CreateResponse, error)
+	UpdateStorage(ctx context.Context, id string, body StorageUpdateRequest) error
+	CloneStorage(ctx context.Context, id string) (CreateResponse, error)
+	DeleteStorage(ctx context.Context, id string) error
+	GetDeletedStorages(ctx context.Context) ([]Storage, error)
+	GetStorageEventList(ctx context.Context, id string) ([]Event, error)
+}
+
 //StorageList JSON struct of a list of storages
 type StorageList struct {
 	//Array of storages

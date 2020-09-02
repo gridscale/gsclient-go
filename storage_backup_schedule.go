@@ -7,6 +7,15 @@ import (
 	"path"
 )
 
+//StorageBackupScheduleOperator is an interface defining API of a backup schedule operator
+type StorageBackupScheduleOperator interface {
+	GetStorageBackupScheduleList(ctx context.Context, id string) ([]StorageBackupSchedule, error)
+	GetStorageBackupSchedule(ctx context.Context, storageID, scheduleID string) (StorageBackupSchedule, error)
+	CreateStorageBackupSchedule(ctx context.Context, id string, body StorageBackupScheduleCreateRequest)
+	UpdateStorageBackupSchedule(ctx context.Context, storageID, scheduleID string, body StorageBackupScheduleUpdateRequest) error
+	DeleteStorageBackupSchedule(ctx context.Context, storageID, scheduleID string) error
+}
+
 type StorageBackupScheduleList struct {
 	List map[string]StorageBackupScheduleProperties `json:"schedule_storage_backups"`
 }

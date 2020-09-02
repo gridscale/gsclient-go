@@ -7,6 +7,23 @@ import (
 	"path"
 )
 
+//ServerOperator is an interface defining API of a server operator
+type ServerOperator interface {
+	GetServer(ctx context.Context, id string) (Server, error)
+	GetServerList(ctx context.Context) ([]Server, error)
+	GetServersByLocation(ctx context.Context, id string) ([]Server, error)
+	CreateServer(ctx context.Context, body ServerCreateRequest) (ServerCreateResponse, error)
+	UpdateServer(ctx context.Context, id string, body ServerUpdateRequest) error
+	DeleteServer(ctx context.Context, id string) error
+	StartServer(ctx context.Context, id string) error
+	StopServer(ctx context.Context, id string) error
+	ShutdownServer(ctx context.Context, id string) error
+	IsServerOn(ctx context.Context, id string) (bool, error)
+	GetServerMetricList(ctx context.Context, id string) ([]ServerMetric, error)
+	GetServerEventList(ctx context.Context, id string) ([]Event, error)
+	GetDeletedServers(ctx context.Context) ([]Server, error)
+}
+
 //ServerList JSON struct of a list of servers
 type ServerList struct {
 	//Array of servers
