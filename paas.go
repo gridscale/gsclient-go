@@ -84,6 +84,9 @@ type Credential struct {
 
 	//If the PaaS service is a k8s cluster, this field will be set.
 	KubeConfig string `json:"kubeconfig"`
+
+	//Expiration time of k8s credential
+	ExpirationTime GSTime `json:"expiration_time"`
 }
 
 //PaaSServiceCreateRequest is JSON struct of a request for creating a PaaS service
