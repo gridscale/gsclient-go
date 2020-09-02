@@ -145,7 +145,7 @@ type IPCreateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//IP address family. Can only be either `IPv4Type` or `IPv6Type`
-	Family ipAddressType `json:"family"`
+	Family IPAddressType `json:"family"`
 
 	//Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
 	Failover bool `json:"failover,omitempty"`
@@ -172,10 +172,12 @@ type IPUpdateRequest struct {
 	Labels *[]string `json:"labels,omitempty"`
 }
 
+type IPAddressType int
+
 //Allowed IP address versions
-var (
-	IPv4Type = ipAddressType{4}
-	IPv6Type = ipAddressType{6}
+const (
+	IPv4Type IPAddressType = 4
+	IPv6Type IPAddressType = 6
 )
 
 //GetIP get a specific IP based on given id
