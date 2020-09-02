@@ -18,9 +18,12 @@ func (t *GSTime) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &tstring); err != nil {
 		return err
 	}
-	parsedTime, err := time.Parse(gsTimeLayout, tstring)
-	*t = GSTime{parsedTime}
-	return err
+	if tstring != "" {
+		parsedTime, err := time.Parse(gsTimeLayout, tstring)
+		*t = GSTime{parsedTime}
+		return err
+	}
+	return nil
 }
 
 //MarshalJSON custom marshaller for GSTime
