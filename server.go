@@ -115,10 +115,10 @@ type ServerCreateRequest struct {
 	Cores int `json:"cores"`
 
 	//Specifies the hardware settings for the virtual machine.
-	//Allowed values: nil, DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
+	//Allowed values: DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
 	//SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
-	//HardwareProfile = nil => server hardware is normal type
-	HardwareProfile *serverHardwareProfile `json:"hardware_profile,omitempty"`
+	//HardwareProfile is not set => server hardware is normal type
+	HardwareProfile ServerHardwareProfile `json:"hardware_profile,omitempty"`
 
 	//Defines which Availability-Zone the Server is placed. Can be empty
 	AvailablityZone string `json:"availability_zone,omitempty"`
@@ -275,16 +275,18 @@ type ServerMetricProperties struct {
 	} `json:"storage_size"`
 }
 
+type ServerHardwareProfile string
+
 //All available server's hardware types
-var (
-	DefaultServerHardware   = &serverHardwareProfile{"default"}
-	NestedServerHardware    = &serverHardwareProfile{"nested"}
-	LegacyServerHardware    = &serverHardwareProfile{"legacy"}
-	CiscoCSRServerHardware  = &serverHardwareProfile{"cisco_csr"}
-	SophosUTMServerHardware = &serverHardwareProfile{"sophos_utm"}
-	F5BigipServerHardware   = &serverHardwareProfile{"f5_bigip"}
-	Q35ServerHardware       = &serverHardwareProfile{"q35"}
-	Q35NestedServerHardware = &serverHardwareProfile{"q35_nested"}
+const (
+	DefaultServerHardware   ServerHardwareProfile = "default"
+	NestedServerHardware    ServerHardwareProfile = "nested"
+	LegacyServerHardware    ServerHardwareProfile = "legacy"
+	CiscoCSRServerHardware  ServerHardwareProfile = "cisco_csr"
+	SophosUTMServerHardware ServerHardwareProfile = "sophos_utm"
+	F5BigipServerHardware   ServerHardwareProfile = "f5_bigip"
+	Q35ServerHardware       ServerHardwareProfile = "q35"
+	Q35NestedServerHardware ServerHardwareProfile = "q35_nested"
 )
 
 //GetServer gets a specific server based on given list

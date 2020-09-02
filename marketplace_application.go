@@ -117,9 +117,9 @@ type MarketplaceApplicationCreateRequest struct {
 	//Path to the images for the application, must be in .gz format and started with s3//
 	ObjectStoragePath string `json:"object_storage_path"`
 
-	//Category of the marketplace application. Allowed values: nil, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
+	//Category of the marketplace application. Allowed values: not-set, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
 	//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory. Optional.
-	Category *marketplaceApplicationCategory `json:"category,omitempty"`
+	Category MarketplaceApplicationCategory `json:"category,omitempty"`
 
 	//whether you want to publish your application or not. Optional
 	Publish *bool `json:"publish,omitempty"`
@@ -157,9 +157,9 @@ type MarketplaceApplicationUpdateRequest struct {
 	//Path to the images for the application, must be in .gz format and started with s3// . Optional.
 	ObjectStoragePath string `json:"object_storage_path,omitempty"`
 
-	//Category of the marketplace application. Allowed values: nil, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
+	//Category of the marketplace application. Allowed values: not-set, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
 	//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory. Optional.
-	Category *marketplaceApplicationCategory `json:"category,omitempty"`
+	Category MarketplaceApplicationCategory `json:"category,omitempty"`
 
 	//whether you want to publish your application or not. Optional
 	Publish *bool `json:"publish,omitempty"`
@@ -171,14 +171,16 @@ type MarketplaceApplicationUpdateRequest struct {
 	Metadata *MarketplaceApplicationMetadata `json:"metadata,omitempty"`
 }
 
+type MarketplaceApplicationCategory string
+
 //All allowed Marketplace application category's values
 var (
-	MarketplaceApplicationCMSCategory               = &marketplaceApplicationCategory{"CMS"}
-	MarketplaceApplicationProjectManagementCategory = &marketplaceApplicationCategory{"project management"}
-	MarketplaceApplicationAdminpanelCategory        = &marketplaceApplicationCategory{"Adminpanel"}
-	MarketplaceApplicationCollaborationCategory     = &marketplaceApplicationCategory{"Collaboration"}
-	MarketplaceApplicationCloudStorageCategory      = &marketplaceApplicationCategory{"Cloud Storage"}
-	MarketplaceApplicationArchivingCategory         = &marketplaceApplicationCategory{"Archiving"}
+	MarketplaceApplicationCMSCategory               MarketplaceApplicationCategory = "CMS"
+	MarketplaceApplicationProjectManagementCategory MarketplaceApplicationCategory = "project management"
+	MarketplaceApplicationAdminpanelCategory        MarketplaceApplicationCategory = "Adminpanel"
+	MarketplaceApplicationCollaborationCategory     MarketplaceApplicationCategory = "Collaboration"
+	MarketplaceApplicationCloudStorageCategory      MarketplaceApplicationCategory = "Cloud Storage"
+	MarketplaceApplicationArchivingCategory         MarketplaceApplicationCategory = "Archiving"
 )
 
 //GetMarketplaceApplicationList gets a list of available marketplace applications
