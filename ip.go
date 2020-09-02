@@ -7,6 +7,19 @@ import (
 	"path"
 )
 
+//IPOperator is an interface defining API of an IP operator
+type IPOperator interface {
+	GetIP(ctx context.Context, id string) (IP, error)
+	GetIPList(ctx context.Context) ([]IP, error)
+	CreateIP(ctx context.Context, body IPCreateRequest) (IPCreateResponse, error)
+	DeleteIP(ctx context.Context, id string) error
+	UpdateIP(ctx context.Context, id string, body IPUpdateRequest) error
+	GetIPEventList(ctx context.Context, id string) ([]Event, error)
+	GetIPVersion(ctx context.Context, id string) int
+	GetIPsByLocation(ctx context.Context, id string) ([]IP, error)
+	GetDeletedIPs(ctx context.Context) ([]IP, error)
+}
+
 //IPList is JSON struct of a list of IPs
 type IPList struct {
 	//Array of IP addresses

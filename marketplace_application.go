@@ -7,6 +7,17 @@ import (
 	"path"
 )
 
+//MarketplaceApplicationOperator an interface defining API of a marketplace application operator
+type MarketplaceApplicationOperator interface {
+	GetMarketplaceApplicationList(ctx context.Context) ([]MarketplaceApplication, error)
+	GetMarketplaceApplication(ctx context.Context, id string) (MarketplaceApplication, error)
+	CreateMarketplaceApplication(ctx context.Context, body MarketplaceApplicationCreateRequest) (MarketplaceApplicationCreateResponse, error)
+	ImportMarketplaceApplication(ctx context.Context, body MarketplaceApplicationImportRequest) (MarketplaceApplicationCreateResponse, error)
+	UpdateMarketplaceApplication(ctx context.Context, id string, body MarketplaceApplicationUpdateRequest) error
+	DeleteMarketplaceApplication(ctx context.Context, id string) error
+	GetMarketplaceApplicationEventList(ctx context.Context, id string) ([]Event, error)
+}
+
 //MarketplaceApplicationList JSON struct of a list of market applications
 type MarketplaceApplicationList struct {
 	//Array of market applications

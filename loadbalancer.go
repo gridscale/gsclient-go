@@ -7,6 +7,16 @@ import (
 	"path"
 )
 
+//LoadBalancerOperator an interface defining API of a loadbalancer operator
+type LoadBalancerOperator interface {
+	GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error)
+	GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, error)
+	CreateLoadBalancer(ctx context.Context, body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error)
+	UpdateLoadBalancer(ctx context.Context, id string, body LoadBalancerUpdateRequest) error
+	DeleteLoadBalancer(ctx context.Context, id string) error
+	GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error)
+}
+
 //LoadBalancers is the JSON struct of a list of loadbalancers
 type LoadBalancers struct {
 	//Array of loadbalancers

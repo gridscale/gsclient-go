@@ -7,6 +7,13 @@ import (
 	"path"
 )
 
+//StorageBackupOperator is an interface defining API of a storage backup operator
+type StorageBackupOperator interface {
+	GetStorageBackupList(ctx context.Context, id string) ([]StorageBackup, error)
+	DeleteStorageBackup(ctx context.Context, storageID, backupID string) error
+	RollbackStorageBackup(ctx context.Context, storageID, backupID string, body StorageRollbackRequest) error
+}
+
 //StorageBackupList is JSON structure of a list of storage backups
 type StorageBackupList struct {
 	//Array of backups

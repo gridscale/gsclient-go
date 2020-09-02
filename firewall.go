@@ -7,6 +7,16 @@ import (
 	"path"
 )
 
+//FirewallOperator is an interface defining API of a firewall operator
+type FirewallOperator interface {
+	GetFirewallList(ctx context.Context) ([]Firewall, error)
+	GetFirewall(ctx context.Context, id string) (Firewall, error)
+	CreateFirewall(ctx context.Context, body FirewallCreateRequest) (FirewallCreateResponse, error)
+	UpdateFirewall(ctx context.Context, id string, body FirewallUpdateRequest) error
+	DeleteFirewall(ctx context.Context, id string) error
+	GetFirewallEventList(ctx context.Context, id string) ([]Event, error)
+}
+
 //FirewallList is JSON structure of a list of firewalls
 type FirewallList struct {
 	//Array of firewalls
