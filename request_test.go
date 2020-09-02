@@ -32,19 +32,19 @@ var getNetworkErrorTests = []networkTestCase{
 		name:          "retry the GET request in case of connection timeout",
 		apiURL:        "http://127.0.0.1",
 		httpClient:    &http.Client{Timeout: 1 * time.Nanosecond},
-		expectedError: "Maximum number of trials has been exhausted with error: Get %s%s: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)",
+		expectedError: "Client.Timeout exceeded while awaiting headers",
 	},
 	{
 		name:          "retry the GET request in case of connection refused",
 		apiURL:        "http://127.0.0.1",
 		httpClient:    http.DefaultClient,
-		expectedError: "Maximum number of trials has been exhausted with error: Get %s%s: dial tcp 127.0.0.1:80: connect: connection refused",
+		expectedError: "dial tcp 127.0.0.1:80: connect: connection refused",
 	},
 	{
 		name:          "retry the GET request in case of DNS lookup error",
-		apiURL:        "http://api.unkown.domain",
+		apiURL:        "http://api.unknown.domain",
 		httpClient:    http.DefaultClient,
-		expectedError: "Maximum number of trials has been exhausted with error: Get %s%s: dial tcp: lookup api.unkown.domain",
+		expectedError: "dial tcp: lookup api.unknown.domain",
 	},
 }
 
@@ -53,19 +53,19 @@ var postNetworkErrorTests = []networkTestCase{
 		name:          "do not retry the POST request in case of connection timeout",
 		apiURL:        "http://127.0.0.1",
 		httpClient:    &http.Client{Timeout: 1 * time.Nanosecond},
-		expectedError: "Post %s%s: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)",
+		expectedError: "Client.Timeout exceeded while awaiting headers",
 	},
 	{
 		name:          "retry the POST request in case of connection refused",
 		apiURL:        "http://127.0.0.1",
 		httpClient:    http.DefaultClient,
-		expectedError: "Maximum number of trials has been exhausted with error: Post %s%s: dial tcp 127.0.0.1:80: connect: connection refused",
+		expectedError: "dial tcp 127.0.0.1:80: connect: connection refused",
 	},
 	{
 		name:          "retry the POST request in case of DNS lookup error",
-		apiURL:        "http://api.unkown.domain",
+		apiURL:        "http://api.unknown.domain",
 		httpClient:    http.DefaultClient,
-		expectedError: "Maximum number of trials has been exhausted with error: Post %s%s: dial tcp: lookup api.unkown.domain",
+		expectedError: "dial tcp: lookup api.unknown.domain",
 	},
 }
 
@@ -96,7 +96,7 @@ func TestRequestGet_NetworkErrors(t *testing.T) {
 		config.httpClient = test.httpClient
 		client := NewClient(config)
 		_, err := client.GetServer(emptyCtx, dummyUUID)
-		assert.Contains(t, fmt.Sprintf("%v", err), fmt.Sprintf(test.expectedError, config.apiURL, uri), test.name)
+		assert.Contains(t, fmt.Sprintf("%v", err), test.expectedError, test.name)
 	}
 }
 
@@ -118,7 +118,7 @@ func TestRequestPost_NetworkErrors(t *testing.T) {
 			HardwareProfile: DefaultServerHardware,
 			Labels:          []string{"label"},
 		})
-		assert.Contains(t, fmt.Sprintf("%v", err), fmt.Sprintf(test.expectedError, config.apiURL, uri), test.name)
+		assert.Contains(t, fmt.Sprintf("%v", err), test.expectedError, test.name)
 	}
 }
 
