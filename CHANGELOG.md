@@ -1,6 +1,14 @@
 # Changelog
 
-## 3.2.0 (Unreleased)
+## 3.3.0 (Unreleased)
+
+FEATURES:
+
+IMPROVEMENTS:
+
+BUG FIXES:
+
+## 3.2.0 (September 2, 2020)
 
 FEATURES:
 * Add storage backup functionalities.
@@ -21,7 +29,7 @@ BUG FIXES:
 FEATURES:
 * Storage can be increased its speed via UpdateStorage.
 * Support custom HTTP headers.
-* Be able to deal with gridscale API rate limiting. 
+* Be able to deal with gridscale API rate limiting.
 
 IMPROVEMENTS:
 * Refactor `execute()` function.
@@ -33,7 +41,7 @@ FEATURES:
 * Add K8S support (get k8s config, renew k8s cluster's credentials).
 
 BUG FIXES:
-* Fixed wrong import path in exmaples.
+* Fixed wrong import path in examples.
 * Fixed wrong import path in README.
 
 ## 3.0.0 (May 6, 2020)
@@ -142,4 +150,4 @@ IMPROVEMENTS:
 
 ## 0.1.0 (January 2, 2019)
 
-- Initial release of gsclient-go.
+* Initial release of gsclient-go.
