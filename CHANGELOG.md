@@ -1,17 +1,9 @@
 # Changelog
 
-## 3.3.0 (Unreleased)
-
-FEATURES:
-
-IMPROVEMENTS:
+## 3.2.1 (September 4, 2020)
 
 BUG FIXES:
-
-## 3.2.1 (Unreleased)
-
-BUG FIXES:
-* (Hot fix) Fixed issue making it unable to get related backups of a backup schedule.
+* Fixed issue making it unable to get related backups of a backup schedule.
 
 ## 3.2.0 (September 2, 2020)
 
