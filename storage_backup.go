@@ -82,7 +82,7 @@ func (c *Client) RollbackStorageBackup(ctx context.Context, storageID, backupID 
 		return errors.New("'storageID' or 'backupID' is invalid")
 	}
 	r := gsRequest{
-		uri:    path.Join(apiStorageBase, storageID, "backups", backupID),
+		uri:    path.Join(apiStorageBase, storageID, "backups", backupID, "rollback"),
 		method: http.MethodPatch,
 		body:   body,
 	}
