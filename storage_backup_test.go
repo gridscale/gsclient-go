@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetStorageBackupList(t *testing.T) {
@@ -66,7 +67,7 @@ func TestClient_RollbackStorageBackup(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
-	uri := path.Join(apiStorageBase, dummyUUID, "backups", dummyUUID)
+	uri := path.Join(apiStorageBase, dummyUUID, "backups", dummyUUID, "rollback")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 		if isFailed {
