@@ -116,7 +116,7 @@ type MarketplaceApplicationMetadata struct {
 	Icon       string   `json:"icon"`
 	Features   string   `json:"features"`
 	TermsOfUse string   `json:"terms_of_use"`
-	Authors    string   `json:"authors"`
+	Author     string   `json:"author"`
 	Advices    string   `json:"advices"`
 }
 
