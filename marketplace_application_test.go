@@ -226,7 +226,7 @@ func getMockMarketplaceApplication(status string) MarketplaceApplication {
 			Icon:       "test",
 			Features:   "test",
 			TermsOfUse: "test",
-			Authors:    "test",
+			Author:     "test",
 			Advices:    "test",
 		},
 		ChangeTime:      dummyTime,
