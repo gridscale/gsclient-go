@@ -9,8 +9,8 @@ script:
   - go test -v -cover $(go list ./... | grep -v /examples)
 
 before_deploy:
-  - git config --local user.name "Van Thong Nguyen"
-  - git config --local user.email "tom@gridscale.io"
+  - git config --local user.name "bot CI"
+  - git config --local user.email "team_wolf@gridscale.io"
 
 deploy:
   provider: releases
