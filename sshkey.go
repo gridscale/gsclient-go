@@ -31,7 +31,7 @@ type Sshkey struct {
 
 //SshkeyProperties JSON struct of properties of a single SSH-key
 type SshkeyProperties struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
@@ -58,7 +58,7 @@ type SshkeyProperties struct {
 
 //SshkeyCreateRequest JSON struct of a request for creating a SSH-key
 type SshkeyCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The OpenSSH public key string (all key types are supported => ed25519, ecdsa, dsa, rsa, rsa1).
@@ -70,7 +70,7 @@ type SshkeyCreateRequest struct {
 
 //SshkeyUpdateRequest JSON struct of a request for updating a SSH-key
 type SshkeyUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	//Optional.
 	Name string `json:"name,omitempty"`
 

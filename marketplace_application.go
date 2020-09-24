@@ -32,7 +32,7 @@ type MarketplaceApplication struct {
 
 //MarketplaceApplicationProperties JSON struct of properties of a market application
 type MarketplaceApplicationProperties struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//Unique hash to allow user to import the self-created marketplace application
@@ -122,7 +122,7 @@ type MarketplaceApplicationMetadata struct {
 
 //MarketplaceApplicationCreateRequest JSON struct of a request for creating a marketplace application
 type MarketplaceApplicationCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//Path to the images for the application, must be in .gz format and started with s3//
@@ -162,7 +162,7 @@ type MarketplaceApplicationCreateResponse struct {
 
 //MarketplaceApplicationUpdateRequest JSON struct of a request for updating a marketplace application
 type MarketplaceApplicationUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters. Optional.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters. Optional.
 	Name string `json:"name,omitempty"`
 
 	//Path to the images for the application, must be in .gz format and started with s3// . Optional.

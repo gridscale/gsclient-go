@@ -26,6 +26,7 @@ type StorageBackup struct {
 	Properties StorageBackupProperties `json:"backup"`
 }
 
+//StorageBackupProperties hold the properties of a single backup.
 type StorageBackupProperties struct {
 	//The UUID of a backup is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
