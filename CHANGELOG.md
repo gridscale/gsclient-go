@@ -1,12 +1,9 @@
 # Changelog
 
-## 3.3.0 (Unreleased)
-
-FEATURES:
+## 3.2.2 (October 27, 2020)
 
 IMPROVEMENTS:
-
-BUG FIXES:
+* Omit `X-Auth-UserID` and `X-Auth-Token` HTTP headers when they are empty.
 
 ## 3.2.1 (September 4, 2020)
 
