@@ -1,7 +1,7 @@
 # The gridscale Go Client
 
 [![Build Status](https://travis-ci.com/gridscale/gsclient-go.svg?branch=master)](https://travis-ci.com/gridscale/gsclient-go) [![Go Report Card](https://goreportcard.com/badge/github.com/gridscale/gsclient-go)](https://goreportcard.com/report/github.com/gridscale/gsclient-go)
-[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/gridscale/gsclient-go?label=release)](https://github.com/gridscale/gsclient-go/releases)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/gridscale/gsclient-go?label=release)](https://github.com/gridscale/gsclient-go/releases) [![PkgGoDev](https://pkg.go.dev/badge/github.com/gridscale/gsclient-go/v3)](https://pkg.go.dev/github.com/gridscale/gsclient-go/v3)
 
 This is a client for the gridscale API. It can be used to make an application interact with the gridscale cloud platform to create and manage resources.
 
