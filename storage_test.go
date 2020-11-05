@@ -84,6 +84,36 @@ func TestClient_CreateStorage(t *testing.T) {
 	}
 }
 
+func TestClient_CreateStorageFromBackup(t *testing.T) {
+	server, client, muxServer := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiStorageBase, "import")
+	muxServer.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		if isFailed {
+			w.WriteHeader(400)
+		} else {
+			fmt.Fprintf(w, prepareStorageCreateResponse())
+		}
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		res, err := client.CreateStorageFromBackup(
+			emptyCtx,
+			dummyUUID,
+			"some-storage-name",
+		)
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "CreateStorageFromBackup returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockStorageCreateResponse()), fmt.Sprintf("%v", res))
+		}
+	}
+}
+
 func TestClient_UpdateStorage(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
