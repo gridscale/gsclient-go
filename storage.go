@@ -13,6 +13,7 @@ type StorageOperator interface {
 	GetStorageList(ctx context.Context) ([]Storage, error)
 	GetStoragesByLocation(ctx context.Context, id string) ([]Storage, error)
 	CreateStorage(ctx context.Context, body StorageCreateRequest) (CreateResponse, error)
+	CreateStorageFromBackup(ctx context.Context, backupID, storageName string) (CreateResponse, error)
 	UpdateStorage(ctx context.Context, id string, body StorageUpdateRequest) error
 	CloneStorage(ctx context.Context, id string) (CreateResponse, error)
 	DeleteStorage(ctx context.Context, id string) error
@@ -244,6 +245,17 @@ type StorageUpdateRequest struct {
 	StorageType StorageType `json:"storage_type,omitempty"`
 }
 
+// CreateStorageFromBackupRequest is JSON structure of a request to create a new storage from a backup
+type CreateStorageFromBackupRequest struct {
+	RequestProperties CreateStorageFromBackupProperties `json:"backup"`
+}
+
+// CreateStorageFromBackupProperties is request properties of CreateStorageFromBackupRequest
+type CreateStorageFromBackupProperties struct {
+	Name       string `json:"name"`
+	BackupUUID string `json:"backup_uuid"`
+}
+
 //StorageType represents a storages physical capabilities.
 type StorageType string
 
@@ -419,6 +431,28 @@ func (c *Client) CloneStorage(ctx context.Context, id string) (CreateResponse, e
 	r := gsRequest{
 		uri:    path.Join(apiStorageBase, id, "clone"),
 		method: http.MethodPost,
+	}
+	err := r.execute(ctx, *c, &response)
+	return response, err
+}
+
+// CreateStorageFromBackup creates a new storage from a specific backup
+//
+// See: https://gridscale.io/en/api-documentation/index.html#operation/storageImport
+func (c *Client) CreateStorageFromBackup(ctx context.Context, backupID, storageName string) (CreateResponse, error) {
+	var response CreateResponse
+	if !isValidUUID(backupID) {
+		return response, errors.New("'backupID' is invalid")
+	}
+	r := gsRequest{
+		uri:    path.Join(apiStorageBase, "import"),
+		method: http.MethodPost,
+		body: CreateStorageFromBackupRequest{
+			RequestProperties: CreateStorageFromBackupProperties{
+				Name:       storageName,
+				BackupUUID: backupID,
+			},
+		},
 	}
 	err := r.execute(ctx, *c, &response)
 	return response, err
