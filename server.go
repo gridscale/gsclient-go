@@ -134,7 +134,6 @@ type ServerCreateRequest struct {
 	//Specifies the hardware settings for the virtual machine.
 	//Allowed values: DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
 	//SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
-	//HardwareProfile is not set => server hardware is normal type
 	HardwareProfile ServerHardwareProfile `json:"hardware_profile,omitempty"`
 
 	//Defines which Availability-Zone the Server is placed. Can be empty
@@ -345,7 +344,7 @@ func (c *Client) GetServerList(ctx context.Context) ([]Server, error) {
 
 //CreateServer create a server
 //
-//NOTE: Allowed values of `HardwareProfile`: nil, DefaultServerHardware, NestedServerHardware, LegacyServerHardware,
+//NOTE: Allowed values of `HardwareProfile`: DefaultServerHardware, NestedServerHardware, LegacyServerHardware,
 //CiscoCSRServerHardware, SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createServer
