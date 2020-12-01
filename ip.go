@@ -105,12 +105,6 @@ type IPRelations struct {
 
 	//Array of object (IPServer)
 	Servers []IPServer `json:"servers"`
-
-	//Array of object (ServerIPRelationProperties)
-	PublicIPs []ServerIPRelationProperties `json:"public_ips"`
-
-	//Array of object (ServerStorageRelationProperties)
-	Storages []ServerStorageRelationProperties `json:"storages"`
 }
 
 //IPLoadbalancer is JSON struct of the relation between an IP and a Load Balancer
