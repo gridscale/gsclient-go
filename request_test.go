@@ -82,6 +82,12 @@ var apiErrorTests = []apiTestCase{
 		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e54",
 		expectedError: "Maximum number of trials has been exhausted with error: Status code: %d. Error: no error message received from server. Request UUID: %s. ",
 	},
+	{
+		name:          "retry the request in case of API error with status code 409",
+		statusCode:    409,
+		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e55",
+		expectedError: "Maximum number of trials has been exhausted with error: Status code: %d. Error: no error message received from server. Request UUID: %s.",
+	},
 }
 
 func TestRequestGet_NetworkErrors(t *testing.T) {
@@ -188,6 +194,10 @@ func Test_isErrorHTTPCodeRetryable(t *testing.T) {
 		},
 		{
 			429,
+			true,
+		},
+		{
+			409,
 			true,
 		},
 		{
