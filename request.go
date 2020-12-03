@@ -244,7 +244,7 @@ func isErrorHTTPCodeRetryable(statusCode int) bool {
 	//if internal server error (>=500)
 	//OR object is in status that does not allow the request (424)
 	//OR we reach the rate limit (429), retry
-	if statusCode >= 500 || statusCode == 424 || statusCode == 429 {
+	if statusCode >= 500 || statusCode == 424 || statusCode == 429 || statusCode == 409 {
 		return true
 	}
 	//stop retrying (false) and return custom error
