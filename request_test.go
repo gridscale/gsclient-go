@@ -164,6 +164,20 @@ func TestRequestPatch_APIErrors(t *testing.T) {
 	}
 }
 
+func TestRequestDelete_APIErrors(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	for _, test := range apiErrorTests {
+		uri := path.Join(apiServerBase, test.dummyUUID)
+		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			w.WriteHeader(test.statusCode)
+		})
+		err := client.DeleteServer(emptyCtx, test.dummyUUID)
+		assert.Contains(t, fmt.Sprintf("%v", err), fmt.Sprintf(test.expectedError, test.statusCode, dummyRequestUUID), test.name)
+	}
+}
+
 func Test_prepareHTTPRequest(t *testing.T) {
 	r := &gsRequest{
 		uri:                 path.Join(apiDeletedBase, "networks"),
