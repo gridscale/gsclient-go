@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.x.y (UNRELEASED)
+
+IMPROVEMENTS:
+* Add CreateStorageFromBackup function ([PR #167](https://github.com/gridscale/gsclient-go/pull/167)).
+
 ## 3.2.2 (October 27, 2020)
 
 IMPROVEMENTS:
