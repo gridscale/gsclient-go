@@ -1,9 +1,17 @@
 # Changelog
 
-## 3.x.y (UNRELEASED)
+## 3.3.0 (December 17, 2020)
+
+FEATURES::
+* Add CreateStorageFromBackup function ([PR #167](https://github.com/gridscale/gsclient-go/pull/167)).
 
 IMPROVEMENTS:
-* Add CreateStorageFromBackup function ([PR #167](https://github.com/gridscale/gsclient-go/pull/167)).
+* Remove L3 Security issue from known issues ([Issue #166](https://github.com/gridscale/gsclient-go/issues/166)).
+* Various documentation fixes ([PR #158](https://github.com/gridscale/gsclient-go/pull/158)).
+* Completely get rid of Travis CI ([PR #163](https://github.com/gridscale/gsclient-go/pull/163)).
+
+BUG FIXES:
+* Remove incorrect IP relations ([PR #162](https://github.com/gridscale/gsclient-go/pull/162)).
 
 ## 3.2.2 (October 27, 2020)
 
