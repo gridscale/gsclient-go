@@ -154,7 +154,7 @@ func (r *gsRequest) retryHTTPRequest(
 	//Init empty response body
 	var responseBodyBytes []byte
 	//
-	err := retryWithLimitedNumOfRetries(func() (bool, error) {
+	err := retryNTimes(func() (bool, error) {
 		//execute the request
 		resp, err := httpClient.Do(httpReq)
 		if err != nil {

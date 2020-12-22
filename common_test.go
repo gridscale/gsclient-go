@@ -79,7 +79,7 @@ func Test_retryWithContext(t *testing.T) {
 	}
 }
 
-func Test_retryWithLimitedNumOfRetries(t *testing.T) {
+func Test_retryNTimes(t *testing.T) {
 	type testCase struct {
 		isContinue   bool
 		err          error
@@ -107,7 +107,7 @@ func Test_retryWithLimitedNumOfRetries(t *testing.T) {
 		},
 	}
 	for _, test := range testCases {
-		err := retryWithLimitedNumOfRetries(func() (bool, error) {
+		err := retryNTimes(func() (bool, error) {
 			return test.isContinue, test.err
 		}, test.numOfRetries, test.delay)
 		if test.err != nil || test.isContinue {
