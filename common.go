@@ -52,6 +52,11 @@ func retryWithLimitedNumOfRetries(targetFunc retryableFunc, numOfRetries int, de
 
 	}
 	if err != nil {
+		reqErr, ok := err.(RequestError)
+		if ok {
+			reqErr.Description = fmt.Sprintf("Maximum number of trials has been exhausted with error: %s", reqErr.Description)
+			return reqErr
+		}
 		return fmt.Errorf("Maximum number of trials has been exhausted with error: %v", err)
 	}
 	return errors.New("Maximum number of trials has been exhausted")
