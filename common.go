@@ -37,8 +37,8 @@ func retryWithContext(ctx context.Context, targetFunc retryableFunc, delay time.
 	}
 }
 
-//retryWithLimitedNumOfRetries reruns a function within a number of retries
-func retryWithLimitedNumOfRetries(targetFunc retryableFunc, numOfRetries int, delay time.Duration) error {
+//retryNTimes reruns a function within a number of retries
+func retryNTimes(targetFunc retryableFunc, numOfRetries int, delay time.Duration) error {
 	retryNo := 0
 	var err error
 	var continueRetrying bool
