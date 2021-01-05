@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.3.1 (January 05, 2021)
+
+IMPROVEMENTS:
+* Remane function `retryWithLimitedNumOfRetries` to `retryNTimes`.
+
+BUG FIXES:
+* Convert type of err in `retryNTimes` to `RequestError` type ([PR #170](https://github.com/gridscale/gsclient-go/pull/170)).
+
 ## 3.3.0 (December 17, 2020)
 
 FEATURES::
