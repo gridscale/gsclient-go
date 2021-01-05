@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.3.1 (January 17, 2021)
+## 3.3.1 (January 05, 2021)
 
 IMPROVEMENTS:
 * Remane function `retryWithLimitedNumOfRetries` to `retryNTimes`.
