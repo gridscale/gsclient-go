@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.3.2 (January 12, 2021)
+
+IMPROVEMENTS:
+* `PaaSServiceTemplateUUID` in PaaS service can be updated ([PR #172](https://github.com/gridscale/gsclient-go/pull/172)).
+
 ## 3.3.1 (January 05, 2021)
 
 IMPROVEMENTS:
