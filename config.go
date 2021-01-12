@@ -12,7 +12,7 @@ import (
 const (
 	defaultMaxNumberOfRetries     = 5
 	defaultDelayIntervalMilliSecs = 1000
-	version                       = "3.3.1"
+	version                       = "3.3.2"
 	defaultAPIURL                 = "https://api.gridscale.io"
 	resourceActiveStatus          = "active"
 	requestDoneStatus             = "done"
