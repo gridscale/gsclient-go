@@ -253,6 +253,9 @@ type PaaSServiceUpdateRequest struct {
 
 	//A list of service resource limits. Leave it if you do not want to update the resource limits
 	ResourceLimits []ResourceLimit `json:"resource_limits,omitempty"`
+
+	//The template that you want to use in the service, you can find an available list at the /service_templates endpoint.
+	PaaSServiceTemplateUUID string `json:"paas_service_template_uuid,omitempty"`
 }
 
 //PaaSServiceMetrics JSON of a list of PaaS metrics
