@@ -187,6 +187,12 @@ type PaaSTemplateProperties struct {
 	//Product No
 	ProductNo int `json:"product_no"`
 
+	// Discounted product number related to the service template.
+	DiscountProductNo int `json:"discount_product_no"`
+
+	// Time period (seconds) for which the discounted product number is valid.
+	DiscountPeriod int64 `json:"discount_period"`
+
 	//List of labels.
 	Labels []string `json:"labels"`
 
@@ -198,6 +204,27 @@ type PaaSTemplateProperties struct {
 
 	//A definition of possible service template parameters (python-cerberus compatible).
 	ParametersSchema map[string]Parameter `json:"parameters_schema"`
+
+	// Describes the flavour of the service. E.g. kubernetes, redis-store, postgres, etc.
+	Flavour string `json:"flavour"`
+
+	// Describes the version of the service.
+	Version string `json:"version"`
+
+	// Describes the release of the service.
+	Release string `json:"release"`
+
+	// Describes the performance class of the service.
+	PerformanceClass string `json:"performance_class"`
+
+	// List of service template uuids to which a performance class update is allowed.
+	PerformanceClassUpdates []string `json:"performance_class_updates"`
+
+	// List of service template uuids to which an upgrade is allowed.
+	VersionUpgrades []string `json:"version_upgrades"`
+
+	// List of service template uuids to which a patch update is allowed.
+	PatchUpdates []string `json:"patch_updates"`
 }
 
 //Parameter JSON of a parameter
@@ -228,6 +255,9 @@ type Parameter struct {
 
 	//Regex
 	Regex string `json:"regex"`
+
+	// Immutable
+	Immutable bool `json:"immutable"`
 }
 
 //Resource JSON of a resource
