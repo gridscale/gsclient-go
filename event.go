@@ -50,6 +50,11 @@ type EventProperties struct {
 
 	//The UUID of the user that triggered the event
 	UserUUID string `json:"user_uuid"`
+
+	// The user that triggered the event.
+	// Usually the user's email if the event was triggered by request of a user,
+	// otherwise a short descriptive name of the system component responsible.
+	Initiator string `json:"initiator"`
 }
 
 //GetEventList gets a list of events
