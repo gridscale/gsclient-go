@@ -11,7 +11,8 @@ import (
 )
 
 var ctx = context.Background()
-const backupID = "this-should-be-a-backup-UUID";
+
+const backupID = "this-should-be-a-backup-UUID"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
