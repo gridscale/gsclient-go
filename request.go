@@ -281,9 +281,9 @@ func maskHeaderCred(header http.Header) http.Header {
 		if k == authUserIDHeaderKey || k == authTokenHeaderKey {
 			if len(v[0]) > 5 {
 				newHeaders[k] = []string{v[0][:5] + maskedValue}
-			} else {
-				newHeaders[k] = []string{maskedValue}
+				continue
 			}
+			newHeaders[k] = []string{maskedValue}
 			continue
 		}
 		newHeaders[k] = v
