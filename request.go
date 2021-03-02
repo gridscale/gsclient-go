@@ -279,7 +279,11 @@ func maskHeaderCred(header http.Header) http.Header {
 	newHeaders := make(http.Header)
 	for k, v := range header {
 		if k == authUserIDHeaderKey || k == authTokenHeaderKey {
-			newHeaders[k] = []string{v[0][:5] + maskedValue}
+			if len(v[0]) > 5 {
+				newHeaders[k] = []string{v[0][:5] + maskedValue}
+			} else {
+				newHeaders[k] = []string{maskedValue}
+			}
 			continue
 		}
 		newHeaders[k] = v
