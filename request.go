@@ -48,6 +48,12 @@ type RequestError struct {
 	RequestUUID string
 }
 
+const (
+	authUserIDHeaderKey = "X-Auth-Userid"
+	authTokenHeaderKey  = "X-Auth-Token"
+	maskedValue         = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+)
+
 //Error just returns error as string
 func (r RequestError) Error() string {
 	message := r.Description
@@ -72,7 +78,7 @@ func (r *gsRequest) execute(ctx context.Context, c Client, output interface{}) e
 	//Prepare http request (including HTTP headers preparation, etc.)
 	httpReq, err := r.prepareHTTPRequest(ctx, c.cfg)
 	logger.Debugf("Request body: %v", httpReq.Body)
-	logger.Debugf("Request headers: %v", httpReq.Header)
+	logger.Debugf("Request headers: %v", maskHeaderCred(httpReq.Header))
 
 	//Execute the request (including retrying when needed)
 	requestUUID, responseBodyBytes, err := r.retryHTTPRequest(ctx, c.HttpClient(), httpReq, c.MaxNumberOfRetries(), c.DelayInterval())
@@ -123,11 +129,11 @@ func (r *gsRequest) prepareHTTPRequest(ctx context.Context, cfg *Config) (*http.
 
 	// Omit X-Auth-UserID when cfg.userUUID is empty
 	if cfg.userUUID != "" {
-		request.Header.Set("X-Auth-UserID", cfg.userUUID)
+		request.Header.Set(authUserIDHeaderKey, cfg.userUUID)
 	}
 	// Omit X-Auth-Token when cfg.apiToken is empty
 	if cfg.apiToken != "" {
-		request.Header.Set("X-Auth-Token", cfg.apiToken)
+		request.Header.Set(authTokenHeaderKey, cfg.apiToken)
 	}
 
 	//Set headers based on a given list of custom headers
@@ -265,4 +271,18 @@ func getDelayTimeInMsFromTimestampStr(timestamp string) (int64, error) {
 	}
 	currentTimestampMs := time.Now().UnixNano() / 1000000
 	return timestampInt - currentTimestampMs, nil
+}
+
+// maskHeaderCred returns new HTTP header with masked credentials
+// it is used when debugging
+func maskHeaderCred(header http.Header) http.Header {
+	newHeaders := make(http.Header)
+	for k, v := range header {
+		if k == authUserIDHeaderKey || k == authTokenHeaderKey {
+			newHeaders[k] = []string{v[0][:5] + maskedValue}
+			continue
+		}
+		newHeaders[k] = v
+	}
+	return newHeaders
 }
