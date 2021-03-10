@@ -9,8 +9,12 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"runtime"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 //gsRequest gridscale's custom gsRequest struct
@@ -74,6 +78,32 @@ const (
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *gsRequest) execute(ctx context.Context, c Client, output interface{}) error {
+	startTime := time.Now()
+	var err error
+	var requestUUID string
+	// Get caller name
+	pc, _, _, _ := runtime.Caller(1)
+	details := runtime.FuncForPC(pc)
+	callerName := details.Name()
+	// No need to trace `waitForRequestCompleted` method
+	if !strings.Contains(callerName, "waitForRequestCompleted") {
+		defer func() {
+			interval := time.Now().Sub(startTime).Milliseconds()
+			if err != nil {
+				logger.WithFields(logrus.Fields{
+					"method":      callerName,
+					"timeMs":      interval,
+					"requestUUID": requestUUID,
+				}).Tracef("Failed with error %s", err.Error())
+				return
+			}
+			logger.WithFields(logrus.Fields{
+				"method":      callerName,
+				"timeMs":      interval,
+				"requestUUID": requestUUID,
+			}).Tracef("Successful")
+		}()
+	}
 
 	//Prepare http request (including HTTP headers preparation, etc.)
 	httpReq, err := r.prepareHTTPRequest(ctx, c.cfg)
