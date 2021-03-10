@@ -86,3 +86,9 @@ func DefaultConfiguration(uuid string, token string) *Config {
 	}
 	return cfg
 }
+
+// SetLogLevel manually sets log level.
+// Read more: https://github.com/sirupsen/logrus#level-logging
+func SetLogLevel(level logrus.Level) {
+	logger.Level = level
+}
