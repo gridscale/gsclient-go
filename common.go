@@ -28,11 +28,11 @@ func retryWithContext(ctx context.Context, targetFunc retryableFunc, delay time.
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			time.Sleep(delay) //delay between retries
 			continueRetrying, err := targetFunc()
 			if !continueRetrying {
 				return err
 			}
+			time.Sleep(delay) //delay between retries
 		}
 	}
 }
