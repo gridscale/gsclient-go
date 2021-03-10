@@ -43,13 +43,12 @@ func retryNTimes(targetFunc retryableFunc, numOfRetries int, delay time.Duration
 	var err error
 	var continueRetrying bool
 	for retryNo <= numOfRetries {
-		retryNo++
-		time.Sleep(delay * time.Duration(retryNo)) //delay between retries
 		continueRetrying, err = targetFunc()
 		if !continueRetrying {
 			return err
 		}
-
+		retryNo++
+		time.Sleep(delay * time.Duration(retryNo)) //delay between retries
 	}
 	if err != nil {
 		reqErr, ok := err.(RequestError)
