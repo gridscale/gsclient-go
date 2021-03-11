@@ -81,7 +81,7 @@ type SshkeyUpdateRequest struct {
 	Labels *[]string `json:"labels,omitempty"`
 }
 
-//GetSshkey gets a ssh key
+//GetSshkey gets a single SSH key object.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKey
 func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
@@ -98,7 +98,7 @@ func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
 	return response, err
 }
 
-//GetSshkeyList gets a list of ssh keys
+//GetSshkeyList gets the list of SSH keys in the project.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeys
 func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
@@ -117,7 +117,7 @@ func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
 	return sshKeys, err
 }
 
-//CreateSshkey creates a ssh key
+//CreateSshkey creates a new SSH key.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createSshKey
 func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (CreateResponse, error) {
@@ -131,7 +131,7 @@ func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (Cr
 	return response, err
 }
 
-//DeleteSshkey deletes a ssh key
+//DeleteSshkey deletes a single SSH key.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSshKey
 func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
@@ -145,7 +145,7 @@ func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-//UpdateSshkey updates a ssh key
+//UpdateSshkey updates a SSH key.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateSshKey
 func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateRequest) error {
@@ -160,7 +160,7 @@ func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateR
 	return r.execute(ctx, *c, nil)
 }
 
-//GetSshkeyEventList gets a ssh key's events
+//GetSshkeyEventList gets a SSH key's events.
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeyEvents
 func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, error) {
