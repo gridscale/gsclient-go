@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.4.1 (UNRELEASED)
+
+This release focuses on performance and documentation fixes.
+
+IMPROVEMENTS:
+
+* gsclient-go now allows tracing the duration of individual client calls (See [#186](https://github.com/gridscale/gsclient-go/issues/186)).
+* Performance got improved a lot in most situations since gsclient-go won't needlessly delay sending the actual HTTP request anymore. More [here](https://github.com/gridscale/gsclient-go/issues/186#issuecomment-795466954).
+
 ## 3.4.0 (February 8, 2021)
 
 This release catches up on some gridscale.io API additions.
