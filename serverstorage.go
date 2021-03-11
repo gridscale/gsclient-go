@@ -187,7 +187,7 @@ func (c *Client) LinkStorage(ctx context.Context, serverID string, storageID str
 	return c.CreateServerStorage(ctx, serverID, body)
 }
 
-//UnlinkStorage remove a storage from a server
+//UnlinkStorage removes a storage from a server
 func (c *Client) UnlinkStorage(ctx context.Context, serverID string, storageID string) error {
 	return c.DeleteServerStorage(ctx, serverID, storageID)
 }
