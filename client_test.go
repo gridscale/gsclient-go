@@ -32,7 +32,7 @@ func TestClient_waitForRequestCompleted(t *testing.T) {
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
-			fmt.Fprint(w, fmt.Sprintf(`{"%s": {"status":"%s", "isFailed" : %v}}`, dummyUUID, reqStatus, isFailed))
+			fmt.Fprintf(w, `{"%s": {"status":"%s", "isFailed" : %v}}`, dummyUUID, reqStatus, isFailed)
 		}
 	})
 	for _, reqStatusTest := range requestTestCases {
