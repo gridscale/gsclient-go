@@ -22,8 +22,8 @@ func main() {
 
 	log.Info("Create a storage and a snapshot: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//In order to create a marketplace application, we need to create a storage and its snapshot
-	//Create storage
+	// In order to create a marketplace application, we need to create a storage and its snapshot
+	// Create storage
 	cStorage, err := client.CreateStorage(
 		emptyCtx,
 		gsclient.StorageCreateRequest{
@@ -43,7 +43,7 @@ func main() {
 		log.Info("Storage successfully deleted")
 	}()
 
-	//Create storage snapshot
+	// Create storage snapshot
 	cSnapshot, err := client.CreateStorageSnapshot(
 		emptyCtx,
 		cStorage.ObjectUUID,
@@ -63,7 +63,7 @@ func main() {
 		log.Info("Storage snapshot successfully deleted")
 	}()
 
-	//Create new object storage access key
+	// Create new object storage access key
 	cobj, err := client.CreateObjectStorageAccessKey(emptyCtx)
 	if err != nil {
 		log.Error("Create object storage access key has failed with error", err)
@@ -73,7 +73,7 @@ func main() {
 		"accesskey_uuid": cobj.AccessKey,
 	}).Info("Create access key successfully")
 	defer func() {
-		//Delete access key
+		// Delete access key
 		err := client.DeleteObjectStorageAccessKey(emptyCtx, cobj.AccessKey.AccessKey)
 		if err != nil {
 			log.Error("Delete access key has failed with error", err)
@@ -89,7 +89,7 @@ func main() {
 		return
 	}
 	bucketName := strings.TrimSuffix(bucketNameStdin, "\n")
-	//Export snapshot to S3
+	// Export snapshot to S3
 	exportReqBody := gsclient.StorageSnapshotExportToS3Request{
 		S3auth: gsclient.S3auth{
 			Host:      "gos3.io",
@@ -109,7 +109,7 @@ func main() {
 		return
 	}
 
-	//Create marketplace application
+	// Create marketplace application
 	cMartketApp, err := client.CreateMarketplaceApplication(emptyCtx, gsclient.MarketplaceApplicationCreateRequest{
 		Name:              "go-client-marketplace-app",
 		ObjectStoragePath: fmt.Sprintf("s3://%s/snapshot.gz", bucketName),
@@ -136,7 +136,7 @@ func main() {
 		log.Info("Marketplace application successfully deleted")
 	}()
 
-	//get a marketplace application to update
+	// get a marketplace application to update
 	marketApp, err := client.GetMarketplaceApplication(emptyCtx, cMartketApp.ObjectUUID)
 	if err != nil {
 		log.Error("Get marketplace application has failed with error", err)
@@ -148,7 +148,7 @@ func main() {
 
 	log.Info("Update marketplace application: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Update marketplace application
+	// Update marketplace application
 	err = client.UpdateMarketplaceApplication(emptyCtx, marketApp.Properties.ObjectUUID, gsclient.MarketplaceApplicationUpdateRequest{
 		Name: "updated marketplace application",
 		Setup: &gsclient.MarketplaceApplicationSetup{
@@ -165,7 +165,7 @@ func main() {
 
 	log.Info("Get marketplace application's events: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Get marketplace application's events
+	// Get marketplace application's events
 	events, err := client.GetMarketplaceApplicationEventList(emptyCtx, marketApp.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get marketplace application's events has failed with error", err)

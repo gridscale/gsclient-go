@@ -30,7 +30,7 @@ func main() {
 		"accesskey_uuid": cobj.AccessKey,
 	}).Info("Create access key successfully")
 	defer func() {
-		//Delete access key
+		// Delete access key
 		err := client.DeleteObjectStorageAccessKey(emptyCtx, cobj.AccessKey.AccessKey)
 		if err != nil {
 			log.Error("Delete access key has failed with error", err)

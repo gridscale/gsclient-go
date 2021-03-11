@@ -20,8 +20,8 @@ func main() {
 
 	log.Info("Create template: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//In order to create a template, we need to create a storage and its snapshot
-	//Create storage
+	// In order to create a template, we need to create a storage and its snapshot
+	// Create storage
 	cStorage, err := client.CreateStorage(
 		emptyCtx,
 		gsclient.StorageCreateRequest{
@@ -41,7 +41,7 @@ func main() {
 		log.Info("Storage successfully deleted")
 	}()
 
-	//Create storage snapshot
+	// Create storage snapshot
 	cSnapshot, err := client.CreateStorageSnapshot(
 		emptyCtx,
 		cStorage.ObjectUUID,
@@ -61,7 +61,7 @@ func main() {
 		log.Info("Storage snapshot successfully deleted")
 	}()
 
-	//Create template
+	// Create template
 	cTemplate, err := client.CreateTemplate(emptyCtx, gsclient.TemplateCreateRequest{
 		Name:         "go-client-template",
 		SnapshotUUID: cSnapshot.ObjectUUID,
@@ -93,7 +93,7 @@ func main() {
 		}).Info("Retrieved deleted templates successfully")
 	}()
 
-	//get a template to update
+	// get a template to update
 	template, err := client.GetTemplate(emptyCtx, cTemplate.ObjectUUID)
 	if err != nil {
 		log.Error("Get template has failed with error", err)
@@ -105,7 +105,7 @@ func main() {
 
 	log.Info("Update template: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Update template
+	// Update template
 	err = client.UpdateTemplate(emptyCtx, template.Properties.ObjectUUID, gsclient.TemplateUpdateRequest{
 		Name:   "updated template",
 		Labels: &template.Properties.Labels,
@@ -118,7 +118,7 @@ func main() {
 
 	log.Info("Get template's events: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Get template's events
+	// Get template's events
 	events, err := client.GetTemplateEventList(emptyCtx, template.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get template's events has failed with error", err)

@@ -34,7 +34,7 @@ func main() {
 			},
 		},
 	}
-	//Create a new firewall
+	// Create a new firewall
 	cfw, err := client.CreateFirewall(emptyCtx, fwRequest)
 	if err != nil {
 		log.Error("Create firewall has failed with error", err)
@@ -52,7 +52,7 @@ func main() {
 	}()
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	//Get a firewall to update
+	// Get a firewall to update
 	fw, err := client.GetFirewall(emptyCtx, cfw.ObjectUUID)
 	if err != nil {
 		log.Errorf("Get firewall %s has failed with error %v", cfw.ObjectUUID, err)
@@ -69,7 +69,7 @@ func main() {
 		return
 	}
 
-	//Get firewall events
+	// Get firewall events
 	events, err := client.GetFirewallEventList(emptyCtx, fw.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get firewall's events has failed with error", err)

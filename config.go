@@ -20,7 +20,7 @@ const (
 	bodyType                      = "application/json"
 )
 
-//Config config for client
+// Config config for client
 type Config struct {
 	apiURL             string
 	userUUID           string
@@ -42,7 +42,7 @@ var logger = logrus.Logger{
 	},
 }
 
-//NewConfiguration creates a new config
+// NewConfiguration creates a new config
 //
 //- Parameters:
 //		+ apiURL string: base URL of API.
@@ -72,7 +72,7 @@ func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync 
 	return cfg
 }
 
-//DefaultConfiguration creates a default configuration
+// DefaultConfiguration creates a default configuration
 func DefaultConfiguration(uuid string, token string) *Config {
 	cfg := &Config{
 		apiURL:             defaultAPIURL,

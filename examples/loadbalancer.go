@@ -104,7 +104,7 @@ func main() {
 	log.Info("Retrive loadbalancer events: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	//Get loadbalancer events
+	// Get loadbalancer events
 	response, err := client.GetLoadBalancerEventList(emptyCtx, glb.Properties.ObjectUUID)
 	if err != nil {
 		log.Fatal("Events loadbalancer has failed with error", err)

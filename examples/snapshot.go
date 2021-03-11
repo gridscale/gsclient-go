@@ -21,7 +21,7 @@ func main() {
 
 	log.Info("Create storage and snapshot: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Create storage
+	// Create storage
 	cStorage, err := client.CreateStorage(
 		emptyCtx,
 		gsclient.StorageCreateRequest{
@@ -44,7 +44,7 @@ func main() {
 		log.Info("Storage successfully deleted")
 	}()
 
-	//Create a snapshot
+	// Create a snapshot
 	cSnapshot, err := client.CreateStorageSnapshot(
 		emptyCtx,
 		cStorage.ObjectUUID,
@@ -78,7 +78,7 @@ func main() {
 		}).Info("Retrieved deleted snapshots successfully")
 	}()
 
-	//Get a snapshot to update
+	// Get a snapshot to update
 	snapshot, err := client.GetStorageSnapshot(emptyCtx, cStorage.ObjectUUID, cSnapshot.ObjectUUID)
 	if err != nil {
 		log.Error("Get snapshot has failed with error", err)
@@ -90,7 +90,7 @@ func main() {
 
 	log.Info("Update snapshot: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Update a snapshot
+	// Update a snapshot
 	err = client.UpdateStorageSnapshot(
 		emptyCtx,
 		cStorage.ObjectUUID,
@@ -106,7 +106,7 @@ func main() {
 
 	log.Info("Rollback storage: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Rollback
+	// Rollback
 	err = client.RollbackStorage(
 		emptyCtx,
 		cStorage.ObjectUUID,

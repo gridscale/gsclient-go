@@ -32,7 +32,7 @@ func main() {
 	}
 	logrus.WithFields(logrus.Fields{"isoimage_uuid": cIso.ObjectUUID}).Info("ISO Image successfully created")
 	defer func() {
-		//Delete ISO-image
+		// Delete ISO-image
 		err := client.DeleteISOImage(emptyCtx, cIso.ObjectUUID)
 		if err != nil {
 			logrus.Error("Delete ISO-image has failed with error", err)
@@ -55,7 +55,7 @@ func main() {
 	logrus.Info("Update ISO image: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	//Get ISO-image to update
+	// Get ISO-image to update
 	iso, err := client.GetISOImage(emptyCtx, cIso.ObjectUUID)
 	if err != nil {
 		logrus.Error("Get ISO-image has failed with error", err)
@@ -73,7 +73,7 @@ func main() {
 	}
 	logrus.WithFields(logrus.Fields{"isoimage_uuid": iso.Properties.ObjectUUID}).Info("ISO image successfully updated")
 
-	//get ISO-image's events
+	// get ISO-image's events
 	events, err := client.GetISOImageEventList(emptyCtx, iso.Properties.ObjectUUID)
 	if err != nil {
 		logrus.Error("Get ISO-image's events has failed with error", err)

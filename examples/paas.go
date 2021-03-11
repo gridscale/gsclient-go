@@ -21,14 +21,14 @@ func main() {
 	log.Info("Create PaaS and Security zone: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	//Get template for creating paas
+	// Get template for creating paas
 	paasTemplates, err := client.GetPaaSTemplateList(emptyCtx)
 	if err != nil {
 		log.Error("Get PaaS templates has failed with error", err)
 		return
 	}
 
-	//Create security zone
+	// Create security zone
 	secZoneRequest := gsclient.PaaSSecurityZoneCreateRequest{
 		Name: "go-client-security-zone",
 	}
@@ -49,7 +49,7 @@ func main() {
 		log.Info("Security zone successfully deleted")
 	}()
 
-	//Create PaaS service
+	// Create PaaS service
 	paasRequest := gsclient.PaaSServiceCreateRequest{
 		Name:                    "go-client-paas",
 		PaaSServiceTemplateUUID: paasTemplates[0].Properties.ObjectUUID,
@@ -86,7 +86,7 @@ func main() {
 	log.Info("Update PaaS and Security zone: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	//Get a security zone to update
+	// Get a security zone to update
 	secZone, err := client.GetPaaSSecurityZone(emptyCtx, cSCZ.ObjectUUID)
 	if err != nil {
 		log.Error("Get security zone has failed with error", err)
@@ -96,7 +96,7 @@ func main() {
 		Name:                 "updated security zone",
 		PaaSSecurityZoneUUID: secZone.Properties.ObjectUUID,
 	}
-	//Update security zone
+	// Update security zone
 	err = client.UpdatePaaSSecurityZone(emptyCtx, secZone.Properties.ObjectUUID, secZoneUpdateRequest)
 	if err != nil {
 		log.Error("Update security zone has failed with error", err)
@@ -104,14 +104,14 @@ func main() {
 	}
 	log.Info("Security Zone successfully updated")
 
-	//Get a PaaS service to update
+	// Get a PaaS service to update
 	paas, err := client.GetPaaSService(emptyCtx, cPaaS.ObjectUUID)
 	if err != nil {
 		log.Error("Get PaaS service has failed with error", err)
 		return
 	}
 
-	//Update PaaS service
+	// Update PaaS service
 	paasUpdateRequest := gsclient.PaaSServiceUpdateRequest{
 		Name:           "updated paas",
 		Labels:         &paas.Properties.Labels,
@@ -125,7 +125,7 @@ func main() {
 	}
 	log.Info("PaaS service successfully updated")
 
-	//Clean up
+	// Clean up
 	log.Info("Delete PaaS and Security zone: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 }

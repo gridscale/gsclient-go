@@ -21,7 +21,7 @@ func main() {
 
 	log.Info("Create storage and snapshot schedule: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Create storage
+	// Create storage
 	cStorage, err := client.CreateStorage(
 		emptyCtx,
 		gsclient.StorageCreateRequest{
@@ -36,7 +36,7 @@ func main() {
 		"storage_uuid": cStorage.ObjectUUID,
 	}).Info("Storage successfully created")
 	defer func() {
-		//Delete all snapshots has been made so far
+		// Delete all snapshots has been made so far
 		snapshots, err := client.GetStorageSnapshotList(emptyCtx, cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Get storage's snapshots has failed with error", err)
@@ -49,7 +49,7 @@ func main() {
 				return
 			}
 		}
-		//we have to wait for the snapshot getting deleted firstly
+		// we have to wait for the snapshot getting deleted firstly
 		err = client.DeleteStorage(emptyCtx, cStorage.ObjectUUID)
 		if err != nil {
 			log.Error("Delete storage has failed with error", err)
@@ -58,7 +58,7 @@ func main() {
 		log.Info("Storage successfully deleted")
 	}()
 
-	//Create Snapshot Schedule
+	// Create Snapshot Schedule
 	cSnapshotSchedule, err := client.CreateStorageSnapshotSchedule(
 		emptyCtx,
 		cStorage.ObjectUUID,
@@ -83,7 +83,7 @@ func main() {
 		log.Info("Snapshot schedule successfully deleted")
 	}()
 
-	//Get snapshot schedule to update
+	// Get snapshot schedule to update
 	snapshotSchedule, err := client.GetStorageSnapshotSchedule(emptyCtx, cStorage.ObjectUUID, cSnapshotSchedule.ObjectUUID)
 	if err != nil {
 		log.Error("Get snapshot schedule has failed with error", err)

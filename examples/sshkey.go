@@ -11,8 +11,8 @@ import (
 
 var emptyCtx = context.Background()
 
-//exampleSSHkey is an example of SSH-key, don't use it in production
-const exampleSSHkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9BlRsUvqRNKi59UkQmmztP5g+1jX5Ettr9C0+udwu9ATOukoM3rr0dXGVEVOJKQO1QCoEvMxn5HhZO2+klTVC1inapOrFrlUveqhcXvx6Fr1l3AmBsgY7loa5ELgi0qcKNcM/c9J7gB3EadKei/kfo5EXLDchn8SGHEq9Rhi8n8RcpGCEFnuvbao7uRsSj1QxTBaZgl5FL+W7wq2/dtwNhUk/KVA+ZKkMd4EnVlkF2ngQ02WQsu+0TN1gusMhBfph5sqtFT0twoOvYE3ejVaCc5LwT+5oxZulQ4TvggbJjzGD618q0QFkJ0CUtuh2s0otJkx1RqABX3TjfgmDjA8L example@gridscales.local"
+// exampleSSHkey is an example of SSH-key, don't use it in production
+const exampleSSHkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDPUCeKyPUNBZOikJKx+Id7udqm/ZKArvCn2AqwwRr02 john@example.com"
 
 func main() {
 	uuid := os.Getenv("GRIDSCALE_UUID")
@@ -45,7 +45,7 @@ func main() {
 		log.Info("SSH-key successfully deleted")
 	}()
 
-	//Get a SSH-key to update
+	// Get a SSH-key to update
 	sshkey, err := client.GetSshkey(emptyCtx, cSSHkey.ObjectUUID)
 	if err != nil {
 		log.Error("Get SSH-key has failed with error", err)

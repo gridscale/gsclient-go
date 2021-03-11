@@ -33,7 +33,7 @@ func main() {
 		"network_uuid": cnetwork.ObjectUUID,
 	}).Info("Network successfully created")
 	defer func() {
-		//delete network
+		// delete network
 		err := client.DeleteNetwork(emptyCtx, cnetwork.ObjectUUID)
 		if err != nil {
 			log.Error("Delete network has failed with error", err)
@@ -53,7 +53,7 @@ func main() {
 		}).Info("Retrieved deleted networks successfully")
 	}()
 
-	//Get network to update
+	// Get network to update
 	net, err := client.GetNetwork(emptyCtx, cnetwork.ObjectUUID)
 	if err != nil {
 		log.Error("Create network has failed ")
@@ -77,7 +77,7 @@ func main() {
 
 	log.Info("Retrieve network's events: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//get network's events
+	// get network's events
 	events, err := client.GetNetworkEventList(emptyCtx, net.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get network's events has failed with error", err)

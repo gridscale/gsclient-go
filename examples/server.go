@@ -25,8 +25,8 @@ const (
 	isoImageType             = iota
 )
 
-//enhancedClient inherits all methods from gsclient.Client
-//We need this to implement a new additional method
+// enhancedClient inherits all methods from gsclient.Client
+// We need this to implement a new additional method
 type enhancedClient struct {
 	*gsclient.Client
 }
@@ -57,7 +57,7 @@ func main() {
 	}).Info("Server successfully created")
 	defer client.deleteService(serverType, cServer.ObjectUUID)
 
-	//get a server to interact with
+	// get a server to interact with
 	server, err := client.GetServer(emptyCtx, cServer.ObjectUUID)
 	if err != nil {
 		log.Error("Get server has failed with error", err)
@@ -66,7 +66,7 @@ func main() {
 
 	log.Info("Start server: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Turn on server
+	// Turn on server
 	err = client.StartServer(emptyCtx, server.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Start server has failed with error", err)
@@ -76,18 +76,18 @@ func main() {
 
 	log.Info("Stop server: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Try to shutdown Server
+	// Try to shutdown Server
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
 	err = client.ShutdownServer(shutdownCtx, server.Properties.ObjectUUID)
-	//if error is returned and it is not caused by an expired context, returns error
+	// if error is returned and it is not caused by an expired context, returns error
 	if err != nil && err != shutdownCtx.Err() {
 		log.Error("ShutdownServer has failed with error", err)
 		return
 	}
 	// if the server cannot be shutdown gracefully, try to turn it off
 	if err == shutdownCtx.Err() {
-		//force the sever to stop
+		// force the sever to stop
 		err = client.StopServer(emptyCtx, server.Properties.ObjectUUID)
 		if err != nil {
 			return
@@ -113,7 +113,7 @@ func main() {
 	}
 	log.Info("Server successfully updated")
 
-	//Get events of server
+	// Get events of server
 	events, err := client.GetServerEventList(emptyCtx, server.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get events has failed with error", err)
@@ -123,7 +123,7 @@ func main() {
 		"events": events,
 	}).Info("Events successfully retrieved")
 
-	//Create storage, network, IP, and ISO-image to attach to the server
+	// Create storage, network, IP, and ISO-image to attach to the server
 	log.Info("Create storage, Network, IP, ISO-image: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	cStorage, err := client.CreateStorage(
@@ -185,7 +185,7 @@ func main() {
 	}).Info("ISO-image successfully created")
 	defer client.deleteService(isoImageType, cISOimage.ObjectUUID)
 
-	//Attach storage, network, IP, and ISO-image to a server
+	// Attach storage, network, IP, and ISO-image to a server
 	err = client.LinkStorage(emptyCtx, server.Properties.ObjectUUID, cStorage.ObjectUUID, false)
 	if err != nil {
 		log.Error("Link storage has failed with error", err)
@@ -234,7 +234,7 @@ func main() {
 func (c *enhancedClient) deleteService(serviceType serviceType, id string) {
 	switch serviceType {
 	case serverType:
-		//turn off server before deleting
+		// turn off server before deleting
 		err := c.StopServer(emptyCtx, id)
 		if err != nil {
 			log.Error("Stop server has failed with error", err)

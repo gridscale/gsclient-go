@@ -21,7 +21,7 @@ func main() {
 
 	log.Info("Create storage and storage backup schedule: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Create storage
+	// Create storage
 	cStorage, err := client.CreateStorage(
 		emptyCtx,
 		gsclient.StorageCreateRequest{
@@ -44,7 +44,7 @@ func main() {
 		log.Info("Storage successfully deleted")
 	}()
 
-	//Create a storage backup schedule
+	// Create a storage backup schedule
 	cBackupSchedule, err := client.CreateStorageBackupSchedule(
 		emptyCtx,
 		cStorage.ObjectUUID,
@@ -69,7 +69,7 @@ func main() {
 		log.Info("Backup schedule successfully deleted")
 	}()
 
-	//Get a backup schedule to update
+	// Get a backup schedule to update
 	backupSchedule, err := client.GetStorageBackupSchedule(emptyCtx, cStorage.ObjectUUID, cBackupSchedule.ObjectUUID)
 	if err != nil {
 		log.Error("Get backup schedule has failed with error", err)
@@ -81,7 +81,7 @@ func main() {
 
 	log.Info("Update backup schedule: press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	//Update a backup schedule
+	// Update a backup schedule
 	err = client.UpdateStorageBackupSchedule(
 		emptyCtx,
 		cStorage.ObjectUUID,

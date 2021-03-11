@@ -22,7 +22,7 @@ func main() {
 	log.Info("Create storage: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
-	//Create a storage
+	// Create a storage
 	cStorage, err := client.CreateStorage(
 		emptyCtx,
 		gsclient.StorageCreateRequest{
@@ -57,7 +57,7 @@ func main() {
 		}).Info("Retrieved deleted storages successfully")
 	}()
 
-	//Get storage to update
+	// Get storage to update
 	storage, err := client.GetStorage(emptyCtx, cStorage.ObjectUUID)
 	if err != nil {
 		log.Error("Get storage has failed with error", err)
