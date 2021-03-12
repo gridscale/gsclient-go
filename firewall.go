@@ -244,7 +244,7 @@ func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpd
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteFirewall delete a specific firewall.
+// DeleteFirewall removes a specific firewall.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteFirewall
 func (c *Client) DeleteFirewall(ctx context.Context, id string) error {

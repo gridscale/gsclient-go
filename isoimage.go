@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// ISOImageOperator is an interface defining API of an ISO-image operator.
+// ISOImageOperator provides an interface for operations on ISO images.
 type ISOImageOperator interface {
 	GetISOImageList(ctx context.Context) ([]ISOImage, error)
 	GetISOImage(ctx context.Context, id string) (ISOImage, error)
@@ -19,25 +19,26 @@ type ISOImageOperator interface {
 	GetDeletedISOImages(ctx context.Context) ([]ISOImage, error)
 }
 
-// ISOImageList is JSON struct of a list of ISO images.
+// ISOImageList hold a list of ISO images.
 type ISOImageList struct {
 	// List of ISO-images.
 	List map[string]ISOImageProperties `json:"isoimages"`
 }
 
-// DeletedISOImageList is JSON struct of a list of deleted SO images.
+// DeletedISOImageList holds a list of deleted ISO images.
 type DeletedISOImageList struct {
 	// List of deleted ISO-images.
 	List map[string]ISOImageProperties `json:"deleted_isoimages"`
 }
 
-// ISOImage is JSON struct of a list an ISO image.
+// ISOImage represent a single ISO image.
 type ISOImage struct {
 	// Properties of an ISO-image.
 	Properties ISOImageProperties `json:"isoimage"`
 }
 
-// ISOImageProperties is JSON struct of properties of an ISO image.
+// ISOImageProperties holds properties of an ISO image.
+// an ISO image can be retrieved and attached to servers via ISO image's UUID.
 type ISOImageProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -94,13 +95,13 @@ type ISOImageProperties struct {
 	CurrentPrice float64 `json:"current_price"`
 }
 
-// ISOImageRelation is JSON struct of a list of an ISO image's relations.
+// ISOImageRelation represents a list of ISO image-server relations.
 type ISOImageRelation struct {
 	// Array of object (ServerinIsoimage).
 	Servers []ServerinISOImage `json:"servers"`
 }
 
-// ServerinISOImage is JSON struct of a relation between an ISO image and a Server.
+// ServerinISOImage represents a relation between an ISO image and a Server.
 type ServerinISOImage struct {
 	// Whether the server boots from this iso image or not.
 	Bootdevice bool `json:"bootdevice"`
@@ -115,7 +116,7 @@ type ServerinISOImage struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// ISOImageCreateRequest is JSON struct of a request for creating an ISO image.
+// ISOImageCreateRequest represents a request for creating an ISO image.
 type ISOImageCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -127,7 +128,7 @@ type ISOImageCreateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 }
 
-// ISOImageCreateResponse is JSON struct of a response for creating an ISO image.
+// ISOImageCreateResponse represents a response for creating an ISO image.
 type ISOImageCreateResponse struct {
 	// Request's UUID
 	RequestUUID string `json:"request_uuid"`
@@ -136,7 +137,7 @@ type ISOImageCreateResponse struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// ISOImageUpdateRequest is JSON struct of a request for updating an ISO image.
+// ISOImageUpdateRequest represents a request for updating an ISO image.
 type ISOImageUpdateRequest struct {
 	// New name. Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
@@ -209,7 +210,7 @@ func (c *Client) UpdateISOImage(ctx context.Context, id string, body ISOImageUpd
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteISOImage deletes a specific ISO image.
+// DeleteISOImage removes a specific ISO image.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteIsoimage
 func (c *Client) DeleteISOImage(ctx context.Context, id string) error {

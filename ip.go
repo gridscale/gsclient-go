@@ -246,7 +246,7 @@ func (c *Client) CreateIP(ctx context.Context, body IPCreateRequest) (IPCreateRe
 	return response, err
 }
 
-// DeleteIP deletes a specific IP address based on given id.
+// DeleteIP removes a specific IP address based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteIp
 func (c *Client) DeleteIP(ctx context.Context, id string) error {
