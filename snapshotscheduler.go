@@ -66,13 +66,13 @@ type StorageSnapshotScheduleProperties struct {
 	StorageUUID string `json:"storage_uuid"`
 }
 
-// StorageSnapshotScheduleRelations holds a list of relations of a storage snapshot schedule and storage snapshots.
+// StorageSnapshotScheduleRelations holds a list of relations between a storage snapshot schedule and storage snapshots.
 type StorageSnapshotScheduleRelations struct {
 	// Array of all related snapshots (snapshots taken by this snapshot schedule).
 	Snapshots []StorageSnapshotScheduleRelation `json:"snapshots"`
 }
 
-// StorageSnapshotScheduleRelation represents a relation of a storage snapshot schedule and a storage snapshot.
+// StorageSnapshotScheduleRelation represents a relation between a storage snapshot schedule and a storage snapshot.
 type StorageSnapshotScheduleRelation struct {
 	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
