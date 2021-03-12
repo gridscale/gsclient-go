@@ -1,13 +1,18 @@
 # Changelog
 
-## 3.4.1 (UNRELEASED)
+## 3.4.1 (March 12, 2021)
 
 This release focuses on performance and documentation fixes.
+
+FEATURES:
+
+* Storage variant now can be set ("distributed", or "local") via method `CreateStorage`.
 
 IMPROVEMENTS:
 
 * gsclient-go now allows tracing the duration of individual client calls (See [#186](https://github.com/gridscale/gsclient-go/issues/186)).
 * Performance got improved a lot in most situations since gsclient-go won't needlessly delay sending the actual HTTP request anymore. More [here](https://github.com/gridscale/gsclient-go/issues/186#issuecomment-795466954).
+* Documentation has just got better (See [#184](https://github.com/gridscale/gsclient-go/issues/184)).
 
 ## 3.4.0 (February 8, 2021)
 
