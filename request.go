@@ -25,7 +25,7 @@ type gsRequest struct {
 	skipCheckingRequest bool
 }
 
-// CreateResponse common struct of a response for creation.
+// CreateResponse represents a common response for creation.
 type CreateResponse struct {
 	// UUID of the object being created.
 	ObjectUUID string `json:"object_uuid"`
@@ -34,17 +34,17 @@ type CreateResponse struct {
 	RequestUUID string `json:"request_uuid"`
 }
 
-// RequestStatus status of a request.
+// RequestStatus represents status of a request.
 type RequestStatus map[string]RequestStatusProperties
 
-// RequestStatusProperties JSON struct of properties of a request's status.
+// RequestStatusProperties holds  properties of a request's status.
 type RequestStatusProperties struct {
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	CreateTime GSTime `json:"create_time"`
 }
 
-// RequestError error of a request.
+// RequestError represents an error of a request.
 type RequestError struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
