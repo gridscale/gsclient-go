@@ -221,6 +221,9 @@ type StorageCreateRequest struct {
 	// Storage type. Allowed values: nil, DefaultStorageType, HighStorageType, InsaneStorageType. Optional.
 	StorageType StorageType `json:"storage_type,omitempty"`
 
+	// Storage variant. Allowed values: nil, DistributedStorageVariant, LocalStorageVariant. Optional.
+	StorageVariant StorageVariant `json:"storage_variant,omitempty"`
+
 	// An object holding important values such as host names, passwords, and SSH keys.
 	// Creating a storage with a template is required either SSH key or password.
 	// Optional
@@ -264,6 +267,15 @@ const (
 	DefaultStorageType StorageType = "storage"
 	HighStorageType    StorageType = "storage_high"
 	InsaneStorageType  StorageType = "storage_insane"
+)
+
+// StorageVariant represents a storage variant.
+type StorageVariant string
+
+// All allowed storage variant's values
+const (
+	DistributedStorageVariant StorageVariant = "distributed"
+	LocalStorageVariant       StorageVariant = "local"
 )
 
 // PasswordType denotes the representation of a password.
