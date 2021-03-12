@@ -5,24 +5,24 @@ import (
 	"net/http"
 )
 
-// EventOperator is an interface defining API of an event operator.
+// EventOperator provides an interface for operations on events.
 type EventOperator interface {
 	GetEventList(ctx context.Context) ([]Event, error)
 }
 
-// EventList is JSON struct of a list of events.
+// EventList holds a list of events.
 type EventList struct {
 	// Array of events.
 	List []EventProperties `json:"events"`
 }
 
-// Event is JSOn struct of a single firewall's event.
+// Event represent a single event.
 type Event struct {
 	// Properties of an event.
 	Properties EventProperties `json:"event"`
 }
 
-// EventProperties is JSON struct of an event properties.
+// EventProperties holds the properties of an event.
 type EventProperties struct {
 	// Type of object (server, storage, IP) etc.
 	ObjectType string `json:"object_type"`
