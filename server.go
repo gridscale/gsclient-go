@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// ServerOperator is an interface defining API of a server operator.
+// ServerOperator provides an interface for operations on servers.
 type ServerOperator interface {
 	GetServer(ctx context.Context, id string) (Server, error)
 	GetServerList(ctx context.Context) ([]Server, error)
@@ -24,25 +24,25 @@ type ServerOperator interface {
 	GetDeletedServers(ctx context.Context) ([]Server, error)
 }
 
-// ServerList JSON struct of a list of servers.
+// ServerList holds a list of servers.
 type ServerList struct {
 	// Array of servers.
 	List map[string]ServerProperties `json:"servers"`
 }
 
-// DeletedServerList JSON struct of a list of deleted servers.
+// DeletedServerList holds a list of deleted servers.
 type DeletedServerList struct {
 	// Array of deleted servers.
 	List map[string]ServerProperties `json:"deleted_servers"`
 }
 
-// Server JSON struct of a single server.
+// Server represents a single server.
 type Server struct {
 	// Properties of a server.
 	Properties ServerProperties `json:"server"`
 }
 
-// ServerProperties JSON struct of properties of a server.
+// ServerProperties holds properties of a server.
 type ServerProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -105,7 +105,8 @@ type ServerProperties struct {
 	ChangeTime GSTime `json:"change_time"`
 }
 
-// ServerRelations JSON struct of a list of server relations.
+// ServerRelations holds a list of server relations.
+// It shows the relations between a server and ISO images/Networks/IP addresses/Storages.
 type ServerRelations struct {
 	// Array of object (ServerIsoImageRelationProperties).
 	IsoImages []ServerIsoImageRelationProperties `json:"isoimages"`
@@ -120,7 +121,7 @@ type ServerRelations struct {
 	Storages []ServerStorageRelationProperties `json:"storages"`
 }
 
-// ServerCreateRequest JSON struct of a request for creating a server.
+// ServerCreateRequest represents a request for creating a server.
 type ServerCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -149,11 +150,11 @@ type ServerCreateRequest struct {
 	AutoRecovery *bool `json:"auto_recovery,omitempty"`
 
 	// The information about other object which are related to this server. the object could be ip, storage, network, and isoimage.
-	//*Caution: This field will be deprecated.
+	// **Caution**: This field is deprecated.
 	Relations *ServerCreateRequestRelations `json:"relations,omitempty"`
 }
 
-// ServerCreateRequestRelations JSOn struct of a list of a server's relations.
+// ServerCreateRequestRelations holds a list of a server's relations.
 type ServerCreateRequestRelations struct {
 	// Array of objects (ServerCreateRequestIsoimage).
 	IsoImages []ServerCreateRequestIsoimage `json:"isoimages"`
@@ -168,7 +169,7 @@ type ServerCreateRequestRelations struct {
 	Storages []ServerCreateRequestStorage `json:"storages"`
 }
 
-// ServerCreateResponse JSON struct of a response for creating a server.
+// ServerCreateResponse represents a response for creating a server.
 type ServerCreateResponse struct {
 	// UUID of object being created. Same as ServerUUID.
 	ObjectUUID string `json:"object_uuid"`
@@ -189,14 +190,14 @@ type ServerCreateResponse struct {
 	IPaddrUUIDs []string `json:"ipaddr_uuids"`
 }
 
-// ServerPowerUpdateRequest JSON struct of a request for updating server's power state.
+// ServerPowerUpdateRequest reresents a request for updating server's power state.
 type ServerPowerUpdateRequest struct {
 	// Power=true => server is on.
 	// Power=false => server if off.
 	Power bool `json:"power"`
 }
 
-// ServerCreateRequestStorage JSON struct of a relation between a server and a storage.
+// ServerCreateRequestStorage represents a relation between a server and a storage.
 type ServerCreateRequestStorage struct {
 	// UUID of the storage being attached to the server.
 	StorageUUID string `json:"storage_uuid"`
@@ -205,7 +206,7 @@ type ServerCreateRequestStorage struct {
 	BootDevice bool `json:"bootdevice,omitempty"`
 }
 
-// ServerCreateRequestNetwork JSON struct of a relation between a server and a network.
+// ServerCreateRequestNetwork represents a relation between a server and a network.
 type ServerCreateRequestNetwork struct {
 	// UUID of the networks being attached to the server.
 	NetworkUUID string `json:"network_uuid"`
@@ -214,19 +215,19 @@ type ServerCreateRequestNetwork struct {
 	BootDevice bool `json:"bootdevice,omitempty"`
 }
 
-// ServerCreateRequestIP JSON struct of a relation between a server and an IP address.
+// ServerCreateRequestIP represents a relation between a server and an IP address.
 type ServerCreateRequestIP struct {
 	// UUID of the IP address being attached to the server.
 	IPaddrUUID string `json:"ipaddr_uuid"`
 }
 
-// ServerCreateRequestIsoimage JSON struct of a relation between a server and an ISO image.
+// ServerCreateRequestIsoimage represents a relation between a server and an ISO image.
 type ServerCreateRequestIsoimage struct {
 	// UUID of the ISO-image being attached to the server.
 	IsoimageUUID string `json:"isoimage_uuid"`
 }
 
-// ServerUpdateRequest JSON of a request for updating a server.
+// ServerUpdateRequest represents a request for updating a server.
 type ServerUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	// Leave it if you do not want to update the name.
@@ -249,19 +250,19 @@ type ServerUpdateRequest struct {
 	AutoRecovery *bool `json:"auto_recovery,omitempty"`
 }
 
-// ServerMetricList JSON struct of a list of a server's metrics.
+// ServerMetricList holds a list of a server's metrics.
 type ServerMetricList struct {
 	// Array of a server's metrics
 	List []ServerMetricProperties `json:"server_metrics"`
 }
 
-// ServerMetric JSON struct of a single metric of a server.
+// ServerMetric represents a single metric of a server.
 type ServerMetric struct {
 	// Properties of a server metric.
 	Properties ServerMetricProperties `json:"server_metric"`
 }
 
-// ServerMetricProperties JSON struct.
+// ServerMetricProperties holds properties of a server metric.
 type ServerMetricProperties struct {
 	// Defines the begin of the time range.
 	BeginTime GSTime `json:"begin_time"`
@@ -291,6 +292,7 @@ type ServerMetricProperties struct {
 	} `json:"storage_size"`
 }
 
+// ServerHardwareProfile represents the type of server.
 type ServerHardwareProfile string
 
 // All available server's hardware types.
@@ -343,9 +345,9 @@ func (c *Client) GetServerList(ctx context.Context) ([]Server, error) {
 }
 
 // CreateServer creates a new server in a project. Normally you want to use
-// `Q35ServerHardware` as hardware profile. See API docs
-// https://gridscale.io/en//api-documentation/index.html#operation/createServer
-// for more.
+// `Q35ServerHardware` as hardware profile.
+//
+// See: https://gridscale.io/en//api-documentation/index.html#operation/createServer
 func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (ServerCreateResponse, error) {
 	// check if these slices are nil
 	// make them be empty slice instead of nil
@@ -379,7 +381,7 @@ func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (Se
 	return response, err
 }
 
-// DeleteServer deletes a specific server.
+// DeleteServer removes a specific server.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteServer
 func (c *Client) DeleteServer(ctx context.Context, id string) error {
@@ -566,7 +568,7 @@ func (c *Client) GetDeletedServers(ctx context.Context) ([]Server, error) {
 	return servers, err
 }
 
-// waitForServerPowerStatus  allows to wait for a server changing its power status.
+// waitForServerPowerStatus allows to wait for a server changing its power status.
 func (c *Client) waitForServerPowerStatus(ctx context.Context, id string, status bool) error {
 	return retryWithContext(ctx, func() (bool, error) {
 		server, err := c.GetServer(ctx, id)
