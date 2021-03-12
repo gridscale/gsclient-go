@@ -5,24 +5,24 @@ import (
 	"net/http"
 )
 
-// LabelOperator is an interface defining API of a label operator.
+// LabelOperator provides an interface for operations on labels.
 type LabelOperator interface {
 	GetLabelList(ctx context.Context) ([]Label, error)
 }
 
-// LabelList JSON struct of a list of labels.
+// LabelList holds a list of labels.
 type LabelList struct {
 	// List of labels.
 	List map[string]LabelProperties `json:"labels"`
 }
 
-// Label JSON struct of a single label.
+// Label represents a single label.
 type Label struct {
 	// Properties of a label.
 	Properties LabelProperties `json:"label"`
 }
 
-// LabelProperties JSON struct of properties of a label.
+// LabelProperties holds properties of a label.
 type LabelProperties struct {
 	// Label's name.
 	Label string `json:"label"`
@@ -40,7 +40,7 @@ type LabelProperties struct {
 	Status string `json:"status"`
 }
 
-// LabelCreateRequest JSON struct of a request for creating a label.
+// LabelCreateRequest represents a request for creating a label.
 type LabelCreateRequest struct {
 	// Name of the new label.
 	Label string `json:"label"`
