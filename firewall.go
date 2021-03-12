@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// FirewallOperator is an interface defining API of a firewall operator.
+// FirewallOperator provides an interface for operations on firewalls.
 type FirewallOperator interface {
 	GetFirewallList(ctx context.Context) ([]Firewall, error)
 	GetFirewall(ctx context.Context, id string) (Firewall, error)
@@ -17,19 +17,20 @@ type FirewallOperator interface {
 	GetFirewallEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-// FirewallList is JSON structure of a list of firewalls.
+// FirewallList holds a list of firewalls.
 type FirewallList struct {
 	// Array of firewalls.
 	List map[string]FirewallProperties `json:"firewalls"`
 }
 
-// Firewall is JSON structure of a single firewall.
+// Firewall represents a single firewall.
 type Firewall struct {
 	// Properties of a firewall.
 	Properties FirewallProperties `json:"firewall"`
 }
 
-// FirewallProperties is JSON struct of a firewall's properties.
+// FirewallProperties holds the properties of a firewall.
+// Firewall's UUID can be used to attach a firewall to servers.
 type FirewallProperties struct {
 	// Status indicates the status of the object.
 	Status string `json:"status"`
@@ -65,7 +66,7 @@ type FirewallProperties struct {
 	Name string `json:"name"`
 }
 
-// FirewallRules is JSON struct of a list of firewall's rules.
+// FirewallRules represents a list of firewall's rules.
 type FirewallRules struct {
 	// Firewall template rules for inbound traffic - covers IPv6 addresses.
 	RulesV6In []FirewallRuleProperties `json:"rules-v6-in,omitempty"`
@@ -80,7 +81,7 @@ type FirewallRules struct {
 	RulesV4Out []FirewallRuleProperties `json:"rules-v4-out,omitempty"`
 }
 
-// FirewallRuleProperties is JSON struct of a firewall's rule properties.
+// FirewallRuleProperties represents properties of a firewall rule.
 type FirewallRuleProperties struct {
 	// Enum:"udp" "tcp". Allowed values: `TCPTransport`, `UDPTransport`.
 	Protocol TransportLayerProtocol `json:"protocol"`
@@ -111,13 +112,15 @@ type FirewallRuleProperties struct {
 	Order int `json:"order"`
 }
 
-// FirewallRelation is a JSON struct of a list of firewall's relations
+// FirewallRelation holds a list of firewall-network-server relations.
 type FirewallRelation struct {
 	// Array of object (NetworkinFirewall).
 	Networks []NetworkInFirewall `json:"networks"`
 }
 
-// NetworkInFirewall is a JSON struct of a firewall's relation.
+// NetworkInFirewall represents properties of a firewall-network-server relation.
+// A firewall-network-server relation tells which server uses the queried firewall
+// and in which network that the firewall is enabled.
 type NetworkInFirewall struct {
 	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
@@ -135,7 +138,7 @@ type NetworkInFirewall struct {
 	ObjectName string `json:"object_name"`
 }
 
-// FirewallCreateRequest is JSON struct of a request for creating a firewall.
+// FirewallCreateRequest represents a request for creating a new firewall.
 type FirewallCreateRequest struct {
 	// Name of firewall being created.
 	Name string `json:"name"`
@@ -147,7 +150,7 @@ type FirewallCreateRequest struct {
 	Rules FirewallRules `json:"rules"`
 }
 
-// FirewallCreateResponse is JSON struct of a response for creating a firewall.
+// FirewallCreateResponse represents a response for creating a firewall.
 type FirewallCreateResponse struct {
 	// Request UUID.
 	RequestUUID string `json:"request_uuid"`
@@ -156,7 +159,7 @@ type FirewallCreateResponse struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// FirewallUpdateRequest is JSON struct of a request for updating a firewall.
+// FirewallUpdateRequest represent a request for updating a firewall.
 type FirewallUpdateRequest struct {
 	// New name. Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
