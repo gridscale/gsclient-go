@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// StorageOperator is an interface defining API of a storage operator.
+// StorageOperator provides an interface for operations on storages.
 type StorageOperator interface {
 	GetStorage(ctx context.Context, id string) (Storage, error)
 	GetStorageList(ctx context.Context) ([]Storage, error)
@@ -21,25 +21,26 @@ type StorageOperator interface {
 	GetStorageEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-// StorageList JSON struct of a list of storages.
+// StorageList holds a list of storages.
 type StorageList struct {
 	// Array of storages.
 	List map[string]StorageProperties `json:"storages"`
 }
 
-// DeletedStorageList JSON struct of a list of storages.
+// DeletedStorageList holds a list of storages.
 type DeletedStorageList struct {
 	// Array of deleted storages.
 	List map[string]StorageProperties `json:"deleted_storages"`
 }
 
-// Storage JSON struct of a single storage.
+// Storage represents a single storage.
 type Storage struct {
 	// Properties of a storage.
 	Properties StorageProperties `json:"storage"`
 }
 
-// StorageProperties JSON struct of properties of a storage.
+// StorageProperties holds properties of a storage.
+// A storages can be retrieved and attached to servers via the storage UUID.
 type StorageProperties struct {
 	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
@@ -101,7 +102,8 @@ type StorageProperties struct {
 	CreateTime GSTime `json:"create_time"`
 }
 
-// StorageRelations JSON struct of a list of a storage's relations.
+// StorageRelations holds a list of a storage's relations.
+// The relations consist of storage-server relations and storage-snapshotschedule relations.
 type StorageRelations struct {
 	// Array of related servers.
 	Servers []StorageServerRelation `json:"servers"`
@@ -110,7 +112,7 @@ type StorageRelations struct {
 	SnapshotSchedules []StorageAndSnapshotScheduleRelation `json:"snapshot_schedules"`
 }
 
-// StorageServerRelation JSON struct of a relation between a storage and a server.
+// StorageServerRelation represents a relation between a storage and a server.
 type StorageServerRelation struct {
 	// Whether the server boots from this iso image or not.
 	Bootdevice bool `json:"bootdevice"`
@@ -139,7 +141,7 @@ type StorageServerRelation struct {
 	ObjectName string `json:"object_name"`
 }
 
-// StorageSnapshotRelation JSON struct of a relation between a storage and a snapshot.
+// StorageSnapshotRelation represents a relation between a storage and a snapshot.
 type StorageSnapshotRelation struct {
 	// Indicates the UUID of the last used template on this storage.
 	LastUsedTemplate string `json:"last_used_template"`
@@ -166,7 +168,7 @@ type StorageSnapshotRelation struct {
 	ObjectName string `json:"object_name"`
 }
 
-// StorageAndSnapshotScheduleRelation JSON struct of a relation between a storage and a snapshot schedule.
+// StorageAndSnapshotScheduleRelation represents a relation between a storage and a snapshot schedule.
 type StorageAndSnapshotScheduleRelation struct {
 	// The interval at which the schedule will run (in minutes).
 	RunInterval int `json:"run_interval"`
@@ -190,7 +192,9 @@ type StorageAndSnapshotScheduleRelation struct {
 	CreateTime GSTime `json:"create_time"`
 }
 
-// StorageTemplate JSON struct of a storage template.
+// StorageTemplate represents a storage template.
+// StorageTemplate is used when you want to create a storage from a template (e.g. Ubuntu 20.04 template),
+// the storage should be attached to a server later to create an Ubuntu 20.04 server.
 type StorageTemplate struct {
 	// List of SSH key UUIDs. Optional.
 	Sshkeys []string `json:"sshkeys,omitempty"`
@@ -210,7 +214,7 @@ type StorageTemplate struct {
 	Hostname string `json:"hostname,omitempty"`
 }
 
-// StorageCreateRequest JSON struct of a request for creating a storage.
+// StorageCreateRequest represents a request for creating a storage.
 type StorageCreateRequest struct {
 	// Required (integer - minimum: 1 - maximum: 4096).
 	Capacity int `json:"capacity"`
@@ -230,7 +234,7 @@ type StorageCreateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 }
 
-// StorageUpdateRequest JSON struct of a request for updating a storage.
+// StorageUpdateRequest represents a request for updating a storage.
 type StorageUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters. Optional.
 	Name string `json:"name,omitempty"`
@@ -245,12 +249,12 @@ type StorageUpdateRequest struct {
 	StorageType StorageType `json:"storage_type,omitempty"`
 }
 
-// CreateStorageFromBackupRequest is JSON structure of a request to create a new storage from a backup.
+// CreateStorageFromBackupRequest represents a request to create a new storage from a backup.
 type CreateStorageFromBackupRequest struct {
 	RequestProperties CreateStorageFromBackupProperties `json:"backup"`
 }
 
-// CreateStorageFromBackupProperties is request properties of CreateStorageFromBackupRequest.
+// CreateStorageFromBackupProperties holds properties of CreateStorageFromBackupRequest.
 type CreateStorageFromBackupProperties struct {
 	Name       string `json:"name"`
 	BackupUUID string `json:"backup_uuid"`
@@ -275,7 +279,7 @@ const (
 	CryptPasswordType PasswordType = "crypt"
 )
 
-// GetStorage get a storage.
+// GetStorage gets a storage.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getStorage
 func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
@@ -330,7 +334,7 @@ func (c *Client) CreateStorage(ctx context.Context, body StorageCreateRequest) (
 	return response, err
 }
 
-// DeleteStorage delete a storage.
+// DeleteStorage removes a storage.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteStorage
 func (c *Client) DeleteStorage(ctx context.Context, id string) error {
@@ -359,7 +363,7 @@ func (c *Client) UpdateStorage(ctx context.Context, id string, body StorageUpdat
 	return r.execute(ctx, *c, nil)
 }
 
-// GetStorageEventList get list of a storage's event.
+// GetStorageEventList gets list of a storage's event.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageEvents
 func (c *Client) GetStorageEventList(ctx context.Context, id string) ([]Event, error) {
