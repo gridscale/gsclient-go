@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// ServerStorageRelationOperator is an interface defining API of a server-storage relation operator.
+// ServerStorageRelationOperator provides an interface for operations on server-storage relations.
 type ServerStorageRelationOperator interface {
 	GetServerStorageList(ctx context.Context, id string) ([]ServerStorageRelationProperties, error)
 	GetServerStorage(ctx context.Context, serverID, storageID string) (ServerStorageRelationProperties, error)
@@ -18,19 +18,19 @@ type ServerStorageRelationOperator interface {
 	UnlinkStorage(ctx context.Context, serverID string, storageID string) error
 }
 
-// ServerStorageRelationList JSON struct of a list of relations between a server and storages.
+// ServerStorageRelationList holds a list of relations between a server and storages.
 type ServerStorageRelationList struct {
 	// Array of relations between a server and storages.
 	List []ServerStorageRelationProperties `json:"storage_relations"`
 }
 
-// ServerStorageRelationSingle JSON struct of a single relation between a server and a storage.
+// ServerStorageRelationSingle represents a single relation between a server and a storage.
 type ServerStorageRelationSingle struct {
 	// Properties of a relation between a server and a storage.
 	Properties ServerStorageRelationProperties `json:"storage_relation"`
 }
 
-// ServerStorageRelationProperties JSON struct of properties of a relation between a server and a storage.
+// ServerStorageRelationProperties holds properties of a relation between a server and a storage.
 type ServerStorageRelationProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -77,7 +77,7 @@ type ServerStorageRelationProperties struct {
 	ServerUUID string `json:"server_uuid"`
 }
 
-// ServerStorageRelationCreateRequest JSON struct of a request for creating a relation between a server and a storage.
+// ServerStorageRelationCreateRequest represents a request for creating a relation between a server and a storage.
 type ServerStorageRelationCreateRequest struct {
 	// The UUID of the storage you are requesting. If server's hardware profile is default, nested, q35 or q35_nested,
 	// you are allowed to attached 8 servers. Only 2 storage are allowed to be attached to server with other hardware profile.
@@ -87,7 +87,7 @@ type ServerStorageRelationCreateRequest struct {
 	BootDevice bool `json:"bootdevice,omitempty"`
 }
 
-// ServerStorageRelationUpdateRequest JSON struct of a request for updating a relation between a server and a storage.
+// ServerStorageRelationUpdateRequest represents a request for updating a relation between a server and a storage.
 type ServerStorageRelationUpdateRequest struct {
 	// The ordering of the network interfaces. Lower numbers have lower PCI-IDs. Optional.
 	Ordering int `json:"ordering,omitempty"`
@@ -149,7 +149,7 @@ func (c *Client) UpdateServerStorage(ctx context.Context, serverID, storageID st
 	return r.execute(ctx, *c, nil)
 }
 
-// CreateServerStorage create a link between a server and a storage.
+// CreateServerStorage creates a link between a server and a storage.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/linkStorageToServer
 func (c *Client) CreateServerStorage(ctx context.Context, id string, body ServerStorageRelationCreateRequest) error {
@@ -164,7 +164,7 @@ func (c *Client) CreateServerStorage(ctx context.Context, id string, body Server
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteServerStorage delete a link between a storage and a server.
+// DeleteServerStorage removes a link between a storage and a server.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/unlinkStorageFromServer
 func (c *Client) DeleteServerStorage(ctx context.Context, serverID, storageID string) error {
@@ -187,7 +187,7 @@ func (c *Client) LinkStorage(ctx context.Context, serverID string, storageID str
 	return c.CreateServerStorage(ctx, serverID, body)
 }
 
-// UnlinkStorage removes a storage from a server.
+// UnlinkStorage detaches a storage from a server.
 func (c *Client) UnlinkStorage(ctx context.Context, serverID string, storageID string) error {
 	return c.DeleteServerStorage(ctx, serverID, storageID)
 }
