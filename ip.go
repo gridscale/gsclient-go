@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// IPOperator is an interface defining API of an IP operator.
+// IPOperator provides an interface for operations on IP addresses.
 type IPOperator interface {
 	GetIP(ctx context.Context, id string) (IP, error)
 	GetIPList(ctx context.Context) ([]IP, error)
@@ -20,25 +20,26 @@ type IPOperator interface {
 	GetDeletedIPs(ctx context.Context) ([]IP, error)
 }
 
-// IPList is JSON struct of a list of IPs.
+// IPList holds a list of IP addresses.
 type IPList struct {
 	// Array of IP addresses.
 	List map[string]IPProperties `json:"ips"`
 }
 
-// DeletedIPList is JSON struct of a list of deleted IPs.
+// DeletedIPList holds a list of deleted IP addresses.
 type DeletedIPList struct {
 	// Array of deleted IP addresses.
 	List map[string]IPProperties `json:"deleted_ips"`
 }
 
-// IP is JSON struct if a single IP.
+// IP represent a single IP address.
 type IP struct {
 	// Properties of an IP address.
 	Properties IPProperties `json:"ip"`
 }
 
-// IPProperties is JSON struct of an IP's properties.
+// IPProperties holds properties of an IP address.
+// An IP address can be retrieved and attached to a server via the IP address's UUID.
 type IPProperties struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -98,7 +99,8 @@ type IPProperties struct {
 	Relations IPRelations `json:"relations"`
 }
 
-// IPRelations is JSON struct of a list of an IP's relations.
+// IPRelations holds list of an IP address's relations.
+// Relations between an IP address, Load Balancers, and servers.
 type IPRelations struct {
 	// Array of object (IPLoadbalancer)
 	Loadbalancers []IPLoadbalancer `json:"loadbalancers"`
@@ -107,7 +109,7 @@ type IPRelations struct {
 	Servers []IPServer `json:"servers"`
 }
 
-// IPLoadbalancer is JSON struct of the relation between an IP and a Load Balancer.
+// IPLoadbalancer represents relation between an IP address and a Load Balancer.
 type IPLoadbalancer struct {
 	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
@@ -119,7 +121,7 @@ type IPLoadbalancer struct {
 	LoadbalancerUUID string `json:"loadbalancer_uuid"`
 }
 
-// IPServer is JSON struct of the relation between an IP and a Server.
+// IPServer represents relation between an IP address and a Server.
 type IPServer struct {
 	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
@@ -131,7 +133,7 @@ type IPServer struct {
 	ServerUUID string `json:"server_uuid"`
 }
 
-// IPCreateResponse is JSON struct of a response for creating an IP.
+// IPCreateResponse represents a response for creating an IP.
 type IPCreateResponse struct {
 	// Request's UUID
 	RequestUUID string `json:"request_uuid"`
@@ -146,7 +148,7 @@ type IPCreateResponse struct {
 	IP string `json:"ip"`
 }
 
-// IPCreateRequest is JSON struct of a request for creating an IP.
+// IPCreateRequest represent a request for creating an IP.
 type IPCreateRequest struct {
 	// Name of an IP address being created. Can be an empty string.
 	Name string `json:"name,omitempty"`
@@ -164,7 +166,7 @@ type IPCreateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 }
 
-// IPUpdateRequest is JSON struct of a request for updating an IP.
+// IPUpdateRequest represent a request for updating an IP.
 type IPUpdateRequest struct {
 	// New name. Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
@@ -179,6 +181,7 @@ type IPUpdateRequest struct {
 	Labels *[]string `json:"labels,omitempty"`
 }
 
+// IPAddressType represents IP address family
 type IPAddressType int
 
 // Allowed IP address versions.
@@ -206,7 +209,7 @@ func (c *Client) GetIP(ctx context.Context, id string) (IP, error) {
 	return response, err
 }
 
-// GetIPList gets a list of available IPs.
+// GetIPList gets a list of available IP addresses.
 //
 // https://gridscale.io/en//api-documentation/index.html#operation/getIps
 func (c *Client) GetIPList(ctx context.Context) ([]IP, error) {
@@ -226,7 +229,7 @@ func (c *Client) GetIPList(ctx context.Context) ([]IP, error) {
 	return IPs, err
 }
 
-// CreateIP creates an IP.
+// CreateIP creates an IP address.
 //
 // Note: IP address family can only be either `IPv4Type` or `IPv6Type`.
 //
@@ -243,7 +246,7 @@ func (c *Client) CreateIP(ctx context.Context, body IPCreateRequest) (IPCreateRe
 	return response, err
 }
 
-// DeleteIP deletes a specific IP based on given id.
+// DeleteIP deletes a specific IP address based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteIp
 func (c *Client) DeleteIP(ctx context.Context, id string) error {
@@ -257,7 +260,7 @@ func (c *Client) DeleteIP(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-// UpdateIP updates a specific IP based on given id.
+// UpdateIP updates a specific IP address based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateIp
 func (c *Client) UpdateIP(ctx context.Context, id string, body IPUpdateRequest) error {
@@ -272,7 +275,7 @@ func (c *Client) UpdateIP(ctx context.Context, id string, body IPUpdateRequest) 
 	return r.execute(ctx, *c, nil)
 }
 
-// GetIPEventList gets a list of an IP's events.
+// GetIPEventList gets a list of an IP address's events.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getIpEvents
 func (c *Client) GetIPEventList(ctx context.Context, id string) ([]Event, error) {
@@ -293,7 +296,7 @@ func (c *Client) GetIPEventList(ctx context.Context, id string) ([]Event, error)
 	return IPEvents, err
 }
 
-// GetIPVersion gets IP's version, returns 0 if an error was encountered.
+// GetIPVersion gets IP address's version, returns 0 if an error was encountered.
 func (c *Client) GetIPVersion(ctx context.Context, id string) int {
 	ip, err := c.GetIP(ctx, id)
 	if err != nil {
@@ -302,7 +305,7 @@ func (c *Client) GetIPVersion(ctx context.Context, id string) int {
 	return ip.Properties.Family
 }
 
-// GetIPsByLocation gets a list of IPs by location.
+// GetIPsByLocation gets a list of IP adresses by location.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationIps
 func (c *Client) GetIPsByLocation(ctx context.Context, id string) ([]IP, error) {
@@ -323,7 +326,7 @@ func (c *Client) GetIPsByLocation(ctx context.Context, id string) ([]IP, error) 
 	return IPs, err
 }
 
-// GetDeletedIPs gets a list of deleted IPs.
+// GetDeletedIPs gets a list of deleted IP adresses.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedIps
 func (c *Client) GetDeletedIPs(ctx context.Context) ([]IP, error) {
