@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.4.1 (March 12, 2021)
+## 3.5.0 (March 12, 2021)
 
 This release focuses on performance and documentation fixes.
 
