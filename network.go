@@ -8,7 +8,7 @@ import (
 	"path"
 )
 
-// NetworkOperator an interface defining API of a network operator.
+// NetworkOperator provides an interface for operations on networks.
 type NetworkOperator interface {
 	GetNetwork(ctx context.Context, id string) (Network, error)
 	GetNetworkList(ctx context.Context) ([]Network, error)
@@ -21,25 +21,26 @@ type NetworkOperator interface {
 	GetDeletedNetworks(ctx context.Context) ([]Network, error)
 }
 
-// NetworkList is JSON struct of a list of networks.
+// NetworkList holds a list of available networks.
 type NetworkList struct {
 	// Array of networks.
 	List map[string]NetworkProperties `json:"networks"`
 }
 
-// DeletedNetworkList is JSON struct of a list of deleted networks.
+// DeletedNetworkList holds a list of deleted networks.
 type DeletedNetworkList struct {
 	// Array of deleted networks.
 	List map[string]NetworkProperties `json:"deleted_networks"`
 }
 
-// Network is JSON struct of a single network.
+// Network represents a single network.
 type Network struct {
 	// Properties of a network.
 	Properties NetworkProperties `json:"network"`
 }
 
-// NetworkProperties is JSON struct of a network's properties.
+// NetworkProperties holds properties of a network.
+// A network can be retrieved and attached to servers via the network UUID.
 type NetworkProperties struct {
 	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
@@ -89,7 +90,8 @@ type NetworkProperties struct {
 	Relations NetworkRelations `json:"relations"`
 }
 
-// NetworkRelations is JSON struct of a list of a network's relations.
+// NetworkRelations holds a list of a network's relations.
+// The relation tells which VLANs/Servers/PaaS security zones relate to the network.
 type NetworkRelations struct {
 	// Array of object (NetworkVlan).
 	Vlans []NetworkVlan `json:"vlans"`
@@ -101,7 +103,7 @@ type NetworkRelations struct {
 	PaaSSecurityZones []NetworkPaaSSecurityZone `json:"paas_security_zones"`
 }
 
-// NetworkVlan is JSON struct of a relation between a network and a VLAN.
+// NetworkVlan represents a relation between a network and a VLAN.
 type NetworkVlan struct {
 	// Vlan.
 	Vlan int `json:"vlan"`
@@ -113,7 +115,7 @@ type NetworkVlan struct {
 	TenantUUID string `json:"tenant_uuid"`
 }
 
-// NetworkServer is JSON struct of a relation between a network and a server.
+// NetworkServer represents a relation between a network and a server.
 type NetworkServer struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -141,6 +143,7 @@ type NetworkServer struct {
 	Ordering int `json:"ordering"`
 }
 
+// NetworkPaaSSecurityZone represents a relation between a network and a PaaS security zone.
 type NetworkPaaSSecurityZone struct {
 	// IPv6 prefix of the PaaS service.
 	IPv6Prefix string `json:"ipv6_prefix"`
@@ -152,7 +155,7 @@ type NetworkPaaSSecurityZone struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// NetworkCreateRequest is JSON of a request for creating a network.
+// NetworkCreateRequest represents a request for creating a network.
 type NetworkCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -166,7 +169,7 @@ type NetworkCreateRequest struct {
 	L2Security bool `json:"l2security,omitempty"`
 }
 
-// NetworkCreateResponse is JSON of a response for creating a network.
+// NetworkCreateResponse represents a response for creating a network.
 type NetworkCreateResponse struct {
 	// UUID of the network being created.
 	ObjectUUID string `json:"object_uuid"`
@@ -175,7 +178,7 @@ type NetworkCreateResponse struct {
 	RequestUUID string `json:"request_uuid"`
 }
 
-// NetworkUpdateRequest is JSON of a request for updating a network.
+// NetworkUpdateRequest represents a request for updating a network.
 type NetworkUpdateRequest struct {
 	// New name. Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
@@ -218,7 +221,7 @@ func (c *Client) CreateNetwork(ctx context.Context, body NetworkCreateRequest) (
 	return response, err
 }
 
-// DeleteNetwork deletes a specific network based on given id.
+// DeleteNetwork removed a specific network based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteNetwork
 func (c *Client) DeleteNetwork(ctx context.Context, id string) error {
@@ -288,7 +291,7 @@ func (c *Client) GetNetworkEventList(ctx context.Context, id string) ([]Event, e
 	return networkEvents, err
 }
 
-// GetNetworkPublic gets public network.
+// GetNetworkPublic gets the public network.
 func (c *Client) GetNetworkPublic(ctx context.Context) (Network, error) {
 	networks, err := c.GetNetworkList(ctx)
 	if err != nil {
