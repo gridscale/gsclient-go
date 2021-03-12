@@ -44,6 +44,11 @@ config := gsclient.NewConfiguration(
 client := gsclient.NewClient(config)
 ```
 
+To trace the duration of individual client calls, set logger to `Trace` level via `gsclient.SetLogLevel()` function. Other log levels: https://github.com/sirupsen/logrus#level-logging
+```go
+gsclient.SetLogLevel(logrus.TraceLevel)
+```
+
 Make sure to replace the user-UUID and API-token strings with valid credentials or variables containing valid credentials. It is recommended to use environment variables for them.
 
 ## Using API endpoints
