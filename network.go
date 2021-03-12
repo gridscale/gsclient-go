@@ -299,7 +299,7 @@ func (c *Client) GetNetworkPublic(ctx context.Context) (Network, error) {
 			return Network{Properties: network.Properties}, nil
 		}
 	}
-	return Network{}, fmt.Errorf("Public Network not found")
+	return Network{}, fmt.Errorf("public network not found")
 }
 
 // GetNetworksByLocation gets a list of networks by location

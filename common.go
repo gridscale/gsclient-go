@@ -56,10 +56,10 @@ func retryNTimes(targetFunc retryableFunc, numOfRetries int, delay time.Duration
 			if reqErr.Description == "" {
 				reqErr.Description = "no error message received from server"
 			}
-			reqErr.Description = fmt.Sprintf("Maximum number of trials has been exhausted with error: %s", reqErr.Description)
+			reqErr.Description = fmt.Sprintf("Maximum number of re-tries has been exhausted with error: %s", reqErr.Description)
 			return reqErr
 		}
-		return fmt.Errorf("Maximum number of trials has been exhausted with error: %v", err)
+		return fmt.Errorf("maximum number of tries has been exhausted with error: %v", err)
 	}
-	return errors.New("Maximum number of trials has been exhausted")
+	return errors.New("maximum number of tries has been exhausted")
 }
