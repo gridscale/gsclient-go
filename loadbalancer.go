@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// LoadBalancerOperator an interface defining API of a loadbalancer operator.
+// LoadBalancerOperator provides an interface for operations on load balancers.
 type LoadBalancerOperator interface {
 	GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error)
 	GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, error)
@@ -17,19 +17,19 @@ type LoadBalancerOperator interface {
 	GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-// LoadBalancers is the JSON struct of a list of load balancers.
+// LoadBalancers holds a list of load balancers.
 type LoadBalancers struct {
 	// Array of load balancers.
 	List map[string]LoadBalancerProperties `json:"loadbalancers"`
 }
 
-// LoadBalancer is the JSON struct of a load balancer.
+// LoadBalancer represent a single load balancer.
 type LoadBalancer struct {
 	// Properties of a load balancer.
 	Properties LoadBalancerProperties `json:"loadbalancer"`
 }
 
-// LoadBalancerProperties is the properties of a load balancer.
+// LoadBalancerProperties holds properties of a load balancer.
 type LoadBalancerProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -89,7 +89,7 @@ type LoadBalancerProperties struct {
 	ListenIPv4UUID string `json:"listen_ipv4_uuid"`
 }
 
-// BackendServer is the JSON struct of backend server.
+// BackendServer holds properties telling how a load balancer deals with a backend server.
 type BackendServer struct {
 	// Weight of the server.
 	Weight int `json:"weight"`
@@ -98,7 +98,8 @@ type BackendServer struct {
 	Host string `json:"host"`
 }
 
-// ForwardingRule is the JSON struct of forwarding rule.
+// ForwardingRule represents a forwarding rule.
+// It tells which port are forwarded to which port.
 type ForwardingRule struct {
 	// SSL from LetsEncrypt.
 	LetsencryptSSL interface{} `json:"letsencrypt_ssl"`
@@ -113,7 +114,7 @@ type ForwardingRule struct {
 	TargetPort int `json:"target_port"`
 }
 
-// LoadBalancerCreateRequest is the JSON struct for creating a load balancer request.
+// LoadBalancerCreateRequest represents a request for creating a load balancer.
 type LoadBalancerCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -143,7 +144,7 @@ type LoadBalancerCreateRequest struct {
 	Status string `json:"status,omitempty"`
 }
 
-// LoadBalancerUpdateRequest is the JSON struct for updating a load balancer request.
+// LoadBalancerUpdateRequest represents a request for updating a load balancer.
 type LoadBalancerUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -173,7 +174,7 @@ type LoadBalancerUpdateRequest struct {
 	Status string `json:"status,omitempty"`
 }
 
-// LoadBalancerCreateResponse is the JSON struct for a load balancer response.
+// LoadBalancerCreateResponse represents a response for creating a load balancer.
 type LoadBalancerCreateResponse struct {
 	// Request's UUID.
 	RequestUUID string `json:"request_uuid"`
@@ -182,6 +183,8 @@ type LoadBalancerCreateResponse struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
+// LoadbalancerAlgorithm represents the algorithm that a load balancer uses to balance
+// the incoming requests.
 type LoadbalancerAlgorithm string
 
 // All available load balancer algorithms.
@@ -264,7 +267,7 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBal
 	return r.execute(ctx, *c, nil)
 }
 
-// GetLoadBalancerEventList retrieves events of a given UUID.
+// GetLoadBalancerEventList retrieves a load balancer's events based on a given load balancer UUID.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancerEvents
 func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error) {
@@ -285,7 +288,7 @@ func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Eve
 	return loadBalancerEvents, err
 }
 
-// DeleteLoadBalancer deletes a load balancer.
+// DeleteLoadBalancer removes a load balancer.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteLoadbalancer
 func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {
