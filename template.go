@@ -179,7 +179,7 @@ func (c *Client) GetTemplateByName(ctx context.Context, name string) (Template, 
 	return Template{}, fmt.Errorf("Template %v not found", name)
 }
 
-// CreateTemplate function can be used to creates a OS template.
+// CreateTemplate creates a new OS template.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/createTemplate
 func (c *Client) CreateTemplate(ctx context.Context, body TemplateCreateRequest) (CreateResponse, error) {
