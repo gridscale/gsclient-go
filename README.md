@@ -49,6 +49,11 @@ To trace the duration of individual client calls, set logger to `Trace` level vi
 gsclient.SetLogLevel(logrus.TraceLevel)
 ```
 
+`Trace` message looks like following:
+```
+TRAC[2021-03-12T10:32:43+01:00] Successful method="github.com/gridscale/gsclient-go/v3.(*Client).GetServer" requestUUID=035fc625-199d-41da-93c4-f32502d101c1 timeMs=350
+```
+
 Make sure to replace the user-UUID and API-token strings with valid credentials or variables containing valid credentials. It is recommended to use environment variables for them.
 
 ## Using API endpoints
