@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// StorageSnapshotOperator is an interface defining API of a storage snapshot operator.
+// StorageSnapshotOperator provides an interface for operations on storage snapshots.
 type StorageSnapshotOperator interface {
 	GetStorageSnapshotList(ctx context.Context, id string) ([]StorageSnapshot, error)
 	GetSnapshotsByLocation(ctx context.Context, id string) ([]StorageSnapshot, error)
@@ -20,25 +20,27 @@ type StorageSnapshotOperator interface {
 	ExportStorageSnapshotToS3(ctx context.Context, storageID, snapshotID string, body StorageSnapshotExportToS3Request) error
 }
 
-// StorageSnapshotList is JSON structure of a list of storage snapshots.
+// StorageSnapshotList holds a list of storage snapshots.
 type StorageSnapshotList struct {
 	// Array of snapshots.
 	List map[string]StorageSnapshotProperties `json:"snapshots"`
 }
 
-// DeletedStorageSnapshotList is JSON structure of a list of deleted storage snapshots.
+// DeletedStorageSnapshotList holds a list of deleted storage snapshots.
 type DeletedStorageSnapshotList struct {
 	// Array of deleted snapshots.
 	List map[string]StorageSnapshotProperties `json:"deleted_snapshots"`
 }
 
-// StorageSnapshot is JSON structure of a single storage snapshot.
+// StorageSnapshot represents a single storage snapshot.
 type StorageSnapshot struct {
 	// Properties of a snapshot.
 	Properties StorageSnapshotProperties `json:"snapshot"`
 }
 
-// StorageSnapshotProperties JSON struct of properties of a storage snapshot.
+// StorageSnapshotProperties holds properties of a storage snapshot.
+// A snapshot can be retrieved, exported to an object storage, and used to
+// rollback a storage via the snapshot UUID.
 type StorageSnapshotProperties struct {
 	// List of labels.
 	Labels []string `json:"labels"`
@@ -87,7 +89,7 @@ type StorageSnapshotProperties struct {
 	ParentUUID string `json:"parent_uuid"`
 }
 
-// StorageSnapshotCreateRequest JSON struct of a request for creating a storage snapshot.
+// StorageSnapshotCreateRequest represents a request for creating a storage snapshot.
 type StorageSnapshotCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	// Optional
@@ -97,7 +99,7 @@ type StorageSnapshotCreateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 }
 
-// StorageSnapshotCreateResponse JSON struct of a response for creating a storage snapshot.
+// StorageSnapshotCreateResponse represents a response for creating a storage snapshot.
 type StorageSnapshotCreateResponse struct {
 	// UUID of the request.
 	RequestUUID string `json:"request_uuid"`
@@ -106,7 +108,7 @@ type StorageSnapshotCreateResponse struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// StorageSnapshotUpdateRequest JSON struct of a request for updating a storage snapshot.
+// StorageSnapshotUpdateRequest represents a request for updating a storage snapshot.
 type StorageSnapshotUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	// Optional.
@@ -116,13 +118,13 @@ type StorageSnapshotUpdateRequest struct {
 	Labels *[]string `json:"labels,omitempty"`
 }
 
-// StorageRollbackRequest JSON struct of a request for rolling back.
+// StorageRollbackRequest represents a request for rolling back a storage.
 type StorageRollbackRequest struct {
 	// Rollback=true => storage will be restored.
 	Rollback bool `json:"rollback,omitempty"`
 }
 
-// StorageSnapshotExportToS3Request JSON struct of a request for exporting a storage snapshot to S3.
+// StorageSnapshotExportToS3Request represents a request for exporting a storage snapshot to S3.
 type StorageSnapshotExportToS3Request struct {
 	// S3 authentication data.
 	S3auth `json:"s3auth"`
@@ -131,7 +133,7 @@ type StorageSnapshotExportToS3Request struct {
 	S3data `json:"s3data"`
 }
 
-// S3auth JSON struct of S3 authentication data.
+// S3auth represents S3 authentication data, which used in `StorageSnapshotExportToS3Request`.
 type S3auth struct {
 	// Host of S3.
 	Host string `json:"host"`
@@ -143,7 +145,7 @@ type S3auth struct {
 	SecretKey string `json:"secret_key"`
 }
 
-// S3data JSON struct of info about snapshot being uploaded.
+// S3data represents info about snapshot being uploaded, which used in `StorageSnapshotExportToS3Request`.
 type S3data struct {
 	// Host of S3.
 	Host string `json:"host"`
@@ -228,7 +230,7 @@ func (c *Client) UpdateStorageSnapshot(ctx context.Context, storageID, snapshotI
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteStorageSnapshot deletes a specific storage's snapshot.
+// DeleteStorageSnapshot removes a specific storage's snapshot.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSnapshot
 func (c *Client) DeleteStorageSnapshot(ctx context.Context, storageID, snapshotID string) error {
@@ -257,7 +259,7 @@ func (c *Client) RollbackStorage(ctx context.Context, storageID, snapshotID stri
 	return r.execute(ctx, *c, nil)
 }
 
-// ExportStorageSnapshotToS3 export a storage's snapshot to S3.
+// ExportStorageSnapshotToS3 exports a storage's snapshot to S3.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/SnapshotExportToS3
 func (c *Client) ExportStorageSnapshotToS3(ctx context.Context, storageID, snapshotID string, body StorageSnapshotExportToS3Request) error {
