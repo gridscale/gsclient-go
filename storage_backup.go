@@ -31,7 +31,7 @@ type StorageBackupProperties struct {
 	// The UUID of a backup is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	// The name of the backup equals schedule name plus backup uuid.
+	// The name of the backup equals schedule name plus backup UUID.
 	Name string `json:"name"`
 
 	// Defines the date and time the object was initially created.
