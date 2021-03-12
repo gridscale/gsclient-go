@@ -7,25 +7,25 @@ import (
 	"path"
 )
 
-// LocationOperator an interface defining API of a location operator.
+// LocationOperator provides an interface for operations on locations.
 type LocationOperator interface {
 	GetLocationList(ctx context.Context) ([]Location, error)
 	GetLocation(ctx context.Context, id string) (Location, error)
 }
 
-// LocationList JSON struct of a list of locations.
+// LocationList holds a list of locations.
 type LocationList struct {
 	// Array of locations.
 	List map[string]LocationProperties `json:"locations"`
 }
 
-// Location JSON struct of a single location.
+// Location represent a single location.
 type Location struct {
 	// Properties of a location.
 	Properties LocationProperties `json:"location"`
 }
 
-// LocationProperties JSON struct of properties of a location.
+// LocationProperties holds properties of a location.
 type LocationProperties struct {
 	// Uses IATA airport code, which works as a location identifier.
 	Iata string `json:"iata"`
