@@ -330,7 +330,7 @@ func TestClient_ShutdownServer(t *testing.T) {
 				})
 				err := client.ShutdownServer(emptyCtx, dummyUUID)
 				assert.Contains(t, fmt.Sprintf("%v", err),
-					fmt.Sprintf("Status code: 500. Error: Maximum number of trials has been exhausted with error: no error message received from server. Request UUID: %s.",
+					fmt.Sprintf("Status code: 500. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
 						dummyRequestUUID), "ShutdownServer returned an error with status code 500")
 				server.Close()
 			}
