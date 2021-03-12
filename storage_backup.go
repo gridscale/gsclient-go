@@ -7,22 +7,22 @@ import (
 	"path"
 )
 
-// StorageBackupOperator is an interface defining API of a storage backup operator
+// StorageBackupOperator is an interface defining API of a storage backup operator.
 type StorageBackupOperator interface {
 	GetStorageBackupList(ctx context.Context, id string) ([]StorageBackup, error)
 	DeleteStorageBackup(ctx context.Context, storageID, backupID string) error
 	RollbackStorageBackup(ctx context.Context, storageID, backupID string, body StorageRollbackRequest) error
 }
 
-// StorageBackupList is JSON structure of a list of storage backups
+// StorageBackupList is JSON structure of a list of storage backups.
 type StorageBackupList struct {
-	// Array of backups
+	// Array of backups.
 	List map[string]StorageBackupProperties `json:"backups"`
 }
 
-// StorageBackup is JSON structure of a single storage backup
+// StorageBackup is JSON structure of a single storage backup.
 type StorageBackup struct {
-	// Properties of a backup
+	// Properties of a backup.
 	Properties StorageBackupProperties `json:"backup"`
 }
 
@@ -41,7 +41,7 @@ type StorageBackupProperties struct {
 	Capacity int `json:"capacity"`
 }
 
-// GetStorageBackupList gets a list of available storage backups
+// GetStorageBackupList gets a list of available storage backups.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackups
 func (c *Client) GetStorageBackupList(ctx context.Context, id string) ([]StorageBackup, error) {
@@ -61,7 +61,7 @@ func (c *Client) GetStorageBackupList(ctx context.Context, id string) ([]Storage
 	return storageBackups, err
 }
 
-// DeleteStorageBackup deletes a specific storage's backup
+// DeleteStorageBackup deletes a specific storage's backup.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteStorageBackup
 func (c *Client) DeleteStorageBackup(ctx context.Context, storageID, backupID string) error {
@@ -75,7 +75,7 @@ func (c *Client) DeleteStorageBackup(ctx context.Context, storageID, backupID st
 	return r.execute(ctx, *c, nil)
 }
 
-// RollbackStorageBackup rollbacks a storage's backup
+// RollbackStorageBackup rollbacks a storage's backup.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/rollbackStorageBackup
 func (c *Client) RollbackStorageBackup(ctx context.Context, storageID, backupID string, body StorageRollbackRequest) error {

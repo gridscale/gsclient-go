@@ -12,16 +12,16 @@ import (
 type emptyStruct struct {
 }
 
-// retryableFunc defines a function that can be retried
+// retryableFunc defines a function that can be retried.
 type retryableFunc func() (bool, error)
 
-// isValidUUID validates the uuid
+// isValidUUID validates the uuid.
 func isValidUUID(u string) bool {
 	_, err := uuid.Parse(u)
 	return err == nil
 }
 
-// retryWithContext reruns a function until the context is done
+// retryWithContext reruns a function until the context is done.
 func retryWithContext(ctx context.Context, targetFunc retryableFunc, delay time.Duration) error {
 	for {
 		select {
@@ -37,7 +37,7 @@ func retryWithContext(ctx context.Context, targetFunc retryableFunc, delay time.
 	}
 }
 
-// retryNTimes reruns a function within a number of retries
+// retryNTimes reruns a function within a number of retries.
 func retryNTimes(targetFunc retryableFunc, numOfRetries int, delay time.Duration) error {
 	retryNo := 0
 	var err error
@@ -47,8 +47,9 @@ func retryNTimes(targetFunc retryableFunc, numOfRetries int, delay time.Duration
 		if !continueRetrying {
 			return err
 		}
+		//delay between retries.
 		retryNo++
-		time.Sleep(delay * time.Duration(retryNo)) //delay between retries
+		time.Sleep(delay * time.Duration(retryNo))
 	}
 	if err != nil {
 		reqErr, ok := err.(RequestError)

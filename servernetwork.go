@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// ServerNetworkRelationOperator is an interface defining API of a server-network relation operator
+// ServerNetworkRelationOperator is an interface defining API of a server-network relation operator.
 type ServerNetworkRelationOperator interface {
 	GetServerNetworkList(ctx context.Context, id string) ([]ServerNetworkRelationProperties, error)
 	GetServerNetwork(ctx context.Context, serverID, networkID string) (ServerNetworkRelationProperties, error)
@@ -18,19 +18,19 @@ type ServerNetworkRelationOperator interface {
 	UnlinkNetwork(ctx context.Context, serverID string, networkID string) error
 }
 
-// ServerNetworkRelationList JSON struct of a list of relations between a server and networks
+// ServerNetworkRelationList JSON struct of a list of relations between a server and networks.
 type ServerNetworkRelationList struct {
-	// Array of relations between a server and networks
+	// Array of relations between a server and networks.
 	List []ServerNetworkRelationProperties `json:"network_relations"`
 }
 
-// ServerNetworkRelation JSON struct of a single relation between a server and a network
+// ServerNetworkRelation JSON struct of a single relation between a server and a network.
 type ServerNetworkRelation struct {
-	// Properties of a relation between a server and a network
+	// Properties of a relation between a server and a network.
 	Properties ServerNetworkRelationProperties `json:"network_relation"`
 }
 
-// ServerNetworkRelationProperties JSON struct of properties of a relation between a server and a network
+// ServerNetworkRelationProperties JSON struct of properties of a relation between a server and a network.
 type ServerNetworkRelationProperties struct {
 	// Defines information about MAC spoofing protection (filters layer2 and ARP traffic based on MAC source).
 	// It can only be (de-)activated on a private network - the public network always has l2security enabled.
@@ -62,16 +62,16 @@ type ServerNetworkRelationProperties struct {
 	// The boot order is as follows => Network > ISO image > Storage.
 	BootDevice bool `json:"bootdevice"`
 
-	// PartnerUUID
+	// PartnerUUID.
 	PartnerUUID string `json:"partner_uuid"`
 
 	// Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs.
 	Ordering int `json:"ordering"`
 
-	// Firewall that is used to this server network relation
+	// Firewall that is used to this server network relation.
 	Firewall FirewallRules `json:"firewall"`
 
-	//(one of network, network_high, network_insane)
+	//(one of network, network_high, network_insane).
 	NetworkType string `json:"network_type"`
 
 	// The UUID of the network you're requesting.
@@ -85,9 +85,9 @@ type ServerNetworkRelationProperties struct {
 	L3security []string `json:"l3security"`
 }
 
-// ServerNetworkRelationCreateRequest JSON struct of a request for creating a relation between a server and a network
+// ServerNetworkRelationCreateRequest JSON struct of a request for creating a relation between a server and a network.
 type ServerNetworkRelationCreateRequest struct {
-	// The UUID of network you wish to add. Only 7 private networks are allowed to be attached to a server
+	// The UUID of network you wish to add. Only 7 private networks are allowed to be attached to a server.
 	ObjectUUID string `json:"object_uuid"`
 
 	// The ordering of the network interfaces. Lower numbers have lower PCI-IDs. Can be empty.
@@ -98,10 +98,10 @@ type ServerNetworkRelationCreateRequest struct {
 
 	// Defines information about IP prefix spoof protection (it allows source traffic only from the IPv4/IPv4 network prefixes).
 	// If empty, it allow no IPv4/IPv6 source traffic. If set to null, l3security is disabled (default).
-	// Can be empty
+	// Can be empty.
 	L3security []string `json:"l3security,omitempty"`
 
-	// All rules of Firewall. Can be empty
+	// All rules of Firewall. Can be empty.
 	Firewall *FirewallRules `json:"firewall,omitempty"`
 
 	// Instead of setting firewall rules manually, you can use a firewall template by setting UUID of the firewall template.
@@ -109,7 +109,7 @@ type ServerNetworkRelationCreateRequest struct {
 	FirewallTemplateUUID string `json:"firewall_template_uuid,omitempty"`
 }
 
-// ServerNetworkRelationUpdateRequest JSON struct of a request for updating a relation between a server and a network
+// ServerNetworkRelationUpdateRequest JSON struct of a request for updating a relation between a server and a network.
 type ServerNetworkRelationUpdateRequest struct {
 	// The ordering of the network interfaces. Lower numbers have lower PCI-IDs. Optional.
 	Ordering int `json:"ordering,omitempty"`
@@ -119,7 +119,7 @@ type ServerNetworkRelationUpdateRequest struct {
 
 	// Defines information about IP prefix spoof protection (it allows source traffic only from the IPv4/IPv4 network prefixes).
 	// If empty, it allow no IPv4/IPv6 source traffic. If set to null, l3security is disabled (default).
-	// Can be empty
+	// Can be empty.
 	L3security []string `json:"l3security,omitempty"`
 
 	// All rules of Firewall. Optional.
@@ -130,7 +130,7 @@ type ServerNetworkRelationUpdateRequest struct {
 	FirewallTemplateUUID string `json:"firewall_template_uuid,omitempty"`
 }
 
-// GetServerNetworkList gets a list of a specific server's networks
+// GetServerNetworkList gets a list of a specific server's networks.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedNetworks
 func (c *Client) GetServerNetworkList(ctx context.Context, id string) ([]ServerNetworkRelationProperties, error) {
@@ -147,7 +147,7 @@ func (c *Client) GetServerNetworkList(ctx context.Context, id string) ([]ServerN
 	return response.List, err
 }
 
-// GetServerNetwork gets a network of a specific server
+// GetServerNetwork gets a network of a specific server.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedNetwork
 func (c *Client) GetServerNetwork(ctx context.Context, serverID, networkID string) (ServerNetworkRelationProperties, error) {
@@ -164,7 +164,7 @@ func (c *Client) GetServerNetwork(ctx context.Context, serverID, networkID strin
 	return response.Properties, err
 }
 
-// UpdateServerNetwork updates a link between a network and a server
+// UpdateServerNetwork updates a link between a network and a server.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateServerLinkedNetwork
 func (c *Client) UpdateServerNetwork(ctx context.Context, serverID, networkID string, body ServerNetworkRelationUpdateRequest) error {
@@ -179,7 +179,7 @@ func (c *Client) UpdateServerNetwork(ctx context.Context, serverID, networkID st
 	return r.execute(ctx, *c, nil)
 }
 
-// CreateServerNetwork creates a link between a network and a storage
+// CreateServerNetwork creates a link between a network and a storage.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/linkNetworkToServer
 func (c *Client) CreateServerNetwork(ctx context.Context, id string, body ServerNetworkRelationCreateRequest) error {
@@ -194,7 +194,7 @@ func (c *Client) CreateServerNetwork(ctx context.Context, id string, body Server
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteServerNetwork deletes a link between a network and a server
+// DeleteServerNetwork deletes a link between a network and a server.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/unlinkNetworkFromServer
 func (c *Client) DeleteServerNetwork(ctx context.Context, serverID, networkID string) error {
@@ -208,7 +208,7 @@ func (c *Client) DeleteServerNetwork(ctx context.Context, serverID, networkID st
 	return r.execute(ctx, *c, nil)
 }
 
-// LinkNetwork attaches a network to a server
+// LinkNetwork attaches a network to a server.
 func (c *Client) LinkNetwork(ctx context.Context, serverID, networkID, firewallTemplate string, bootdevice bool, order int,
 	l3security []string, firewall *FirewallRules) error {
 	body := ServerNetworkRelationCreateRequest{
@@ -222,7 +222,7 @@ func (c *Client) LinkNetwork(ctx context.Context, serverID, networkID, firewallT
 	return c.CreateServerNetwork(ctx, serverID, body)
 }
 
-// UnlinkNetwork removes the link between a network and a server
+// UnlinkNetwork removes the link between a network and a server.
 func (c *Client) UnlinkNetwork(ctx context.Context, serverID string, networkID string) error {
 	return c.DeleteServerNetwork(ctx, serverID, networkID)
 }

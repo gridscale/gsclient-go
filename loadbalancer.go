@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// LoadBalancerOperator an interface defining API of a loadbalancer operator
+// LoadBalancerOperator an interface defining API of a loadbalancer operator.
 type LoadBalancerOperator interface {
 	GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error)
 	GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, error)
@@ -17,19 +17,19 @@ type LoadBalancerOperator interface {
 	GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-// LoadBalancers is the JSON struct of a list of load balancers
+// LoadBalancers is the JSON struct of a list of load balancers.
 type LoadBalancers struct {
-	// Array of load balancers
+	// Array of load balancers.
 	List map[string]LoadBalancerProperties `json:"loadbalancers"`
 }
 
-// LoadBalancer is the JSON struct of a load balancer
+// LoadBalancer is the JSON struct of a load balancer.
 type LoadBalancer struct {
-	// Properties of a load balancer
+	// Properties of a load balancer.
 	Properties LoadBalancerProperties `json:"loadbalancer"`
 }
 
-// LoadBalancerProperties is the properties of a load balancer
+// LoadBalancerProperties is the properties of a load balancer.
 type LoadBalancerProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -40,7 +40,7 @@ type LoadBalancerProperties struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	// Forwarding rules of a load balancer
+	// Forwarding rules of a load balancer.
 	ForwardingRules []ForwardingRule `json:"forwarding_rules"`
 
 	// Uses IATA airport code, which works as a location identifier.
@@ -73,7 +73,7 @@ type LoadBalancerProperties struct {
 	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
-	// Total minutes of cores used
+	// Total minutes of cores used.
 	UsageInMinutes int `json:"usage_in_minutes"`
 
 	// The algorithm used to process requests. Accepted values: roundrobin / leastconn.
@@ -89,31 +89,31 @@ type LoadBalancerProperties struct {
 	ListenIPv4UUID string `json:"listen_ipv4_uuid"`
 }
 
-// BackendServer is the JSON struct of backend server
+// BackendServer is the JSON struct of backend server.
 type BackendServer struct {
-	// Weight of the server
+	// Weight of the server.
 	Weight int `json:"weight"`
 
 	// Host of the server. Can be URL or IP address.
 	Host string `json:"host"`
 }
 
-// ForwardingRule is the JSON struct of forwarding rule
+// ForwardingRule is the JSON struct of forwarding rule.
 type ForwardingRule struct {
-	// SSL from LetsEncrypt
+	// SSL from LetsEncrypt.
 	LetsencryptSSL interface{} `json:"letsencrypt_ssl"`
 
-	// Listen port
+	// Listen port.
 	ListenPort int `json:"listen_port"`
 
-	// Mode of forwarding
+	// Mode of forwarding.
 	Mode string `json:"mode"`
 
-	// Target port
+	// Target port.
 	TargetPort int `json:"target_port"`
 }
 
-// LoadBalancerCreateRequest is the JSON struct for creating a load balancer request
+// LoadBalancerCreateRequest is the JSON struct for creating a load balancer request.
 type LoadBalancerCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -124,26 +124,26 @@ type LoadBalancerCreateRequest struct {
 	// The UUID of the IPv4 address the load balancer will listen to for incoming requests.
 	ListenIPv4UUID string `json:"listen_ipv4_uuid"`
 
-	// The algorithm used to process requests. Allowed values: `LoadbalancerRoundrobinAlg`, `LoadbalancerLeastConnAlg`
+	// The algorithm used to process requests. Allowed values: `LoadbalancerRoundrobinAlg`, `LoadbalancerLeastConnAlg`.
 	Algorithm LoadbalancerAlgorithm `json:"algorithm"`
 
 	// An array of ForwardingRule objects containing the forwarding rules for the load balancer
 	ForwardingRules []ForwardingRule `json:"forwarding_rules"`
 
-	// The servers that this load balancer can communicate with
+	// The servers that this load balancer can communicate with.
 	BackendServers []BackendServer `json:"backend_servers"`
 
 	// List of labels.
 	Labels []string `json:"labels"`
 
-	// Whether the Load balancer is forced to redirect requests from HTTP to HTTPS
+	// Whether the Load balancer is forced to redirect requests from HTTP to HTTPS.
 	RedirectHTTPToHTTPS bool `json:"redirect_http_to_https"`
 
 	// Status indicates the status of the object.
 	Status string `json:"status,omitempty"`
 }
 
-// LoadBalancerUpdateRequest is the JSON struct for updating a load balancer request
+// LoadBalancerUpdateRequest is the JSON struct for updating a load balancer request.
 type LoadBalancerUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -157,40 +157,40 @@ type LoadBalancerUpdateRequest struct {
 	// The algorithm used to process requests. Allowed values: `LoadbalancerRoundrobinAlg`, `LoadbalancerLeastConnAlg`
 	Algorithm LoadbalancerAlgorithm `json:"algorithm"`
 
-	// An array of ForwardingRule objects containing the forwarding rules for the load balancer
+	// An array of ForwardingRule objects containing the forwarding rules for the load balancer.
 	ForwardingRules []ForwardingRule `json:"forwarding_rules"`
 
-	// The servers that this load balancer can communicate with
+	// The servers that this load balancer can communicate with.
 	BackendServers []BackendServer `json:"backend_servers"`
 
 	// List of labels.
 	Labels []string `json:"labels"`
 
-	// Whether the Load balancer is forced to redirect requests from HTTP to HTTPS
+	// Whether the Load balancer is forced to redirect requests from HTTP to HTTPS.
 	RedirectHTTPToHTTPS bool `json:"redirect_http_to_https"`
 
 	// Status indicates the status of the object.
 	Status string `json:"status,omitempty"`
 }
 
-// LoadBalancerCreateResponse is the JSON struct for a load balancer response
+// LoadBalancerCreateResponse is the JSON struct for a load balancer response.
 type LoadBalancerCreateResponse struct {
-	// Request's UUID
+	// Request's UUID.
 	RequestUUID string `json:"request_uuid"`
 
-	// UUID of the load balancer being created
+	// UUID of the load balancer being created.
 	ObjectUUID string `json:"object_uuid"`
 }
 
 type LoadbalancerAlgorithm string
 
-// All available load balancer algorithms
+// All available load balancer algorithms.
 var (
 	LoadbalancerRoundrobinAlg LoadbalancerAlgorithm = "roundrobin"
 	LoadbalancerLeastConnAlg  LoadbalancerAlgorithm = "leastconn"
 )
 
-// GetLoadBalancerList returns a list of load balancers
+// GetLoadBalancerList returns a list of load balancers.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancers
 func (c *Client) GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error) {
@@ -208,7 +208,7 @@ func (c *Client) GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error
 	return loadBalancers, err
 }
 
-// GetLoadBalancer returns a load balancer of a given UUID
+// GetLoadBalancer returns a load balancer of a given UUID.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancer
 func (c *Client) GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, error) {
@@ -225,9 +225,9 @@ func (c *Client) GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, 
 	return response, err
 }
 
-// CreateLoadBalancer creates a new load balancer
+// CreateLoadBalancer creates a new load balancer.
 //
-// Note: A load balancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
+// Note: A load balancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/createLoadbalancer
 func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error) {
@@ -244,9 +244,9 @@ func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreate
 	return response, err
 }
 
-// UpdateLoadBalancer update configuration of a load balancer
+// UpdateLoadBalancer update configuration of a load balancer.
 //
-// Note: A load balancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
+// Note: A load balancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateLoadbalancer
 func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBalancerUpdateRequest) error {
@@ -264,7 +264,7 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBal
 	return r.execute(ctx, *c, nil)
 }
 
-// GetLoadBalancerEventList retrieves events of a given UUID
+// GetLoadBalancerEventList retrieves events of a given UUID.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancerEvents
 func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error) {
@@ -285,7 +285,7 @@ func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Eve
 	return loadBalancerEvents, err
 }
 
-// DeleteLoadBalancer deletes a load balancer
+// DeleteLoadBalancer deletes a load balancer.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteLoadbalancer
 func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {

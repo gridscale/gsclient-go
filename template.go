@@ -22,19 +22,19 @@ type TemplateOperator interface {
 
 // TemplateList holds a list of templates.
 type TemplateList struct {
-	// Array of templates
+	// Array of templates.
 	List map[string]TemplateProperties `json:"templates"`
 }
 
 // DeletedTemplateList Holds a list of deleted templates.
 type DeletedTemplateList struct {
-	// Array of deleted templates
+	// Array of deleted templates.
 	List map[string]TemplateProperties `json:"deleted_templates"`
 }
 
 // Template represents a single OS template.
 type Template struct {
-	// Properties of a template
+	// Properties of a template.
 	Properties TemplateProperties `json:"template"`
 }
 
@@ -107,7 +107,7 @@ type TemplateCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	// Snapshot UUID for template
+	// Snapshot UUID for template.
 	SnapshotUUID string `json:"snapshot_uuid"`
 
 	// List of labels. Optional.
@@ -225,8 +225,7 @@ func (c *Client) DeleteTemplate(ctx context.Context, id string) error {
 // GetTemplateEventList gets the list of events that are associated with the
 // given template.
 //
-// See:
-// https://gridscale.io/en//api-documentation/index.html#operation/getTemplateEvents
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getTemplateEvents
 func (c *Client) GetTemplateEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")

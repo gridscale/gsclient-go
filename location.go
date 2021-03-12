@@ -7,25 +7,25 @@ import (
 	"path"
 )
 
-// LocationOperator an interface defining API of a location operator
+// LocationOperator an interface defining API of a location operator.
 type LocationOperator interface {
 	GetLocationList(ctx context.Context) ([]Location, error)
 	GetLocation(ctx context.Context, id string) (Location, error)
 }
 
-// LocationList JSON struct of a list of locations
+// LocationList JSON struct of a list of locations.
 type LocationList struct {
-	// Array of locations
+	// Array of locations.
 	List map[string]LocationProperties `json:"locations"`
 }
 
-// Location JSON struct of a single location
+// Location JSON struct of a single location.
 type Location struct {
-	// Properties of a location
+	// Properties of a location.
 	Properties LocationProperties `json:"location"`
 }
 
-// LocationProperties JSON struct of properties of a location
+// LocationProperties JSON struct of properties of a location.
 type LocationProperties struct {
 	// Uses IATA airport code, which works as a location identifier.
 	Iata string `json:"iata"`
@@ -46,7 +46,7 @@ type LocationProperties struct {
 	Country string `json:"country"`
 }
 
-// GetLocationList gets a list of available locations]
+// GetLocationList gets a list of available locations.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLocations
 func (c *Client) GetLocationList(ctx context.Context) ([]Location, error) {
@@ -64,7 +64,7 @@ func (c *Client) GetLocationList(ctx context.Context) ([]Location, error) {
 	return locations, err
 }
 
-// GetLocation gets a specific location
+// GetLocation gets a specific location.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLocation
 func (c *Client) GetLocation(ctx context.Context, id string) (Location, error) {

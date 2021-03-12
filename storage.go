@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// StorageOperator is an interface defining API of a storage operator
+// StorageOperator is an interface defining API of a storage operator.
 type StorageOperator interface {
 	GetStorage(ctx context.Context, id string) (Storage, error)
 	GetStorageList(ctx context.Context) ([]Storage, error)
@@ -21,25 +21,25 @@ type StorageOperator interface {
 	GetStorageEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-// StorageList JSON struct of a list of storages
+// StorageList JSON struct of a list of storages.
 type StorageList struct {
-	// Array of storages
+	// Array of storages.
 	List map[string]StorageProperties `json:"storages"`
 }
 
-// DeletedStorageList JSON struct of a list of storages
+// DeletedStorageList JSON struct of a list of storages.
 type DeletedStorageList struct {
-	// Array of deleted storages
+	// Array of deleted storages.
 	List map[string]StorageProperties `json:"deleted_storages"`
 }
 
-// Storage JSON struct of a single storage
+// Storage JSON struct of a single storage.
 type Storage struct {
-	// Properties of a storage
+	// Properties of a storage.
 	Properties StorageProperties `json:"storage"`
 }
 
-// StorageProperties JSON struct of properties of a storage
+// StorageProperties JSON struct of properties of a storage.
 type StorageProperties struct {
 	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
@@ -101,16 +101,16 @@ type StorageProperties struct {
 	CreateTime GSTime `json:"create_time"`
 }
 
-// StorageRelations JSON struct of a list of a storage's relations
+// StorageRelations JSON struct of a list of a storage's relations.
 type StorageRelations struct {
-	// Array of related servers
+	// Array of related servers.
 	Servers []StorageServerRelation `json:"servers"`
 
-	// Array if related snapshot schedules
+	// Array if related snapshot schedules.
 	SnapshotSchedules []StorageAndSnapshotScheduleRelation `json:"snapshot_schedules"`
 }
 
-// StorageServerRelation JSON struct of a relation between a storage and a server
+// StorageServerRelation JSON struct of a relation between a storage and a server.
 type StorageServerRelation struct {
 	// Whether the server boots from this iso image or not.
 	Bootdevice bool `json:"bootdevice"`
@@ -139,7 +139,7 @@ type StorageServerRelation struct {
 	ObjectName string `json:"object_name"`
 }
 
-// StorageSnapshotRelation JSON struct of a relation between a storage and a snapshot
+// StorageSnapshotRelation JSON struct of a relation between a storage and a snapshot.
 type StorageSnapshotRelation struct {
 	// Indicates the UUID of the last used template on this storage.
 	LastUsedTemplate string `json:"last_used_template"`
@@ -156,7 +156,7 @@ type StorageSnapshotRelation struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	SchedulesSnapshotUUID string `json:"schedules_snapshot_uuid"`
 
-	// Capacity of the snapshot (in GB)
+	// Capacity of the snapshot (in GB).
 	ObjectCapacity int `json:"object_capacity"`
 
 	// Defines the date and time the object was initially created.
@@ -166,9 +166,9 @@ type StorageSnapshotRelation struct {
 	ObjectName string `json:"object_name"`
 }
 
-// StorageAndSnapshotScheduleRelation JSON struct of a relation between a storage and a snapshot schedule
+// StorageAndSnapshotScheduleRelation JSON struct of a relation between a storage and a snapshot schedule.
 type StorageAndSnapshotScheduleRelation struct {
-	// The interval at which the schedule will run (in minutes)
+	// The interval at which the schedule will run (in minutes).
 	RunInterval int `json:"run_interval"`
 
 	// The amount of Snapshots to keep before overwriting the last created Snapshot.
@@ -190,9 +190,9 @@ type StorageAndSnapshotScheduleRelation struct {
 	CreateTime GSTime `json:"create_time"`
 }
 
-// StorageTemplate JSON struct of a storage template
+// StorageTemplate JSON struct of a storage template.
 type StorageTemplate struct {
-	// List of SSH key UUIDs. Optional
+	// List of SSH key UUIDs. Optional.
 	Sshkeys []string `json:"sshkeys,omitempty"`
 
 	// The UUID of a template (public or private).
@@ -210,7 +210,7 @@ type StorageTemplate struct {
 	Hostname string `json:"hostname,omitempty"`
 }
 
-// StorageCreateRequest JSON struct of a request for creating a storage
+// StorageCreateRequest JSON struct of a request for creating a storage.
 type StorageCreateRequest struct {
 	// Required (integer - minimum: 1 - maximum: 4096).
 	Capacity int `json:"capacity"`
@@ -230,7 +230,7 @@ type StorageCreateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 }
 
-// StorageUpdateRequest JSON struct of a request for updating a storage
+// StorageUpdateRequest JSON struct of a request for updating a storage.
 type StorageUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters. Optional.
 	Name string `json:"name,omitempty"`
@@ -241,16 +241,16 @@ type StorageUpdateRequest struct {
 	// The Capacity of the Storage in GB. Optional.
 	Capacity int `json:"capacity,omitempty"`
 
-	// Storage type. Allowed values: nil, DefaultStorageType, HighStorageType, InsaneStorageType. Optional. Downgrading is not supported
+	// Storage type. Allowed values: nil, DefaultStorageType, HighStorageType, InsaneStorageType. Optional. Downgrading is not supported.
 	StorageType StorageType `json:"storage_type,omitempty"`
 }
 
-// CreateStorageFromBackupRequest is JSON structure of a request to create a new storage from a backup
+// CreateStorageFromBackupRequest is JSON structure of a request to create a new storage from a backup.
 type CreateStorageFromBackupRequest struct {
 	RequestProperties CreateStorageFromBackupProperties `json:"backup"`
 }
 
-// CreateStorageFromBackupProperties is request properties of CreateStorageFromBackupRequest
+// CreateStorageFromBackupProperties is request properties of CreateStorageFromBackupRequest.
 type CreateStorageFromBackupProperties struct {
 	Name       string `json:"name"`
 	BackupUUID string `json:"backup_uuid"`
@@ -269,13 +269,13 @@ const (
 // PasswordType denotes the representation of a password.
 type PasswordType string
 
-// All allowed password type's values
+// All allowed password type's values.
 const (
 	PlainPasswordType PasswordType = "plain"
 	CryptPasswordType PasswordType = "crypt"
 )
 
-// GetStorage get a storage
+// GetStorage get a storage.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getStorage
 func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
@@ -292,7 +292,7 @@ func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
 	return response, err
 }
 
-// GetStorageList gets a list of available storages
+// GetStorageList gets a list of available storages.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getStorages
 func (c *Client) GetStorageList(ctx context.Context) ([]Storage, error) {
@@ -380,7 +380,7 @@ func (c *Client) GetStorageEventList(ctx context.Context, id string) ([]Event, e
 	return storageEvents, err
 }
 
-// GetStoragesByLocation gets a list of storages by location
+// GetStoragesByLocation gets a list of storages by location.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationStorages
 func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storage, error) {
@@ -401,7 +401,7 @@ func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storag
 	return storages, err
 }
 
-// GetDeletedStorages gets a list of deleted storages
+// GetDeletedStorages gets a list of deleted storages.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedStorages
 func (c *Client) GetDeletedStorages(ctx context.Context) ([]Storage, error) {
@@ -419,8 +419,9 @@ func (c *Client) GetDeletedStorages(ctx context.Context) ([]Storage, error) {
 	return storages, err
 }
 
-// CloneStorage clones a specific storage
+// CloneStorage clones a specific storage.
 //
+// See https://gridscale.io/en/api-documentation/index.html#operation/storageClone
 func (c *Client) CloneStorage(ctx context.Context, id string) (CreateResponse, error) {
 	var response CreateResponse
 	if !isValidUUID(id) {
@@ -434,7 +435,7 @@ func (c *Client) CloneStorage(ctx context.Context, id string) (CreateResponse, e
 	return response, err
 }
 
-// CreateStorageFromBackup creates a new storage from a specific backup
+// CreateStorageFromBackup creates a new storage from a specific backup.
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/storageImport
 func (c *Client) CreateStorageFromBackup(ctx context.Context, backupID, storageName string) (CreateResponse, error) {

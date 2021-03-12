@@ -8,7 +8,7 @@ import (
 	"path"
 )
 
-// NetworkOperator an interface defining API of a network operator
+// NetworkOperator an interface defining API of a network operator.
 type NetworkOperator interface {
 	GetNetwork(ctx context.Context, id string) (Network, error)
 	GetNetworkList(ctx context.Context) ([]Network, error)
@@ -21,25 +21,25 @@ type NetworkOperator interface {
 	GetDeletedNetworks(ctx context.Context) ([]Network, error)
 }
 
-// NetworkList is JSON struct of a list of networks
+// NetworkList is JSON struct of a list of networks.
 type NetworkList struct {
-	// Array of networks
+	// Array of networks.
 	List map[string]NetworkProperties `json:"networks"`
 }
 
-// DeletedNetworkList is JSON struct of a list of deleted networks
+// DeletedNetworkList is JSON struct of a list of deleted networks.
 type DeletedNetworkList struct {
-	// Array of deleted networks
+	// Array of deleted networks.
 	List map[string]NetworkProperties `json:"deleted_networks"`
 }
 
-// Network is JSON struct of a single network
+// Network is JSON struct of a single network.
 type Network struct {
-	// Properties of a network
+	// Properties of a network.
 	Properties NetworkProperties `json:"network"`
 }
 
-// NetworkProperties is JSON struct of a network's properties
+// NetworkProperties is JSON struct of a network's properties.
 type NetworkProperties struct {
 	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
@@ -85,35 +85,35 @@ type NetworkProperties struct {
 	// List of labels.
 	Labels []string `json:"labels"`
 
-	// The information about other object which are related to this network. the object could be servers and/or vlans
+	// The information about other object which are related to this network. the object could be servers and/or vlans.
 	Relations NetworkRelations `json:"relations"`
 }
 
-// NetworkRelations is JSON struct of a list of a network's relations
+// NetworkRelations is JSON struct of a list of a network's relations.
 type NetworkRelations struct {
-	// Array of object (NetworkVlan)
+	// Array of object (NetworkVlan).
 	Vlans []NetworkVlan `json:"vlans"`
 
-	// Array of object (NetworkServer)
+	// Array of object (NetworkServer).
 	Servers []NetworkServer `json:"servers"`
 
-	// Array of object (NetworkPaaSSecurityZone)
+	// Array of object (NetworkPaaSSecurityZone).
 	PaaSSecurityZones []NetworkPaaSSecurityZone `json:"paas_security_zones"`
 }
 
-// NetworkVlan is JSON struct of a relation between a network and a VLAN
+// NetworkVlan is JSON struct of a relation between a network and a VLAN.
 type NetworkVlan struct {
-	// Vlan
+	// Vlan.
 	Vlan int `json:"vlan"`
 
-	// Name of tenant
+	// Name of tenant.
 	TenantName string `json:"tenant_name"`
 
-	// UUID of tenant
+	// UUID of tenant.
 	TenantUUID string `json:"tenant_uuid"`
 }
 
-// NetworkServer is JSON struct of a relation between a network and a server
+// NetworkServer is JSON struct of a relation between a network and a server.
 type NetworkServer struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -142,7 +142,7 @@ type NetworkServer struct {
 }
 
 type NetworkPaaSSecurityZone struct {
-	// IPv6 prefix of the PaaS service
+	// IPv6 prefix of the PaaS service.
 	IPv6Prefix string `json:"ipv6_prefix"`
 
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
@@ -152,7 +152,7 @@ type NetworkPaaSSecurityZone struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// NetworkCreateRequest is JSON of a request for creating a network
+// NetworkCreateRequest is JSON of a request for creating a network.
 type NetworkCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -166,28 +166,28 @@ type NetworkCreateRequest struct {
 	L2Security bool `json:"l2security,omitempty"`
 }
 
-// NetworkCreateResponse is JSON of a response for creating a network
+// NetworkCreateResponse is JSON of a response for creating a network.
 type NetworkCreateResponse struct {
-	// UUID of the network being created
+	// UUID of the network being created.
 	ObjectUUID string `json:"object_uuid"`
 
-	// UUID of the request
+	// UUID of the request.
 	RequestUUID string `json:"request_uuid"`
 }
 
-// NetworkUpdateRequest is JSON of a request for updating a network
+// NetworkUpdateRequest is JSON of a request for updating a network.
 type NetworkUpdateRequest struct {
-	// New name. Leave it if you do not want to update the name
+	// New name. Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
 
-	// L2Security. Leave it if you do not want to update the l2 security
+	// L2Security. Leave it if you do not want to update the l2 security.
 	L2Security bool `json:"l2security"`
 
 	// List of labels. Can be empty.
 	Labels *[]string `json:"labels,omitempty"`
 }
 
-// GetNetwork get a specific network based on given id
+// GetNetwork get a specific network based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getNetwork
 func (c *Client) GetNetwork(ctx context.Context, id string) (Network, error) {
@@ -204,7 +204,7 @@ func (c *Client) GetNetwork(ctx context.Context, id string) (Network, error) {
 	return response, err
 }
 
-// CreateNetwork creates a network
+// CreateNetwork creates a network.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#tag/network
 func (c *Client) CreateNetwork(ctx context.Context, body NetworkCreateRequest) (NetworkCreateResponse, error) {
@@ -218,7 +218,7 @@ func (c *Client) CreateNetwork(ctx context.Context, body NetworkCreateRequest) (
 	return response, err
 }
 
-// DeleteNetwork deletes a specific network based on given id
+// DeleteNetwork deletes a specific network based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteNetwork
 func (c *Client) DeleteNetwork(ctx context.Context, id string) error {
@@ -232,7 +232,7 @@ func (c *Client) DeleteNetwork(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-// UpdateNetwork updates a specific network based on given id
+// UpdateNetwork updates a specific network based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateNetwork
 func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdateRequest) error {
@@ -247,7 +247,7 @@ func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdat
 	return r.execute(ctx, *c, nil)
 }
 
-// GetNetworkList gets a list of available networks
+// GetNetworkList gets a list of available networks.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getNetworks
 func (c *Client) GetNetworkList(ctx context.Context) ([]Network, error) {
@@ -267,7 +267,7 @@ func (c *Client) GetNetworkList(ctx context.Context) ([]Network, error) {
 	return networks, err
 }
 
-// GetNetworkEventList gets a list of a network's events
+// GetNetworkEventList gets a list of a network's events.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#tag/network
 func (c *Client) GetNetworkEventList(ctx context.Context, id string) ([]Event, error) {
@@ -288,7 +288,7 @@ func (c *Client) GetNetworkEventList(ctx context.Context, id string) ([]Event, e
 	return networkEvents, err
 }
 
-// GetNetworkPublic gets public network
+// GetNetworkPublic gets public network.
 func (c *Client) GetNetworkPublic(ctx context.Context) (Network, error) {
 	networks, err := c.GetNetworkList(ctx)
 	if err != nil {
@@ -302,7 +302,7 @@ func (c *Client) GetNetworkPublic(ctx context.Context) (Network, error) {
 	return Network{}, fmt.Errorf("public network not found")
 }
 
-// GetNetworksByLocation gets a list of networks by location
+// GetNetworksByLocation gets a list of networks by location.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedNetworks
 func (c *Client) GetNetworksByLocation(ctx context.Context, id string) ([]Network, error) {
@@ -323,7 +323,7 @@ func (c *Client) GetNetworksByLocation(ctx context.Context, id string) ([]Networ
 	return networks, err
 }
 
-// GetDeletedNetworks gets a list of deleted networks
+// GetDeletedNetworks gets a list of deleted networks.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedNetworks
 func (c *Client) GetDeletedNetworks(ctx context.Context) ([]Network, error) {

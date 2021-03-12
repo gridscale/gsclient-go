@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// StorageSnapshotOperator is an interface defining API of a storage snapshot operator
+// StorageSnapshotOperator is an interface defining API of a storage snapshot operator.
 type StorageSnapshotOperator interface {
 	GetStorageSnapshotList(ctx context.Context, id string) ([]StorageSnapshot, error)
 	GetSnapshotsByLocation(ctx context.Context, id string) ([]StorageSnapshot, error)
@@ -20,25 +20,25 @@ type StorageSnapshotOperator interface {
 	ExportStorageSnapshotToS3(ctx context.Context, storageID, snapshotID string, body StorageSnapshotExportToS3Request) error
 }
 
-// StorageSnapshotList is JSON structure of a list of storage snapshots
+// StorageSnapshotList is JSON structure of a list of storage snapshots.
 type StorageSnapshotList struct {
-	// Array of snapshots
+	// Array of snapshots.
 	List map[string]StorageSnapshotProperties `json:"snapshots"`
 }
 
-// DeletedStorageSnapshotList is JSON structure of a list of deleted storage snapshots
+// DeletedStorageSnapshotList is JSON structure of a list of deleted storage snapshots.
 type DeletedStorageSnapshotList struct {
-	// Array of deleted snapshots
+	// Array of deleted snapshots.
 	List map[string]StorageSnapshotProperties `json:"deleted_snapshots"`
 }
 
-// StorageSnapshot is JSON structure of a single storage snapshot
+// StorageSnapshot is JSON structure of a single storage snapshot.
 type StorageSnapshot struct {
-	// Properties of a snapshot
+	// Properties of a snapshot.
 	Properties StorageSnapshotProperties `json:"snapshot"`
 }
 
-// StorageSnapshotProperties JSON struct of properties of a storage snapshot
+// StorageSnapshotProperties JSON struct of properties of a storage snapshot.
 type StorageSnapshotProperties struct {
 	// List of labels.
 	Labels []string `json:"labels"`
@@ -83,11 +83,11 @@ type StorageSnapshotProperties struct {
 	// Uses IATA airport code, which works as a location identifier.
 	LocationIata string `json:"location_iata"`
 
-	// Uuid of the storage used to create this snapshot
+	// Uuid of the storage used to create this snapshot.
 	ParentUUID string `json:"parent_uuid"`
 }
 
-// StorageSnapshotCreateRequest JSON struct of a request for creating a storage snapshot
+// StorageSnapshotCreateRequest JSON struct of a request for creating a storage snapshot.
 type StorageSnapshotCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	// Optional
@@ -97,68 +97,68 @@ type StorageSnapshotCreateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 }
 
-// StorageSnapshotCreateResponse JSON struct of a response for creating a storage snapshot
+// StorageSnapshotCreateResponse JSON struct of a response for creating a storage snapshot.
 type StorageSnapshotCreateResponse struct {
-	// UUID of the request
+	// UUID of the request.
 	RequestUUID string `json:"request_uuid"`
 
-	// UUID of the snapshot being created
+	// UUID of the snapshot being created.
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// StorageSnapshotUpdateRequest JSON struct of a request for updating a storage snapshot
+// StorageSnapshotUpdateRequest JSON struct of a request for updating a storage snapshot.
 type StorageSnapshotUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
-	// Optional
+	// Optional.
 	Name string `json:"name,omitempty"`
 
 	// List of labels. Optional.
 	Labels *[]string `json:"labels,omitempty"`
 }
 
-// StorageRollbackRequest JSON struct of a request for rolling back
+// StorageRollbackRequest JSON struct of a request for rolling back.
 type StorageRollbackRequest struct {
-	// Rollback=true => storage will be restored
+	// Rollback=true => storage will be restored.
 	Rollback bool `json:"rollback,omitempty"`
 }
 
-// StorageSnapshotExportToS3Request JSON struct of a request for exporting a storage snapshot to S3
+// StorageSnapshotExportToS3Request JSON struct of a request for exporting a storage snapshot to S3.
 type StorageSnapshotExportToS3Request struct {
-	// S3 authentication data
+	// S3 authentication data.
 	S3auth `json:"s3auth"`
 
-	// S3 info about snapshot being uploaded
+	// S3 info about snapshot being uploaded.
 	S3data `json:"s3data"`
 }
 
-// S3auth JSON struct of S3 authentication data
+// S3auth JSON struct of S3 authentication data.
 type S3auth struct {
-	// Host of S3
+	// Host of S3.
 	Host string `json:"host"`
 
-	// Access key of S3
+	// Access key of S3.
 	AccessKey string `json:"access_key"`
 
-	// Secret key of S3
+	// Secret key of S3.
 	SecretKey string `json:"secret_key"`
 }
 
-// S3data JSON struct of info about snapshot being uploaded
+// S3data JSON struct of info about snapshot being uploaded.
 type S3data struct {
-	// Host of S3
+	// Host of S3.
 	Host string `json:"host"`
 
-	// Bucket that file will be uploaded to
+	// Bucket that file will be uploaded to.
 	Bucket string `json:"bucket"`
 
-	// Name of the file being uploaded
+	// Name of the file being uploaded.
 	Filename string `json:"filename"`
 
-	// Is the file private?
+	// Is the file private?.
 	Private bool `json:"private"`
 }
 
-// GetStorageSnapshotList gets a list of storage snapshots
+// GetStorageSnapshotList gets a list of storage snapshots.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getSnapshots
 func (c *Client) GetStorageSnapshotList(ctx context.Context, id string) ([]StorageSnapshot, error) {
@@ -196,7 +196,7 @@ func (c *Client) GetStorageSnapshot(ctx context.Context, storageID, snapshotID s
 	return response, err
 }
 
-// CreateStorageSnapshot creates a new storage's snapshot
+// CreateStorageSnapshot creates a new storage's snapshot.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/createSnapshot
 func (c *Client) CreateStorageSnapshot(ctx context.Context, id string, body StorageSnapshotCreateRequest) (StorageSnapshotCreateResponse, error) {
@@ -213,7 +213,7 @@ func (c *Client) CreateStorageSnapshot(ctx context.Context, id string, body Stor
 	return response, err
 }
 
-// UpdateStorageSnapshot updates a specific storage's snapshot
+// UpdateStorageSnapshot updates a specific storage's snapshot.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateSnapshot
 func (c *Client) UpdateStorageSnapshot(ctx context.Context, storageID, snapshotID string, body StorageSnapshotUpdateRequest) error {
@@ -228,7 +228,7 @@ func (c *Client) UpdateStorageSnapshot(ctx context.Context, storageID, snapshotI
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteStorageSnapshot deletes a specific storage's snapshot
+// DeleteStorageSnapshot deletes a specific storage's snapshot.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSnapshot
 func (c *Client) DeleteStorageSnapshot(ctx context.Context, storageID, snapshotID string) error {
@@ -242,7 +242,7 @@ func (c *Client) DeleteStorageSnapshot(ctx context.Context, storageID, snapshotI
 	return r.execute(ctx, *c, nil)
 }
 
-// RollbackStorage rollbacks a storage
+// RollbackStorage rollbacks a storage.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/StorageRollback
 func (c *Client) RollbackStorage(ctx context.Context, storageID, snapshotID string, body StorageRollbackRequest) error {
@@ -257,7 +257,7 @@ func (c *Client) RollbackStorage(ctx context.Context, storageID, snapshotID stri
 	return r.execute(ctx, *c, nil)
 }
 
-// ExportStorageSnapshotToS3 export a storage's snapshot to S3
+// ExportStorageSnapshotToS3 export a storage's snapshot to S3.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/SnapshotExportToS3
 func (c *Client) ExportStorageSnapshotToS3(ctx context.Context, storageID, snapshotID string, body StorageSnapshotExportToS3Request) error {
@@ -272,7 +272,7 @@ func (c *Client) ExportStorageSnapshotToS3(ctx context.Context, storageID, snaps
 	return r.execute(ctx, *c, nil)
 }
 
-// GetSnapshotsByLocation gets a list of storage snapshots by location
+// GetSnapshotsByLocation gets a list of storage snapshots by location.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationSnapshots
 func (c *Client) GetSnapshotsByLocation(ctx context.Context, id string) ([]StorageSnapshot, error) {
@@ -293,7 +293,7 @@ func (c *Client) GetSnapshotsByLocation(ctx context.Context, id string) ([]Stora
 	return snapshots, err
 }
 
-// GetDeletedSnapshots gets a list of deleted storage snapshots
+// GetDeletedSnapshots gets a list of deleted storage snapshots.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedSnapshots
 func (c *Client) GetDeletedSnapshots(ctx context.Context) ([]StorageSnapshot, error) {

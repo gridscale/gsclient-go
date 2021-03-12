@@ -5,50 +5,50 @@ import (
 	"net/http"
 )
 
-// EventOperator is an interface defining API of an event operator
+// EventOperator is an interface defining API of an event operator.
 type EventOperator interface {
 	GetEventList(ctx context.Context) ([]Event, error)
 }
 
-// EventList is JSON struct of a list of events
+// EventList is JSON struct of a list of events.
 type EventList struct {
-	// Array of events
+	// Array of events.
 	List []EventProperties `json:"events"`
 }
 
-// Event is JSOn struct of a single firewall's event
+// Event is JSOn struct of a single firewall's event.
 type Event struct {
-	// Properties of an event
+	// Properties of an event.
 	Properties EventProperties `json:"event"`
 }
 
-// EventProperties is JSON struct of an event properties
+// EventProperties is JSON struct of an event properties.
 type EventProperties struct {
-	// Type of object (server, storage, IP) etc
+	// Type of object (server, storage, IP) etc.
 	ObjectType string `json:"object_type"`
 
-	// The UUID of the event
+	// The UUID of the event.
 	RequestUUID string `json:"request_uuid"`
 
-	// The UUID of the objects the event was executed on
+	// The UUID of the objects the event was executed on.
 	ObjectUUID string `json:"object_uuid"`
 
-	// The type of change
+	// The type of change.
 	Activity string `json:"activity"`
 
-	// The type of request
+	// The type of request.
 	RequestType string `json:"request_type"`
 
-	// True or false, whether the request was successful or not
+	// True or false, whether the request was successful or not.
 	RequestStatus string `json:"request_status"`
 
 	// A detailed description of the change.
 	Change string `json:"change"`
 
-	// Time the event was triggered
+	// Time the event was triggered.
 	Timestamp GSTime `json:"timestamp"`
 
-	// The UUID of the user that triggered the event
+	// The UUID of the user that triggered the event.
 	UserUUID string `json:"user_uuid"`
 
 	// The user that triggered the event.
@@ -57,7 +57,7 @@ type EventProperties struct {
 	Initiator string `json:"initiator"`
 }
 
-// GetEventList gets a list of events
+// GetEventList gets a list of events.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/EventGetAll
 func (c *Client) GetEventList(ctx context.Context) ([]Event, error) {
