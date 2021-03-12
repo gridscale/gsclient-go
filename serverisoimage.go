@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// ServerIsoImageRelationOperator is an interface defining API of a server-isoimage relation operator.
+// ServerIsoImageRelationOperator provides an interface for operations on server-ISO image relations.
 type ServerIsoImageRelationOperator interface {
 	GetServerIsoImageList(ctx context.Context, id string) ([]ServerIsoImageRelationProperties, error)
 	GetServerIsoImage(ctx context.Context, serverID, isoImageID string) (ServerIsoImageRelationProperties, error)
@@ -18,19 +18,19 @@ type ServerIsoImageRelationOperator interface {
 	UnlinkIsoImage(ctx context.Context, serverID string, isoimageID string) error
 }
 
-// ServerIsoImageRelationList JSON struct of a list of relations between a server and ISO images.
+// ServerIsoImageRelationList holds a list of relations between a server and ISO images.
 type ServerIsoImageRelationList struct {
 	// Array of relations between a server and ISO images.
 	List []ServerIsoImageRelationProperties `json:"isoimage_relations"`
 }
 
-// ServerIsoImageRelation JSON struct of a single relation between a server and an ISO image.
+// ServerIsoImageRelation represents a single relation between a server and an ISO image.
 type ServerIsoImageRelation struct {
 	// Properties of a relation between a server and an ISO image.
 	Properties ServerIsoImageRelationProperties `json:"isoimage_relation"`
 }
 
-// ServerIsoImageRelationProperties JSON struct of properties of a relation between a server and an ISO image.
+// ServerIsoImageRelationProperties holds properties of a relation between a server and an ISO image.
 type ServerIsoImageRelationProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -48,13 +48,13 @@ type ServerIsoImageRelationProperties struct {
 	Bootdevice bool `json:"bootdevice"`
 }
 
-// ServerIsoImageRelationCreateRequest JSON struct of a request for creating a relation between a server and an ISO image.
+// ServerIsoImageRelationCreateRequest represents a request for creating a relation between a server and an ISO image.
 type ServerIsoImageRelationCreateRequest struct {
 	// The UUID of the ISO-image you are requesting.
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// ServerIsoImageRelationUpdateRequest JSON struct of a request for updating a relation between a server and an ISO image.
+// ServerIsoImageRelationUpdateRequest represents a request for updating a relation between a server and an ISO image.
 type ServerIsoImageRelationUpdateRequest struct {
 	// Whether the server boots from this ISO-image or not.
 	BootDevice bool   `json:"bootdevice"`
@@ -125,7 +125,7 @@ func (c *Client) CreateServerIsoImage(ctx context.Context, id string, body Serve
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteServerIsoImage deletes a link between an ISO image and a server.
+// DeleteServerIsoImage removes a link between an ISO image and a server.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/unlinkIsoimageFromServer
 func (c *Client) DeleteServerIsoImage(ctx context.Context, serverID, isoImageID string) error {
@@ -147,7 +147,7 @@ func (c *Client) LinkIsoImage(ctx context.Context, serverID string, isoimageID s
 	return c.CreateServerIsoImage(ctx, serverID, body)
 }
 
-// UnlinkIsoImage removes the link between an ISO image and a server.
+// UnlinkIsoImage detaches an ISO image from a server.
 func (c *Client) UnlinkIsoImage(ctx context.Context, serverID string, isoimageID string) error {
 	return c.DeleteServerIsoImage(ctx, serverID, isoimageID)
 }
