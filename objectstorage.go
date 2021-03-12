@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// ObjectStorageOperator is an interface defining API of an object storage operator.
+// ObjectStorageOperator provides an interface for operations on object storages.
 type ObjectStorageOperator interface {
 	GetObjectStorageAccessKeyList(ctx context.Context) ([]ObjectStorageAccessKey, error)
 	GetObjectStorageAccessKey(ctx context.Context, id string) (ObjectStorageAccessKey, error)
@@ -17,19 +17,19 @@ type ObjectStorageOperator interface {
 	GetObjectStorageBucketList(ctx context.Context) ([]ObjectStorageBucket, error)
 }
 
-// ObjectStorageAccessKeyList is JSON structure of a list of Object Storage Access Keys.
+// ObjectStorageAccessKeyList holds a list of object storage access keys.
 type ObjectStorageAccessKeyList struct {
 	// Array of Object Storages' access keys.
 	List []ObjectStorageAccessKeyProperties `json:"access_keys"`
 }
 
-// ObjectStorageAccessKey is JSON structure of a single Object Storage Access Key.
+// ObjectStorageAccessKey represents a single object storage access key.
 type ObjectStorageAccessKey struct {
 	// Properties of an object storage access key.
 	Properties ObjectStorageAccessKeyProperties `json:"access_key"`
 }
 
-// ObjectStorageAccessKeyProperties is JSON struct of properties of an object storage access key.
+// ObjectStorageAccessKeyProperties holds properties of an object storage access key.
 type ObjectStorageAccessKeyProperties struct {
 	// The object storage secret_key.
 	SecretKey string `json:"secret_key"`
@@ -41,7 +41,7 @@ type ObjectStorageAccessKeyProperties struct {
 	User string `json:"user"`
 }
 
-// ObjectStorageAccessKeyCreateResponse is JSON struct of a response for creating an object storage access key.
+// ObjectStorageAccessKeyCreateResponse represents a response for creating an object storage access key.
 type ObjectStorageAccessKeyCreateResponse struct {
 	AccessKey struct {
 		////The object storage secret_key.
@@ -55,19 +55,19 @@ type ObjectStorageAccessKeyCreateResponse struct {
 	RequestUUID string `json:"request_uuid"`
 }
 
-// ObjectStorageBucketList is JSON struct of a list of buckets.
+// ObjectStorageBucketList holds a list of buckets.
 type ObjectStorageBucketList struct {
 	// Array of Buckets
 	List []ObjectStorageBucketProperties `json:"buckets"`
 }
 
-// ObjectStorageBucket is JSON struct of a single bucket.
+// ObjectStorageBucket represents a single bucket.
 type ObjectStorageBucket struct {
 	// Properties of a bucket.
 	Properties ObjectStorageBucketProperties `json:"bucket"`
 }
 
-// ObjectStorageBucketProperties is JSON struct of properties of a bucket.
+// ObjectStorageBucketProperties holds properties of a bucket.
 type ObjectStorageBucketProperties struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -130,7 +130,7 @@ func (c *Client) CreateObjectStorageAccessKey(ctx context.Context) (ObjectStorag
 	return response, err
 }
 
-// DeleteObjectStorageAccessKey deletes a specific object storage access key based on given id.
+// DeleteObjectStorageAccessKey removed a specific object storage access key based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteAccessKey
 func (c *Client) DeleteObjectStorageAccessKey(ctx context.Context, id string) error {
