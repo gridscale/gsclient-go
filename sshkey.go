@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// SSHKeyOperator is used for manipulating SSH keys.
+// SSHKeyOperator provides an interface for operations on SSH keys.
 type SSHKeyOperator interface {
 	GetSshkey(ctx context.Context, id string) (Sshkey, error)
 	GetSshkeyList(ctx context.Context) ([]Sshkey, error)
@@ -17,19 +17,21 @@ type SSHKeyOperator interface {
 	GetSshkeyEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-// SshkeyList JSON struct of a list of SSH keys.
+// SshkeyList holds a list of SSH keys.
 type SshkeyList struct {
 	// Array of SSH keys.
 	List map[string]SshkeyProperties `json:"sshkeys"`
 }
 
-// Sshkey JSON struct of a single SSH key.
+// Sshkey represents a single SSH key.
 type Sshkey struct {
 	// Properties of a SSH key.
 	Properties SshkeyProperties `json:"sshkey"`
 }
 
-// SshkeyProperties JSON struct of properties of a single SSH key.
+// SshkeyProperties holds properties of a single SSH key.
+// A SSH key can be retrieved when creating new storages and attaching them to
+// servers.
 type SshkeyProperties struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -56,7 +58,7 @@ type SshkeyProperties struct {
 	UserUUID string `json:"user_uuid"`
 }
 
-// SshkeyCreateRequest JSON struct of a request for creating a SSH key.
+// SshkeyCreateRequest represents a request for creating a SSH key.
 type SshkeyCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -68,7 +70,7 @@ type SshkeyCreateRequest struct {
 	Labels []string `json:"labels,omitempty"`
 }
 
-// SshkeyUpdateRequest JSON struct of a request for updating a SSH key.
+// SshkeyUpdateRequest represents a request for updating a SSH key.
 type SshkeyUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	// Optional.
@@ -131,7 +133,7 @@ func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (Cr
 	return response, err
 }
 
-// DeleteSshkey deletes a single SSH key.
+// DeleteSshkey removes a single SSH key.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSshKey
 func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
