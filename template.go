@@ -8,7 +8,7 @@ import (
 	"path"
 )
 
-// TemplateOperator is an interface defining API of a template operator
+// TemplateOperator provides an interface for operations on OS templates.
 type TemplateOperator interface {
 	GetTemplate(ctx context.Context, id string) (Template, error)
 	GetTemplateByName(ctx context.Context, name string) (Template, error)
@@ -20,25 +20,28 @@ type TemplateOperator interface {
 	GetTemplateEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-// TemplateList JSON struct of a list of templates
+// TemplateList holds a list of templates.
 type TemplateList struct {
 	// Array of templates
 	List map[string]TemplateProperties `json:"templates"`
 }
 
-// DeletedTemplateList JSON struct of a list of deleted templates
+// DeletedTemplateList Holds a list of deleted templates.
 type DeletedTemplateList struct {
 	// Array of deleted templates
 	List map[string]TemplateProperties `json:"deleted_templates"`
 }
 
-// Template JSON struct of a single template
+// Template represents a single OS template.
 type Template struct {
 	// Properties of a template
 	Properties TemplateProperties `json:"template"`
 }
 
-// TemplateProperties JSOn struct of properties of a template
+// TemplateProperties holds the properties of an OS template. OS templates can
+// be selected by a user when creating new storages and attaching them to
+// servers. Usually there are a fixed number of OS templates available and you
+// would reference them by name or ObjectUUID.
 type TemplateProperties struct {
 	// Status indicates the status of the object.
 	Status string `json:"status"`
@@ -49,16 +52,16 @@ type TemplateProperties struct {
 	// Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
-	// Description of the Template.
+	// A version string for this template.
 	Version string `json:"version"`
 
-	// Description of the Template.
+	// Description of the template.
 	LocationIata string `json:"location_iata"`
 
-	// Defines the date and time of the last object change.
+	// Defines the date and time of the last change.
 	ChangeTime GSTime `json:"change_time"`
 
-	// the object is private, the value will be true. Otherwise the value will be false.
+	// Whether the object is private, the value will be true. Otherwise the value will be false.
 	Private bool `json:"private"`
 
 	// The UUID of an object is always unique, and refers to a specific object.
@@ -74,16 +77,16 @@ type TemplateProperties struct {
 	// Total minutes the object has been running.
 	UsageInMinutes int `json:"usage_in_minutes"`
 
-	// The capacity of a storage/ISO image/template/snapshot in GB.
+	// The capacity of a storage/ISO image/template/snapshot in GiB.
 	Capacity int `json:"capacity"`
 
 	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
-	// The OS distribution that the Template contains.
+	// The OS distribution of this template.
 	Distro string `json:"distro"`
 
-	// Description of the Template.
+	// Description of the template.
 	Description string `json:"description"`
 
 	// The price for the current period since the last bill.
@@ -99,19 +102,19 @@ type TemplateProperties struct {
 	Labels []string `json:"labels"`
 }
 
-// TemplateCreateRequest JSON struct of a request for creating a template
+// TemplateCreateRequest represents the request for creating a new OS template from an existing storage snapshot.
 type TemplateCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	// snapshot uuid for template
+	// Snapshot UUID for template
 	SnapshotUUID string `json:"snapshot_uuid"`
 
 	// List of labels. Optional.
 	Labels []string `json:"labels,omitempty"`
 }
 
-// TemplateUpdateRequest JSON struct of a request for updating a template
+// TemplateUpdateRequest represents a request to update a OS template.
 type TemplateUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	// Optional.
@@ -121,7 +124,7 @@ type TemplateUpdateRequest struct {
 	Labels *[]string `json:"labels,omitempty"`
 }
 
-// GetTemplate gets a template
+// GetTemplate gets an OS template object by a given ID.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getTemplate
 func (c *Client) GetTemplate(ctx context.Context, id string) (Template, error) {
@@ -138,7 +141,7 @@ func (c *Client) GetTemplate(ctx context.Context, id string) (Template, error) {
 	return response, err
 }
 
-// GetTemplateList gets a list of templates
+// GetTemplateList gets a list of OS templates.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getTemplates
 func (c *Client) GetTemplateList(ctx context.Context) ([]Template, error) {
@@ -158,7 +161,8 @@ func (c *Client) GetTemplateList(ctx context.Context) ([]Template, error) {
 	return templates, err
 }
 
-// GetTemplateByName gets a template by its name
+// GetTemplateByName retrieves a single template by its name. Use GetTemplate to
+// retrieve a single template by it's ID.
 func (c *Client) GetTemplateByName(ctx context.Context, name string) (Template, error) {
 	if name == "" {
 		return Template{}, errors.New("'name' is required")
@@ -175,7 +179,7 @@ func (c *Client) GetTemplateByName(ctx context.Context, name string) (Template, 
 	return Template{}, fmt.Errorf("Template %v not found", name)
 }
 
-// CreateTemplate creates a template
+// CreateTemplate function can be used to creates a OS template.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/createTemplate
 func (c *Client) CreateTemplate(ctx context.Context, body TemplateCreateRequest) (CreateResponse, error) {
@@ -189,7 +193,7 @@ func (c *Client) CreateTemplate(ctx context.Context, body TemplateCreateRequest)
 	return response, err
 }
 
-// UpdateTemplate updates a template
+// UpdateTemplate updates an existing OS template's properties.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateTemplate
 func (c *Client) UpdateTemplate(ctx context.Context, id string, body TemplateUpdateRequest) error {
@@ -204,7 +208,7 @@ func (c *Client) UpdateTemplate(ctx context.Context, id string, body TemplateUpd
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteTemplate deletes a template
+// DeleteTemplate removes a single OS template.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteTemplate
 func (c *Client) DeleteTemplate(ctx context.Context, id string) error {
@@ -218,9 +222,11 @@ func (c *Client) DeleteTemplate(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-// GetTemplateEventList gets a list of a template's events
+// GetTemplateEventList gets the list of events that are associated with the
+// given template.
 //
-// See: https://gridscale.io/en//api-documentation/index.html#operation/getTemplateEvents
+// See:
+// https://gridscale.io/en//api-documentation/index.html#operation/getTemplateEvents
 func (c *Client) GetTemplateEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
@@ -239,7 +245,7 @@ func (c *Client) GetTemplateEventList(ctx context.Context, id string) ([]Event, 
 	return templateEvents, err
 }
 
-// GetTemplatesByLocation gets a list of templates by location
+// GetTemplatesByLocation gets a list of templates by location.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationTemplates
 func (c *Client) GetTemplatesByLocation(ctx context.Context, id string) ([]Template, error) {
@@ -260,7 +266,7 @@ func (c *Client) GetTemplatesByLocation(ctx context.Context, id string) ([]Templ
 	return templates, err
 }
 
-// GetDeletedTemplates gets a list of deleted templates
+// GetDeletedTemplates gets a list of deleted templates.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedTemplates
 func (c *Client) GetDeletedTemplates(ctx context.Context) ([]Template, error) {

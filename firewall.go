@@ -171,7 +171,7 @@ type FirewallUpdateRequest struct {
 // TransportLayerProtocol represents a layer 4 protocol.
 type TransportLayerProtocol string
 
-// All available transport protocol
+// All available transport protocols.
 var (
 	TCPTransport TransportLayerProtocol = "tcp"
 	UDPTransport TransportLayerProtocol = "udp"
