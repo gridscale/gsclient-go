@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// StorageSnapshotScheduleOperator is an interface defining API of a snapshot schedule operator.
+// StorageSnapshotScheduleOperator provides an interface for operations on snapshot schedules.
 type StorageSnapshotScheduleOperator interface {
 	GetStorageSnapshotScheduleList(ctx context.Context, id string) ([]StorageSnapshotSchedule, error)
 	GetStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string) (StorageSnapshotSchedule, error)
@@ -16,19 +16,19 @@ type StorageSnapshotScheduleOperator interface {
 	DeleteStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string) error
 }
 
-// StorageSnapshotScheduleList JSON of a list of storage snapshot schedules.
+// StorageSnapshotScheduleList holds a list of storage snapshot schedules.
 type StorageSnapshotScheduleList struct {
 	// Array of storage snapshot schedules.
 	List map[string]StorageSnapshotScheduleProperties `json:"snapshot_schedules"`
 }
 
-// StorageSnapshotSchedule JSON struct of a single storage snapshot scheduler.
+// StorageSnapshotSchedule represents a single storage snapshot schedule.
 type StorageSnapshotSchedule struct {
 	// Properties of a storage snapshot schedule.
 	Properties StorageSnapshotScheduleProperties `json:"snapshot_schedule"`
 }
 
-// StorageSnapshotScheduleProperties JSON struct of properties of a single storage snapshot schedule.
+// StorageSnapshotScheduleProperties holds properties of a single storage snapshot schedule.
 type StorageSnapshotScheduleProperties struct {
 	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
@@ -66,13 +66,13 @@ type StorageSnapshotScheduleProperties struct {
 	StorageUUID string `json:"storage_uuid"`
 }
 
-// StorageSnapshotScheduleRelations JSON struct of a list of relations of a storage snapshot schedule.
+// StorageSnapshotScheduleRelations holds a list of relations of a storage snapshot schedule and storage snapshots.
 type StorageSnapshotScheduleRelations struct {
 	// Array of all related snapshots (snapshots taken by this snapshot schedule).
 	Snapshots []StorageSnapshotScheduleRelation `json:"snapshots"`
 }
 
-// StorageSnapshotScheduleRelation JSON struct of a relation of a storage snapshot schedule.
+// StorageSnapshotScheduleRelation represents a relation of a storage snapshot schedule and a storage snapshot.
 type StorageSnapshotScheduleRelation struct {
 	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
@@ -84,7 +84,7 @@ type StorageSnapshotScheduleRelation struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// StorageSnapshotScheduleCreateRequest JSON struct of a request for creating a storage snapshot schedule.
+// StorageSnapshotScheduleCreateRequest represents a request for creating a storage snapshot schedule.
 type StorageSnapshotScheduleCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -104,7 +104,7 @@ type StorageSnapshotScheduleCreateRequest struct {
 	NextRuntime *GSTime `json:"next_runtime,omitempty"`
 }
 
-// StorageSnapshotScheduleCreateResponse JSON struct of a response for creating a storage snapshot schedule.
+// StorageSnapshotScheduleCreateResponse represents a response for creating a storage snapshot schedule.
 type StorageSnapshotScheduleCreateResponse struct {
 	// UUID of the request.
 	RequestUUID string `json:"request_uuid"`
@@ -113,7 +113,7 @@ type StorageSnapshotScheduleCreateResponse struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// StorageSnapshotScheduleUpdateRequest JSON struct of a request for updating a storage snapshot schedule.
+// StorageSnapshotScheduleUpdateRequest represents a request for updating a storage snapshot schedule.
 type StorageSnapshotScheduleUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	// Optional.
@@ -155,7 +155,7 @@ func (c *Client) GetStorageSnapshotScheduleList(ctx context.Context, id string) 
 	return schedules, err
 }
 
-// GetStorageSnapshotSchedule gets a specific storage snapshot scheduler based on a given storage's id and scheduler's id.
+// GetStorageSnapshotSchedule gets a specific storage snapshot schedule based on a given storage's id and schedule's id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getSnapshotSchedule
 func (c *Client) GetStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string) (StorageSnapshotSchedule, error) {
@@ -172,7 +172,7 @@ func (c *Client) GetStorageSnapshotSchedule(ctx context.Context, storageID, sche
 	return response, err
 }
 
-// CreateStorageSnapshotSchedule create a storage's snapshot scheduler.
+// CreateStorageSnapshotSchedule creates a storage snapshot schedule.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/createSnapshotSchedule
 func (c *Client) CreateStorageSnapshotSchedule(ctx context.Context, id string, body StorageSnapshotScheduleCreateRequest) (
@@ -190,7 +190,7 @@ func (c *Client) CreateStorageSnapshotSchedule(ctx context.Context, id string, b
 	return response, err
 }
 
-// UpdateStorageSnapshotSchedule updates specific Storage's snapshot scheduler based on a given storage's id and scheduler's id.
+// UpdateStorageSnapshotSchedule updates specific storage snapshot schedule based on a given storage's id and schedule's id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateSnapshotSchedule
 func (c *Client) UpdateStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string,
@@ -206,7 +206,7 @@ func (c *Client) UpdateStorageSnapshotSchedule(ctx context.Context, storageID, s
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteStorageSnapshotSchedule deletes specific Storage's snapshot scheduler based on a given storage's id and scheduler's id.
+// DeleteStorageSnapshotSchedule removes specific storage snapshot scheduler based on a given storage's id and scheduler's id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSnapshotSchedule
 func (c *Client) DeleteStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string) error {
