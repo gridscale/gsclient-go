@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// PaaSOperator is an interface defining API of a PaaS-related resource operator
+// PaaSOperator is an interface defining API of a PaaS-related resource operator.
 type PaaSOperator interface {
 	GetPaaSServiceList(ctx context.Context) ([]PaaSService, error)
 	GetPaaSService(ctx context.Context, id string) (PaaSService, error)
@@ -25,25 +25,25 @@ type PaaSOperator interface {
 	DeletePaaSSecurityZone(ctx context.Context, id string) error
 }
 
-// PaaSServices is the JSON struct of a list of PaaS services
+// PaaSServices is the JSON struct of a list of PaaS services.
 type PaaSServices struct {
 	// Array of PaaS services
 	List map[string]PaaSServiceProperties `json:"paas_services"`
 }
 
-// DeletedPaaSServices is the JSON struct of a list of deleted PaaS services
+// DeletedPaaSServices is the JSON struct of a list of deleted PaaS services.
 type DeletedPaaSServices struct {
-	// Array of deleted PaaS services
+	// Array of deleted PaaS services.
 	List map[string]PaaSServiceProperties `json:"deleted_paas_services"`
 }
 
-// PaaSService is the JSON struct of a single PaaS service
+// PaaSService is the JSON struct of a single PaaS service.
 type PaaSService struct {
-	// Properties of a PaaS service
+	// Properties of a PaaS service.
 	Properties PaaSServiceProperties `json:"paas_service"`
 }
 
-// PaaSServiceProperties is the properties of a single PaaS service
+// PaaSServiceProperties is the properties of a single PaaS service.
 type PaaSServiceProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -89,7 +89,7 @@ type PaaSServiceProperties struct {
 	Parameters map[string]interface{} `json:"parameters"`
 }
 
-// Credential is JSON struct of credential
+// Credential is JSON struct of credential.
 type Credential struct {
 	// The initial username to authenticate the Service.
 	Username string `json:"username"`
@@ -103,11 +103,11 @@ type Credential struct {
 	// If the PaaS service is a k8s cluster, this field will be set.
 	KubeConfig string `json:"kubeconfig"`
 
-	// Expiration time of k8s credential
+	// Expiration time of k8s credential.
 	ExpirationTime GSTime `json:"expiration_time"`
 }
 
-// PaaSServiceCreateRequest is JSON struct of a request for creating a PaaS service
+// PaaSServiceCreateRequest is JSON struct of a request for creating a PaaS service.
 type PaaSServiceCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -115,7 +115,7 @@ type PaaSServiceCreateRequest struct {
 	// The template used to create the service, you can find an available list at the /service_templates endpoint.
 	PaaSServiceTemplateUUID string `json:"paas_service_template_uuid"`
 
-	// The template used to create the service, you can find an available list at the /service_templates endpoint.
+	// The list of labels.
 	Labels []string `json:"labels,omitempty"`
 
 	// The UUID of the security zone that the service is running in.
@@ -128,7 +128,7 @@ type PaaSServiceCreateRequest struct {
 	Parameters map[string]interface{} `json:"parameters,omitempty"`
 }
 
-// ResourceLimit is JSON struct of resource limit
+// ResourceLimit is JSON struct of resource limit.
 type ResourceLimit struct {
 	// The name of the resource you would like to cap.
 	Resource string `json:"resource"`
@@ -137,9 +137,9 @@ type ResourceLimit struct {
 	Limit int `json:"limit"`
 }
 
-// PaaSServiceCreateResponse is JSON struct of a response for creating a PaaS service
+// PaaSServiceCreateResponse is JSON struct of a response for creating a PaaS service.
 type PaaSServiceCreateResponse struct {
-	// UUID of the request
+	// UUID of the request.
 	RequestUUID string `json:"request_uuid"`
 
 	// Contains the IPv6 address and port that the Service will listen to, you can use these details to connect internally to a service.
@@ -161,19 +161,19 @@ type PaaSServiceCreateResponse struct {
 	Parameters map[string]interface{} `json:"parameters"`
 }
 
-// PaaSTemplates is JSON struct of a list of PaaS Templates
+// PaaSTemplates is JSON struct of a list of PaaS Templates.
 type PaaSTemplates struct {
-	// Array of PaaS templates
+	// Array of PaaS templates.
 	List map[string]PaaSTemplateProperties `json:"paas_service_templates"`
 }
 
-// PaaSTemplate is JSON struct for a single PaaS Template
+// PaaSTemplate is JSON struct for a single PaaS Template.
 type PaaSTemplate struct {
-	// Properties of a PaaS template
+	// Properties of a PaaS template.
 	Properties PaaSTemplateProperties `json:"paas_service_template"`
 }
 
-// PaaSTemplateProperties is JSOn struct of properties of a PaaS template
+// PaaSTemplateProperties is JSOn struct of properties of a PaaS template.
 type PaaSTemplateProperties struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
@@ -184,7 +184,7 @@ type PaaSTemplateProperties struct {
 	// Describes the category of the service.
 	Category string `json:"category"`
 
-	// Product No
+	// Product No.
 	ProductNo int `json:"product_no"`
 
 	// Discounted product number related to the service template.
@@ -227,40 +227,40 @@ type PaaSTemplateProperties struct {
 	PatchUpdates []string `json:"patch_updates"`
 }
 
-// Parameter JSON of a parameter
+// Parameter JSON of a parameter.
 type Parameter struct {
-	// Is required
+	// Is required.
 	Required bool `json:"required"`
 
-	// Is empty
+	// Is empty.
 	Empty bool `json:"empty"`
 
-	// Description of parameter
+	// Description of parameter.
 	Description string `json:"description"`
 
-	// Maximum
+	// Maximum.
 	Max int `json:"max"`
 
-	// Minimum
+	// Minimum.
 	Min int `json:"min"`
 
-	// Default value
+	// Default value.
 	Default interface{} `json:"default"`
 
-	// Type of parameter
+	// Type of parameter.
 	Type string `json:"type"`
 
-	// Allowed values
+	// Allowed values.
 	Allowed []string `json:"allowed"`
 
-	// Regex
+	// Regex.
 	Regex string `json:"regex"`
 
-	// Immutable
+	// Immutable.
 	Immutable bool `json:"immutable"`
 }
 
-// Resource JSON of a resource
+// Resource JSON of a resource.
 type Resource struct {
 	// The amount of memory required by the service, either RAM(MB) or SSD Storage(GB).
 	Memory int `json:"memory"`
@@ -269,38 +269,38 @@ type Resource struct {
 	Connections int `json:"connections"`
 }
 
-// PaaSServiceUpdateRequest JSON of a request for updating a PaaS service
+// PaaSServiceUpdateRequest JSON of a request for updating a PaaS service.
 type PaaSServiceUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
-	// Leave it if you do not want to update the name
+	// Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
 
-	// List of labels. Leave it if you do not want to update the list of labels
+	// List of labels. Leave it if you do not want to update the list of labels.
 	Labels *[]string `json:"labels,omitempty"`
 
-	// Contains the service parameters for the service. Leave it if you do not want to update the parameters
+	// Contains the service parameters for the service. Leave it if you do not want to update the parameters.
 	Parameters map[string]interface{} `json:"parameters,omitempty"`
 
-	// A list of service resource limits. Leave it if you do not want to update the resource limits
+	// A list of service resource limits. Leave it if you do not want to update the resource limits.
 	ResourceLimits []ResourceLimit `json:"resource_limits,omitempty"`
 
 	// The template that you want to use in the service, you can find an available list at the /service_templates endpoint.
 	PaaSServiceTemplateUUID string `json:"paas_service_template_uuid,omitempty"`
 }
 
-// PaaSServiceMetrics JSON of a list of PaaS metrics
+// PaaSServiceMetrics JSON of a list of PaaS metrics.
 type PaaSServiceMetrics struct {
-	// Array of a PaaS service's metrics
+	// Array of a PaaS service's metrics.
 	List []PaaSMetricProperties `json:"paas_service_metrics"`
 }
 
-// PaaSServiceMetric JSON of a single PaaS metric
+// PaaSServiceMetric JSON of a single PaaS metric.
 type PaaSServiceMetric struct {
-	// Properties of a PaaS service metric
+	// Properties of a PaaS service metric.
 	Properties PaaSMetricProperties `json:"paas_service_metric"`
 }
 
-// PaaSMetricProperties JSON of properties of a PaaS metric
+// PaaSMetricProperties JSON of properties of a PaaS metric.
 type PaaSMetricProperties struct {
 	// Defines the begin of the time range.
 	BeginTime GSTime `json:"begin_time"`
@@ -311,35 +311,35 @@ type PaaSMetricProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	PaaSServiceUUID string `json:"paas_service_uuid"`
 
-	// CPU core usage
+	// CPU core usage.
 	CoreUsage PaaSMetricValue `json:"core_usage"`
 
-	// Storage usage
+	// Storage usage.
 	StorageSize PaaSMetricValue `json:"storage_size"`
 }
 
-// PaaSMetricValue JSON of a metric value
+// PaaSMetricValue JSON of a metric value.
 type PaaSMetricValue struct {
-	// Value
+	// Value.
 	Value float64 `json:"value"`
 
-	// Unit of the value
+	// Unit of the value.
 	Unit string `json:"unit"`
 }
 
-// PaaSSecurityZones JSON struct of a list of PaaS security zones
+// PaaSSecurityZones JSON struct of a list of PaaS security zones.
 type PaaSSecurityZones struct {
-	// Array of security zones
+	// Array of security zones.
 	List map[string]PaaSSecurityZoneProperties `json:"paas_security_zones"`
 }
 
-// PaaSSecurityZone JSON struct of a single PaaS security zone
+// PaaSSecurityZone JSON struct of a single PaaS security zone.
 type PaaSSecurityZone struct {
-	// Properties of a security zone
+	// Properties of a security zone.
 	Properties PaaSSecurityZoneProperties `json:"paas_security_zone"`
 }
 
-// PaaSSecurityZoneProperties JSOn struct of properties of a PaaS security zone
+// PaaSSecurityZoneProperties JSOn struct of properties of a PaaS security zone.
 type PaaSSecurityZoneProperties struct {
 	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
@@ -371,50 +371,50 @@ type PaaSSecurityZoneProperties struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	// object (PaaSRelationService)
+	// object (PaaSRelationService).
 	Relation PaaSRelationService `json:"relation"`
 }
 
-// PaaSRelationService JSON struct of a relation between a PaaS service and a service
+// PaaSRelationService JSON struct of a relation between a PaaS service and a service.
 type PaaSRelationService struct {
-	// Array of object (ServiceObject)
+	// Array of object (ServiceObject).
 	Services []ServiceObject `json:"services"`
 }
 
-// ServiceObject JSON struct of a service object
+// ServiceObject JSON struct of a service object.
 type ServiceObject struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// PaaSSecurityZoneCreateRequest JSON struct of a request for creating a PaaS security zone
+// PaaSSecurityZoneCreateRequest JSON struct of a request for creating a PaaS security zone.
 type PaaSSecurityZoneCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 }
 
-// PaaSSecurityZoneCreateResponse JSON struct of a response for creating a PaaS security zone
+// PaaSSecurityZoneCreateResponse JSON struct of a response for creating a PaaS security zone.
 type PaaSSecurityZoneCreateResponse struct {
-	// UUID of the request
+	// UUID of the request.
 	RequestUUID string `json:"request_uuid"`
 
-	// UUID of the security zone being created
+	// UUID of the security zone being created.
 	PaaSSecurityZoneUUID string `json:"paas_security_zone_uuid"`
 
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// PaaSSecurityZoneUpdateRequest JSON struct of a request for updating a PaaS security zone
+// PaaSSecurityZoneUpdateRequest JSON struct of a request for updating a PaaS security zone.
 type PaaSSecurityZoneUpdateRequest struct {
-	// The new name you give to the security zone. Leave it if you do not want to update the name
+	// The new name you give to the security zone. Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
 
-	// The UUID for the security zone you would like to update. Leave it if you do not want to update the security zone
+	// The UUID for the security zone you would like to update. Leave it if you do not want to update the security zone.
 	PaaSSecurityZoneUUID string `json:"paas_security_zone_uuid,omitempty"`
 }
 
-// GetPaaSServiceList returns a list of PaaS Services
+// GetPaaSServiceList returns a list of PaaS Services.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasServices
 func (c *Client) GetPaaSServiceList(ctx context.Context) ([]PaaSService, error) {
@@ -434,7 +434,7 @@ func (c *Client) GetPaaSServiceList(ctx context.Context) ([]PaaSService, error) 
 	return paasServices, err
 }
 
-// CreatePaaSService creates a new PaaS service
+// CreatePaaSService creates a new PaaS service.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/createPaasService
 func (c *Client) CreatePaaSService(ctx context.Context, body PaaSServiceCreateRequest) (PaaSServiceCreateResponse, error) {
@@ -448,7 +448,7 @@ func (c *Client) CreatePaaSService(ctx context.Context, body PaaSServiceCreateRe
 	return response, err
 }
 
-// GetPaaSService returns a specific PaaS Service based on given id
+// GetPaaSService returns a specific PaaS Service based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasService
 func (c *Client) GetPaaSService(ctx context.Context, id string) (PaaSService, error) {
@@ -465,7 +465,7 @@ func (c *Client) GetPaaSService(ctx context.Context, id string) (PaaSService, er
 	return response, err
 }
 
-// UpdatePaaSService updates a specific PaaS Service based on a given id
+// UpdatePaaSService updates a specific PaaS Service based on a given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updatePaasService
 func (c *Client) UpdatePaaSService(ctx context.Context, id string, body PaaSServiceUpdateRequest) error {
@@ -480,7 +480,7 @@ func (c *Client) UpdatePaaSService(ctx context.Context, id string, body PaaSServ
 	return r.execute(ctx, *c, nil)
 }
 
-// DeletePaaSService deletes a PaaS service
+// DeletePaaSService deletes a PaaS service.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deletePaasService
 func (c *Client) DeletePaaSService(ctx context.Context, id string) error {
@@ -494,7 +494,7 @@ func (c *Client) DeletePaaSService(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-// GetPaaSServiceMetrics get a specific PaaS Service's metrics based on a given id
+// GetPaaSServiceMetrics get a specific PaaS Service's metrics based on a given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasServiceMetrics
 func (c *Client) GetPaaSServiceMetrics(ctx context.Context, id string) ([]PaaSServiceMetric, error) {
@@ -517,10 +517,10 @@ func (c *Client) GetPaaSServiceMetrics(ctx context.Context, id string) ([]PaaSSe
 	return metrics, err
 }
 
-// RenewK8sCredentials renew credentials of a k8s cluster.
-// If the PaaS is not a k8s cluster, the function will return an error.
+// RenewK8sCredentials renews credentials for gridscale Kubernetes PaaS service templates.
+// The credentials of a PaaS service will be renewed (if supported by service template).
 //
-// See:
+// See:https://gridscale.io/en/api-documentation/index.html#operation/renewPaasServiceCredentials
 func (c *Client) RenewK8sCredentials(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
@@ -533,7 +533,7 @@ func (c *Client) RenewK8sCredentials(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-// GetPaaSTemplateList returns a list of PaaS service templates
+// GetPaaSTemplateList returns a list of PaaS service templates.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasServiceTemplates
 func (c *Client) GetPaaSTemplateList(ctx context.Context) ([]PaaSTemplate, error) {
@@ -554,7 +554,7 @@ func (c *Client) GetPaaSTemplateList(ctx context.Context) ([]PaaSTemplate, error
 	return paasTemplates, err
 }
 
-// GetPaaSSecurityZoneList get available security zones
+// GetPaaSSecurityZoneList get available security zones.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasSecurityZones
 func (c *Client) GetPaaSSecurityZoneList(ctx context.Context) ([]PaaSSecurityZone, error) {
@@ -574,7 +574,7 @@ func (c *Client) GetPaaSSecurityZoneList(ctx context.Context) ([]PaaSSecurityZon
 	return securityZones, err
 }
 
-// CreatePaaSSecurityZone creates a new PaaS security zone
+// CreatePaaSSecurityZone creates a new PaaS security zone.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/createPaasSecurityZone
 func (c *Client) CreatePaaSSecurityZone(ctx context.Context, body PaaSSecurityZoneCreateRequest) (PaaSSecurityZoneCreateResponse, error) {
@@ -588,7 +588,7 @@ func (c *Client) CreatePaaSSecurityZone(ctx context.Context, body PaaSSecurityZo
 	return response, err
 }
 
-// GetPaaSSecurityZone get a specific PaaS Security Zone based on given id
+// GetPaaSSecurityZone get a specific PaaS Security Zone based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasSecurityZone
 func (c *Client) GetPaaSSecurityZone(ctx context.Context, id string) (PaaSSecurityZone, error) {
@@ -605,7 +605,7 @@ func (c *Client) GetPaaSSecurityZone(ctx context.Context, id string) (PaaSSecuri
 	return response, err
 }
 
-// UpdatePaaSSecurityZone update a specific PaaS security zone based on given id
+// UpdatePaaSSecurityZone update a specific PaaS security zone based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updatePaasSecurityZone
 func (c *Client) UpdatePaaSSecurityZone(ctx context.Context, id string, body PaaSSecurityZoneUpdateRequest) error {
@@ -620,7 +620,7 @@ func (c *Client) UpdatePaaSSecurityZone(ctx context.Context, id string, body Paa
 	return r.execute(ctx, *c, nil)
 }
 
-// DeletePaaSSecurityZone delete a specific PaaS Security Zone based on given id
+// DeletePaaSSecurityZone delete a specific PaaS Security Zone based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deletePaasSecurityZone
 func (c *Client) DeletePaaSSecurityZone(ctx context.Context, id string) error {
@@ -634,7 +634,7 @@ func (c *Client) DeletePaaSSecurityZone(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-// GetDeletedPaaSServices returns a list of deleted PaaS Services
+// GetDeletedPaaSServices returns a list of deleted PaaS Services.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedPaasServices
 func (c *Client) GetDeletedPaaSServices(ctx context.Context) ([]PaaSService, error) {

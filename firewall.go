@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// FirewallOperator is an interface defining API of a firewall operator
+// FirewallOperator is an interface defining API of a firewall operator.
 type FirewallOperator interface {
 	GetFirewallList(ctx context.Context) ([]Firewall, error)
 	GetFirewall(ctx context.Context, id string) (Firewall, error)
@@ -17,45 +17,45 @@ type FirewallOperator interface {
 	GetFirewallEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-// FirewallList is JSON structure of a list of firewalls
+// FirewallList is JSON structure of a list of firewalls.
 type FirewallList struct {
-	// Array of firewalls
+	// Array of firewalls.
 	List map[string]FirewallProperties `json:"firewalls"`
 }
 
-// Firewall is JSON structure of a single firewall
+// Firewall is JSON structure of a single firewall.
 type Firewall struct {
-	// Properties of a firewall
+	// Properties of a firewall.
 	Properties FirewallProperties `json:"firewall"`
 }
 
-// FirewallProperties is JSON struct of a firewall's properties
+// FirewallProperties is JSON struct of a firewall's properties.
 type FirewallProperties struct {
-	// Status indicates the status of the object
+	// Status indicates the status of the object.
 	Status string `json:"status"`
 
-	// List of labels
+	// List of labels.
 	Labels []string `json:"labels"`
 
-	// The UUID of an object is always unique, and refers to a specific object
+	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	// Defines the date and time of the last object change
+	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
 
-	// FirewallRules
+	// FirewallRules.
 	Rules FirewallRules `json:"rules"`
 
-	// Defines the date and time the object was initially created
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	// If this is a private or public Firewall-Template
+	// If this is a private or public Firewall-Template.
 	Private bool `json:"private"`
 
 	// The information about other object which are related to this Firewall. The object could be Network.
 	Relations FirewallRelation `json:"relations"`
 
-	// Description of the ISO image release
+	// Description of the ISO image release.
 	Description string `json:"description"`
 
 	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
@@ -65,7 +65,7 @@ type FirewallProperties struct {
 	Name string `json:"name"`
 }
 
-// FirewallRules is JSON struct of a list of firewall's rules
+// FirewallRules is JSON struct of a list of firewall's rules.
 type FirewallRules struct {
 	// Firewall template rules for inbound traffic - covers IPv6 addresses.
 	RulesV6In []FirewallRuleProperties `json:"rules-v6-in,omitempty"`
@@ -80,9 +80,9 @@ type FirewallRules struct {
 	RulesV4Out []FirewallRuleProperties `json:"rules-v4-out,omitempty"`
 }
 
-// FirewallRuleProperties is JSON struct of a firewall's rule properties
+// FirewallRuleProperties is JSON struct of a firewall's rule properties.
 type FirewallRuleProperties struct {
-	// Enum:"udp" "tcp". Allowed values: `TCPTransport`, `UDPTransport`
+	// Enum:"udp" "tcp". Allowed values: `TCPTransport`, `UDPTransport`.
 	Protocol TransportLayerProtocol `json:"protocol"`
 
 	// A Number between 1 and 65535, port ranges are separated by a colon for FTP.
@@ -97,7 +97,7 @@ type FirewallRuleProperties struct {
 	// Enum:"accept" "drop". This defines what the firewall will do. Either accept or drop.
 	Action string `json:"action"`
 
-	// Description
+	// Description.
 	Comment string `json:"comment,omitempty"`
 
 	// Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then all IPs have access to this service.
@@ -113,11 +113,11 @@ type FirewallRuleProperties struct {
 
 // FirewallRelation is a JSON struct of a list of firewall's relations
 type FirewallRelation struct {
-	// Array of object (NetworkinFirewall)
+	// Array of object (NetworkinFirewall).
 	Networks []NetworkInFirewall `json:"networks"`
 }
 
-// NetworkInFirewall is a JSON struct of a firewall's relation
+// NetworkInFirewall is a JSON struct of a firewall's relation.
 type NetworkInFirewall struct {
 	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
@@ -135,36 +135,36 @@ type NetworkInFirewall struct {
 	ObjectName string `json:"object_name"`
 }
 
-// FirewallCreateRequest is JSON struct of a request for creating a firewall
+// FirewallCreateRequest is JSON struct of a request for creating a firewall.
 type FirewallCreateRequest struct {
-	// Name of firewall being created
+	// Name of firewall being created.
 	Name string `json:"name"`
 
-	// Labels. Can be nil
+	// Labels. Can be nil.
 	Labels []string `json:"labels,omitempty"`
 
-	// FirewallRules
+	// FirewallRules.
 	Rules FirewallRules `json:"rules"`
 }
 
-// FirewallCreateResponse is JSON struct of a response for creating a firewall
+// FirewallCreateResponse is JSON struct of a response for creating a firewall.
 type FirewallCreateResponse struct {
-	// Request UUID
+	// Request UUID.
 	RequestUUID string `json:"request_uuid"`
 
-	// The UUID of the firewall being created
+	// The UUID of the firewall being created.
 	ObjectUUID string `json:"object_uuid"`
 }
 
-// FirewallUpdateRequest is JSON struct of a request for updating a firewall
+// FirewallUpdateRequest is JSON struct of a request for updating a firewall.
 type FirewallUpdateRequest struct {
-	// New name. Leave it if you do not want to update the name
+	// New name. Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
 
-	// New list of labels. Leave it if you do not want to update the Labels
+	// New list of labels. Leave it if you do not want to update the Labels.
 	Labels *[]string `json:"labels,omitempty"`
 
-	// FirewallRules. Leave it if you do not want to update the firewall rules
+	// FirewallRules. Leave it if you do not want to update the firewall rules.
 	Rules *FirewallRules `json:"rules,omitempty"`
 }
 
@@ -177,7 +177,7 @@ var (
 	UDPTransport TransportLayerProtocol = "udp"
 )
 
-// GetFirewallList gets a list of available firewalls
+// GetFirewallList gets a list of available firewalls.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewalls
 func (c *Client) GetFirewallList(ctx context.Context) ([]Firewall, error) {
@@ -195,7 +195,7 @@ func (c *Client) GetFirewallList(ctx context.Context) ([]Firewall, error) {
 	return firewalls, err
 }
 
-// GetFirewall gets a specific firewall based on given id
+// GetFirewall gets a specific firewall based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewall
 func (c *Client) GetFirewall(ctx context.Context, id string) (Firewall, error) {
@@ -212,7 +212,7 @@ func (c *Client) GetFirewall(ctx context.Context, id string) (Firewall, error) {
 	return response, err
 }
 
-// CreateFirewall creates a new firewall
+// CreateFirewall creates a new firewall.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/createFirewall
 func (c *Client) CreateFirewall(ctx context.Context, body FirewallCreateRequest) (FirewallCreateResponse, error) {
@@ -226,7 +226,7 @@ func (c *Client) CreateFirewall(ctx context.Context, body FirewallCreateRequest)
 	return response, err
 }
 
-// UpdateFirewall update a specific firewall
+// UpdateFirewall update a specific firewall.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateFirewall
 func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpdateRequest) error {
@@ -241,7 +241,7 @@ func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpd
 	return r.execute(ctx, *c, nil)
 }
 
-// DeleteFirewall delete a specific firewall
+// DeleteFirewall delete a specific firewall.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteFirewall
 func (c *Client) DeleteFirewall(ctx context.Context, id string) error {
@@ -255,7 +255,7 @@ func (c *Client) DeleteFirewall(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-// GetFirewallEventList get list of a firewall's events
+// GetFirewallEventList get list of a firewall's events.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewallEvents
 func (c *Client) GetFirewallEventList(ctx context.Context, id string) ([]Event, error) {
