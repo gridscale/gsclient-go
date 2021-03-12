@@ -6,7 +6,7 @@ This release focuses on performance and documentation fixes.
 
 FEATURES:
 
-* Storage variant now can be set ("distributed", or "local") via method `CreateStorage`.
+* Storage variant now can be set ("distributed", or "local") via method `CreateStorage`.(See [PR #188](https://github.com/gridscale/gsclient-go/pull/188) for details.)
 
 IMPROVEMENTS:
 
