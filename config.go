@@ -20,7 +20,7 @@ const (
 	bodyType                      = "application/json"
 )
 
-// Config config for client.
+// Config holds config for client.
 type Config struct {
 	apiURL             string
 	userUUID           string
