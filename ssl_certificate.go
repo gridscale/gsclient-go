@@ -7,6 +7,14 @@ import (
 	"path"
 )
 
+// SSLCertificateOperator provides an interface for operations on SSL certificates.
+type SSLCertificateOperator interface {
+	GetSSLCertificateList(ctx context.Context) ([]SSLCertificate, error)
+	GetSSLCertificate(ctx context.Context, id string) (SSLCertificate, error)
+	CreateSSLCertificate(ctx context.Context, body SSLCertificateCreateRequest) (CreateResponse, error)
+	DeleteSSLCertificate(ctx context.Context, id string) error
+}
+
 // SSLCertificateList holds a list of SSL certificates.
 type SSLCertificateList struct {
 	// Array of SSL certificates.
