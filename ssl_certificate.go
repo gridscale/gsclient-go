@@ -82,7 +82,7 @@ type SSLCertificateCreateRequest struct {
 	LeafCertificate string `json:"leaf_certificate"`
 
 	// The PEM-formatted full-chain between the certificate authority and the domain's SSL certificate.
-	CertificateChain string `json:"certificate_chain"`
+	CertificateChain string `json:"certificate_chain,omitempty"`
 }
 
 // GetSSLCertificateList gets the list of available SSL certificates in the project.
