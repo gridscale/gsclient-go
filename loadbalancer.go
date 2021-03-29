@@ -104,6 +104,9 @@ type ForwardingRule struct {
 	// A valid domain name that points to the loadbalancer's IP address.
 	LetsencryptSSL *string `json:"letsencrypt_ssl"`
 
+	// The UUID of a custom certificate.
+	CertificateUUID string `json:"certificate_uuid,omitempty"`
+
 	// Listen port.
 	ListenPort int `json:"listen_port"`
 
