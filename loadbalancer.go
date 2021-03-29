@@ -101,8 +101,8 @@ type BackendServer struct {
 // ForwardingRule represents a forwarding rule.
 // It tells which port are forwarded to which port.
 type ForwardingRule struct {
-	// SSL from LetsEncrypt.
-	LetsencryptSSL interface{} `json:"letsencrypt_ssl"`
+	// A valid domain name that points to the loadbalancer's IP address.
+	LetsencryptSSL *string `json:"letsencrypt_ssl"`
 
 	// Listen port.
 	ListenPort int `json:"listen_port"`
