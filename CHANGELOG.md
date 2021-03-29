@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.5.1 (UNRELEASED)
+
+IMPROVEMENTS:
+
+* Add `AutoscalingProperties` field to `AutoscalingProperties` ([#192](https://github.com/gridscale/gsclient-go/issues/192)).
+
 ## 3.5.0 (March 12, 2021)
 
 This release focuses on performance and documentation fixes.
