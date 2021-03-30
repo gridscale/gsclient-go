@@ -32,6 +32,7 @@ func main() {
 			Name:            "go-client-ssl-cert",
 			PrivateKey:      examplePrivateKey,
 			LeafCertificate: exampleLeafCert,
+			Labels:          []string{"test"},
 		})
 	if err != nil {
 		log.Error("Create SSL certificate has failed with error", err)

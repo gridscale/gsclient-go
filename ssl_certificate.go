@@ -83,6 +83,9 @@ type SSLCertificateCreateRequest struct {
 
 	// The PEM-formatted full-chain between the certificate authority and the domain's SSL certificate.
 	CertificateChain string `json:"certificate_chain,omitempty"`
+
+	// List of labels.
+	Labels []string `json:"labels,omitempty"`
 }
 
 // GetSSLCertificateList gets the list of available SSL certificates in the project.
