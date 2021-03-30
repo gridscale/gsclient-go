@@ -195,7 +195,7 @@ func getMockLoadbalancer(status string) LoadBalancer {
 			RedirectHTTPToHTTPS: false,
 			ForwardingRules: []ForwardingRule{
 				{
-					LetsencryptSSL: "",
+					LetsencryptSSL: nil,
 					ListenPort:     8080,
 					Mode:           "http",
 					TargetPort:     8000,
