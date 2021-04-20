@@ -1,14 +1,18 @@
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/google/uuid v1.2.0
+## explicit
 github.com/google/uuid
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
 # github.com/sirupsen/logrus v1.7.0
+## explicit
 github.com/sirupsen/logrus
 # github.com/stretchr/testify v1.7.0
+## explicit
 github.com/stretchr/testify/assert
 # golang.org/x/net v0.0.0-20210119194325-5f4716e94777
+## explicit
 golang.org/x/net/context
 # golang.org/x/sys v0.0.0-20201119102817-f84b799fce68
 golang.org/x/sys/internal/unsafeheader
