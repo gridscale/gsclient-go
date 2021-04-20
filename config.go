@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"crypto/tls"
 	"net/http"
 	"os"
 	"runtime"
@@ -60,12 +61,16 @@ func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync 
 	}
 
 	cfg := &Config{
-		apiURL:             apiURL,
-		userUUID:           uuid,
-		apiToken:           token,
-		userAgent:          "gsclient-go/" + version + " (" + runtime.GOOS + ")",
-		sync:               sync,
-		httpClient:         http.DefaultClient,
+		apiURL:    apiURL,
+		userUUID:  uuid,
+		apiToken:  token,
+		userAgent: "gsclient-go/" + version + " (" + runtime.GOOS + ")",
+		sync:      sync,
+		httpClient: &http.Client{
+			Transport: &http.Transport{
+				TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
+			},
+		},
 		delayInterval:      time.Duration(delayIntervalMilliSecs) * time.Millisecond,
 		maxNumberOfRetries: maxNumberOfRetries,
 	}
@@ -75,12 +80,16 @@ func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync 
 // DefaultConfiguration creates a default configuration.
 func DefaultConfiguration(uuid string, token string) *Config {
 	cfg := &Config{
-		apiURL:             defaultAPIURL,
-		userUUID:           uuid,
-		apiToken:           token,
-		userAgent:          "gsclient-go/" + version + " (" + runtime.GOOS + ")",
-		sync:               true,
-		httpClient:         http.DefaultClient,
+		apiURL:    defaultAPIURL,
+		userUUID:  uuid,
+		apiToken:  token,
+		userAgent: "gsclient-go/" + version + " (" + runtime.GOOS + ")",
+		sync:      true,
+		httpClient: &http.Client{
+			Transport: &http.Transport{
+				TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
+			},
+		},
 		delayInterval:      time.Duration(defaultDelayIntervalMilliSecs) * time.Millisecond,
 		maxNumberOfRetries: defaultMaxNumberOfRetries,
 	}
