@@ -105,13 +105,8 @@ func (r *gsRequest) execute(ctx context.Context, c Client, output interface{}) e
 		}()
 	}
 
-	// Prepare http request (including HTTP headers preparation, etc.).
-	httpReq, err := r.prepareHTTPRequest(ctx, c.cfg)
-	logger.Debugf("Request body: %v", httpReq.Body)
-	logger.Debugf("Request headers: %v", maskHeaderCred(httpReq.Header))
-
 	// Execute the request (including retrying when needed).
-	requestUUID, responseBodyBytes, err := r.retryHTTPRequest(ctx, c.HttpClient(), httpReq, c.MaxNumberOfRetries(), c.DelayInterval())
+	requestUUID, responseBodyBytes, err := r.retryHTTPRequest(ctx, c.cfg)
 	if err != nil {
 		return err
 	}
@@ -178,21 +173,19 @@ func (r *gsRequest) prepareHTTPRequest(ctx context.Context, cfg *Config) (*http.
 
 // retryHTTPRequest runs & retries a HTTP request.
 // Returns UUID (string), response body ([]byte), error
-func (r *gsRequest) retryHTTPRequest(
-	ctx context.Context,
-	httpClient *http.Client,
-	httpReq *http.Request,
-	maxNoOfRetries int,
-	delayInterval time.Duration,
-) (string, []byte, error) {
+func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, []byte, error) {
 	// Init request UUID variable.
 	var requestUUID string
 	// Init empty response body.
 	var responseBodyBytes []byte
 	//
 	err := retryNTimes(func() (bool, error) {
+		// Prepare http request (including HTTP headers preparation, etc.).
+		httpReq, err := r.prepareHTTPRequest(ctx, cfg)
+		logger.Debugf("Request body: %v", httpReq.Body)
+		logger.Debugf("Request headers: %v", maskHeaderCred(httpReq.Header))
 		// execute the request.
-		resp, err := httpClient.Do(httpReq)
+		resp, err := cfg.httpClient.Do(httpReq)
 		if err != nil {
 			// If the error is caused by expired context, return context error and no need to retry.
 			if ctx.Err() != nil {
@@ -266,7 +259,7 @@ func (r *gsRequest) retryHTTPRequest(
 		logger.Debugf("Response body: %v", string(responseBodyBytes))
 		// stop retrying (false) as no more errors.
 		return false, nil
-	}, maxNoOfRetries, delayInterval)
+	}, cfg.maxNumberOfRetries, cfg.delayInterval)
 	// No need to return when the context is already expired.
 	select {
 	case <-ctx.Done():
