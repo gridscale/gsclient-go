@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.6.3 (UNRELEASED)
+
+BUG FIXES:
+- Fix an error when requests are read to the end during re-try ([#201](https://github.com/gridscale/gsclient-go/issues/201)).
+
 ## 3.6.2 (April 20, 2021)
 
 BUG FIXES:
