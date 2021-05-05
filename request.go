@@ -266,7 +266,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, 
 				// Recursive retryHTTPRequest.
 				requestUUID, responseBodyBytes, err = r.retryHTTPRequest(ctx, cfg)
 				// Because of the recursive retryHTTPRequest, no need to retry here.
-				return false, errorMessage
+				return false, err
 			}
 			// If the error is not retryable.
 			logger.Errorf(
