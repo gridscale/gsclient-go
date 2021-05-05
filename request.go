@@ -74,6 +74,7 @@ func (r RequestError) Error() string {
 const (
 	requestUUIDHeaderParam           = "X-Request-Id"
 	requestRateLimitResetHeaderParam = "ratelimit-reset"
+	requestRetryAfteHeaderParam      = "Retry-After"
 )
 
 // This function takes the client and a struct and then adds the result to the given struct if possible.
@@ -174,6 +175,11 @@ func (r *gsRequest) prepareHTTPRequest(ctx context.Context, cfg *Config) (*http.
 // retryHTTPRequest runs & retries a HTTP request.
 // Returns UUID (string), response body ([]byte), error
 func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, []byte, error) {
+	select {
+	case <-ctx.Done():
+		return "", nil, ctx.Err()
+	default:
+	}
 	// Init request UUID variable.
 	var requestUUID string
 	// Init empty response body.
@@ -225,25 +231,43 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, 
 			errorMessage.RequestUUID = requestUUID
 			json.Unmarshal(responseBodyBytes, &errorMessage)
 
-			// If the error is retryable.
-			if isErrorHTTPCodeRetryable(statusCode) {
-				// If status code is 429, that means we reach the rate limit.
-				if statusCode == 429 {
-					// Get the time that the rate limit will be reset.
-					rateLimitResetTimestamp := resp.Header.Get(requestRateLimitResetHeaderParam)
-					// Get the delay time.
-					delayMs, err := getDelayTimeInMsFromTimestampStr(rateLimitResetTimestamp)
-					if err != nil {
-						return false, err
-					}
-					// Delay the retry until the rate limit is reset.
-					logger.Debugf("Delay request for %d ms: %v method sent to url %v with body %v", delayMs, r.method, httpReq.URL.RequestURI(), r.body)
-					time.Sleep(time.Duration(delayMs) * time.Millisecond)
+			switch statusCode {
+			case http.StatusServiceUnavailable:
+				// Get the delay (in second) for the next retry
+				delayDurationStr := resp.Header.Get(requestRetryAfteHeaderParam)
+				delayDuration, err := strconv.Atoi(delayDurationStr)
+				if err != nil { // If there is no valid "Retry-After", do normal retry.
+					return true, errorMessage
+				}
+				select {
+				case <-ctx.Done(): // If context expires first, return context.Err()
+					return false, ctx.Err()
+				case <-time.After(time.Duration(delayDuration) * time.Second): // If the delay finishes first, continue.
 				}
 				logger.Debugf("Retrying request: %v method sent to url %v with body %v", r.method, httpReq.URL.RequestURI(), r.body)
 				return true, errorMessage
-			}
 
+			case http.StatusTooManyRequests: // If status code is 429, that means we reach the rate limit.
+				// Get the time that the rate limit will be reset.
+				rateLimitResetTimestamp := resp.Header.Get(requestRateLimitResetHeaderParam)
+				// Get the delay time.
+				delayMs, err := getDelayTimeInMsFromTimestampStr(rateLimitResetTimestamp)
+				if err != nil {
+					return false, err
+				}
+				// Delay the retry until the rate limit is reset.
+				logger.Debugf("Delay request for %d ms: %v method sent to url %v with body %v", delayMs, r.method, httpReq.URL.RequestURI(), r.body)
+				select {
+				case <-ctx.Done(): // If context expires first, return context.Err()
+					return false, ctx.Err()
+				case <-time.After(time.Duration(delayMs) * time.Millisecond): // If the delay finishes first, continue.
+				}
+				logger.Debugf("Retrying request - recursive retryHTTPRequest (due to rate limit): %v method sent to url %v with body %v", r.method, httpReq.URL.RequestURI(), r.body)
+				// Recursive retryHTTPRequest.
+				requestUUID, responseBodyBytes, err = r.retryHTTPRequest(ctx, cfg)
+				// Because of the recursive retryHTTPRequest, no need to retry here.
+				return false, errorMessage
+			}
 			// If the error is not retryable.
 			logger.Errorf(
 				"Error message: %v. Title: %v. Code: %v. Request UUID: %v.",
@@ -254,30 +278,12 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, 
 			)
 			// stop retrying (false) and return custom error.
 			return false, errorMessage
-
 		}
 		logger.Debugf("Response body: %v", string(responseBodyBytes))
 		// stop retrying (false) as no more errors.
 		return false, nil
 	}, cfg.maxNumberOfRetries, cfg.delayInterval)
-	// No need to return when the context is already expired.
-	select {
-	case <-ctx.Done():
-		return "", nil, ctx.Err()
-	default:
-	}
 	return requestUUID, responseBodyBytes, err
-}
-
-func isErrorHTTPCodeRetryable(statusCode int) bool {
-	// if internal server error (>=500)
-	// OR object is in status that does not allow the request (424)
-	// OR we reach the rate limit (429), retry.
-	if statusCode >= 500 || statusCode == 424 || statusCode == 429 || statusCode == 409 {
-		return true
-	}
-	// stop retrying (false) and return custom error.
-	return false
 }
 
 // getDelayTimeInMsFromTimestampStr takes a unix timestamp (ms) string
