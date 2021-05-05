@@ -72,20 +72,8 @@ var postNetworkErrorTests = []networkTestCase{
 var apiErrorTests = []apiTestCase{
 	{
 		name:          "retry the request in case of API error with status code 500",
-		statusCode:    500,
+		statusCode:    503,
 		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e53",
-		expectedError: "Status code: %d. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
-	},
-	{
-		name:          "retry the request in case of API error with status code 424",
-		statusCode:    424,
-		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e54",
-		expectedError: "Status code: %d. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
-	},
-	{
-		name:          "retry the request in case of API error with status code 409",
-		statusCode:    409,
-		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e55",
 		expectedError: "Status code: %d. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
 	},
 }

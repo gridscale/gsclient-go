@@ -291,8 +291,8 @@ func TestClient_ShutdownServer(t *testing.T) {
 					writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
 					if retries < 5 {
 						retries++
-						writer.WriteHeader(http.StatusInternalServerError)
-						writer.Write([]byte("☄ HTTP status code returned!"))
+						writer.WriteHeader(http.StatusServiceUnavailable)
+						writer.Write([]byte("☄ HTTP status code 503 returned!"))
 						return
 					}
 					power = false
@@ -319,8 +319,8 @@ func TestClient_ShutdownServer(t *testing.T) {
 				mux.HandleFunc(uri+"/shutdown", func(writer http.ResponseWriter, request *http.Request) {
 					assert.Equal(t, http.MethodPatch, request.Method)
 					writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
-					writer.WriteHeader(http.StatusInternalServerError)
-					writer.Write([]byte("☄ HTTP status code returned!"))
+					writer.WriteHeader(http.StatusServiceUnavailable)
+					writer.Write([]byte("☄ HTTP status code 503 returned!"))
 				})
 				mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
 					assert.Equal(t, http.MethodPatch, request.Method)
@@ -330,7 +330,7 @@ func TestClient_ShutdownServer(t *testing.T) {
 				})
 				err := client.ShutdownServer(emptyCtx, dummyUUID)
 				assert.Contains(t, fmt.Sprintf("%v", err),
-					fmt.Sprintf("Status code: 500. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
+					fmt.Sprintf("Status code: 503. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
 						dummyRequestUUID), "ShutdownServer returned an error with status code 500")
 				server.Close()
 			}
