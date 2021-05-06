@@ -71,7 +71,7 @@ var postNetworkErrorTests = []networkTestCase{
 
 var apiErrorTests = []apiTestCase{
 	{
-		name:          "retry the request in case of API error with status code 500",
+		name:          "retry the request in case of API error with status code 503",
 		statusCode:    503,
 		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e53",
 		expectedError: "Status code: %d. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
