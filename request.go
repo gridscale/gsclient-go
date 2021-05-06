@@ -73,7 +73,7 @@ func (r RequestError) Error() string {
 
 const (
 	requestUUIDHeader           = "X-Request-Id"
-	requestRateLimitResetHeader = "ratelimit-reset"
+	requestRateLimitResetHeader = "Ratelimit-Reset"
 	retryAfterHeader            = "Retry-After"
 )
 
