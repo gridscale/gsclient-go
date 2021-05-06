@@ -19,7 +19,7 @@ func TestClient_CreateLoadBalancer(t *testing.T) {
 	uri := path.Join(apiLoadBalancerBase)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodPost)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -57,7 +57,7 @@ func TestClient_GetLoadBalancer(t *testing.T) {
 	expectedObject := getMockLoadbalancer("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareLoadBalancerHTTPGetResponse("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -79,7 +79,7 @@ func TestClient_GetLoadBalancerList(t *testing.T) {
 	expectedObjects := getMockLoadbalancer("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareLoadBalancerHTTPListResponse("active"))
 	})
 	loadbalancers, err := client.GetLoadBalancerList(emptyCtx)
@@ -94,7 +94,7 @@ func TestClient_UpdateLoadBalancer(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiLoadBalancerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -133,7 +133,7 @@ func TestClient_DeleteLoadBalancer(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiLoadBalancerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -165,7 +165,7 @@ func TestClient_GetLoadBalancerEventList(t *testing.T) {
 	expectedObjects := getMockEvent()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {

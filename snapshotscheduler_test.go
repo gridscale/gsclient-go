@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
@@ -15,7 +16,7 @@ func TestClient_GetStorageSnapshotScheduleList(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -36,7 +37,7 @@ func TestClient_GetStorageSnapshotSchedule(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareStorageSnapshotScheduleHTTPGet("active"))
 	})
 	for _, testStorageID := range uuidCommonTestCases {
@@ -59,7 +60,7 @@ func TestClient_CreateStorageSnapshotSchedule(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -95,7 +96,7 @@ func TestClient_UpdateStorageSnapshotSchedule(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -137,7 +138,7 @@ func TestClient_DeleteStorageSnapshotSchedule(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshot_schedules", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {

@@ -16,7 +16,7 @@ func TestClient_GetLocationList(t *testing.T) {
 	uri := apiLocationBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareLocationListHTTPGet())
 	})
 	res, err := client.GetLocationList(emptyCtx)
@@ -31,7 +31,7 @@ func TestClient_GetLocation(t *testing.T) {
 	uri := path.Join(apiLocationBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareLocationHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {

@@ -122,7 +122,7 @@ func TestRequestGet_APIErrors(t *testing.T) {
 	for _, test := range apiErrorTests {
 		uri := path.Join(apiServerBase, test.dummyUUID)
 		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			w.WriteHeader(test.statusCode)
 		})
 		_, err := client.GetServer(emptyCtx, test.dummyUUID)
@@ -136,7 +136,7 @@ func TestRequestPatch_APIErrors(t *testing.T) {
 	for _, test := range apiErrorTests {
 		uri := path.Join(apiServerBase, test.dummyUUID)
 		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			w.WriteHeader(test.statusCode)
 		})
 		err := client.UpdateServer(
@@ -158,7 +158,7 @@ func TestRequestDelete_APIErrors(t *testing.T) {
 	for _, test := range apiErrorTests {
 		uri := path.Join(apiServerBase, test.dummyUUID)
 		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			w.WriteHeader(test.statusCode)
 		})
 		err := client.DeleteServer(emptyCtx, test.dummyUUID)

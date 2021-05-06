@@ -72,9 +72,9 @@ func (r RequestError) Error() string {
 }
 
 const (
-	requestUUIDHeaderParam           = "X-Request-Id"
-	requestRateLimitResetHeaderParam = "ratelimit-reset"
-	requestRetryAfteHeaderParam      = "Retry-After"
+	requestUUIDHeader           = "X-Request-Id"
+	requestRateLimitResetHeader = "ratelimit-reset"
+	retryAfterHeader            = "Retry-After"
 )
 
 // This function takes the client and a struct and then adds the result to the given struct if possible.
@@ -214,7 +214,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, 
 		defer resp.Body.Close()
 
 		statusCode := resp.StatusCode
-		requestUUID = resp.Header.Get(requestUUIDHeaderParam)
+		requestUUID = resp.Header.Get(requestUUIDHeader)
 		responseBodyBytes, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			logger.Errorf("Error while reading the response's body: %v", err)
@@ -234,7 +234,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, 
 			switch statusCode {
 			case http.StatusServiceUnavailable:
 				// Get the delay (in second) for the next retry
-				delayDurationStr := resp.Header.Get(requestRetryAfteHeaderParam)
+				delayDurationStr := resp.Header.Get(retryAfterHeader)
 				delayDuration, err := strconv.Atoi(delayDurationStr)
 				if err != nil { // If there is no valid "Retry-After", do normal retry.
 					return true, errorMessage
@@ -249,7 +249,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, 
 
 			case http.StatusTooManyRequests: // If status code is 429, that means we reach the rate limit.
 				// Get the time that the rate limit will be reset.
-				rateLimitResetTimestamp := resp.Header.Get(requestRateLimitResetHeaderParam)
+				rateLimitResetTimestamp := resp.Header.Get(requestRateLimitResetHeader)
 				// Get the delay time.
 				delayMs, err := getDelayTimeInMsFromTimestampStr(rateLimitResetTimestamp)
 				if err != nil {

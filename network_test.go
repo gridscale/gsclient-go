@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetNetworkList(t *testing.T) {
@@ -15,7 +16,7 @@ func TestClient_GetNetworkList(t *testing.T) {
 	uri := apiNetworkBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet(true, "active"))
 	})
 	res, err := client.GetNetworkList(emptyCtx)
@@ -30,7 +31,7 @@ func TestClient_GetNetwork(t *testing.T) {
 	uri := path.Join(apiNetworkBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareNetworkHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -51,7 +52,7 @@ func TestClient_CreateNetwork(t *testing.T) {
 	uri := apiNetworkBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -83,7 +84,7 @@ func TestClient_UpdateNetwork(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiNetworkBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -119,7 +120,7 @@ func TestClient_DeleteNetwork(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiNetworkBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -149,7 +150,7 @@ func TestClient_GetNetworkEventList(t *testing.T) {
 	uri := path.Join(apiNetworkBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -173,7 +174,7 @@ func TestClient_GetNetworkPublic(t *testing.T) {
 	uri := apiNetworkBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -201,7 +202,7 @@ func TestClient_GetNetworksByLocation(t *testing.T) {
 	uri := path.Join(apiLocationBase, dummyUUID, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareNetworkListHTTPGet(true, "active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -222,7 +223,7 @@ func TestClient_GetDeletedNetworks(t *testing.T) {
 	uri := path.Join(apiDeletedBase, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareDeletedNetworkListHTTPGet("active"))
 	})
 	res, err := client.GetDeletedNetworks(emptyCtx)

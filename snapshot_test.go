@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetStorageSnapshotList(t *testing.T) {
@@ -15,7 +16,7 @@ func TestClient_GetStorageSnapshotList(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshots")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareStorageSnapshotListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -36,7 +37,7 @@ func TestClient_GetStorageSnapshot(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareStorageSnapshotHTTPGet("active"))
 	})
 	for _, testStorageID := range uuidCommonTestCases {
@@ -59,7 +60,7 @@ func TestClient_CreateStorageSnapshot(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshots")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -93,7 +94,7 @@ func TestClient_UpdateStorageSnapshot(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -132,7 +133,7 @@ func TestClient_DeleteStorageSnapshot(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -164,7 +165,7 @@ func TestClient_RollbackStorage(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID, "rollback")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -192,7 +193,7 @@ func TestClient_ExportStorageSnapshotToS3(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID, "snapshots", dummyUUID, "export_to_s3")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -236,7 +237,7 @@ func TestClient_GetSnapshotsByLocation(t *testing.T) {
 	uri := path.Join(apiLocationBase, dummyUUID, "snapshots")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareStorageSnapshotListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -257,7 +258,7 @@ func TestClient_GetDeletedSnapshots(t *testing.T) {
 	uri := path.Join(apiDeletedBase, "snapshots")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareDeletedStorageSnapshotListHTTPGet())
 	})
 

@@ -16,7 +16,7 @@ func TestClient_GetStorageList(t *testing.T) {
 	uri := apiStorageBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareStorageListHTTPGet())
 	})
 	response, err := client.GetStorageList(emptyCtx)
@@ -31,7 +31,7 @@ func TestClient_GetStorage(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareStorageHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -52,7 +52,7 @@ func TestClient_CreateStorage(t *testing.T) {
 	uri := apiStorageBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -91,7 +91,7 @@ func TestClient_CreateStorageFromBackup(t *testing.T) {
 	uri := path.Join(apiStorageBase, "import")
 	muxServer.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -120,7 +120,7 @@ func TestClient_UpdateStorage(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -157,7 +157,7 @@ func TestClient_DeleteStorage(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -187,7 +187,7 @@ func TestClient_GetStorageEventList(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -208,7 +208,7 @@ func TestClient_GetStoragesByLocation(t *testing.T) {
 	uri := path.Join(apiLocationBase, dummyUUID, "storages")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareStorageListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -229,7 +229,7 @@ func TestClient_GetDeletedStorages(t *testing.T) {
 	uri := path.Join(apiDeletedBase, "storages")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareDeletedStorageListHTTPGet())
 	})
 	response, err := client.GetDeletedStorages(emptyCtx)
@@ -245,7 +245,7 @@ func TestClient_CloneStorage(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "clone")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
