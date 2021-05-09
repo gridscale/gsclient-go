@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetISOImageList(t *testing.T) {
@@ -15,7 +16,7 @@ func TestClient_GetISOImageList(t *testing.T) {
 	uri := path.Join(apiISOBase)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareISOImageHTTPGetList("active"))
 	})
 	res, err := client.GetISOImageList(emptyCtx)
@@ -30,7 +31,7 @@ func TestClient_GetISOImage(t *testing.T) {
 	uri := path.Join(apiISOBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareISOImageHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -51,7 +52,7 @@ func TestClient_CreateISOImage(t *testing.T) {
 	var isFailed bool
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -82,7 +83,7 @@ func TestClient_UpdateISOImage(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiISOBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -118,7 +119,7 @@ func TestClient_DeleteISOImage(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiISOBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -148,7 +149,7 @@ func TestClient_GetISOImageEventList(t *testing.T) {
 	uri := path.Join(apiISOBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -169,7 +170,7 @@ func TestClient_GetISOImagesByLocation(t *testing.T) {
 	uri := path.Join(apiLocationBase, dummyUUID, "isoimages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareISOImageHTTPGetList("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -190,7 +191,7 @@ func TestClient_GetDeletedISOImages(t *testing.T) {
 	uri := path.Join(apiDeletedBase, "isoimages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareDeletedISOImageHTTPGetList("deleted"))
 	})
 	res, err := client.GetDeletedISOImages(emptyCtx)

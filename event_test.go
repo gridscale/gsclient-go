@@ -3,9 +3,10 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetEventList(t *testing.T) {
@@ -14,7 +15,7 @@ func TestClient_GetEventList(t *testing.T) {
 	uri := apiEventBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	response, err := client.GetEventList(emptyCtx)

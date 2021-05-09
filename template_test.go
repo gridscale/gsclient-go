@@ -16,7 +16,7 @@ func TestClient_GetTemplateList(t *testing.T) {
 	uri := apiTemplateBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	response, err := client.GetTemplateList(emptyCtx)
@@ -31,7 +31,7 @@ func TestClient_GetTemplate(t *testing.T) {
 	uri := path.Join(apiTemplateBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareTemplateHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -62,7 +62,7 @@ func TestClient_GetTemplateByName(t *testing.T) {
 	uri := apiTemplateBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	for _, test := range testCases {
@@ -83,7 +83,7 @@ func TestClient_CreateTemplate(t *testing.T) {
 	uri := apiTemplateBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -114,7 +114,7 @@ func TestClient_UpdateTemplate(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiTemplateBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -150,7 +150,7 @@ func TestClient_DeleteTemplate(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiTemplateBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -180,7 +180,7 @@ func TestClient_GetTemplateEventList(t *testing.T) {
 	uri := path.Join(apiTemplateBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -201,7 +201,7 @@ func TestClient_GetTemplatesByLocation(t *testing.T) {
 	uri := path.Join(apiLocationBase, dummyUUID, "templates")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareTemplateListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -222,7 +222,7 @@ func TestClient_GetDeletedTemplates(t *testing.T) {
 	uri := path.Join(apiDeletedBase, "templates")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareDeletedTemplateListHTTPGet())
 	})
 	response, err := client.GetDeletedTemplates(emptyCtx)

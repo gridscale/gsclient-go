@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetServerNetworkList(t *testing.T) {
@@ -15,7 +16,7 @@ func TestClient_GetServerNetworkList(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareServerNetworkListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -36,7 +37,7 @@ func TestClient_GetServerNetwork(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareServerNetworkHTTPGet())
 	})
 	for _, testServerID := range uuidCommonTestCases {
@@ -59,7 +60,7 @@ func TestClient_CreateServerNetwork(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -96,7 +97,7 @@ func TestClient_UpdateServerNetwork(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, "")
 	})
 	for _, testServerID := range uuidCommonTestCases {
@@ -125,7 +126,7 @@ func TestClient_DeleteServerNetwork(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -157,7 +158,7 @@ func TestClient_LinkNetwork(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "networks")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 	})
 	err := client.LinkNetwork(emptyCtx, dummyUUID, dummyUUID, dummyUUID, false, 1, nil, nil)
 	assert.Nil(t, err, "LinkNetwork returned an error %v", err)
@@ -168,7 +169,7 @@ func TestClient_UnlinkNetwork(t *testing.T) {
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "networks", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if request.Method == http.MethodDelete {
 			fmt.Fprintf(writer, "")
 		} else if request.Method == http.MethodGet {

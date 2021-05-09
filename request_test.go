@@ -71,21 +71,9 @@ var postNetworkErrorTests = []networkTestCase{
 
 var apiErrorTests = []apiTestCase{
 	{
-		name:          "retry the request in case of API error with status code 500",
-		statusCode:    500,
+		name:          "retry the request in case of API error with status code 503",
+		statusCode:    503,
 		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e53",
-		expectedError: "Status code: %d. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
-	},
-	{
-		name:          "retry the request in case of API error with status code 424",
-		statusCode:    424,
-		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e54",
-		expectedError: "Status code: %d. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
-	},
-	{
-		name:          "retry the request in case of API error with status code 409",
-		statusCode:    409,
-		dummyUUID:     "690de890-13c0-4e76-8a01-e10ba8786e55",
 		expectedError: "Status code: %d. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
 	},
 }
@@ -134,7 +122,7 @@ func TestRequestGet_APIErrors(t *testing.T) {
 	for _, test := range apiErrorTests {
 		uri := path.Join(apiServerBase, test.dummyUUID)
 		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			w.WriteHeader(test.statusCode)
 		})
 		_, err := client.GetServer(emptyCtx, test.dummyUUID)
@@ -148,7 +136,7 @@ func TestRequestPatch_APIErrors(t *testing.T) {
 	for _, test := range apiErrorTests {
 		uri := path.Join(apiServerBase, test.dummyUUID)
 		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			w.WriteHeader(test.statusCode)
 		})
 		err := client.UpdateServer(
@@ -170,7 +158,7 @@ func TestRequestDelete_APIErrors(t *testing.T) {
 	for _, test := range apiErrorTests {
 		uri := path.Join(apiServerBase, test.dummyUUID)
 		mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			w.WriteHeader(test.statusCode)
 		})
 		err := client.DeleteServer(emptyCtx, test.dummyUUID)
@@ -190,39 +178,6 @@ func Test_prepareHTTPRequest(t *testing.T) {
 	assert.Equal(t, r.method, httpReq.Method)
 	assert.Equal(t, r.uri, httpReq.URL.RequestURI())
 	assert.Nil(t, err)
-}
-
-func Test_isErrorHTTPCodeRetryable(t *testing.T) {
-	type testCase struct {
-		code        int
-		isRetryable bool
-	}
-	testCases := []testCase{
-		{
-			500,
-			true,
-		},
-		{
-			424,
-			true,
-		},
-		{
-			429,
-			true,
-		},
-		{
-			409,
-			true,
-		},
-		{
-			404,
-			false,
-		},
-	}
-	for _, test := range testCases {
-		isRetryable := isErrorHTTPCodeRetryable(test.code)
-		assert.Equal(t, test.isRetryable, isRetryable)
-	}
 }
 
 func Test_getDelayTimeInMsFromTimestampStr(t *testing.T) {

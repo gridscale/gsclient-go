@@ -16,7 +16,7 @@ func TestClient_GetMarketplaceApplicationList(t *testing.T) {
 	uri := apiMarketplaceApplicationBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareMarketplaceApplicationListHTTPGet())
 	})
 	response, err := client.GetMarketplaceApplicationList(emptyCtx)
@@ -31,7 +31,7 @@ func TestClient_GetMarketplaceApplication(t *testing.T) {
 	uri := path.Join(apiMarketplaceApplicationBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareMarketplaceApplicationHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -52,7 +52,7 @@ func TestClient_CreateMarketplaceApplication(t *testing.T) {
 	uri := apiMarketplaceApplicationBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -90,7 +90,7 @@ func TestClient_ImportMarketplaceApplication(t *testing.T) {
 	uri := apiMarketplaceApplicationBase
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -119,7 +119,7 @@ func TestClient_UpdateMarketplaceApplication(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiMarketplaceApplicationBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -161,7 +161,7 @@ func TestClient_DeleteMarketplaceApplication(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiMarketplaceApplicationBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -191,7 +191,7 @@ func TestClient_GetMarketplaceApplicationEventList(t *testing.T) {
 	uri := path.Join(apiMarketplaceApplicationBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {

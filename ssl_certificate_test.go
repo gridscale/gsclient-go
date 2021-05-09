@@ -16,7 +16,7 @@ func TestClient_GetSSLCertificateList(t *testing.T) {
 	uri := apiSSLCertificateBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareSSLCertificateListHTTPGet())
 	})
 	res, err := client.GetSSLCertificateList(emptyCtx)
@@ -31,7 +31,7 @@ func TestClient_GetSSLCertificate(t *testing.T) {
 	uri := path.Join(apiSSLCertificateBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareSSLCertificateHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -52,7 +52,7 @@ func TestClient_SSLCertificate(t *testing.T) {
 	uri := apiSSLCertificateBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -83,7 +83,7 @@ func TestClient_DeleteSSLCertificate(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiSSLCertificateBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {

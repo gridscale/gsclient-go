@@ -26,7 +26,7 @@ func TestClient_GetLabelList(t *testing.T) {
 	uri := apiLabelBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareLabelListHTTPGet("test"))
 	})
 	res, err := client.GetLabelList(emptyCtx)

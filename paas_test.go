@@ -17,7 +17,7 @@ func TestClient_GetPaaSServiceList(t *testing.T) {
 	expectedObj := getMockPaaSService("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, preparePaaSHTTPGetListResponse("active"))
 	})
 	paasList, err := client.GetPaaSServiceList(emptyCtx)
@@ -33,7 +33,7 @@ func TestClient_GetPaaSService(t *testing.T) {
 	expectedObj := getMockPaaSService("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, preparePaaSHTTPGetResponse("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -55,7 +55,7 @@ func TestClient_CreatePaaSService(t *testing.T) {
 	expectedRespObj := getMockPaaSServiceCreateResponse()
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodPost)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -95,7 +95,7 @@ func TestClient_UpdatePaaSService(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiPaaSBase, "services", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -140,7 +140,7 @@ func TestClient_DeletePaaSService(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiPaaSBase, "services", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -170,7 +170,7 @@ func TestClient_GetPaaSServiceMetrics(t *testing.T) {
 	uri := path.Join(apiPaaSBase, "services", dummyUUID, "metrics")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, preparePaaSHTTPGetMetricsResponse())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -191,7 +191,7 @@ func TestClient_RenewK8sCredentials(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiPaaSBase, "services", dummyUUID, "renew_credentials")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -220,7 +220,7 @@ func TestClient_GetPaaSTemplateList(t *testing.T) {
 	uri := path.Join(apiPaaSBase, "service_templates")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, preparePaaSHTTPGetTemplatesResponse())
 	})
 	res, err := client.GetPaaSTemplateList(emptyCtx)
@@ -235,7 +235,7 @@ func TestClient_GetPaaSSecurityZoneList(t *testing.T) {
 	uri := path.Join(apiPaaSBase, "security_zones")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZoneList("active"))
 	})
 	res, err := client.GetPaaSSecurityZoneList(emptyCtx)
@@ -251,7 +251,7 @@ func TestClient_CreatePaaSSecurityZone(t *testing.T) {
 	uri := path.Join(apiPaaSBase, "security_zones")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodPost)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -280,7 +280,7 @@ func TestClient_GetPaaSSecurityZone(t *testing.T) {
 	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.Method, http.MethodGet)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, preparePaaSHTTPGetSecurityZone("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -300,7 +300,7 @@ func TestClient_UpdatePaaSSecurityZone(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -336,7 +336,7 @@ func TestClient_DeletePaaSSecurityZone(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiPaaSBase, "security_zones", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -367,7 +367,7 @@ func TestClient_GetDeletedPaaSServices(t *testing.T) {
 	expectedObj := getMockPaaSService("active")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, http.MethodGet)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareDeletedPaaSHTTPGetListResponse("active"))
 	})
 	paasList, err := client.GetDeletedPaaSServices(emptyCtx)

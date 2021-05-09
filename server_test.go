@@ -16,7 +16,7 @@ func TestClient_GetServerList(t *testing.T) {
 	uri := apiServerBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, prepareServerListHTTPGet("active"))
 	})
 	res, err := client.GetServerList(emptyCtx)
@@ -31,7 +31,7 @@ func TestClient_GetServer(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, prepareServerHTTPGet(true, "active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -52,7 +52,7 @@ func TestClient_CreateServer(t *testing.T) {
 	uri := apiServerBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -87,7 +87,7 @@ func TestClient_UpdateServer(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -126,7 +126,7 @@ func TestClient_DeleteServer(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -156,7 +156,7 @@ func TestClient_GetServerEventList(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -177,7 +177,7 @@ func TestClient_GetServerMetricList(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "metrics")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, prepareServerMetricListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -198,7 +198,7 @@ func TestClient_IsServerOn(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, prepareServerHTTPGet(true, "active"))
 	})
 	isOn, err := client.IsServerOn(emptyCtx, dummyUUID)
@@ -213,12 +213,12 @@ func TestClient_setServerPowerState(t *testing.T) {
 		power := true
 		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 			assert.Equal(t, http.MethodGet, request.Method)
-			writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			fmt.Fprint(writer, prepareServerHTTPGet(power, "active"))
 		})
 		mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
 			assert.Equal(t, http.MethodPatch, request.Method)
-			writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			power = false
 			fmt.Fprint(writer, "")
 		})
@@ -235,12 +235,12 @@ func TestClient_StartServer(t *testing.T) {
 		power := false
 		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 			assert.Equal(t, http.MethodGet, request.Method)
-			writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			fmt.Fprint(writer, prepareServerHTTPGet(power, "active"))
 		})
 		mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
 			assert.Equal(t, http.MethodPatch, request.Method)
-			writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			power = true
 			fmt.Fprint(writer, "")
 		})
@@ -257,12 +257,12 @@ func TestClient_StopServer(t *testing.T) {
 		power := true
 		mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 			assert.Equal(t, http.MethodGet, request.Method)
-			writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			fmt.Fprint(writer, prepareServerHTTPGet(power, "active"))
 		})
 		mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
 			assert.Equal(t, http.MethodPatch, request.Method)
-			writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+			writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 			power = false
 			fmt.Fprint(writer, "")
 		})
@@ -283,16 +283,16 @@ func TestClient_ShutdownServer(t *testing.T) {
 				retries := 0
 				mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 					assert.Equal(t, http.MethodGet, request.Method)
-					writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+					writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 					fmt.Fprint(writer, prepareServerHTTPGet(power, "active"))
 				})
 				mux.HandleFunc(uri+"/shutdown", func(writer http.ResponseWriter, request *http.Request) {
 					assert.Equal(t, http.MethodPatch, request.Method)
-					writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+					writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 					if retries < 5 {
 						retries++
-						writer.WriteHeader(http.StatusInternalServerError)
-						writer.Write([]byte("☄ HTTP status code returned!"))
+						writer.WriteHeader(http.StatusServiceUnavailable)
+						writer.Write([]byte("☄ HTTP status code 503 returned!"))
 						return
 					}
 					power = false
@@ -300,7 +300,7 @@ func TestClient_ShutdownServer(t *testing.T) {
 				})
 				mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
 					assert.Equal(t, http.MethodPatch, request.Method)
-					writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+					writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 					power = false
 					fmt.Fprint(writer, "")
 				})
@@ -313,24 +313,24 @@ func TestClient_ShutdownServer(t *testing.T) {
 				power := true
 				mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 					assert.Equal(t, http.MethodGet, request.Method)
-					writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+					writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 					fmt.Fprint(writer, prepareServerHTTPGet(power, "active"))
 				})
 				mux.HandleFunc(uri+"/shutdown", func(writer http.ResponseWriter, request *http.Request) {
 					assert.Equal(t, http.MethodPatch, request.Method)
-					writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
-					writer.WriteHeader(http.StatusInternalServerError)
-					writer.Write([]byte("☄ HTTP status code returned!"))
+					writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
+					writer.WriteHeader(http.StatusServiceUnavailable)
+					writer.Write([]byte("☄ HTTP status code 503 returned!"))
 				})
 				mux.HandleFunc(uri+"/power", func(writer http.ResponseWriter, request *http.Request) {
 					assert.Equal(t, http.MethodPatch, request.Method)
-					writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+					writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 					power = false
 					fmt.Fprint(writer, "")
 				})
 				err := client.ShutdownServer(emptyCtx, dummyUUID)
 				assert.Contains(t, fmt.Sprintf("%v", err),
-					fmt.Sprintf("Status code: 500. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
+					fmt.Sprintf("Status code: 503. Error: Maximum number of re-tries has been exhausted with error: no error message received from server. Request UUID: %s.",
 						dummyRequestUUID), "ShutdownServer returned an error with status code 500")
 				server.Close()
 			}
@@ -344,7 +344,7 @@ func TestClient_GetServersByLocation(t *testing.T) {
 	uri := path.Join(apiLocationBase, dummyUUID, "servers")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, prepareServerListHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
@@ -365,7 +365,7 @@ func TestClient_GetDeletedServers(t *testing.T) {
 	uri := path.Join(apiDeletedBase, "servers")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, prepareDeletedServerListHTTPGet("active"))
 	})
 	res, err := client.GetDeletedServers(emptyCtx)
@@ -380,7 +380,7 @@ func TestClient_waitForServerPowerStatus(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(w, prepareServerHTTPGet(true, "active"))
 	})
 	err := client.waitForServerPowerStatus(emptyCtx, dummyUUID, true)

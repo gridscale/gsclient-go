@@ -16,7 +16,7 @@ func TestClient_GetStorageBackupList(t *testing.T) {
 	uri := path.Join(apiStorageBase, dummyUUID, "backups")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareStorageBackupListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -37,7 +37,7 @@ func TestClient_DeleteStorageBackup(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID, "backups", dummyUUID)
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {
@@ -69,7 +69,7 @@ func TestClient_RollbackStorageBackup(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiStorageBase, dummyUUID, "backups", dummyUUID, "rollback")
 	mux.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			w.WriteHeader(400)
 		} else {

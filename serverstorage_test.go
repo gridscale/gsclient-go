@@ -3,10 +3,11 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetServerStorageList(t *testing.T) {
@@ -15,7 +16,7 @@ func TestClient_GetServerStorageList(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "storages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareServerStorageListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
@@ -36,7 +37,7 @@ func TestClient_GetServerStorage(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareServerStorageHTTPGet())
 	})
 	for _, testServerID := range uuidCommonTestCases {
@@ -59,7 +60,7 @@ func TestClient_CreateServerStorage(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "storages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -93,7 +94,7 @@ func TestClient_UpdateServerStorage(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, "")
 	})
 	for _, testServerID := range uuidCommonTestCases {
@@ -121,7 +122,7 @@ func TestClient_DeleteServerStorage(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
@@ -153,7 +154,7 @@ func TestClient_LinkStorage(t *testing.T) {
 	uri := path.Join(apiServerBase, dummyUUID, "storages")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, "")
 	})
 	err := client.LinkStorage(emptyCtx, dummyUUID, dummyUUID, true)
@@ -166,7 +167,7 @@ func TestClient_UnlinkStorage(t *testing.T) {
 	defer server.Close()
 	uri := path.Join(apiServerBase, dummyUUID, "storages", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set(requestUUIDHeaderParam, dummyRequestUUID)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if request.Method == http.MethodDelete {
 			fmt.Fprintf(writer, "")
 		} else if request.Method == http.MethodGet {
