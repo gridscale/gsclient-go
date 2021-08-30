@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.7.1 (Aug 30, 2021)
+## 3.7.0 (Aug 30, 2021)
 
 FEATURES:
 
