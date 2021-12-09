@@ -11,6 +11,9 @@ import (
 type LocationOperator interface {
 	GetLocationList(ctx context.Context) ([]Location, error)
 	GetLocation(ctx context.Context, id string) (Location, error)
+	CreateLocation(ctx context.Context, body LocationCreateRequest) (CreateResponse, error)
+	UpdateLocation(ctx context.Context, id string, body LocationUpdateRequest) error
+	DeleteLocation(ctx context.Context, id string) error
 }
 
 // LocationList holds a list of locations.
