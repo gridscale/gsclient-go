@@ -22,6 +22,7 @@ type gsRequest struct {
 	uri                 string
 	method              string
 	body                interface{}
+	queryParameters     map[string]string
 	skipCheckingRequest bool
 }
 
@@ -167,6 +168,11 @@ func (r *gsRequest) prepareHTTPRequest(ctx context.Context, cfg *Config) (*http.
 	// override the headers' values if they are already set.
 	for k, v := range cfg.httpHeaders {
 		request.Header.Set(k, v)
+	}
+
+	// Set query parameters if there are any of them.
+	for k, v := range r.queryParameters {
+		request.URL.Query().Add(k, v)
 	}
 
 	return request, nil
