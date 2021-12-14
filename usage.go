@@ -37,6 +37,11 @@ type ResourceUsageInfo struct {
 
 // GeneralUsage represents general usage.
 type GeneralUsage struct {
+	ResourcesUsage GeneralUsageProperties `json:"products"`
+}
+
+// GeneralUsageProperties holds GeneralUsage's properties.
+type GeneralUsageProperties struct {
 	Servers             ResourceUsageInfo `json:"servers"`
 	RocketStorages      ResourceUsageInfo `json:"rocket_storages"`
 	DistributedStorages ResourceUsageInfo `json:"distributed_storages"`
@@ -51,6 +56,11 @@ type GeneralUsage struct {
 
 // ServersUsage represents usage of servers.
 type ServersUsage struct {
+	ResourcesUsage []ServerUsageProperties `json:"servers"`
+}
+
+// ServerUsageProperties holds properties of a server usage.
+type ServerUsageProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -82,8 +92,18 @@ type ServersUsage struct {
 	UsagePerInterval []UsagePerInterval `json:"usage_per_interval"`
 }
 
-// StoragesUsage represents usage of distributed/rocket storages.
-type StoragesUsage struct {
+// DistributedStoragesUsage represents usage of distributed storages.
+type DistributedStoragesUsage struct {
+	ResourcesUsage []StorageUsageProperties `json:"distributed_storages"`
+}
+
+// RocketStoragesUsage represents usage of rocket storages.
+type RocketStoragesUsage struct {
+	ResourcesUsage []StorageUsageProperties `json:"rocket_storages"`
+}
+
+// StorageUsageProperties holds the properties of a distributed/rocket storage usage.
+type StorageUsageProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -121,6 +141,11 @@ type StoragesUsage struct {
 
 // StorageBackupsUsage represents usage of storage backups.
 type StorageBackupsUsage struct {
+	ResourcesUsage []StorageBackupUsageProperties `json:"storage_backups"`
+}
+
+// StorageBackupUsageProperties holds properties of a storage bakup usage.
+type StorageBackupUsageProperties struct {
 	// The UUID of a backup is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -145,6 +170,11 @@ type StorageBackupsUsage struct {
 
 // SnapshotsUsage represents usage of snapshots.
 type SnapshotsUsage struct {
+	ResourcesUsage []SnapshotUsageProperties `json:"snapshots"`
+}
+
+// SnapshotUsageProperties holds properties of a snapshot usage.
+type SnapshotUsageProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -187,6 +217,11 @@ type SnapshotsUsage struct {
 
 // TemplatesUsage represents usage of templates.
 type TemplatesUsage struct {
+	ResourcesUsage []TemplateUsageProperties `json:"templates"`
+}
+
+// TemplateUsageProperties holds properties of a template usage.
+type TemplateUsageProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -242,6 +277,11 @@ type TemplatesUsage struct {
 
 // ISOImagesUsage represents usage of ISO images.
 type ISOImagesUsage struct {
+	ResourcesUsage []ISOImageUsageProperties `json:"iso_images"`
+}
+
+// ISOImageUsageProperties holds properties of an ISO Image usage.
+type ISOImageUsageProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -290,6 +330,11 @@ type ISOImagesUsage struct {
 
 // IPsUsage represents usage of IP addresses.
 type IPsUsage struct {
+	ResourcesUsage []IPUsageProperties `json:"ip_addresses"`
+}
+
+// IPUsageProperties holds properties of an IP address usage.
+type IPUsageProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -356,6 +401,11 @@ type IPsUsage struct {
 
 // LoadBalancersUsage represents usage of storage backups.
 type LoadBalancersUsage struct {
+	ResourcesUsage []LoadBalancerUsageProperties `json:"load_balancers"`
+}
+
+// LoadBalancerUsageProperties holds properties of a loadbalancer usage.
+type LoadBalancerUsageProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -398,6 +448,11 @@ type LoadBalancersUsage struct {
 
 // PaaSServicesUsage represents usage of PaaS services.
 type PaaSServicesUsage struct {
+	ResourcesUsage []PaaSServiceUsageProperties `json:"paas_services"`
+}
+
+// PaaSServiceUsageProperties holds properties of a PaaS service usage.
+type PaaSServiceUsageProperties struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -543,7 +598,7 @@ func (c *Client) GetServersUsage(ctx context.Context, queryLevel usageQueryLevel
 //		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelDistributedStorageUsageGet
-func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (StoragesUsage, error) {
+func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (DistributedStoragesUsage, error) {
 	queryParam := map[string]string{
 		"from_time":         fromTime.String(),
 		"without_deleted":   strconv.FormatBool(withoutDeleted),
@@ -559,7 +614,7 @@ func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usa
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return StoragesUsage{}, invalidUsageQueryLevel
+		return DistributedStoragesUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "distributed_storages"),
@@ -567,7 +622,7 @@ func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usa
 		skipCheckingRequest: true,
 		queryParameters:     queryParam,
 	}
-	var response StoragesUsage
+	var response DistributedStoragesUsage
 	err := r.execute(ctx, *c, &response)
 	return response, err
 }
@@ -580,7 +635,7 @@ func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usa
 //		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelRocketStorageUsageGet
-func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (StoragesUsage, error) {
+func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (RocketStoragesUsage, error) {
 	queryParam := map[string]string{
 		"from_time":         fromTime.String(),
 		"without_deleted":   strconv.FormatBool(withoutDeleted),
@@ -596,7 +651,7 @@ func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQue
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return StoragesUsage{}, invalidUsageQueryLevel
+		return RocketStoragesUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "rocket_storages"),
@@ -604,7 +659,7 @@ func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQue
 		skipCheckingRequest: true,
 		queryParameters:     queryParam,
 	}
-	var response StoragesUsage
+	var response RocketStoragesUsage
 	err := r.execute(ctx, *c, &response)
 	return response, err
 }
