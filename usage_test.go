@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"path"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetGeneralUsage(t *testing.T) {
@@ -333,12 +334,12 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 	mux.HandleFunc(projectServerURI, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
-		fmt.Fprint(w, prepareResourceUsageGet("storages"))
+		fmt.Fprint(w, prepareResourceUsageGet("distributed_storages"))
 	})
 	mux.HandleFunc(contractServerURI, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
-		fmt.Fprint(w, prepareResourceUsageGet("storages"))
+		fmt.Fprint(w, prepareResourceUsageGet("distributed_storages"))
 	})
 	type args struct {
 		ctx              context.Context
@@ -351,7 +352,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    StoragesUsage
+		want    DistributedStoragesUsage
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
@@ -364,7 +365,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 				withoutDeleted:   false,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockDistributedStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -377,7 +378,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 				withoutDeleted:   false,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockDistributedStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -390,7 +391,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 				withoutDeleted:   false,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockDistributedStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -403,7 +404,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 				withoutDeleted:   false,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockDistributedStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -416,7 +417,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockDistributedStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -429,7 +430,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockDistributedStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -442,7 +443,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: HourIntervalVariable,
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockDistributedStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -455,7 +456,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: HourIntervalVariable,
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockDistributedStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -468,7 +469,7 @@ func TestClient_GetDistributedStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: HourIntervalVariable,
 			},
-			want:    StoragesUsage{},
+			want:    DistributedStoragesUsage{},
 			wantErr: assert.Error,
 		},
 	}
@@ -491,12 +492,12 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 	mux.HandleFunc(projectServerURI, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
-		fmt.Fprint(w, prepareResourceUsageGet("storages"))
+		fmt.Fprint(w, prepareResourceUsageGet("rocket_storages"))
 	})
 	mux.HandleFunc(contractServerURI, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		w.Header().Set(requestUUIDHeader, dummyRequestUUID)
-		fmt.Fprint(w, prepareResourceUsageGet("storages"))
+		fmt.Fprint(w, prepareResourceUsageGet("rocket_storages"))
 	})
 	type args struct {
 		ctx              context.Context
@@ -509,7 +510,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    StoragesUsage
+		want    RocketStoragesUsage
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
@@ -522,7 +523,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 				withoutDeleted:   false,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockRocketStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -535,7 +536,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 				withoutDeleted:   false,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockRocketStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -548,7 +549,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 				withoutDeleted:   false,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockRocketStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -561,7 +562,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 				withoutDeleted:   false,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockRocketStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -574,7 +575,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockRocketStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -587,7 +588,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: "",
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockRocketStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -600,7 +601,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: HourIntervalVariable,
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockRocketStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -613,7 +614,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: HourIntervalVariable,
 			},
-			want:    getMockStoragesUsage(),
+			want:    getMockRocketStoragesUsage(),
 			wantErr: assert.NoError,
 		},
 		{
@@ -626,7 +627,7 @@ func TestClient_GetRocketStoragesUsage(t *testing.T) {
 				withoutDeleted:   true,
 				intervalVariable: HourIntervalVariable,
 			},
-			want:    StoragesUsage{},
+			want:    RocketStoragesUsage{},
 			wantErr: assert.Error,
 		},
 	}
@@ -1767,216 +1768,255 @@ func getMockGeneralUsage() GeneralUsage {
 		UsagePerInterval:      dummyRsUsagePerInterval,
 	}
 	mock := GeneralUsage{
-		Servers:             dummyRsUsageInfo,
-		RocketStorages:      dummyRsUsageInfo,
-		DistributedStorages: dummyRsUsageInfo,
-		StorageBackups:      dummyRsUsageInfo,
-		Snapshots:           dummyRsUsageInfo,
-		Templates:           dummyRsUsageInfo,
-		IsoImages:           dummyRsUsageInfo,
-		IPAddresses:         dummyRsUsageInfo,
-		LoadBalancers:       dummyRsUsageInfo,
-		PaaSServices:        dummyRsUsageInfo,
+		ResourcesUsage: GeneralUsageProperties{
+			Servers:             dummyRsUsageInfo,
+			RocketStorages:      dummyRsUsageInfo,
+			DistributedStorages: dummyRsUsageInfo,
+			StorageBackups:      dummyRsUsageInfo,
+			Snapshots:           dummyRsUsageInfo,
+			Templates:           dummyRsUsageInfo,
+			IsoImages:           dummyRsUsageInfo,
+			IPAddresses:         dummyRsUsageInfo,
+			LoadBalancers:       dummyRsUsageInfo,
+			PaaSServices:        dummyRsUsageInfo,
+		},
 	}
 	return mock
 }
 
 func getMockServersUsage() ServersUsage {
 	mock := ServersUsage{
-		ObjectUUID:            dummyUUID,
-		Name:                  "test",
-		Memory:                2,
-		Cores:                 1,
-		Power:                 true,
-		Labels:                []string{"test"},
-		Deleted:               false,
-		Status:                "active",
-		CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
-		UsagePerInterval:      dummyRsUsagePerInterval,
-	}
+		ResourcesUsage: []ServerUsageProperties{{
+			ObjectUUID:            dummyUUID,
+			Name:                  "test",
+			Memory:                2,
+			Cores:                 1,
+			Power:                 true,
+			Labels:                []string{"test"},
+			Deleted:               false,
+			Status:                "active",
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
+		},
+		}}
 	return mock
 }
 
-func getMockStoragesUsage() StoragesUsage {
-	mock := StoragesUsage{
-		ObjectUUID:            dummyUUID,
-		ParentUUID:            dummyUUID,
-		Name:                  "test",
-		Labels:                []string{"test"},
-		Deleted:               false,
-		Status:                "active",
-		StorageType:           string(InsaneStorageType),
-		LastUsedTemplate:      "",
-		Capacity:              1000,
-		CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
-		UsagePerInterval:      dummyRsUsagePerInterval,
-	}
+func getMockDistributedStoragesUsage() DistributedStoragesUsage {
+	mock := DistributedStoragesUsage{
+		ResourcesUsage: []StorageUsageProperties{{
+			ObjectUUID:            dummyUUID,
+			ParentUUID:            dummyUUID,
+			Name:                  "test",
+			Labels:                []string{"test"},
+			Deleted:               false,
+			Status:                "active",
+			StorageType:           string(InsaneStorageType),
+			LastUsedTemplate:      "",
+			Capacity:              1000,
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
+		},
+		}}
+	return mock
+}
+
+func getMockRocketStoragesUsage() RocketStoragesUsage {
+	mock := RocketStoragesUsage{
+		ResourcesUsage: []StorageUsageProperties{{
+			ObjectUUID:            dummyUUID,
+			ParentUUID:            dummyUUID,
+			Name:                  "test",
+			Labels:                []string{"test"},
+			Deleted:               false,
+			Status:                "active",
+			StorageType:           string(InsaneStorageType),
+			LastUsedTemplate:      "",
+			Capacity:              1000,
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
+		},
+		}}
 	return mock
 }
 
 func getMockStorageBackupsUsage() StorageBackupsUsage {
 	mock := StorageBackupsUsage{
-		ObjectUUID:            dummyUUID,
-		Name:                  "test",
-		CreateTime:            dummyTime,
-		ChangeTime:            dummyTime,
-		Capacity:              1000,
-		CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
-		UsagePerInterval:      dummyRsUsagePerInterval,
-	}
+		ResourcesUsage: []StorageBackupUsageProperties{{
+			ObjectUUID:            dummyUUID,
+			Name:                  "test",
+			CreateTime:            dummyTime,
+			ChangeTime:            dummyTime,
+			Capacity:              1000,
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
+		},
+		}}
 	return mock
 }
 
 func getMockSnapshotsUsage() SnapshotsUsage {
 	mock := SnapshotsUsage{
-		ObjectUUID:            dummyUUID,
-		Name:                  "test",
-		ParentUUID:            dummyUUID,
-		ParentName:            "test",
-		ProjectUUID:           dummyUUID,
-		Labels:                nil,
-		Status:                "active",
-		CreateTime:            dummyTime,
-		ChangeTime:            dummyTime,
-		Capacity:              1000,
-		Deleted:               false,
-		CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
-		UsagePerInterval:      dummyRsUsagePerInterval,
-	}
+		ResourcesUsage: []SnapshotUsageProperties{{
+			ObjectUUID:            dummyUUID,
+			Name:                  "test",
+			ParentUUID:            dummyUUID,
+			ParentName:            "test",
+			ProjectUUID:           dummyUUID,
+			Labels:                nil,
+			Status:                "active",
+			CreateTime:            dummyTime,
+			ChangeTime:            dummyTime,
+			Capacity:              1000,
+			Deleted:               false,
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
+		},
+		}}
 	return mock
 }
 
 func getMockTemplatesUsage() TemplatesUsage {
 	mock := TemplatesUsage{
-		ObjectUUID:            dummyUUID,
-		Name:                  "test",
-		Status:                "active",
-		Ostype:                "linux",
-		Version:               "0.1",
-		CreateTime:            dummyTime,
-		ChangeTime:            dummyTime,
-		Private:               false,
-		LicenseProductNo:      0,
-		Capacity:              1000,
-		Distro:                "ubuntu",
-		Description:           "test",
-		Labels:                nil,
-		ProjectUUID:           dummyUUID,
-		Deleted:               false,
-		CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
-		UsagePerInterval:      dummyRsUsagePerInterval,
-	}
+		ResourcesUsage: []TemplateUsageProperties{{
+			ObjectUUID:            dummyUUID,
+			Name:                  "test",
+			Status:                "active",
+			Ostype:                "linux",
+			Version:               "0.1",
+			CreateTime:            dummyTime,
+			ChangeTime:            dummyTime,
+			Private:               false,
+			LicenseProductNo:      0,
+			Capacity:              1000,
+			Distro:                "ubuntu",
+			Description:           "test",
+			Labels:                nil,
+			ProjectUUID:           dummyUUID,
+			Deleted:               false,
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
+		},
+		}}
 	return mock
 }
 
 func getMockISOImagesUsage() ISOImagesUsage {
 	mock := ISOImagesUsage{
-		ObjectUUID:            dummyUUID,
-		Name:                  "test",
-		Description:           "test",
-		SourceURL:             "https://example.com",
-		Labels:                nil,
-		Status:                "active",
-		CreateTime:            dummyTime,
-		ChangeTime:            dummyTime,
-		Version:               "0.1",
-		Private:               true,
-		Capacity:              1000,
-		ProjectUUID:           dummyUUID,
-		Deleted:               false,
-		CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
-		UsagePerInterval:      dummyRsUsagePerInterval,
-	}
+		ResourcesUsage: []ISOImageUsageProperties{{
+			ObjectUUID:            dummyUUID,
+			Name:                  "test",
+			Description:           "test",
+			SourceURL:             "https://example.com",
+			Labels:                nil,
+			Status:                "active",
+			CreateTime:            dummyTime,
+			ChangeTime:            dummyTime,
+			Version:               "0.1",
+			Private:               true,
+			Capacity:              1000,
+			ProjectUUID:           dummyUUID,
+			Deleted:               false,
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
+		},
+		}}
 	return mock
 }
 
 func getMockIPsUsage() IPsUsage {
 	mock := IPsUsage{
-		ObjectUUID:            dummyUUID,
-		Name:                  "test",
-		IP:                    "192.168.1.1",
-		Family:                0,
-		CreateTime:            dummyTime,
-		ChangeTime:            dummyTime,
-		Status:                "active",
-		LocationCountry:       "test",
-		LocationName:          "test",
-		LocationIata:          "test",
-		LocationUUID:          dummyUUID,
-		Prefix:                "192.168.1.1",
-		DeleteBlock:           false,
-		Failover:              false,
-		Labels:                nil,
-		ReverseDNS:            "192.168.2.1",
-		PartnerUUID:           dummyUUID,
-		ProjectUUID:           dummyUUID,
-		Deleted:               false,
-		CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
-		UsagePerInterval:      dummyRsUsagePerInterval,
-	}
+		ResourcesUsage: []IPUsageProperties{{
+			ObjectUUID:            dummyUUID,
+			Name:                  "test",
+			IP:                    "192.168.1.1",
+			Family:                0,
+			CreateTime:            dummyTime,
+			ChangeTime:            dummyTime,
+			Status:                "active",
+			LocationCountry:       "test",
+			LocationName:          "test",
+			LocationIata:          "test",
+			LocationUUID:          dummyUUID,
+			Prefix:                "192.168.1.1",
+			DeleteBlock:           false,
+			Failover:              false,
+			Labels:                nil,
+			ReverseDNS:            "192.168.2.1",
+			PartnerUUID:           dummyUUID,
+			ProjectUUID:           dummyUUID,
+			Deleted:               false,
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
+		},
+		}}
 	return mock
 }
 
 func getMockLoadBalancersUsage() LoadBalancersUsage {
 	mock := LoadBalancersUsage{
-		ObjectUUID: dummyUUID,
-		Name:       "test",
-		ForwardingRules: []ForwardingRule{
-			{
-				LetsencryptSSL: nil,
-				ListenPort:     8080,
-				Mode:           "http",
-				TargetPort:     8000,
+		ResourcesUsage: []LoadBalancerUsageProperties{{
+			ObjectUUID: dummyUUID,
+			Name:       "test",
+			ForwardingRules: []ForwardingRule{
+				{
+					LetsencryptSSL: nil,
+					ListenPort:     8080,
+					Mode:           "http",
+					TargetPort:     8000,
+				},
 			},
-		},
-		BackendServers: []BackendServer{
-			{
-				Weight: 100,
-				Host:   "185.201.147.176",
+			BackendServers: []BackendServer{
+				{
+					Weight: 100,
+					Host:   "185.201.147.176",
+				},
 			},
+			CreateTime:            dummyTime,
+			ChangeTime:            dummyTime,
+			Status:                "active",
+			RedirectHTTPToHTTPS:   false,
+			Algorithm:             "leastconn",
+			ListenIPv6UUID:        dummyUUID,
+			ListenIPv4UUID:        dummyUUID,
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
 		},
-		CreateTime:            dummyTime,
-		ChangeTime:            dummyTime,
-		Status:                "active",
-		RedirectHTTPToHTTPS:   false,
-		Algorithm:             "leastconn",
-		ListenIPv6UUID:        dummyUUID,
-		ListenIPv4UUID:        dummyUUID,
-		CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
-		UsagePerInterval:      dummyRsUsagePerInterval,
-	}
+		}}
 	return mock
 }
 
 func getMockPaaSServicesUsage() PaaSServicesUsage {
 	mock := PaaSServicesUsage{
-		ObjectUUID: dummyUUID,
-		Name:       "test",
-		Status:     "active",
-		Credentials: []Credential{
-			{
-				Username: "username",
-				Password: "password",
-				Type:     "type",
+		ResourcesUsage: []PaaSServiceUsageProperties{{
+			ObjectUUID: dummyUUID,
+			Name:       "test",
+			Status:     "active",
+			Credentials: []Credential{
+				{
+					Username: "username",
+					Password: "password",
+					Type:     "type",
+				},
 			},
-		},
-		CreateTime:          dummyTime,
-		ChangeTime:          dummyTime,
-		ServiceTemplateUUID: dummyUUID,
-		Parameters: map[string]interface{}{
-			"TEST_PARAM": "test value",
-		},
-		ResourceLimits: []ResourceLimit{
-			{
-				Resource: "cpu",
-				Limit:    2,
+			CreateTime:          dummyTime,
+			ChangeTime:          dummyTime,
+			ServiceTemplateUUID: dummyUUID,
+			Parameters: map[string]interface{}{
+				"TEST_PARAM": "test value",
 			},
+			ResourceLimits: []ResourceLimit{
+				{
+					Resource: "cpu",
+					Limit:    2,
+				},
+			},
+			ProjectUUID:           dummyUUID,
+			Deleted:               false,
+			CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
+			UsagePerInterval:      dummyRsUsagePerInterval,
 		},
-		ProjectUUID:           dummyUUID,
-		Deleted:               false,
-		CurrentUsagePerMinute: dummyRsCurrentUsagePerMinute,
-		UsagePerInterval:      dummyRsUsagePerInterval,
-	}
+		}}
 	return mock
 }
 
@@ -1985,8 +2025,10 @@ func prepareResourceUsageGet(resourceName string) string {
 	switch resourceName {
 	case "servers":
 		usage = getMockServersUsage()
-	case "storages":
-		usage = getMockStoragesUsage()
+	case "distributed_storages":
+		usage = getMockDistributedStoragesUsage()
+	case "rocket_storages":
+		usage = getMockRocketStoragesUsage()
 	case "storage_backups":
 		usage = getMockStorageBackupsUsage()
 	case "snapshots":
