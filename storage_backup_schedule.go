@@ -62,6 +62,12 @@ type StorageBackupScheduleProperties struct {
 
 	// Status of the schedule.
 	Active bool `json:"active"`
+
+	// The Location where your backup is stored.
+	BackupLocationUUID string `json:"backup_location_uuid"`
+
+	// The human-readable name of backup location. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	BackupLocationName string `json:"backup_location_name"`
 }
 
 // StorageBackupScheduleRelations holds a list of relations between a storage backup schedule and storage backups.
@@ -100,6 +106,9 @@ type StorageBackupScheduleCreateRequest struct {
 
 	// Status of the schedule.
 	Active bool `json:"active"`
+
+	// The Location where your backup is stored.
+	BackupLocationUUID string `json:"backup_location_uuid,omitempty"`
 }
 
 // StorageBackupScheduleCreateResponse represents a response for creating a storage backup schedule.
@@ -130,6 +139,25 @@ type StorageBackupScheduleUpdateRequest struct {
 
 	// Status of the schedule. Optional.
 	Active *bool `json:"active,omitempty"`
+}
+
+// StorageBackupLocationList holds a list of available location to store your backup.
+type StorageBackupLocationList struct {
+	List map[string]StorageBackupLocationProperties `json:"backup_locations"`
+}
+
+//StorageBackupLocation represents a backup location.
+type StorageBackupLocation struct {
+	Properties StorageBackupLocationProperties
+}
+
+// StorageBackupLocationProperties represents a backup location's properties.
+type StorageBackupLocationProperties struct {
+	// UUID of the location.
+	ObjectUUID string `json:"object_uuid"`
+
+	// Name of the location.
+	Name string `json:"name"`
 }
 
 // GetStorageBackupScheduleList gets a list of available storage backup schedules based on a given storage's id.
@@ -216,4 +244,24 @@ func (c *Client) DeleteStorageBackupSchedule(ctx context.Context, storageID, sch
 		method: http.MethodDelete,
 	}
 	return r.execute(ctx, *c, nil)
+}
+
+// GetStorageBackupLocationList gets a list of available locations to store your backup.
+//
+// See: https://gridscale.io/en//api-documentation/index.html#operation/GetBackupLocations
+func (c *Client) GetStorageBackupLocationList(ctx context.Context) ([]StorageBackupLocation, error) {
+	r := gsRequest{
+		uri:                 apiBackupLocationBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
+	}
+	var response StorageBackupLocationList
+	var locationList []StorageBackupLocation
+	err := r.execute(ctx, *c, &response)
+	for _, locationProperties := range response.List {
+		locationList = append(locationList, StorageBackupLocation{
+			Properties: locationProperties,
+		})
+	}
+	return locationList, err
 }
