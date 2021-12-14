@@ -8,6 +8,21 @@ import (
 	"strconv"
 )
 
+// UsageOperator provides an interface for operations on usage.
+type UsageOperator interface {
+	GetGeneralUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (GeneralUsage, error)
+	GetServersUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (ServersUsage, error)
+	GetDistributedStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (DistributedStoragesUsage, error)
+	GetRocketStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (RocketStoragesUsage, error)
+	GetStorageBackupsUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (StorageBackupsUsage, error)
+	etSnapshotsUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (SnapshotsUsage, error)
+	GetTemplatesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (TemplatesUsage, error)
+	GetISOImagesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (ISOImagesUsage, error)
+	GetIPsUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (IPsUsage, error)
+	GetLoadBalancersUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (LoadBalancersUsage, error)
+	GetPaaSServicesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (PaaSServicesUsage, error)
+}
+
 // Usage represents usage of a product.
 type Usage struct {
 	// Number of a product.
