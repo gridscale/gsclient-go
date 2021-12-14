@@ -2,6 +2,7 @@ package gsclient
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"path"
 	"strconv"
@@ -81,8 +82,8 @@ type ServersUsage struct {
 	UsagePerInterval []UsagePerInterval `json:"usage_per_interval"`
 }
 
-// DistributedStoragesUsage represents usage of distributed storages.
-type DistributedStoragesUsage struct {
+// StoragesUsage represents usage of distributed/rocket storages.
+type StoragesUsage struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -116,11 +117,6 @@ type DistributedStoragesUsage struct {
 
 	// Usage of active product within a specific interval.
 	UsagePerInterval []UsagePerInterval `json:"usage_per_interval"`
-}
-
-// RocketStoragesUsage represents usage of rocket storages.
-type RocketStoragesUsage struct {
-	DistributedStoragesUsage
 }
 
 // StorageBackupsUsage represents usage of storage backups.
@@ -400,8 +396,8 @@ type LoadBalancersUsage struct {
 	UsagePerInterval []UsagePerInterval `json:"usage_per_interval"`
 }
 
-// PaaSUsage represents usage of PaaS services.
-type PaaSUsage struct {
+// PaaSServicesUsage represents usage of PaaS services.
+type PaaSServicesUsage struct {
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
@@ -442,16 +438,12 @@ type PaaSUsage struct {
 	UsagePerInterval []UsagePerInterval `json:"usage_per_interval"`
 }
 
-// IntervalVariable represents interval variable when querying usage.
-// IntervalVariable is used to get usage of resources within time intervals.
-type IntervalVariable string
-
 // All allowed interval variable's values
 const (
-	HourIntervalVariable  IntervalVariable = "H"
-	DayIntervalVariable   IntervalVariable = "D"
-	WeekIntervalVariable  IntervalVariable = "W"
-	MonthIntervalVariable IntervalVariable = "M"
+	HourIntervalVariable  = "H"
+	DayIntervalVariable   = "D"
+	WeekIntervalVariable  = "W"
+	MonthIntervalVariable = "M"
 )
 
 type usageQueryLevel int
@@ -464,27 +456,25 @@ const (
 	ContractLevelUsage = iota
 )
 
+var invalidUsageQueryLevel = errors.New("invalid Usage query level. Valid values: `gslclient.ProjectLevelUsage`, and `gslclient.ContractLevelUsage`")
+
 // GetGeneralUsage returns general usage of all resources in project/contract level.
 // Args:
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelUsageGet
-func (c *Client) GetGeneralUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (GeneralUsage, error) {
+func (c *Client) GetGeneralUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (GeneralUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -492,6 +482,8 @@ func (c *Client) GetGeneralUsage(ctx context.Context, queryLevel usageQueryLevel
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return GeneralUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 uri,
@@ -509,22 +501,18 @@ func (c *Client) GetGeneralUsage(ctx context.Context, queryLevel usageQueryLevel
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelServerUsageGet
-func (c *Client) GetServersUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (ServersUsage, error) {
+func (c *Client) GetServersUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (ServersUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -532,6 +520,8 @@ func (c *Client) GetServersUsage(ctx context.Context, queryLevel usageQueryLevel
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return ServersUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "servers"),
@@ -549,22 +539,18 @@ func (c *Client) GetServersUsage(ctx context.Context, queryLevel usageQueryLevel
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelDistributedStorageUsageGet
-func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (DistributedStoragesUsage, error) {
+func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (StoragesUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -572,6 +558,8 @@ func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usa
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return StoragesUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "distributed_storages"),
@@ -579,7 +567,7 @@ func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usa
 		skipCheckingRequest: true,
 		queryParameters:     queryParam,
 	}
-	var response DistributedStoragesUsage
+	var response StoragesUsage
 	err := r.execute(ctx, *c, &response)
 	return response, err
 }
@@ -589,21 +577,17 @@ func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usa
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
 //		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelRocketStorageUsageGet
-func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (RocketStoragesUsage, error) {
+func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (StoragesUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -611,6 +595,8 @@ func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQue
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return StoragesUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "rocket_storages"),
@@ -618,7 +604,7 @@ func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQue
 		skipCheckingRequest: true,
 		queryParameters:     queryParam,
 	}
-	var response RocketStoragesUsage
+	var response StoragesUsage
 	err := r.execute(ctx, *c, &response)
 	return response, err
 }
@@ -628,22 +614,18 @@ func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQue
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelStorageBackupUsageGet
-func (c *Client) GetStorageBackupsUsage(ctx context.Context, fromTime GSTime, queryLevel usageQueryLevel, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (StorageBackupsUsage, error) {
+func (c *Client) GetStorageBackupsUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (StorageBackupsUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -651,9 +633,11 @@ func (c *Client) GetStorageBackupsUsage(ctx context.Context, fromTime GSTime, qu
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return StorageBackupsUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
-		uri:                 path.Join(uri, "rocket_storages"),
+		uri:                 path.Join(uri, "storage_backups"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
 		queryParameters:     queryParam,
@@ -668,22 +652,18 @@ func (c *Client) GetStorageBackupsUsage(ctx context.Context, fromTime GSTime, qu
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelSnapshotUsageGet
-func (c *Client) GetSnapshotsUsage(ctx context.Context, fromTime GSTime, queryLevel usageQueryLevel, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (SnapshotsUsage, error) {
+func (c *Client) GetSnapshotsUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (SnapshotsUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -691,6 +671,8 @@ func (c *Client) GetSnapshotsUsage(ctx context.Context, fromTime GSTime, queryLe
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return SnapshotsUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "snapshots"),
@@ -708,22 +690,18 @@ func (c *Client) GetSnapshotsUsage(ctx context.Context, fromTime GSTime, queryLe
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelTemplateUsageGet
-func (c *Client) GetTemplatesUsage(ctx context.Context, fromTime GSTime, queryLevel usageQueryLevel, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (TemplatesUsage, error) {
+func (c *Client) GetTemplatesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (TemplatesUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -731,6 +709,8 @@ func (c *Client) GetTemplatesUsage(ctx context.Context, fromTime GSTime, queryLe
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return TemplatesUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "templates"),
@@ -748,22 +728,18 @@ func (c *Client) GetTemplatesUsage(ctx context.Context, fromTime GSTime, queryLe
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelIsoimageUsageGet
-func (c *Client) GetISOImagesUsage(ctx context.Context, fromTime GSTime, queryLevel usageQueryLevel, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (ISOImagesUsage, error) {
+func (c *Client) GetISOImagesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (ISOImagesUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -771,6 +747,8 @@ func (c *Client) GetISOImagesUsage(ctx context.Context, fromTime GSTime, queryLe
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return ISOImagesUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "iso_images"),
@@ -788,22 +766,18 @@ func (c *Client) GetISOImagesUsage(ctx context.Context, fromTime GSTime, queryLe
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelIpUsageGet
-func (c *Client) GetIPsUsage(ctx context.Context, fromTime GSTime, queryLevel usageQueryLevel, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (IPsUsage, error) {
+func (c *Client) GetIPsUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (IPsUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -811,6 +785,8 @@ func (c *Client) GetIPsUsage(ctx context.Context, fromTime GSTime, queryLevel us
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return IPsUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "ip_addresses"),
@@ -828,22 +804,18 @@ func (c *Client) GetIPsUsage(ctx context.Context, fromTime GSTime, queryLevel us
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelLoadbalancerUsageGet
-func (c *Client) GetLoadBalancersUsage(ctx context.Context, fromTime GSTime, queryLevel usageQueryLevel, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (LoadBalancersUsage, error) {
+func (c *Client) GetLoadBalancersUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (LoadBalancersUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -851,6 +823,8 @@ func (c *Client) GetLoadBalancersUsage(ctx context.Context, fromTime GSTime, que
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return LoadBalancersUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "load_balancers"),
@@ -868,22 +842,18 @@ func (c *Client) GetLoadBalancersUsage(ctx context.Context, fromTime GSTime, que
 //		- queryLevel (Required): resources' usage query level. Either ProjectLevelUsage or ContractLevelUsage.
 // 		- fromTime (Required): Starting time when the usage should be calculated.
 //		- toTime (Optional, can be nil): End time when the usage should be calculated.
-//		- withoutDeleted (Optional, can be nil): To calculate the usage with or without deleted resources.
-//		- intervalVariable (Optional, can be nil): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable.
+//		- withoutDeleted (Required, true/false): To calculate the usage with or without deleted resources.
+//		- intervalVariable (Optional, can be empty ""): HourIntervalVariable, DayIntervalVariable, WeekIntervalVariable, MonthIntervalVariable, or "".
 //
 // See: https://gridscale.io/en/api-documentation/index.html#operation/ProjectLevelPaasServiceUsageGet
-func (c *Client) GetPaaSServicesUsage(ctx context.Context, fromTime GSTime, queryLevel usageQueryLevel, toTime *GSTime, withoutDeleted *bool, intervalVariable *IntervalVariable) (PaaSUsage, error) {
+func (c *Client) GetPaaSServicesUsage(ctx context.Context, queryLevel usageQueryLevel, fromTime GSTime, toTime *GSTime, withoutDeleted bool, intervalVariable string) (PaaSServicesUsage, error) {
 	queryParam := map[string]string{
-		"from_time": fromTime.String(),
+		"from_time":         fromTime.String(),
+		"without_deleted":   strconv.FormatBool(withoutDeleted),
+		"interval_variable": intervalVariable,
 	}
 	if toTime != nil {
 		queryParam["to_time"] = toTime.String()
-	}
-	if withoutDeleted != nil {
-		queryParam["without_deleted"] = strconv.FormatBool(*withoutDeleted)
-	}
-	if intervalVariable != nil {
-		queryParam["interval_variable"] = string(*intervalVariable)
 	}
 	var uri string
 	switch queryLevel {
@@ -891,6 +861,8 @@ func (c *Client) GetPaaSServicesUsage(ctx context.Context, fromTime GSTime, quer
 		uri = apiProjectLevelUsage
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
+	default:
+		return PaaSServicesUsage{}, invalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "paas_services"),
@@ -898,7 +870,7 @@ func (c *Client) GetPaaSServicesUsage(ctx context.Context, fromTime GSTime, quer
 		skipCheckingRequest: true,
 		queryParameters:     queryParam,
 	}
-	var response PaaSUsage
+	var response PaaSServicesUsage
 	err := r.execute(ctx, *c, &response)
 	return response, err
 }
