@@ -19,7 +19,7 @@ type NetworkOperator interface {
 	GetNetworkPublic(ctx context.Context) (Network, error)
 	GetNetworksByLocation(ctx context.Context, id string) ([]Network, error)
 	GetDeletedNetworks(ctx context.Context) ([]Network, error)
-	GetPinnedServerList(ctx context.Context, id string) (Network, error)
+	GetPinnedServerList(ctx context.Context, networkUUID string) (PinnedServerList, error)
 	UpdateNetworkPinnedServer(ctx context.Context, networkUUID, serverUUID string, body PinServerRequest) error
 	DeleteNetworkPinnedServer(ctx context.Context, networkUUID, serverUUID string) error
 }
