@@ -108,7 +108,7 @@ type LocationInformation struct {
 	// Website of the owner.
 	OwnerWebsite string `json:"owner_website"`
 
-	// Name of site.
+	// The name of site.
 	SiteName string `json:"site_name"`
 }
 
@@ -148,15 +148,16 @@ type LocationCreateRequest struct {
 	ProductNo int `json:"product_no"`
 }
 
-// LocationUpdateRequest represent a request for updating a location.
+// LocationUpdateRequest represents a request for updating a location.
 type LocationUpdateRequest struct {
-	// New name. Leave it if you do not want to update the name.
+	// Name is the human-readable name of the object. Name is an optional field.
 	Name string `json:"name,omitempty"`
 
-	// List of labels. Leave it if you do not want to update the labels.
+	// List of labels. Labels is an optional field.
 	Labels *[]string `json:"labels,omitempty"`
 
 	// The number of dedicated cpunodes to assigne to the private location.
+	// CPUNodeCount is an optional field.
 	CPUNodeCount *int `json:"cpunode_count,omitempty"`
 }
 
