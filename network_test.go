@@ -217,6 +217,86 @@ func TestClient_GetNetworksByLocation(t *testing.T) {
 	}
 }
 
+func TestClient_GetPinnedServerList(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiNetworkBase, dummyUUID, "pinned_servers")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
+		fmt.Fprintf(writer, preparePinnedServerListHTTPGet())
+	})
+	for _, test := range uuidCommonTestCases {
+		res, err := client.GetPinnedServerList(emptyCtx, test.testUUID)
+		if test.isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "GetPinnedServerList returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockPinnedServerList()), fmt.Sprintf("%v", res))
+		}
+	}
+}
+
+func TestClient_UpdateNetworkPinnedServer(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := path.Join(apiNetworkBase, dummyUUID, "pinned_servers", dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodPatch, request.Method)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
+		fmt.Fprint(writer, "")
+	})
+	for _, netTestCase := range uuidCommonTestCases {
+		for _, serverTestCase := range uuidCommonTestCases {
+			err := client.UpdateNetworkPinnedServer(
+				emptyCtx,
+				netTestCase.testUUID,
+				serverTestCase.testUUID,
+				PinServerRequest{
+					IP: "192.168.0.1",
+				},
+			)
+			if netTestCase.isFailed || serverTestCase.isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "UpdateNetworkPinnedServer returned an error %v", err)
+			}
+		}
+	}
+}
+
+func TestClient_DeleteNetworkPinnedServer(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiNetworkBase, dummyUUID, "pinned_servers", dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			if request.Method == http.MethodDelete {
+				fmt.Fprintf(writer, "")
+			} else if request.Method == http.MethodGet {
+				writer.WriteHeader(404)
+			}
+		}
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		for _, netTestCase := range uuidCommonTestCases {
+			for _, serverTestCase := range uuidCommonTestCases {
+				err := client.DeleteNetworkPinnedServer(emptyCtx, netTestCase.testUUID, serverTestCase.testUUID)
+				if netTestCase.isFailed || serverTestCase.isFailed || isFailed {
+					assert.NotNil(t, err)
+				} else {
+					assert.Nil(t, err, "DeleteNetworkPinnedServer returned an error %v", err)
+				}
+			}
+		}
+	}
+}
+
 func TestClient_GetDeletedNetworks(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
@@ -260,6 +340,18 @@ func getMockNetwork(isPublic bool, status string) Network {
 	return mock
 }
 
+func getMockPinnedServerList() PinnedServerList {
+	mock := PinnedServerList{
+		List: []ServerWithIP{
+			{
+				ServerUUID: dummyUUID,
+				IP:         "192.168.0.1",
+			},
+		},
+	}
+	return mock
+}
+
 func prepareNetworkListHTTPGet(isPublic bool, status string) string {
 	network := getMockNetwork(isPublic, status)
 	res, _ := json.Marshal(network.Properties)
@@ -269,6 +361,12 @@ func prepareNetworkListHTTPGet(isPublic bool, status string) string {
 func prepareNetworkHTTPGet(status string) string {
 	network := getMockNetwork(true, status)
 	res, _ := json.Marshal(network)
+	return string(res)
+}
+
+func preparePinnedServerListHTTPGet() string {
+	pinnedServers := getMockPinnedServerList()
+	res, _ := json.Marshal(pinnedServers)
 	return string(res)
 }
 
