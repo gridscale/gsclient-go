@@ -256,7 +256,7 @@ type PinnedServerList struct {
 	List []ServerWithIP `json:"pinned_servers"`
 }
 
-// PinServerRequest represents a request assigning DHCP IP into a server
+// PinServerRequest represents a request assigning DHCP IP to a server
 type PinServerRequest struct {
 	// IP which is assigned to the server
 	IP string `json:"ip"`
@@ -433,7 +433,7 @@ func (c *Client) GetPinnedServerList(ctx context.Context, networkUUID string) (P
 	return response, err
 }
 
-// UpdateNetworkPinnedServer assigns DHCP IP into a server.
+// UpdateNetworkPinnedServer assigns DHCP IP to a server.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateNetworkPinnedServer
 func (c *Client) UpdateNetworkPinnedServer(ctx context.Context, networkUUID, serverUUID string, body PinServerRequest) error {
