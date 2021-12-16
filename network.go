@@ -416,7 +416,7 @@ func (c *Client) GetDeletedNetworks(ctx context.Context) ([]Network, error) {
 	return networks, err
 }
 
-// GetPinnedServerList get a list of pinned servers in a specific network.
+// GetPinnedServerList returns a list of pinned servers in a specific network.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getNetworkPinnedServers
 func (c *Client) GetPinnedServerList(ctx context.Context, networkUUID string) (PinnedServerList, error) {
