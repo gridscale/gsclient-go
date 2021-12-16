@@ -63,7 +63,7 @@ type StorageBackupScheduleProperties struct {
 	// Status of the schedule.
 	Active bool `json:"active"`
 
-	// The UUD of the location where your backup is stored.
+	// The UUID of the location where your backup is stored.
 	BackupLocationUUID string `json:"backup_location_uuid"`
 
 	// The human-readable name of backup location. It supports the full UTF-8 character set, with a maximum of 64 characters.
@@ -107,7 +107,7 @@ type StorageBackupScheduleCreateRequest struct {
 	// Status of the schedule.
 	Active bool `json:"active"`
 
-	// The UUD of the location where your backup is stored.
+	// The UUID of the location where your backup is stored.
 	BackupLocationUUID string `json:"backup_location_uuid,omitempty"`
 }
 
