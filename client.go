@@ -30,6 +30,7 @@ const (
 	apiSSLCertificateBase         = "/objects/certificates"
 	apiProjectLevelUsage          = "/projects/usage"
 	apiContractLevelUsage         = "/contracts/usage"
+	apiBackupLocationBase         = "/objects/backup_locations"
 )
 
 // Client struct of a gridscale golang client.

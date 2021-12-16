@@ -163,6 +163,35 @@ func TestClient_DeleteStorageBackupSchedule(t *testing.T) {
 	}
 }
 
+func TestClient_GetStorageBackupLocationList(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	uri := apiBackupLocationBase
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodGet, request.Method)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
+		fmt.Fprintf(writer, prepareBackupLocationListHTTPGet())
+	})
+	res, err := client.GetStorageBackupLocationList(emptyCtx)
+	assert.Nil(t, err, "GetStorageBackupLocationList returned an error %v", err)
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockBackupLocation()), fmt.Sprintf("%v", res))
+}
+
+func getMockBackupLocation() StorageBackupLocation {
+	mock := StorageBackupLocation{Properties: StorageBackupLocationProperties{
+		ObjectUUID: dummyUUID,
+		Name:       "test backup location",
+	}}
+	return mock
+}
+
+func prepareBackupLocationListHTTPGet() string {
+	location := getMockBackupLocation()
+	res, _ := json.Marshal(location.Properties)
+	return fmt.Sprintf(`{"backup_locations" : {"%s" : %s}}`, dummyUUID, string(res))
+}
+
 func getMockStorageBackupSchedule(status string) StorageBackupSchedule {
 	mock := StorageBackupSchedule{Properties: StorageBackupScheduleProperties{
 		ChangeTime:  dummyTime,
