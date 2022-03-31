@@ -61,10 +61,10 @@ type PaaSServiceProperties struct {
 	// you can use these details to connect internally to a service.
 	ListenPorts map[string]map[string]int `json:"listen_ports"`
 
-	// The UUID of the security zone that the service is running in.
+	// The UUID of the security zone that the service is attached to.
 	SecurityZoneUUID string `json:"security_zone_uuid"`
 
-	// The UUID of the network that the service is running in.
+	// The UUID of the network that the service is attached to.
 	NetworkUUID string `json:"network_uuid"`
 
 	// The template used to create the service, you can find an available list at the /service_templates endpoint.
@@ -121,10 +121,10 @@ type PaaSServiceCreateRequest struct {
 	// The list of labels.
 	Labels []string `json:"labels,omitempty"`
 
-	// The UUID of the security zone that the service is running in.
+	// The UUID of the security zone that the service is attached to.
 	PaaSSecurityZoneUUID string `json:"paas_security_zone_uuid,omitempty"`
 
-	// The UUID of the network that the service is running in.
+	// The UUID of the network that the service is attached to.
 	NetworkUUID string `json:"network_uuid,omitempty"`
 
 	// A list of service resource limits.
@@ -321,7 +321,7 @@ type PaaSServiceUpdateRequest struct {
 	// The template that you want to use in the service, you can find an available list at the /service_templates endpoint.
 	PaaSServiceTemplateUUID string `json:"service_template_uuid,omitempty"`
 
-	// The UUID of the network that the service is running in.
+	// The UUID of the network that the service is attached to.
 	NetworkUUID string `json:"network_uuid,omitempty"`
 }
 
