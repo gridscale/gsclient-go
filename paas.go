@@ -70,6 +70,9 @@ type PaaSServiceProperties struct {
 	// The template used to create the service, you can find an available list at the /service_templates endpoint.
 	ServiceTemplateUUID string `json:"service_template_uuid"`
 
+	// The template category used to create the service.
+	ServiceTemplateCategory string `json:"service_template_category"`
+
 	// Total minutes the object has been running.
 	UsageInMinutes int `json:"usage_in_minutes"`
 
