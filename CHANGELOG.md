@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.9.0 (Apr 5, 2022)
+
+FEATURES:
+- Allow to attach PaaS service to a private network [#216](https://github.com/gridscale/gsclient-go/pull/216).
+
 ## 3.8.1 (Jan 26, 2022)
 
 IMPROVEMENTS:
