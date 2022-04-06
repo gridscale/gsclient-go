@@ -264,12 +264,12 @@ type NetworkUpdateRequest struct {
 	DHCPRange *string `json:"dhcp_range,omitempty"`
 
 	// The ip reserved and communicated by the dhcp service to be the default gateway.
-	DHCPGateway *string `json:"dhcp_gateway"`
+	DHCPGateway *string `json:"dhcp_gateway,omitempty"`
 
-	DHCPDNS *string `json:"dhcp_dns"`
+	DHCPDNS *string `json:"dhcp_dns,omitempty"`
 
 	// Subrange within the ip range.
-	DHCPReservedSubnet *[]string `json:"dhcp_reserved_subnet"`
+	DHCPReservedSubnet *[]string `json:"dhcp_reserved_subnet,omitempty"`
 }
 
 // PinnedServerList hold a list of pinned server with corresponding DCHP IP.
