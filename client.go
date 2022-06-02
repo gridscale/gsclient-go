@@ -15,7 +15,7 @@ const (
 	apiStorageBase                = "/objects/storages"
 	apiNetworkBase                = "/objects/networks"
 	apiIPBase                     = "/objects/ips"
-	apiSshkeyBase                 = "/objects/sshkeys"
+	apiSSHKeyBase                 = "/objects/sshkeys"
 	apiTemplateBase               = "/objects/templates"
 	apiLoadBalancerBase           = "/objects/loadbalancers"
 	apiPaaSBase                   = "/objects/paas"

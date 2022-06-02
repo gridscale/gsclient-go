@@ -13,13 +13,13 @@ import (
 func TestClient_GetSshkeyList(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	uri := apiSshkeyBase
+	uri := apiSSHKeyBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareSshkeyListHTTPGet())
 	})
-	res, err := client.GetSshkeyList(emptyCtx)
+	res, err := client.GetSSHKeyList(emptyCtx)
 	assert.Nil(t, err, "GetSshkeyList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, fmt.Sprintf("[%v]", getMockSshkey("active")), fmt.Sprintf("%v", res))
@@ -28,14 +28,14 @@ func TestClient_GetSshkeyList(t *testing.T) {
 func TestClient_GetSshkey(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	uri := path.Join(apiSshkeyBase, dummyUUID)
+	uri := path.Join(apiSSHKeyBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprintf(writer, prepareSshkeyHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetSshkey(emptyCtx, test.testUUID)
+		res, err := client.GetSSHKey(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -49,7 +49,7 @@ func TestClient_CreateSshkey(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
-	uri := apiSshkeyBase
+	uri := apiSSHKeyBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPost, request.Method)
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
@@ -61,11 +61,11 @@ func TestClient_CreateSshkey(t *testing.T) {
 	})
 	for _, test := range commonSuccessFailTestCases {
 		isFailed = test.isFailed
-		response, err := client.CreateSshkey(
+		response, err := client.CreateSSHKey(
 			emptyCtx,
-			SshkeyCreateRequest{
+			SSHKeyCreateRequest{
 				Name:   "test",
-				Sshkey: "example",
+				SSHKey: "example",
 				Labels: []string{"label"},
 			})
 		if isFailed {
@@ -81,7 +81,7 @@ func TestClient_UpdateSshkey(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
-	uri := path.Join(apiSshkeyBase, dummyUUID)
+	uri := path.Join(apiSSHKeyBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
@@ -97,12 +97,12 @@ func TestClient_UpdateSshkey(t *testing.T) {
 	for _, serverTest := range commonSuccessFailTestCases {
 		isFailed = serverTest.isFailed
 		for _, test := range uuidCommonTestCases {
-			err := client.UpdateSshkey(
+			err := client.UpdateSSHKey(
 				emptyCtx,
 				test.testUUID,
-				SshkeyUpdateRequest{
+				SSHKeyUpdateRequest{
 					Name:   "test",
-					Sshkey: "example",
+					SSHKey: "example",
 				})
 			if test.isFailed || isFailed {
 				assert.NotNil(t, err)
@@ -117,7 +117,7 @@ func TestClient_DeleteSshkey(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
-	uri := path.Join(apiSshkeyBase, dummyUUID)
+	uri := path.Join(apiSSHKeyBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
@@ -133,7 +133,7 @@ func TestClient_DeleteSshkey(t *testing.T) {
 	for _, serverTest := range commonSuccessFailTestCases {
 		isFailed = serverTest.isFailed
 		for _, test := range uuidCommonTestCases {
-			err := client.DeleteSshkey(emptyCtx, test.testUUID)
+			err := client.DeleteSSHKey(emptyCtx, test.testUUID)
 			if test.isFailed || isFailed {
 				assert.NotNil(t, err)
 			} else {
@@ -146,14 +146,14 @@ func TestClient_DeleteSshkey(t *testing.T) {
 func TestClient_GetSshkeyEventList(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
-	uri := path.Join(apiSshkeyBase, dummyUUID, "events")
+	uri := path.Join(apiSSHKeyBase, dummyUUID, "events")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		fmt.Fprint(writer, prepareEventListHTTPGet())
 	})
 	for _, test := range uuidCommonTestCases {
-		res, err := client.GetSshkeyEventList(emptyCtx, test.testUUID)
+		res, err := client.GetSSHKeyEventList(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
@@ -164,14 +164,14 @@ func TestClient_GetSshkeyEventList(t *testing.T) {
 	}
 }
 
-func getMockSshkey(status string) Sshkey {
-	mock := Sshkey{Properties: SshkeyProperties{
+func getMockSshkey(status string) SSHKey {
+	mock := SSHKey{Properties: SSHKeyProperties{
 		Name:       "test",
 		ObjectUUID: dummyUUID,
 		Status:     status,
 		CreateTime: dummyTime,
 		ChangeTime: dummyTime,
-		Sshkey:     "example",
+		SSHKey:     "example",
 		Labels:     []string{"label"},
 		UserUUID:   dummyUUID,
 	}}

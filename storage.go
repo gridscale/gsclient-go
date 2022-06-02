@@ -202,7 +202,7 @@ type StorageAndSnapshotScheduleRelation struct {
 // the storage should be attached to a server later to create an Ubuntu 20.04 server.
 type StorageTemplate struct {
 	// List of SSH key UUIDs. Optional.
-	Sshkeys []string `json:"sshkeys,omitempty"`
+	SSHKeys []string `json:"sshkeys,omitempty"`
 
 	// The UUID of a template (public or private).
 	TemplateUUID string `json:"template_uuid"`
