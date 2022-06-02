@@ -10,42 +10,42 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestClient_GetSshkeyList(t *testing.T) {
+func TestClient_GetSSHKeyList(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := apiSSHKeyBase
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
-		fmt.Fprintf(writer, prepareSshkeyListHTTPGet())
+		fmt.Fprintf(writer, prepareSSHKeyListHTTPGet())
 	})
 	res, err := client.GetSSHKeyList(emptyCtx)
-	assert.Nil(t, err, "GetSshkeyList returned an error %v", err)
+	assert.Nil(t, err, "GetSSHKeyList returned an error %v", err)
 	assert.Equal(t, 1, len(res))
-	assert.Equal(t, fmt.Sprintf("[%v]", getMockSshkey("active")), fmt.Sprintf("%v", res))
+	assert.Equal(t, fmt.Sprintf("[%v]", getMockSSHKey("active")), fmt.Sprintf("%v", res))
 }
 
-func TestClient_GetSshkey(t *testing.T) {
+func TestClient_GetSSHKey(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiSSHKeyBase, dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodGet, request.Method)
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
-		fmt.Fprintf(writer, prepareSshkeyHTTPGet("active"))
+		fmt.Fprintf(writer, prepareSSHKeyHTTPGet("active"))
 	})
 	for _, test := range uuidCommonTestCases {
 		res, err := client.GetSSHKey(emptyCtx, test.testUUID)
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
-			assert.Nil(t, err, "GetSshkey returned an error %v", err)
-			assert.Equal(t, fmt.Sprintf("%v", getMockSshkey("active")), fmt.Sprintf("%v", res))
+			assert.Nil(t, err, "GetSSHKey returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockSSHKey("active")), fmt.Sprintf("%v", res))
 		}
 	}
 }
 
-func TestClient_CreateSshkey(t *testing.T) {
+func TestClient_CreateSSHKey(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
@@ -56,7 +56,7 @@ func TestClient_CreateSshkey(t *testing.T) {
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
-			fmt.Fprintf(writer, prepareSshkeyCreateResponse())
+			fmt.Fprintf(writer, prepareSSHKeyCreateResponse())
 		}
 	})
 	for _, test := range commonSuccessFailTestCases {
@@ -71,13 +71,13 @@ func TestClient_CreateSshkey(t *testing.T) {
 		if isFailed {
 			assert.NotNil(t, err)
 		} else {
-			assert.Nil(t, err, "CreateSshkey returned an error %v", err)
-			assert.Equal(t, fmt.Sprintf("%v", getMockSshkeyCreateResponse()), fmt.Sprintf("%s", response))
+			assert.Nil(t, err, "CreateSSHKey returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockSSHKeyCreateResponse()), fmt.Sprintf("%s", response))
 		}
 	}
 }
 
-func TestClient_UpdateSshkey(t *testing.T) {
+func TestClient_UpdateSSHKey(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
@@ -90,7 +90,7 @@ func TestClient_UpdateSshkey(t *testing.T) {
 			if request.Method == http.MethodPatch {
 				fmt.Fprintf(writer, "")
 			} else if request.Method == http.MethodGet {
-				fmt.Fprint(writer, prepareSshkeyHTTPGet("active"))
+				fmt.Fprint(writer, prepareSSHKeyHTTPGet("active"))
 			}
 		}
 	})
@@ -107,13 +107,13 @@ func TestClient_UpdateSshkey(t *testing.T) {
 			if test.isFailed || isFailed {
 				assert.NotNil(t, err)
 			} else {
-				assert.Nil(t, err, "UpdateSshkey returned an error %v", err)
+				assert.Nil(t, err, "UpdateSSHKey returned an error %v", err)
 			}
 		}
 	}
 }
 
-func TestClient_DeleteSshkey(t *testing.T) {
+func TestClient_DeleteSSHKey(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
@@ -137,13 +137,13 @@ func TestClient_DeleteSshkey(t *testing.T) {
 			if test.isFailed || isFailed {
 				assert.NotNil(t, err)
 			} else {
-				assert.Nil(t, err, "DeleteSshkey returned an error %v", err)
+				assert.Nil(t, err, "DeleteSSHKey returned an error %v", err)
 			}
 		}
 	}
 }
 
-func TestClient_GetSshkeyEventList(t *testing.T) {
+func TestClient_GetSSHKeyEventList(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	uri := path.Join(apiSSHKeyBase, dummyUUID, "events")
@@ -157,14 +157,14 @@ func TestClient_GetSshkeyEventList(t *testing.T) {
 		if test.isFailed {
 			assert.NotNil(t, err)
 		} else {
-			assert.Nil(t, err, "GetSshkeyEventList returned an error %v", err)
+			assert.Nil(t, err, "GetSSHKeyEventList returned an error %v", err)
 			assert.Equal(t, 1, len(res))
 			assert.Equal(t, fmt.Sprintf("[%v]", getMockEvent()), fmt.Sprintf("%v", res))
 		}
 	}
 }
 
-func getMockSshkey(status string) SSHKey {
+func getMockSSHKey(status string) SSHKey {
 	mock := SSHKey{Properties: SSHKeyProperties{
 		Name:       "test",
 		ObjectUUID: dummyUUID,
@@ -178,7 +178,7 @@ func getMockSshkey(status string) SSHKey {
 	return mock
 }
 
-func getMockSshkeyCreateResponse() CreateResponse {
+func getMockSSHKeyCreateResponse() CreateResponse {
 	mock := CreateResponse{
 		ObjectUUID:  dummyUUID,
 		RequestUUID: dummyRequestUUID,
@@ -186,20 +186,20 @@ func getMockSshkeyCreateResponse() CreateResponse {
 	return mock
 }
 
-func prepareSshkeyListHTTPGet() string {
-	key := getMockSshkey("active")
+func prepareSSHKeyListHTTPGet() string {
+	key := getMockSSHKey("active")
 	res, _ := json.Marshal(key.Properties)
 	return fmt.Sprintf(`{"sshkeys": {"%s": %s}}`, dummyUUID, string(res))
 }
 
-func prepareSshkeyHTTPGet(status string) string {
-	key := getMockSshkey(status)
+func prepareSSHKeyHTTPGet(status string) string {
+	key := getMockSSHKey(status)
 	res, _ := json.Marshal(key)
 	return string(res)
 }
 
-func prepareSshkeyCreateResponse() string {
-	response := getMockSshkeyCreateResponse()
+func prepareSSHKeyCreateResponse() string {
+	response := getMockSSHKeyCreateResponse()
 	res, _ := json.Marshal(response)
 	return string(res)
 }
