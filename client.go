@@ -46,8 +46,8 @@ func NewClient(c *Config) *Client {
 	return client
 }
 
-// HttpClient returns http client.
-func (c *Client) HttpClient() *http.Client {
+// HTTPClient returns http client.
+func (c *Client) HTTPClient() *http.Client {
 	return c.cfg.httpClient
 }
 
