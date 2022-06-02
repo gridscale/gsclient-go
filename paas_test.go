@@ -399,7 +399,6 @@ func getMockPaaSService(status string) PaaSService {
 			SecurityZoneUUID:    "d711fc50-ad96-4070-b769-6fe2bf93792c",
 			ServiceTemplateUUID: "504e2d11-7255-4712-b744-fcb093a4e613",
 			UsageInMinutes:      999,
-			CurrentPrice:        5.789,
 			ChangeTime:          dummyTime,
 			Status:              status,
 			Name:                "test",

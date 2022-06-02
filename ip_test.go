@@ -246,7 +246,6 @@ func getMockIP(status string) IP {
 		IP:              "192.168.0.1",
 		DeleteBlock:     false,
 		UsagesInMinutes: 10,
-		CurrentPrice:    0.9,
 		Labels:          []string{"label"},
 		Relations: IPRelations{
 			Loadbalancers: []IPLoadbalancer{

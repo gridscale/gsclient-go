@@ -228,7 +228,6 @@ func getMockISOImage(status string) ISOImage {
 		Private:         false,
 		ChangeTime:      dummyTime,
 		Capacity:        10,
-		CurrentPrice:    9.99,
 	}}
 	return mock
 }

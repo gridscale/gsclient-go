@@ -76,9 +76,6 @@ type PaaSServiceProperties struct {
 	// Total minutes the object has been running.
 	UsageInMinutes int `json:"usage_in_minutes"`
 
-	// **DEPRECATED** The price for the current period since the last bill.
-	CurrentPrice float64 `json:"current_price"`
-
 	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
 

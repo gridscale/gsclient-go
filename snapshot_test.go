@@ -279,7 +279,6 @@ func getMockStorageSnapshot(status string) StorageSnapshot {
 		LocationUUID:     dummyUUID,
 		ChangeTime:       dummyTime,
 		LicenseProductNo: 20,
-		CurrentPrice:     0.5,
 		CreateTime:       dummyTime,
 		Capacity:         10,
 		LocationName:     "Cologne",
