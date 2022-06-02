@@ -397,7 +397,6 @@ func getMockServer(power bool, status string) Server {
 		Status:               status,
 		LocationUUID:         dummyUUID,
 		Power:                power,
-		CurrentPrice:         9.5,
 		AvailabilityZone:     "",
 		AutoRecovery:         true,
 		Legacy:               false,

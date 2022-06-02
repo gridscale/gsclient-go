@@ -273,7 +273,6 @@ func getMockStorage(status string) Storage {
 		LocationCountry:  "Germany",
 		UsageInMinutes:   10,
 		LastUsedTemplate: dummyUUID,
-		CurrentPrice:     9.1,
 		Capacity:         10,
 		LocationUUID:     dummyUUID,
 		StorageType:      "storage",

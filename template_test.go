@@ -248,7 +248,6 @@ func getMockTemplate(status string) Template {
 		LocationName:     "Cologne",
 		Distro:           "Centos7",
 		Description:      "description",
-		CurrentPrice:     0,
 		LocationCountry:  "Germany",
 		Name:             "test",
 		Labels:           []string{"label"},
