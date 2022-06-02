@@ -210,12 +210,12 @@ Not all endpoints have been implemented in this client, but new ones will be add
   * IP Events Get (GetIPEventList)
   * IP Version Get (GetIPVersion)
 * SSH-Keys
-  * SSH-Keys Get (GetSshkeyList)
-  * SSH-Key Get (GetSshkey)
-  * SSH-Key Create (CreateSshkey)
-  * SSH-Key Patch (UpdateSshkey)
-  * SSH-Key Delete (DeleteSshkey)
-  * SSH-Key's events Get (GetSshkeyEventList)
+  * SSH-Keys Get (GetSSHKeyList)
+  * SSH-Key Get (GetSSHKey)
+  * SSH-Key Create (CreateSSHKey)
+  * SSH-Key Patch (UpdateSSHKey)
+  * SSH-Key Delete (DeleteSSHKey)
+  * SSH-Key's events Get (GetSSHKeyEventList)
 * Template
   * Templates Get (GetTemplateList)
   * Template Get (GetTemplate)

@@ -15,7 +15,7 @@ const (
 	apiStorageBase                = "/objects/storages"
 	apiNetworkBase                = "/objects/networks"
 	apiIPBase                     = "/objects/ips"
-	apiSshkeyBase                 = "/objects/sshkeys"
+	apiSSHKeyBase                 = "/objects/sshkeys"
 	apiTemplateBase               = "/objects/templates"
 	apiLoadBalancerBase           = "/objects/loadbalancers"
 	apiPaaSBase                   = "/objects/paas"
@@ -46,8 +46,8 @@ func NewClient(c *Config) *Client {
 	return client
 }
 
-// HttpClient returns http client.
-func (c *Client) HttpClient() *http.Client {
+// HTTPClient returns http client.
+func (c *Client) HTTPClient() *http.Client {
 	return c.cfg.httpClient
 }
 

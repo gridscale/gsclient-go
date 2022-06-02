@@ -526,7 +526,7 @@ const (
 	ContractLevelUsage = iota
 )
 
-var invalidUsageQueryLevel = errors.New("invalid Usage query level. Valid values: `gslclient.ProjectLevelUsage`, and `gslclient.ContractLevelUsage`")
+var errInvalidUsageQueryLevel = errors.New("invalid Usage query level. Valid values: `gslclient.ProjectLevelUsage`, and `gslclient.ContractLevelUsage`")
 
 // GetGeneralUsage returns general usage of all resources in project/contract level.
 // Args:
@@ -553,7 +553,7 @@ func (c *Client) GetGeneralUsage(ctx context.Context, queryLevel usageQueryLevel
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return GeneralUsage{}, invalidUsageQueryLevel
+		return GeneralUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 uri,
@@ -591,7 +591,7 @@ func (c *Client) GetServersUsage(ctx context.Context, queryLevel usageQueryLevel
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return ServersUsage{}, invalidUsageQueryLevel
+		return ServersUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "servers"),
@@ -629,7 +629,7 @@ func (c *Client) GetDistributedStoragesUsage(ctx context.Context, queryLevel usa
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return DistributedStoragesUsage{}, invalidUsageQueryLevel
+		return DistributedStoragesUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "distributed_storages"),
@@ -666,7 +666,7 @@ func (c *Client) GetRocketStoragesUsage(ctx context.Context, queryLevel usageQue
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return RocketStoragesUsage{}, invalidUsageQueryLevel
+		return RocketStoragesUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "rocket_storages"),
@@ -704,7 +704,7 @@ func (c *Client) GetStorageBackupsUsage(ctx context.Context, queryLevel usageQue
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return StorageBackupsUsage{}, invalidUsageQueryLevel
+		return StorageBackupsUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "storage_backups"),
@@ -742,7 +742,7 @@ func (c *Client) GetSnapshotsUsage(ctx context.Context, queryLevel usageQueryLev
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return SnapshotsUsage{}, invalidUsageQueryLevel
+		return SnapshotsUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "snapshots"),
@@ -780,7 +780,7 @@ func (c *Client) GetTemplatesUsage(ctx context.Context, queryLevel usageQueryLev
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return TemplatesUsage{}, invalidUsageQueryLevel
+		return TemplatesUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "templates"),
@@ -818,7 +818,7 @@ func (c *Client) GetISOImagesUsage(ctx context.Context, queryLevel usageQueryLev
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return ISOImagesUsage{}, invalidUsageQueryLevel
+		return ISOImagesUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "iso_images"),
@@ -856,7 +856,7 @@ func (c *Client) GetIPsUsage(ctx context.Context, queryLevel usageQueryLevel, fr
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return IPsUsage{}, invalidUsageQueryLevel
+		return IPsUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "ip_addresses"),
@@ -894,7 +894,7 @@ func (c *Client) GetLoadBalancersUsage(ctx context.Context, queryLevel usageQuer
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return LoadBalancersUsage{}, invalidUsageQueryLevel
+		return LoadBalancersUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "load_balancers"),
@@ -932,7 +932,7 @@ func (c *Client) GetPaaSServicesUsage(ctx context.Context, queryLevel usageQuery
 	case ContractLevelUsage:
 		uri = apiContractLevelUsage
 	default:
-		return PaaSServicesUsage{}, invalidUsageQueryLevel
+		return PaaSServicesUsage{}, errInvalidUsageQueryLevel
 	}
 	r := gsRequest{
 		uri:                 path.Join(uri, "paas_services"),

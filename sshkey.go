@@ -9,30 +9,30 @@ import (
 
 // SSHKeyOperator provides an interface for operations on SSH keys.
 type SSHKeyOperator interface {
-	GetSshkey(ctx context.Context, id string) (Sshkey, error)
-	GetSshkeyList(ctx context.Context) ([]Sshkey, error)
-	CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (CreateResponse, error)
-	DeleteSshkey(ctx context.Context, id string) error
-	UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateRequest) error
-	GetSshkeyEventList(ctx context.Context, id string) ([]Event, error)
+	GetSSHKey(ctx context.Context, id string) (SSHKey, error)
+	GetSSHKeyList(ctx context.Context) ([]SSHKey, error)
+	CreateSSHKey(ctx context.Context, body SSHKeyCreateRequest) (CreateResponse, error)
+	DeleteSSHKey(ctx context.Context, id string) error
+	UpdateSSHKey(ctx context.Context, id string, body SSHKeyUpdateRequest) error
+	GetSSHKeyEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-// SshkeyList holds a list of SSH keys.
-type SshkeyList struct {
+// SSHKeyList holds a list of SSH keys.
+type SSHKeyList struct {
 	// Array of SSH keys.
-	List map[string]SshkeyProperties `json:"sshkeys"`
+	List map[string]SSHKeyProperties `json:"sshkeys"`
 }
 
-// Sshkey represents a single SSH key.
-type Sshkey struct {
+// SSHKey represents a single SSH key.
+type SSHKey struct {
 	// Properties of a SSH key.
-	Properties SshkeyProperties `json:"sshkey"`
+	Properties SSHKeyProperties `json:"sshkey"`
 }
 
-// SshkeyProperties holds properties of a single SSH key.
+// SSHKeyProperties holds properties of a single SSH key.
 // A SSH key can be retrieved when creating new storages and attaching them to
 // servers.
-type SshkeyProperties struct {
+type SSHKeyProperties struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
@@ -49,7 +49,7 @@ type SshkeyProperties struct {
 	ChangeTime GSTime `json:"change_time"`
 
 	// The OpenSSH public key string (all key types are supported => ed25519, ecdsa, dsa, rsa, rsa1).
-	Sshkey string `json:"sshkey"`
+	SSHKey string `json:"sshkey"`
 
 	// List of labels.
 	Labels []string `json:"labels"`
@@ -58,73 +58,73 @@ type SshkeyProperties struct {
 	UserUUID string `json:"user_uuid"`
 }
 
-// SshkeyCreateRequest represents a request for creating a SSH key.
-type SshkeyCreateRequest struct {
+// SSHKeyCreateRequest represents a request for creating a SSH key.
+type SSHKeyCreateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	// The OpenSSH public key string (all key types are supported => ed25519, ecdsa, dsa, rsa, rsa1).
-	Sshkey string `json:"sshkey"`
+	SSHKey string `json:"sshkey"`
 
 	// List of labels. Optional.
 	Labels []string `json:"labels,omitempty"`
 }
 
-// SshkeyUpdateRequest represents a request for updating a SSH key.
-type SshkeyUpdateRequest struct {
+// SSHKeyUpdateRequest represents a request for updating a SSH key.
+type SSHKeyUpdateRequest struct {
 	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	// Optional.
 	Name string `json:"name,omitempty"`
 
 	// The OpenSSH public key string (all key types are supported => ed25519, ecdsa, dsa, rsa, rsa1). Optional.
-	Sshkey string `json:"sshkey,omitempty"`
+	SSHKey string `json:"sshkey,omitempty"`
 
 	// List of labels. Optional.
 	Labels *[]string `json:"labels,omitempty"`
 }
 
-// GetSshkey gets a single SSH key object.
+// GetSSHKey gets a single SSH key object.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKey
-func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
+func (c *Client) GetSSHKey(ctx context.Context, id string) (SSHKey, error) {
 	if !isValidUUID(id) {
-		return Sshkey{}, errors.New("'id' is invalid")
+		return SSHKey{}, errors.New("'id' is invalid")
 	}
 	r := gsRequest{
-		uri:                 path.Join(apiSshkeyBase, id),
+		uri:                 path.Join(apiSSHKeyBase, id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
 	}
-	var response Sshkey
+	var response SSHKey
 	err := r.execute(ctx, *c, &response)
 	return response, err
 }
 
-// GetSshkeyList gets the list of SSH keys in the project.
+// GetSSHKeyList gets the list of SSH keys in the project.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeys
-func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
+func (c *Client) GetSSHKeyList(ctx context.Context) ([]SSHKey, error) {
 	r := gsRequest{
-		uri:                 apiSshkeyBase,
+		uri:                 apiSSHKeyBase,
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
 	}
 
-	var response SshkeyList
-	var sshKeys []Sshkey
+	var response SSHKeyList
+	var sshKeys []SSHKey
 	err := r.execute(ctx, *c, &response)
 	for _, properties := range response.List {
-		sshKeys = append(sshKeys, Sshkey{Properties: properties})
+		sshKeys = append(sshKeys, SSHKey{Properties: properties})
 	}
 	return sshKeys, err
 }
 
-// CreateSshkey creates a new SSH key.
+// CreateSSHKey creates a new SSH key.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/createSshKey
-func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (CreateResponse, error) {
+func (c *Client) CreateSSHKey(ctx context.Context, body SSHKeyCreateRequest) (CreateResponse, error) {
 	r := gsRequest{
-		uri:    apiSshkeyBase,
+		uri:    apiSSHKeyBase,
 		method: "POST",
 		body:   body,
 	}
@@ -133,44 +133,44 @@ func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (Cr
 	return response, err
 }
 
-// DeleteSshkey removes a single SSH key.
+// DeleteSSHKey removes a single SSH key.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/deleteSshKey
-func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
+func (c *Client) DeleteSSHKey(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	r := gsRequest{
-		uri:    path.Join(apiSshkeyBase, id),
+		uri:    path.Join(apiSSHKeyBase, id),
 		method: http.MethodDelete,
 	}
 	return r.execute(ctx, *c, nil)
 }
 
-// UpdateSshkey updates a SSH key.
+// UpdateSSHKey updates a SSH key.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/updateSshKey
-func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateRequest) error {
+func (c *Client) UpdateSSHKey(ctx context.Context, id string, body SSHKeyUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	r := gsRequest{
-		uri:    path.Join(apiSshkeyBase, id),
+		uri:    path.Join(apiSSHKeyBase, id),
 		method: http.MethodPatch,
 		body:   body,
 	}
 	return r.execute(ctx, *c, nil)
 }
 
-// GetSshkeyEventList gets a SSH key's events.
+// GetSSHKeyEventList gets a SSH key's events.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeyEvents
-func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, error) {
+func (c *Client) GetSSHKeyEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
 	r := gsRequest{
-		uri:                 path.Join(apiSshkeyBase, id, "events"),
+		uri:                 path.Join(apiSSHKeyBase, id, "events"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
 	}

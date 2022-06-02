@@ -23,11 +23,11 @@ func main() {
 
 	log.Info("Create SSH-key: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	cSSHkey, err := client.CreateSshkey(
+	cSSHkey, err := client.CreateSSHKey(
 		emptyCtx,
-		gsclient.SshkeyCreateRequest{
+		gsclient.SSHKeyCreateRequest{
 			Name:   "go-client-ssh-key",
-			Sshkey: exampleSSHkey,
+			SSHKey: exampleSSHkey,
 		})
 	if err != nil {
 		log.Error("Create SSH-key has failed with error", err)
@@ -37,7 +37,7 @@ func main() {
 		"sshkey_uuid": cSSHkey.ObjectUUID,
 	}).Info("SSH-key successfully created")
 	defer func() {
-		err := client.DeleteSshkey(emptyCtx, cSSHkey.ObjectUUID)
+		err := client.DeleteSSHKey(emptyCtx, cSSHkey.ObjectUUID)
 		if err != nil {
 			log.Error("Delete SSH-key has failed with error", err)
 			return
@@ -46,7 +46,7 @@ func main() {
 	}()
 
 	// Get a SSH-key to update
-	sshkey, err := client.GetSshkey(emptyCtx, cSSHkey.ObjectUUID)
+	sshkey, err := client.GetSSHKey(emptyCtx, cSSHkey.ObjectUUID)
 	if err != nil {
 		log.Error("Get SSH-key has failed with error", err)
 		return
@@ -54,12 +54,12 @@ func main() {
 
 	log.Info("Update SSH-key: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	err = client.UpdateSshkey(
+	err = client.UpdateSSHKey(
 		emptyCtx,
 		sshkey.Properties.ObjectUUID,
-		gsclient.SshkeyUpdateRequest{
+		gsclient.SSHKeyUpdateRequest{
 			Name:   "updated SSH-key",
-			Sshkey: sshkey.Properties.Sshkey,
+			SSHKey: sshkey.Properties.SSHKey,
 			Labels: &sshkey.Properties.Labels,
 		})
 	if err != nil {
@@ -70,7 +70,7 @@ func main() {
 
 	log.Info("Get SSH-key's events: Press 'Enter' to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	events, err := client.GetSshkeyEventList(emptyCtx, sshkey.Properties.ObjectUUID)
+	events, err := client.GetSSHKeyEventList(emptyCtx, sshkey.Properties.ObjectUUID)
 	if err != nil {
 		log.Error("Get SSH-key's events has failed with error", err)
 		return
