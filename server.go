@@ -348,7 +348,7 @@ type USBController string
 // All available USB controllers.
 const (
 	NecXHCIUSBController   USBController = "nec_xhci"
-	Piix3UHCIUSBController USBController = "piix3_uhc"
+	Piix3UHCIUSBController USBController = "piix3_uhci"
 )
 
 type NetworkModel string
