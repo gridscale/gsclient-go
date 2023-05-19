@@ -66,8 +66,59 @@ func TestClient_CreateObjectStorageAccessKey(t *testing.T) {
 		if isFailed {
 			assert.NotNil(t, err)
 		} else {
-			assert.Nil(t, err, "DeleteObjectStorageAccessKey returned an error %v", err)
+			assert.Nil(t, err, "CreateObjectStorageAccessKey returned an error %v", err)
 			assert.Equal(t, fmt.Sprintf("%v", getMockObjectStorageAccessKeyCreateResponse()), fmt.Sprintf("%v", res))
+		}
+	}
+}
+
+func TestClient_AdvancedCreateObjectStorageAccessKey(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiObjectStorageBase, "access_keys")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodPost, request.Method)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			fmt.Fprint(writer, prepareObjectStorageAccessKeyHTTPCreateResponse())
+		}
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		res, err := client.AdvancedCreateObjectStorageAccessKey(emptyCtx, ObjectStorageAccessKeyCreateRequest{})
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "AdvancedCreateObjectStorageAccessKey returned an error %v", err)
+			assert.Equal(t, fmt.Sprintf("%v", getMockObjectStorageAccessKeyCreateResponse()), fmt.Sprintf("%v", res))
+		}
+	}
+}
+
+func TestClient_UpdateObjectStorageAccessKey(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiObjectStorageBase, "access_keys")
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, http.MethodPost, request.Method)
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			fmt.Fprint(writer, prepareObjectStorageAccessKeyHTTPCreateResponse())
+		}
+	})
+	for _, test := range commonSuccessFailTestCases {
+		isFailed = test.isFailed
+		err := client.UpdateObjectStorageAccessKey(emptyCtx, dummyUUID, ObjectStorageAccessKeyUpdateRequest{})
+		if isFailed {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err, "AdvancedCreateObjectStorageAccessKey returned an error %v", err)
 		}
 	}
 }
