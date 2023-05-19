@@ -102,16 +102,21 @@ func TestClient_UpdateObjectStorageAccessKey(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
 	var isFailed bool
-	uri := path.Join(apiObjectStorageBase, "access_keys")
+	uri := path.Join(apiObjectStorageBase, "access_keys", dummyUUID)
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, http.MethodPatch, request.Method)
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
-			fmt.Fprint(writer, prepareObjectStorageAccessKeyHTTPCreateResponse())
+			if request.Method == http.MethodPatch {
+				fmt.Fprintf(writer, "")
+			} else if request.Method == http.MethodGet {
+				fmt.Fprint(writer, prepareNetworkHTTPGet("active"))
+			}
 		}
 	})
+
 	for _, test := range commonSuccessFailTestCases {
 		isFailed = test.isFailed
 		err := client.UpdateObjectStorageAccessKey(emptyCtx, dummyUUID, ObjectStorageAccessKeyUpdateRequest{})
