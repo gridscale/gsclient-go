@@ -109,11 +109,7 @@ func TestClient_UpdateObjectStorageAccessKey(t *testing.T) {
 		if isFailed {
 			writer.WriteHeader(400)
 		} else {
-			if request.Method == http.MethodPatch {
-				fmt.Fprintf(writer, "")
-			} else if request.Method == http.MethodGet {
-				fmt.Fprint(writer, prepareNetworkHTTPGet("active"))
-			}
+			writer.WriteHeader(204)
 		}
 	})
 
