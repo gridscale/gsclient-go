@@ -104,7 +104,7 @@ func TestClient_UpdateObjectStorageAccessKey(t *testing.T) {
 	var isFailed bool
 	uri := path.Join(apiObjectStorageBase, "access_keys")
 	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
-		assert.Equal(t, http.MethodPost, request.Method)
+		assert.Equal(t, http.MethodPatch, request.Method)
 		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
 		if isFailed {
 			writer.WriteHeader(400)
