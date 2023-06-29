@@ -203,8 +203,9 @@ func getMockLoadbalancer(status string) LoadBalancer {
 			},
 			BackendServers: []BackendServer{
 				{
-					Weight: 100,
-					Host:   "185.201.147.176",
+					Weight:        100,
+					Host:          "185.201.147.176",
+					ProxyProtocol: "v1",
 				},
 			},
 			Labels: labels,
