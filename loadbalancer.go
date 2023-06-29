@@ -98,7 +98,7 @@ type BackendServer struct {
 	Host string `json:"host"`
 
 	// Proxy protocol version
-	ProxyProtocol string `json:"proxy_protocol,omitempty"`
+	ProxyProtocol *string `json:"proxy_protocol,omitempty"`
 }
 
 // ForwardingRule represents a forwarding rule.
