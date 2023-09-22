@@ -114,6 +114,43 @@ func TestClient_UpdateNetwork(t *testing.T) {
 	}
 }
 
+func TestClient_PutUpdateNetwork(t *testing.T) {
+	server, client, mux := setupTestClient(true)
+	defer server.Close()
+	var isFailed bool
+	uri := path.Join(apiNetworkBase, dummyUUID)
+	mux.HandleFunc(uri, func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set(requestUUIDHeader, dummyRequestUUID)
+		if isFailed {
+			writer.WriteHeader(400)
+		} else {
+			if request.Method == http.MethodPatch {
+				fmt.Fprintf(writer, "")
+			} else if request.Method == http.MethodGet {
+				fmt.Fprint(writer, prepareNetworkHTTPGet("active"))
+			}
+		}
+	})
+	for _, serverTest := range commonSuccessFailTestCases {
+		isFailed = serverTest.isFailed
+		for _, test := range uuidCommonTestCases {
+			err := client.PutUpdateNetwork(
+				emptyCtx,
+				test.testUUID,
+				NetworkUpdatePutRequest{
+					Name:       "test",
+					L2Security: false,
+					Labels:     &[]string{"label"},
+				})
+			if test.isFailed || isFailed {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err, "PutUpdateNetwork returned an error %v", err)
+			}
+		}
+	}
+}
+
 func TestClient_DeleteNetwork(t *testing.T) {
 	server, client, mux := setupTestClient(true)
 	defer server.Close()
