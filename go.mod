@@ -1,6 +1,6 @@
 module github.com/gridscale/gsclient-go/v3
 
-go 1.16
+go 1.21
 
 require (
 	github.com/google/uuid v1.2.0
