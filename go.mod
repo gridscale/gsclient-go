@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/google/uuid v1.2.0
-	github.com/sirupsen/logrus v1.7.0
+	github.com/sirupsen/logrus v1.8.3
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/net v0.23.0
 )
